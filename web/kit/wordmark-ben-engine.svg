@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="520" height="120" role="img" aria-label="BEN Engine by Schreiber AI">
+  <rect width="520" height="120" rx="16" fill="#0B1018"/>
+  <text x="28" y="72" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="56" font-weight="800" fill="#EDF4FF" letter-spacing="2">BEN</text>
+  <text x="170" y="72" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="56" font-weight="300" fill="#66E3FF">Engine</text>
+  <text x="30" y="100" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="16" fill="#9FB3CC" letter-spacing="4">BUSINESS EDGE NODE · SCHREIBER AI</text>
+  <circle cx="486" cy="40" r="7" fill="#FFC66D"/>
+</svg>

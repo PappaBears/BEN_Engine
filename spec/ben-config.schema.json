@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreiberai.com/schemas/ben-config.schema.json",
+  "title": "BEN Engine configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tier",
+    "profile",
+    "it_kw",
+    "racks",
+    "cooling",
+    "redundancy",
+    "climate"
+  ],
+  "properties": {
+    "tier": {
+      "enum": [
+        "micro",
+        "ben10",
+        "ben20",
+        "ben40"
+      ],
+      "description": "Enclosure tier"
+    },
+    "profile": {
+      "enum": [
+        "ai_inference",
+        "ai_training",
+        "private_cloud",
+        "disaster_recovery",
+        "industrial_ot",
+        "healthcare",
+        "public_sector",
+        "off_grid"
+      ]
+    },
+    "it_kw": {
+      "type": "number",
+      "minimum": 2,
+      "maximum": 500
+    },
+    "racks": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "cooling": {
+      "enum": [
+        "cabinet_dx",
+        "inrow_dx",
+        "rdhx_drycooler",
+        "dlc_cdu"
+      ]
+    },
+    "redundancy": {
+      "enum": [
+        "N",
+        "N+1",
+        "2N"
+      ]
+    },
+    "climate": {
+      "enum": [
+        "temperate",
+        "hot_arid",
+        "hot_humid",
+        "cold",
+        "coastal",
+        "high_altitude"
+      ]
+    },
+    "subsystems": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "power",
+          "cooling",
+          "compute",
+          "controls"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "white_label": {
+      "type": "boolean"
+    },
+    "brand": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "ups_minutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 60
+    },
+    "generator": {
+      "type": "boolean"
+    },
+    "site_name": {
+      "type": "string",
+      "maxLength": 80
+    }
+  },
+  "x-tier-limits": {
+    "micro": {
+      "it_kw_min": 2,
+      "it_kw_max": 6,
+      "max_racks": 1
+    },
+    "ben10": {
+      "it_kw_min": 10,
+      "it_kw_max": 30,
+      "max_racks": 2
+    },
+    "ben20": {
+      "it_kw_min": 50,
+      "it_kw_max": 150,
+      "max_racks": 6
+    },
+    "ben40": {
+      "it_kw_min": 150,
+      "it_kw_max": 500,
+      "max_racks": 12
+    }
+  },
+  "x-cooling-limits": {
+    "cabinet_dx": {
+      "max_rack_kw": 6,
+      "medium": "air"
+    },
+    "inrow_dx": {
+      "max_rack_kw": 30,
+      "medium": "air"
+    },
+    "rdhx_drycooler": {
+      "max_rack_kw": 40,
+      "medium": "water"
+    },
+    "dlc_cdu": {
+      "max_rack_kw": 80,
+      "medium": "liquid"
+    }
+  }
+}

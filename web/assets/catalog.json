@@ -1,0 +1,202 @@
+{
+ "tiers": {
+  "micro": {
+   "label": "BEN Micro",
+   "enclosure": "Outdoor 24U NEMA 3R cabinet on skid",
+   "ext_l_m": 1.2,
+   "ext_w_m": 1.0,
+   "ext_h_m": 1.8,
+   "int_l_m": 1.0,
+   "int_w_m": 0.8,
+   "int_h_m": 1.4,
+   "max_racks": 1,
+   "rack_u": 24,
+   "it_kw_min": 2,
+   "it_kw_max": 6,
+   "default_cooling": "cabinet_dx",
+   "voltage": "208/240 V 1ph",
+   "tare_kg": 320
+  },
+  "ben10": {
+   "label": "BEN 10",
+   "enclosure": "10 ft high-cube ISO container",
+   "ext_l_m": 2.991,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 2.7,
+   "int_w_m": 2.2,
+   "int_h_m": 2.55,
+   "max_racks": 2,
+   "rack_u": 42,
+   "it_kw_min": 10,
+   "it_kw_max": 30,
+   "default_cooling": "inrow_dx",
+   "voltage": "208 V 3ph",
+   "tare_kg": 1300
+  },
+  "ben20": {
+   "label": "BEN 20",
+   "enclosure": "20 ft high-cube ISO container",
+   "ext_l_m": 6.058,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 5.75,
+   "int_w_m": 2.2,
+   "int_h_m": 2.55,
+   "max_racks": 6,
+   "rack_u": 42,
+   "it_kw_min": 50,
+   "it_kw_max": 150,
+   "default_cooling": "inrow_dx",
+   "voltage": "480 V 3ph",
+   "tare_kg": 2400
+  },
+  "ben40": {
+   "label": "BEN 40",
+   "enclosure": "40 ft high-cube ISO container",
+   "ext_l_m": 12.192,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 11.85,
+   "int_w_m": 2.2,
+   "int_h_m": 2.55,
+   "max_racks": 12,
+   "rack_u": 48,
+   "it_kw_min": 150,
+   "it_kw_max": 500,
+   "default_cooling": "dlc_cdu",
+   "voltage": "480 V 3ph",
+   "tare_kg": 3900
+  }
+ },
+ "cooling": {
+  "cabinet_dx": {
+   "label": "Cabinet DX air conditioner",
+   "unit_kw": 5.8,
+   "cop": 2.6,
+   "medium": "air",
+   "max_rack_kw": 6
+  },
+  "inrow_dx": {
+   "label": "In-row DX cooling unit",
+   "unit_kw": 30.0,
+   "cop": 3.2,
+   "medium": "air",
+   "max_rack_kw": 30
+  },
+  "rdhx_drycooler": {
+   "label": "Rear-door heat exchanger + dry cooler",
+   "unit_kw": 35.0,
+   "cop": 8.0,
+   "medium": "water",
+   "max_rack_kw": 40
+  },
+  "dlc_cdu": {
+   "label": "Direct liquid cooling + CDU + dry cooler",
+   "unit_kw": 300.0,
+   "cop": 12.0,
+   "medium": "liquid",
+   "max_rack_kw": 80
+  }
+ },
+ "profiles": {
+  "ai_inference": {
+   "label": "AI inference edge",
+   "redundancy": "N+1",
+   "ashrae": "A2",
+   "rack_kw": 20
+  },
+  "ai_training": {
+   "label": "AI training pod",
+   "redundancy": "N+1",
+   "ashrae": "A1",
+   "rack_kw": 60
+  },
+  "private_cloud": {
+   "label": "Private cloud / ERP",
+   "redundancy": "N+1",
+   "ashrae": "A2",
+   "rack_kw": 10
+  },
+  "disaster_recovery": {
+   "label": "Disaster recovery",
+   "redundancy": "N",
+   "ashrae": "A3",
+   "rack_kw": 8
+  },
+  "industrial_ot": {
+   "label": "Industrial OT analytics",
+   "redundancy": "N+1",
+   "ashrae": "A3",
+   "rack_kw": 8
+  },
+  "healthcare": {
+   "label": "Healthcare (HIPAA)",
+   "redundancy": "2N",
+   "ashrae": "A1",
+   "rack_kw": 10
+  },
+  "public_sector": {
+   "label": "Public sector / tactical",
+   "redundancy": "2N",
+   "ashrae": "A3",
+   "rack_kw": 12
+  },
+  "off_grid": {
+   "label": "Remote / off-grid",
+   "redundancy": "N+1",
+   "ashrae": "A3",
+   "rack_kw": 6
+  }
+ },
+ "climates": {
+  "temperate": {
+   "label": "Temperate",
+   "t_design_c": 35,
+   "t_min_c": -15,
+   "solar_w_m2": 800,
+   "corrosion": "C3",
+   "wind_ms": 47
+  },
+  "hot_arid": {
+   "label": "Hot / arid",
+   "t_design_c": 46,
+   "t_min_c": -5,
+   "solar_w_m2": 1000,
+   "corrosion": "C2",
+   "wind_ms": 47
+  },
+  "hot_humid": {
+   "label": "Hot / humid",
+   "t_design_c": 38,
+   "t_min_c": 0,
+   "solar_w_m2": 900,
+   "corrosion": "C4",
+   "wind_ms": 58
+  },
+  "cold": {
+   "label": "Cold",
+   "t_design_c": 30,
+   "t_min_c": -40,
+   "solar_w_m2": 700,
+   "corrosion": "C3",
+   "wind_ms": 47
+  },
+  "coastal": {
+   "label": "Coastal",
+   "t_design_c": 34,
+   "t_min_c": -5,
+   "solar_w_m2": 850,
+   "corrosion": "C5",
+   "wind_ms": 67
+  },
+  "high_altitude": {
+   "label": "High altitude",
+   "t_design_c": 32,
+   "t_min_c": -30,
+   "solar_w_m2": 1100,
+   "corrosion": "C3",
+   "wind_ms": 51
+  }
+ }
+}

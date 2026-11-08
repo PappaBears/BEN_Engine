@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BEN Engine — Schreiber AI</title>
+<meta name="description" content="BEN Engine: modular edge data centers from one rack to 500 kW, built in off-the-shelf containers, with Schreiber AI controls, digital twin and commissioning. Risks disclosed before pricing.">
+<link rel="icon" href="kit/logo-sai.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <a class="brand" href="#"><img src="kit/logo-sai.svg" alt="Schreiber AI" width="36" height="36"><span>Schreiber AI</span><span class="sep">/</span><strong>BEN Engine</strong></a>
+  <nav aria-label="Page">
+    <a href="#profiles">Mission profiles</a><a href="#risks">Risks</a><a href="#configure">Configure</a><a href="#demo">Live demo</a><a href="#how">How we build</a><a href="#compliance">Compliance</a><a href="#contact" class="cta">Talk to Ben</a>
+  </nav>
+</header>
+
+<main id="main">
+<section class="hero">
+  <div>
+    <p class="eyebrow">Business Edge Node · modular data center</p>
+    <h1>AI infrastructure that arrives finished.</h1>
+    <p class="lead">A data center in an off-the-shelf container or outdoor cabinet, sized from one rack for a small business to a 500 kW liquid-cooled AI pod. Designed, built, commissioned and watched by Schreiber AI. Buy the whole box, just the power or cooling module, or put your own brand on it.</p>
+    <div class="hero-actions"><a class="btn primary" href="#profiles">Pick a mission profile</a><a class="btn" href="#demo">See it run</a></div>
+    <ul class="proof">
+      <li>Four tiers, one engineering model: every drawing, part and alarm threshold comes from the same configuration.</li>
+      <li>Risks are shown before prices. Always.</li>
+      <li>Open, local-first controls. Your data stays in your box.</li>
+    </ul>
+  </div>
+  <figure class="hero-art">
+    <img id="heroImg" src="assets/hero-ben20.svg" alt="Isometric illustration of a BEN 20 container data center with the Schreiber AI mark on the side" width="640" height="420">
+    <figcaption>BEN 20 · 20 ft high-cube · up to 150 kW IT · generated from the configuration model</figcaption>
+  </figure>
+</section>
+
+<section class="tiers" aria-labelledby="tiersH">
+  <h2 id="tiersH">One family, four sizes</h2>
+  <div class="tier-grid" id="tierGrid"></div>
+  <p class="note">Modules can be bought separately: <strong>Power</strong> (service entrance, ATS, UPS, distribution), <strong>Cooling</strong> (DX, rear-door, or direct liquid), <strong>Compute</strong> (racks and reference GPU/CPU nodes), <strong>Controls</strong> (BEN gateway, nodes, dashboard, twin). The container, envelope and fire/safety come with any module.</p>
+</section>
+
+<section id="profiles" class="profiles" aria-labelledby="profH">
+  <h2 id="profH">Mission profile picker</h2>
+  <p>Start with what the box is for. The profile sets the environmental class, redundancy, climate package, compliance pack and the risk list you will see next.</p>
+  <div class="profile-grid" id="profileGrid" role="list"></div>
+  <div class="climate-row">
+    <label>Where will it live? <select id="climateSel"></select></label>
+    <span id="climateNote" class="muted"></span>
+  </div>
+</section>
+
+<section id="risks" class="risks" aria-labelledby="riskH">
+  <h2 id="riskH">The risks, before the price</h2>
+  <p>Every modular data center carries these risks. We list them first so you can see exactly which ones BEN Engine covers by design, which we monitor, and which stay with you. Filtered for the profile you picked.</p>
+  <div id="riskList" class="risk-list"></div>
+  <p class="muted small">Full register with likelihood, consequence and mitigation: <a href="../docs/RISK_REGISTER.md">docs/RISK_REGISTER.md</a>.</p>
+</section>
+
+<section id="configure" class="configure" aria-labelledby="cfgH">
+  <h2 id="cfgH">Configure your BEN</h2>
+  <form id="cfgForm" class="cfg-form" onsubmit="return false">
+    <fieldset><legend>Size</legend>
+      <label>Tier <select id="tier"></select></label>
+      <label>IT load <output id="itOut">100</output> kW <input id="it_kw" type="range" min="2" max="500" step="1"></label>
+      <label>Racks <input id="racks" type="number" min="1" max="12"></label>
+    </fieldset>
+    <fieldset><legend>Resilience</legend>
+      <label>Cooling <select id="cooling"></select></label>
+      <label>Redundancy <select id="redundancy"><option>N</option><option>N+1</option><option>2N</option></select></label>
+      <label>UPS ride-through <select id="ups_minutes"><option>5</option><option selected>10</option><option>15</option><option>30</option></select> min</label>
+      <label class="check"><input id="generator" type="checkbox"> Standby generator</label>
+    </fieldset>
+    <fieldset><legend>Modules</legend>
+      <label class="check"><input type="checkbox" class="sub" value="power" checked> Power</label>
+      <label class="check"><input type="checkbox" class="sub" value="cooling" checked> Cooling</label>
+      <label class="check"><input type="checkbox" class="sub" value="compute" checked> Compute</label>
+      <label class="check"><input type="checkbox" class="sub" value="controls" checked> Controls (BEN gateway + dashboard)</label>
+      <label class="check"><input id="white_label" type="checkbox"> White-label</label>
+      <label>Brand on the box <input id="brand" type="text" value="Schreiber AI" maxlength="40"></label>
+    </fieldset>
+  </form>
+  <div id="cfgErrors" class="errors" role="alert" hidden></div>
+  <div class="cfg-out">
+    <div class="sizing" id="sizing"></div>
+    <div class="price" id="price"></div>
+  </div>
+  <p class="muted small">Sizing comes from the same model that generates the drawings and the bill of materials (<code>software/ben_engine/config.py</code>). Prices are indicative and show how much of the total is vendor-confirmed, list price, or our estimate.</p>
+  <div class="hero-actions"><a class="btn primary" id="openDemo" href="../dashboard/" target="_blank" rel="noopener">Open this configuration in the live twin</a><button class="btn" id="dlCfg">Download configuration JSON</button></div>
+</section>
+
+<section id="demo" class="demo" aria-labelledby="demoH">
+  <h2 id="demoH">See it run before it exists</h2>
+  <p>Every BEN ships with its digital twin. The dashboard below is the same software that runs in the box, in simulation mode: live data, 3-D walkthrough, automated test sweeps, fault injection, calibration, CFD and CSV export, with no hardware attached.</p>
+  <div class="demo-grid">
+    <figure><img src="../docs/media/screens/exterior.png" alt="Dashboard: exterior isometric 3D view of the configured unit" loading="lazy"><figcaption>3-D twin built from the selector</figcaption></figure>
+    <figure><img src="../docs/media/screens/walkthrough.png" alt="Dashboard: first-person walkthrough in the cold aisle" loading="lazy"><figcaption>Walkthrough with live sensor values</figcaption></figure>
+    <figure><img src="../docs/media/screens/sweeps.png" alt="Dashboard: automated sweep results with pass/fail" loading="lazy"><figcaption>Automated sweeps with pass/fail and CSV</figcaption></figure>
+    <figure><img src="../docs/media/screens/alarms.png" alt="Dashboard: alarm list and highlighted failed cooling unit" loading="lazy"><figcaption>Fault injection: cooling unit failover</figcaption></figure>
+  </div>
+  <p><a class="btn" href="../dashboard/" target="_blank" rel="noopener">Launch the demo dashboard</a> <span class="muted small">Runs locally: <code>bash scripts/run_dashboard.sh</code> then open http://localhost:8080</span></p>
+</section>
+
+<section id="how" class="how" aria-labelledby="howH">
+  <h2 id="howH">How we build it</h2>
+  <ol class="steps">
+    <li><strong>Profile and site.</strong> You pick the mission; we survey the site and you sign the site requirements.</li>
+    <li><strong>Engineering release.</strong> The configuration is frozen. Drawings, bill of materials, compliance pack and twin are generated from it.</li>
+    <li><strong>Factory build.</strong> Off-the-shelf container or cabinet, fitted out from Simplified Technical English instructions with hold points for the licensed trades.</li>
+    <li><strong>Factory acceptance test.</strong> The commissioning script runs the unit through load steps, failover and ride-through before it ships.</li>
+    <li><strong>Site acceptance.</strong> Same script, on your pad, with you watching. You get the signed report and the data.</li>
+    <li><strong>Operate.</strong> Schreiber AI watches it, or you do, or your partner does under their brand.</li>
+  </ol>
+  <p class="muted small">Full process flow with owners, hold points and records: <a href="../docs/PROCESS_FLOW.md">docs/PROCESS_FLOW.md</a>.</p>
+</section>
+
+<section id="compliance" class="compliance" aria-labelledby="compH">
+  <h2 id="compH">Compliance is the product</h2>
+  <div class="comp-grid">
+    <div><h3>Electrical</h3><p>NEC Art. 645 and 110.26 working space, UL 891/67 distribution, UL 1778 UPS, UL 9540 battery cabinets, NFPA 70E arc-flash labels, UL 508A controls panel.</p></div>
+    <div><h3>Fire and life safety</h3><p>NFPA 75/76 practices, NFPA 72 detection, NFPA 2001 clean agent, hardwired EPO and door interlocks, never on the controls network.</p></div>
+    <div><h3>Thermal and refrigerant</h3><p>ASHRAE TC 9.9 classes A1–A4, ASHRAE 15/34 and UL 60335-2-40 charge limits for A2L refrigerants, EPA 608 handling.</p></div>
+    <div><h3>Structure and transport</h3><p>ISO 668/1496 container, CSC re-certification after modification, ASCE 7 wind/seismic/snow by climate package.</p></div>
+    <div><h3>Cyber</h3><p>IEC 62443 zones, local-first data, signed firmware, no cloud dependency, SOC 2 roadmap for the managed service.</p></div>
+    <div><h3>Profile packs</h3><p>HIPAA for healthcare, NIST 800-171/CMMC for public sector, TIA-942 rated-level mapping for every tier.</p></div>
+  </div>
+  <p class="muted small">Matrix with verification methods and who certifies: <a href="../docs/COMPLIANCE.md">docs/COMPLIANCE.md</a>.</p>
+</section>
+
+<section id="contact" class="contact" aria-labelledby="contactH">
+  <h2 id="contactH">Talk to Ben</h2>
+  <p>Schreiber AI builds BEN Engine for small and medium businesses that want AI on their own terms. Send the configuration you built above and we will come back with a site checklist and a real quote.</p>
+  <a class="btn primary" id="mailto" href="mailto:Ben@SchreiberAI.com?subject=BEN%20Engine%20inquiry">Ben@SchreiberAI.com</a>
+</section>
+</main>
+
+<footer>
+  <img src="kit/wordmark-ben-engine.svg" alt="BEN Engine, Business Edge Node, Schreiber AI" width="260" height="60">
+  <p class="muted small">© Schreiber AI. Numbers on this page are produced by the configuration model and the bill of materials in the open repository; nothing is invented for marketing. Prices are indicative until quoted.</p>
+</footer>
+<script type="module" src="assets/site.js"></script>
+</body>
+</html>
