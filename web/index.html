@@ -39,7 +39,7 @@
 <section class="tiers" aria-labelledby="tiersH">
   <h2 id="tiersH">One family, four sizes</h2>
   <div class="tier-grid" id="tierGrid"></div>
-  <p class="note">Modules can be bought separately: <strong>Power</strong> (service entrance, ATS, UPS, distribution), <strong>Cooling</strong> (DX, rear-door, or direct liquid), <strong>Compute</strong> (racks and reference GPU/CPU nodes), <strong>Controls</strong> (BEN gateway, nodes, dashboard, twin). The container, envelope and fire/safety come with any module.</p>
+  <p class="note">Modules can be bought separately: <strong>Power</strong> (service entrance, ATS, UPS, distribution), <strong>Cooling</strong> (DX, rear-door, or direct liquid), <strong>Compute</strong> (racks and reference GPU/CPU nodes), <strong>Controls</strong> (BEN Controller, BEN Pods on the BEN Mesh, dashboard, twin, BEN Care): <strong>BEN Controls Lite</strong> (Revolution Pi, Micro and BEN 10) or <strong>BEN Controls Pro</strong> (PLCnext PLC in a UL 508A panel + industrial edge computer, BEN 20/40 and BEN 10 on request). The container, envelope and fire/safety come with any module.</p>
 </section>
 
 <section id="profiles" class="profiles" aria-labelledby="profH">
@@ -77,7 +77,7 @@
       <label class="check"><input type="checkbox" class="sub" value="power" checked> Power</label>
       <label class="check"><input type="checkbox" class="sub" value="cooling" checked> Cooling</label>
       <label class="check"><input type="checkbox" class="sub" value="compute" checked> Compute</label>
-      <label class="check"><input type="checkbox" class="sub" value="controls" checked> Controls (BEN gateway + dashboard)</label>
+      <label class="check"><input type="checkbox" class="sub" value="controls" checked> Controls (BEN Controller + Pods + dashboard)</label>
       <label class="check"><input id="white_label" type="checkbox"> White-label</label>
       <label>Brand on the box <input id="brand" type="text" value="Schreiber AI" maxlength="40"></label>
     </fieldset>
@@ -119,8 +119,8 @@
 <section id="compliance" class="compliance" aria-labelledby="compH">
   <h2 id="compH">Compliance is the product</h2>
   <div class="comp-grid">
-    <div><h3>Electrical</h3><p>NEC Art. 645 and 110.26 working space, UL 891/67 distribution, UL 1778 UPS, UL 9540 battery cabinets, NFPA 70E arc-flash labels, UL 508A controls panel.</p></div>
-    <div><h3>Fire and life safety</h3><p>NFPA 75/76 practices, NFPA 72 detection, NFPA 2001 clean agent, hardwired EPO and door interlocks, never on the controls network.</p></div>
+    <div><h3>Electrical</h3><p>NEC Art. 645 and 110.26 working space, UL 891/67 distribution, UL 1778 UPS, UL 9540 battery cabinets, NFPA 70E arc-flash labels, UL 508A BEN Controller panel (BEN Controls Pro: Phoenix Contact PLCnext PLC, industrial edge computer with TPM); BEN Controls Lite uses listed DIN-rail components (Revolution Pi).</p></div>
+    <div><h3>Fire and life safety</h3><p>NFPA 75/76 practices, NFPA 72 detection, NFPA 2001 clean agent, hardwired EPO and door interlocks, never on the controls network or the BEN Mesh; every BEN Pod carries a hardware root of trust (Secure Vault High) and attests before it joins.</p></div>
     <div><h3>Thermal and refrigerant</h3><p>ASHRAE TC 9.9 classes A1–A4, ASHRAE 15/34 and UL 60335-2-40 charge limits for A2L refrigerants, EPA 608 handling.</p></div>
     <div><h3>Structure and transport</h3><p>ISO 668/1496 container, CSC re-certification after modification, ASCE 7 wind/seismic/snow by climate package.</p></div>
     <div><h3>Cyber</h3><p>IEC 62443 zones, local-first data, signed firmware, no cloud dependency, SOC 2 roadmap for the managed service.</p></div>

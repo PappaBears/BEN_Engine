@@ -212,7 +212,7 @@ def default_budget(channel: str, placement: Optional[Sequence[str]] = None, cali
                    reading: Optional[float] = None, cal: Optional[CalResult] = None) -> Budget:
     """Default uncertainty budget per PROTOCOL.md channel.
 
-    ``channel`` one of: ``DS18B20`` (rack inlet/outlet), ``SHT45_T``, ``SHT45_RH``, ``SDP810``,
+    ``channel`` one of: ``PT1000`` (BEN Pod rack inlet/outlet, current design), ``DS18B20`` (legacy generation-1 node, kept for comparison), ``SHT45_T``, ``SHT45_RH``, ``SDP810``,
     ``ADS1115_4_20MA``, ``POWER_CLASS05``. ``placement`` lists keys of ``PLACEMENT_EFFECTS``.
     ``calibrated=False`` replaces the calibration terms with the bare datasheet accuracy. If a
     ``CalResult`` is given its residual scatter and coefficient uncertainty are used as the Type A
@@ -238,6 +238,23 @@ def default_budget(channel: str, placement: Optional[Sequence[str]] = None, cali
         S.append(UncertaintySource("self-heating (parasitic power, moving air)", 0.05, "rectangular", "B", unit=unit, note="datasheet < 0.1 K in still air; moving air halves it"))
         S.append(UncertaintySource("thermal lag at 1 Hz, slow drift", 0.03, "rectangular", "B", unit=unit, note="TO-92 time constant ~10 s; negligible except during steps"))
         S.append(UncertaintySource("1-Wire string: supply / ground offset", 0.02, "rectangular", "B", unit=unit))
+    elif ch == "PT1000":
+        # BEN Pod rack inlet/outlet channel: Pt1000 class A 3-wire string on a 24-bit ratiometric front end
+        unit = "K"
+        if calibrated:
+            S.append(UncertaintySource("reference thermometer (bath comparison)", 0.05, "normal_k2", "B", unit=unit, note="reference certificate U95 = 0.05 K"))
+            S.append(UncertaintySource("bath uniformity / stability during comparison", 0.03, "rectangular", "B", unit=unit, note="stirred bath"))
+            if cal is not None and reading is not None:
+                S.append(UncertaintySource("fit residual + coefficient uncertainty (Type A)", cal.u_at(reading), "normal", "A", dof=cal.dof, unit=unit, note=f"from linear_fit, n={cal.n}"))
+            else:
+                S.append(UncertaintySource("calibration repeatability (Type A)", 0.02, "normal", "A", dof=9, unit=unit, note="10 readings per point"))
+            S.append(UncertaintySource("post-calibration drift, 12 months", 0.03, "rectangular", "B", unit=unit, note="thin-film Pt1000 class A drift typically < 0.05 K/yr"))
+        else:
+            S.append(UncertaintySource("IEC 60751 class A tolerance at 25 °C (uncalibrated)", 0.15 + 0.002 * 25, "rectangular", "B", unit=unit, note="±(0.15 + 0.002·|t|) K"))
+        S.append(UncertaintySource("ADC ratiometric gain/offset + reference resistor 0.05 % (24-bit, ADS124S08 class)", 0.04, "rectangular", "B", unit=unit, note="0.05 % of 1 kΩ ≈ 0.13 K worst case, ratiometric cancels most; residual estimate"))
+        S.append(UncertaintySource("3-wire lead resistance mismatch", 0.02, "rectangular", "B", unit=unit, note="≤ 20 mΩ mismatch on 1 kΩ element"))
+        S.append(UncertaintySource("self-heating (1 mA excitation pulsed, moving air)", 0.02, "rectangular", "B", unit=unit, note="0.1 K/mW in still air; duty-cycled excitation"))
+        S.append(UncertaintySource("thermal lag at 1 Hz, slow drift", 0.02, "rectangular", "B", unit=unit, note="probe time constant ~5 s in moving air"))
     elif ch == "SHT45_T":
         unit = "K"
         S.append(UncertaintySource("datasheet accuracy typical 0…60 °C", 0.1, "rectangular", "B", unit=unit, note="SHT45 typ ±0.1 K, max ±0.2 K"))
@@ -299,8 +316,8 @@ def default_budget(channel: str, placement: Optional[Sequence[str]] = None, cali
     return combine(S, channel=ch, unit=unit, notes=notes)
 
 
-CHANNELS = ["DS18B20", "SHT45_T", "SHT45_RH", "SDP810", "ADS1115_4_20MA", "POWER_CLASS05"]
-PROTOCOL_CLAIMS = {"DS18B20": 0.25, "SHT45_T": 0.15, "SHT45_RH": 1.5, "SDP810": 0.4, "ADS1115_4_20MA": 0.02, "POWER_CLASS05": None}
+CHANNELS = ["PT1000", "DS18B20", "SHT45_T", "SHT45_RH", "SDP810", "ADS1115_4_20MA", "POWER_CLASS05"]
+PROTOCOL_CLAIMS = {"PT1000": 0.25, "DS18B20": 0.25, "SHT45_T": 0.15, "SHT45_RH": 1.5, "SDP810": 0.4, "ADS1115_4_20MA": 0.02, "POWER_CLASS05": None}
 
 
 def all_default_budgets(placement: Optional[Dict[str, Sequence[str]]] = None) -> Dict[str, Budget]:

@@ -54,7 +54,8 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 | Total electrical demand | [TOTAL_KVA] kVA |
 | UPS | [UPS_MODULES] x [UPS_KVA_EACH] kVA; battery [BATTERY_KWH] kWh (NFPA 855 package: [NFPA855_PACKAGE]) |
 | Cooling units | [COOLING_UNITS_TOTAL] (including redundancy) |
-| BEN Nodes | [NODE_COUNT] plus spares per `docs/MAINTENANCE.md` Section 7 |
+| Controls tier | [CONTROLS_TIER_LABEL] |
+| BEN Pods | [POD_COUNT] plus spares per `docs/MAINTENANCE.md` Section 7 (logical node ids: [NODE_COUNT]) |
 | Estimated PUE (model, to be measured at SAT) | [PUE_ESTIMATE] |
 | Gross shipped mass (to be weighed at Q-11) | [GROSS_MASS_KG] kg |
 | Design wind speed / exposure / seismic category / snow load | [WIND_SPEED] / [EXPOSURE_CATEGORY] / [SEISMIC_CATEGORY] / [SNOW_LOAD] |
@@ -135,15 +136,15 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 
 | Scope item | Included / Excluded | Notes |
 | --- | --- | --- |
-| UL 508A controls panel: gateway (Raspberry Pi 5), managed PoE switch, 24 V DC supply, relays, firewall, remote-support key switch | [SCOPE_CTL_PANEL] | |
-| BEN Nodes (ESP32-S3 on Olimex ESP32-POE-ISO) x [NODE_COUNT], sensors per `spec/PROTOCOL.md` (DS18B20 strings, SHT45, SDP810, rope leak, door reed, 4–20 mA inputs, pulse input) | [SCOPE_CTL_NODES] | |
+| BEN Controller, tier [CONTROLS_TIER_LABEL]: Pro = UL 508A listed panel with Phoenix Contact PLCnext AXC F 2152 PLC and Axioline F I/O, OnLogic Karbon 400 edge computer (TPM 2.0), redundant QUINT4 24 V DC supplies, surge protection, managed switch, interface relays, firewall, remote-support key switch; Lite = DIN-rail cabinet with Revolution Pi RevPi Connect 4 controller and DIO/AIO modules, 24 V DC supply, switch, watchdog relay | [SCOPE_CTL_PANEL] | |
+| BEN Pods x [POD_COUNT] on the BEN Mesh (Thread/IPv6, Silicon Labs MGM240P with Secure Vault, per-Pod certificate and attestation), with Pt1000 probe strings, SHT45, SDP810, rope leak, door reed, 4–20 mA inputs, pulse input per `spec/PROTOCOL.md`; wired transmitters on the PLC (Pro): Setra 264 dP, Vaisala HMW90 RH, RLE LD2100 leak controller | [SCOPE_CTL_NODES] | |
 | Signed firmware load, per-node certificates, `cal_id` applied, factory calibration with traceable references (Q-08, W12) | [SCOPE_CTL_FIRMWARE_CAL] | |
 | Modbus/SNMP integration to UPS, cooling units, PDUs, meters, fire panel dry contacts (monitor only), door controller | [SCOPE_CTL_INTEGRATION] | |
 | Dashboard (live data, 3-D twin, alarms, sweeps, CSV export, I/O test, calibration), digital twin fitted from commissioning data | [SCOPE_CTL_DASHBOARD] | |
 | Software Licence per `docs/contracts/SOFTWARE_LICENSE_BEN_CONTROLS.md`: [LICENSE_TYPE] | [SCOPE_CTL_LICENSE] | perpetual per-Unit / subscription / white-label |
 | Remote support path (outbound WireGuard) | [SCOPE_CTL_REMOTE] | enabled / disabled (air-gap) per consent form |
 | Alarm forwarding to Customer systems (SNMP trap / syslog / webhook); read-only API | [SCOPE_CTL_FORWARDING] | |
-| Backup target for gateway database (Customer SMB/NFS/S3 or second SSD) | [SCOPE_CTL_BACKUP] | |
+| Backup target for the edge computer database (Customer SMB/NFS/S3 or second SSD) | [SCOPE_CTL_BACKUP] | |
 
 ### 3.6 Fire and life safety (always included with container tiers)
 
@@ -317,7 +318,7 @@ Payment terms [PAYMENT_TERMS_DAYS] days. Milestones delayed by Customer-Caused D
 | Step | Name | What is done | Pass criteria | FAT | SAT | Experiment |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Pre-power visual checklist | Operator confirms each checklist item: unit level and tied down, CSC plate legible; grounding electrode conductor landed and tested; feeder terminated with torque marks, breaker open and locked; no shipping damage to cooling units, condensate drains connected; fire suppression and EPO hardwired and tagged, not on controls bus; racks anchored, blanking panels fitted, containment doors latch; controls LAN has no route to the internet; uplinks labelled both ends | Every item confirmed "yes" by the operator and the Customer witness; any "no" fails the step | Yes (factory equivalents for pad and feeder) | Yes | — |
-| 2 | Node discovery and firmware versions | Gateway discovers all BEN Nodes | Node count equals 1 + ceil(racks / 2) = [NODE_COUNT]; every node reports the same signed firmware version [FIRMWARE_VERSION]; every node `status` heartbeat < 60 s old | Yes | Yes | E12 (part) |
+| 2 | Pod discovery, attestation and firmware versions | The BEN Controller discovers all BEN Pods on the mesh | Pod count equals [POD_COUNT] (two per rack + room + outdoor; Micro 3); every Pod attested; every Pod reports the same signed firmware version [FIRMWARE_VERSION]; every Pod `status` heartbeat < 60 s old; logical node ids [NODE_COUNT] | Yes | Yes | E12 (part) |
 | 3 | Sensor sanity at idle | 20 % load for 5 minutes; read all inlet probes, RH, tare dP | All rack inlet probes within 2.0 K of each other; RH between 20 % and 80 %; dP tare acknowledged and residual ≤ 0.5 Pa | Yes | Yes | E1, E2 |
 | 4 | I/O point-to-point | Each relay on each node set 1 then 0 and read back; door and leak contacts read 0, forced 1, released 0 | 100 % of points read back as set; 0 failed points | Yes | Yes | — |
 | 5 | Power chain: meter vs PDU sum | 60 % load for 5 minutes; utility meter reconciled to PDU sum after subtracting metered cooling, house load and UPS losses | Disagreement ≤ 3.0 %; PUE recorded | Yes | Yes | E9 |
@@ -334,10 +335,11 @@ Payment terms [PAYMENT_TERMS_DAYS] days. Milestones delayed by Customer-Caused D
 | Fire alarm and suppression acceptance | NFPA 72 Chapter 14 record of completion issued; door fan test shows ≥ 10-minute hold at design concentration; AHJ fire acceptance | Fire contractor report; AHJ certificate |
 | Acoustic survey (E10) | Measured level at the property line ≤ ordinance limit in Annex A Section 9 ([NOISE_LIMIT_DAY] dBA day / [NOISE_LIMIT_NIGHT] dBA night) | Survey report |
 | Burn-in (E11) | 48 hours at SAT (24 hours at FAT) with no critical alarm and no component replacement | Commissioning CSV |
-| Cyber (E12) | Port scan finds only the services in `docs/CYBERSECURITY.md` Section 3; default credentials none; unsigned firmware image rejected and logged; gateway loss leaves nodes buffering and failsafe outputs correct | E12 report |
+| Cyber (E12) | Port scan finds only the services in `docs/CYBERSECURITY.md` Section 3; default credentials none; unsigned firmware image rejected and logged; 100 % of Pods attested and a rogue Pod rejected at join; edge computer loss leaves Pods buffering and the PLC holding interlocks; PLC loss drops the watchdog relay with cooling on | E12 report |
+| Mesh resilience (E13) | Removing a router Pod: children re-attach within 60 s, telemetry ≥ 99.5 % complete after buffer catch-up | E13 report |
 | Electrical | Ground electrode ≤ 25 Ω (target ≤ 5 Ω); bonding ≤ 0.1 Ω; insulation resistance ≥ 100 MΩ at 1 kV; phase rotation correct; emergency lights pass 90-minute test; final arc-flash labels installed with utility data | Q-07, Q-12 |
 | Cooling | Superheat/subcool in range; no leak at 24 h sniff; glycol concentration and pH in range | Q-06 |
-| Backup and restore | Gateway database restored to a spare gateway from the backup target | Turnover item G2 |
+| Backup and restore | Edge computer database restored to a spare edge computer from the backup target | Turnover item G2 |
 
 8.3 **Deemed acceptance.** 10 Business Days ([DEEMED_ACCEPTANCE_DAYS]) per MSA 8.4.
 

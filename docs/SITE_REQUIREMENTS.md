@@ -80,8 +80,8 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 | --- | --- |
 | Conduit | Two 50 mm conduits (one spare) from the customer's demarcation to the unit's communications entry plate, with pull strings, sealed against water and rodents |
 | Service | Customer orders the circuit(s); single-mode fiber preferred; diverse routes for 2N profiles. Lead time 60–120 days — order at H3 |
-| Remote support (optional) | One outbound-only internet path for the gateway (can be LTE/5G on our modem); no inbound ports required. Can be disabled for air-gapped sites |
-| Time | Gateway uses SNTP; GPS time source option for air-gapped sites |
+| Remote support (optional) | One outbound-only internet path for the edge computer (can be LTE/5G on our modem); no inbound ports required. Can be disabled for air-gapped sites |
+| Time | The edge computer uses SNTP; GPS time source option for air-gapped sites |
 | Who | Customer |
 
 ## 8. Water, drain and fluids (liquid-cooled or RDHx options; condensate for all DX)

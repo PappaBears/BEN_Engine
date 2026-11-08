@@ -31,12 +31,14 @@ else (bill of materials, drawings, digital twin, dashboard 3D scene, commissioni
 compliance matrix) is generated from that configuration. Changing a value in the selector changes
 every downstream deliverable consistently.
 
-| Tier | Enclosure (off the shelf) | IT load | Racks | Cooling | Power |
-| --- | --- | --- | --- | --- | --- |
-| **BEN Micro** | NEMA 3R / IP55 outdoor 24U cabinet with integral air conditioner, on a skid | 3–8 kW | 1 | Cabinet DX air conditioner | 208/240 V 1φ, 30–50 A; 3–6 kVA UPS |
-| **BEN 10** | 10 ft high-cube ISO container | 10–30 kW | 1–2 | In-row DX, hot-aisle containment, economizer | 208 V 3φ 100 A; 20–30 kVA UPS |
-| **BEN 20** | 20 ft high-cube ISO container | 50–150 kW | 4–6 | In-row DX or rear-door heat exchangers + dry cooler; DLC option | 480 V 3φ 400 A; 150 kVA modular UPS |
-| **BEN 40** | 40 ft high-cube ISO container | 150–500 kW | 8–12 | Direct liquid cooling with CDU + external dry cooler; RDHx | 480 V 3φ 800–1200 A; modular UPS, generator ready |
+| Tier | Enclosure (off the shelf) | IT load | Racks | Cooling | Power | Controls (default) |
+| --- | --- | --- | --- | --- | --- | --- |
+| **BEN Micro** | NEMA 3R / IP55 outdoor 24U cabinet with integral air conditioner, on a skid | 3–8 kW | 1 | Cabinet DX air conditioner | 208/240 V 1φ, 30–50 A; 3–6 kVA UPS | BEN Controls Lite: Revolution Pi RevPi Connect 4 + 3 BEN Pods |
+| **BEN 10** | 10 ft high-cube ISO container | 10–30 kW | 1–2 | In-row DX, hot-aisle containment, economizer | 208 V 3φ 100 A; 20–30 kVA UPS | Lite (Pro selectable; Pro default for healthcare, public sector, AI training) |
+| **BEN 20** | 20 ft high-cube ISO container | 50–150 kW | 4–6 | In-row DX or rear-door heat exchangers + dry cooler; DLC option | 480 V 3φ 400 A; 150 kVA modular UPS | BEN Controls Pro: PLCnext AXC F 2152 + Axioline I/O in a UL 508A panel, OnLogic Karbon 400 edge computer, 2 Pods per rack + 2 |
+| **BEN 40** | 40 ft high-cube ISO container | 150–500 kW | 8–12 | Direct liquid cooling with CDU + external dry cooler; RDHx | 480 V 3φ 800–1200 A; modular UPS, generator ready | BEN Controls Pro |
+
+Controls hardware is the industrial platform in `docs/CONTROLS_HARDWARE_DECISION.md`: both tiers run the same software, the same BEN Pods on the BEN Mesh (Thread, Silicon Labs MGM240P with Secure Vault High) and the same protocol; life safety is hardwired in both.
 
 Subsystems are selectable separately: **Power module**, **Cooling module**, **Compute module**,
 **Controls module**. A customer can buy any one of them or all of them.
@@ -55,7 +57,7 @@ list that must be disclosed on the product page before purchase.
 | 1 | Issue-for-construction drawing set per tier with CTQ/CTP callouts | `design/drawings/` | Drawings generated from the config; every CTQ has a check method and tolerance |
 | 2 | Assembly renders + Simplified Technical English assembly instructions | `design/renders/`, `design/assembly/` | A worker with no data-center experience can follow numbered steps with one action per step |
 | 3 | Manufacturing process flow, design to field deployed | `docs/PROCESS_FLOW.md` | Every stage has an owner, inputs, outputs, hold points and records |
-| 4 | Firmware for the controls nodes with spec sheets and one-line wiring diagrams | `firmware/`, `design/specs/` | Compiles; unit tests pass on host; protocol documented; ESP32 build status stated honestly |
+| 4 | Firmware for the BEN Pods (MGM240P / OpenThread) and the BEN Controller (edge image, PLC project), with spec sheets and one-line wiring diagrams | `firmware/`, `design/specs/` | Compiles; unit tests pass on host; protocol documented; EFR32 build and attestation status stated honestly |
 | 5 | Commissioning script usable by Schreiber AI or the customer | `software/ben_engine/commissioning.py` | Runs against the simulator end to end and produces a signed report |
 | 6 | Turnover package and maintenance schedule (outdoor) | `docs/TURNOVER.md`, `docs/MAINTENANCE.md` | Intervals, tasks, parts, and records for every subsystem and the envelope |
 | 7 | Compliance matrix | `docs/COMPLIANCE.md` | Each applicable code or standard mapped to a design feature and a verification |
@@ -95,7 +97,7 @@ list that must be disclosed on the product page before purchase.
 6. **Service model and economics**: managed service, white-label and hardware-only tiers each need a margin model; the VC proposition depends on it.
 7. **Transport and lifting**: CSC plate validity, tie-downs, crane/forklift pockets, weight distribution, and road permits.
 8. **Decommissioning and relocation**: containers move; the design must survive a second deployment.
-9. **Data recovery is separate from code recovery**: the gateway database needs its own backup plan.
+9. **Data recovery is separate from code recovery**: the edge computer database needs its own backup plan.
 10. **An investor-grade proposition** (added at the operator's request mid-session).
 11. **Proposal-level output from the selector** and the **two-sided paperwork** (customer deals; integrator, contract-manufacturer and supplier agreements) with liquidated damages and scope-change rules that flow back-to-back (added mid-session).
 12. **Third-party manufacturing first**, greenfield factory later (added mid-session).

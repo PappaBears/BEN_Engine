@@ -31,7 +31,7 @@ function fillChannels() {
   chanSel.replaceChildren(...ctxRef.store.sensors.filter(s => s.unit !== 'bool').map(s => h('option', { value: s.id, selected: s.id === cur }, `${s.id} (${s.unit}, U95 ±${s.u95})`)));
 }
 function renderPairs() {
-  if (!pairs.length) { pairsEl.replaceChildren(h('div', { class: 'note' }, 'Add at least two pairs, or generate demo points. Reference = traceable instrument, reading = node value.')); return; }
+  if (!pairs.length) { pairsEl.replaceChildren(h('div', { class: 'note' }, 'Add at least two pairs, or generate demo points. Reference = traceable instrument, reading = Pod value.')); return; }
   pairsEl.replaceChildren(h('table', { class: 'data' }, h('thead', {}, h('tr', {}, h('th', {}, '#'), h('th', {}, 'reference'), h('th', {}, 'reading'), h('th', {}, ''))),
     h('tbody', {}, ...pairs.map((p, i) => h('tr', {}, h('td', { class: 'muted' }, i + 1),
       h('td', {}, h('input', { type: 'number', step: 'any', value: p.reference, onInput: (e) => { p.reference = e.target.value; } })),

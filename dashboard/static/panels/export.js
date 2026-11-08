@@ -18,7 +18,7 @@ export default {
       h('div', { class: 'row' },
         h('a', { class: 'btn btn-primary', id: 'btn-export-csv', href: '#', onClick: (e) => { e.currentTarget.href = url('csv'); } }, 'Download CSV'),
         h('a', { class: 'btn', id: 'btn-export-json', href: '#', onClick: (e) => { e.currentTarget.href = url('json'); } }, 'Download JSON')),
-      h('p', { class: 'muted', style: { fontSize: '12px' } }, 'One row per simulated second: timestamps, every rack inlet/outlet, supply/return, ΔP, RH, cooling units, power chain, PUE, active alarms and faults. The buffer holds the last 6 hours in memory; the gateway database is the long-term record.'),
+      h('p', { class: 'muted', style: { fontSize: '12px' } }, 'One row per simulated second: timestamps, every rack inlet/outlet, supply/return, ΔP, RH, cooling units, power chain, PUE, active alarms and faults. The buffer holds the last 6 hours in memory; the edge computer database is the long-term record.'),
     );
     function toggle() { const r = modeSel.value === 'range'; rangeFields.hidden = !r; lastField.hidden = r; }
     refresh();

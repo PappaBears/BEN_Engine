@@ -111,7 +111,7 @@
 
 6.3 **Spares kit.** Schreiber AI keeps the on-site spares kit (`docs/MAINTENANCE.md` Section 7) at the listed quantities for [TIER], replenishing used items within 10 Business Days; refrigerant cylinders are held by the HVAC subcontractor where local rules require.
 
-6.4 **BEN Node and gateway swaps** follow the RMA procedure in `docs/contracts/WARRANTY_TERMS.md` Section 7; a spare node is swapped within the on-site target for the alarm severity and recalibrated or given its stored `cal_id`.
+6.4 **BEN Pod and edge computer swaps** follow the RMA procedure in `docs/contracts/WARRANTY_TERMS.md` Section 7; a spare Pod is swapped within the on-site target for the alarm severity and recalibrated or given its stored `cal_id`.
 
 ## 7. Reporting
 

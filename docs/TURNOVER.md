@@ -1,6 +1,6 @@
 # BEN Engine — Turnover Package and Turnover Meeting
 
-**Owner:** Schreiber AI operations. **When:** stage 20 in `docs/PROCESS_FLOW.md`, after SAT sign-off (H19). **Format:** one indexed binder (PDF) plus the same files on an encrypted USB left in the controls cabinet document pocket, plus a copy in the gateway's `/srv/ben/turnover/` share. Every document carries the unit serial, configuration version and date.
+**Owner:** Schreiber AI operations. **When:** stage 20 in `docs/PROCESS_FLOW.md`, after SAT sign-off (H19). **Format:** one indexed binder (PDF) plus the same files on an encrypted USB left in the controls cabinet document pocket, plus a copy in the edge computer's `/srv/ben/turnover/` share. Every document carries the unit serial, configuration version and date.
 
 ## 1. Turnover package checklist
 
@@ -49,8 +49,8 @@ Tick every line. "N/A" must be justified in the notes column (e.g. "no generator
 | F1 | Spare parts list with part numbers and quantities delivered (see `MAINTENANCE.md` §7) | Schreiber AI operations | CSV | All | | |
 | F2 | Recommended stock for years 2–5 with lead times | Ops | PDF | All | | |
 | **G. Software, firmware and security** | | | | | | |
-| G1 | Firmware versions and SHA-256 hashes for every node and the gateway image; signing certificate fingerprint | ENG | PDF + JSON | All | | |
-| G2 | Gateway backup (full image) and database backup, with restore procedure tested at SAT | ENG | USB + PDF | All | | |
+| G1 | Firmware versions and SHA-256 hashes for every BEN Pod, the PLC project and the edge computer image; Pod certificate serials and attestation report; TPM PCR baseline; signing certificate fingerprint | ENG | PDF + JSON | All | | |
+| G2 | Edge computer backup (full image) and database backup, with restore procedure tested at SAT; PLC project backup | ENG | USB + PDF | All | | |
 | G3 | Network and security configuration (zones, firewall rules, accounts, certificates and expiry dates) | ENG | PDF | All | | |
 | G4 | **Password and credential handover record** (see §3) | ENG + CUST | PDF, signed | All | | |
 | G5 | Data ownership and retention statement; export procedure (CSV) | Compliance | PDF | All | | |
@@ -76,11 +76,11 @@ Tick every line. "N/A" must be justified in the notes column (e.g. "no generator
 
 ## 3. Password and credential handover procedure
 
-1. Before the meeting, Schreiber AI generates **new** credentials for every account the customer will own (dashboard admin, gateway OS admin, MQTT broker, Modbus/SNMP device passwords, fire panel installer code if the contractor permits, door controller, UPS and cooling web interfaces, Wi-Fi if enabled). Factory defaults are never left in place; the SAT includes a default-credential scan (E12).
+1. Before the meeting, Schreiber AI generates **new** credentials for every account the customer will own (dashboard admin, edge computer OS admin, PLC engineering account, MQTT broker, Modbus/SNMP device passwords, fire panel installer code if the contractor permits, door controller, UPS and cooling web interfaces, Wi-Fi if enabled). Factory defaults are never left in place; the SAT includes a default-credential scan (E12).
 2. Credentials are delivered in a sealed envelope **and** in an encrypted file (age/GPG) to the customer's named security contact; the passphrase is given verbally at the meeting. No credentials are emailed.
 3. The customer changes every password during the meeting while Schreiber AI watches the dashboard confirm the change. Schreiber AI's own remote-support account is separate, uses certificate authentication, and is either enabled (managed service, consent form signed) or deleted (hardware-only / air-gap) in front of the customer.
 4. The handover record lists every account, who now holds it, and the date; both parties sign. Schreiber AI destroys its copies of customer-owned credentials and records this.
-5. Recovery: the customer stores a copy of the gateway backup (G2) and the admin credentials in their own vault. Schreiber AI keeps no customer passwords; recovery of a lost gateway requires the customer's backup or a factory re-image, which loses local history unless a database backup exists.
+5. Recovery: the customer stores a copy of the edge computer backup (G2) and the admin credentials in their own vault. Schreiber AI keeps no customer passwords; recovery of a lost edge computer requires the customer's backup or a factory re-image, which loses local history unless a database backup exists.
 
 ## 4. Training modules and sign-off
 

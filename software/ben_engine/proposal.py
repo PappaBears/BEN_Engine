@@ -104,7 +104,7 @@ SCHEDULE_TIER = {
 
 COMMISSIONING_STEPS = [
     ("1", "Pre-power visual checklist", "Every checklist item answered yes by the operator; no open item"),
-    ("2", "Node discovery and firmware versions", "All nodes answer; firmware versions and hashes match the release record"),
+    ("2", "Pod discovery, attestation and firmware versions", "All BEN Pods answer and attest; firmware versions and hashes match the release record"),
     ("3", "Sensor sanity at idle", "Rack inlet temperatures within 2 K of each other; RH plausible; aisle dP tared"),
     ("4", "I/O point-to-point test", "Every relay toggles and reads back; every contact (door, leak, EPO) reads correctly"),
     ("5", "Power chain: utility meter vs PDU sum", "Meter agrees with the PDU sum within 3 % after metered cooling, house and UPS losses"),
@@ -591,6 +591,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
         ["Row fit", "fits" if d["row_fits"] else "DOES NOT FIT - revise", f"single row {d['row_length_mm']} mm vs interior {int(g['int_l_m'] * 1000)} mm"],
         ["Cooling electrical", f"{d['cooling_elec_kw']} kW", f"COP {COOLING_LIBRARY[cfg.cooling]['cop']} at design point"],
         ["Total electrical demand", f"{d['total_kw']} kW / {d['total_kva']} kVA", "IT + cooling + 2 % house + 0.5 kW controls, pf 0.95"],
+        ["Controls tier", d["controls_label"], ("PLCnext AXC F 2152 + Axioline I/O in a UL 508A BEN Controller panel, OnLogic Karbon 400 edge computer (TPM 2.0)" if d["controls_tier_resolved"] == "pro" else "Revolution Pi RevPi Connect 4 + DIO/AIO (DIN rail, listed), software interlocks behind a hardware watchdog relay") + f"; {d['pods']} BEN Pods on the BEN Mesh (Thread, Secure Vault); selectable with controls_tier (docs/CONTROLS_HARDWARE_DECISION.md 2a)"],
         ["Service", f"{d['voltage']}, {d['service_breaker_a']} A breaker", f"calculated {d['service_amps_calc']} A at 80 % continuous, rounded to the next frame"],
         ["UPS", f"{d['ups_modules']} x {d['ups_kva_each']} kVA", f"IT only with 15 % headroom, {cfg.redundancy}"],
         ["Battery", f"{d['battery_kwh']} kWh lithium (LFP)", f"{cfg.ups_minutes} min at IT load, 90 % depth of discharge"],
@@ -664,13 +665,13 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
     s = Section(8, "Drawings and documents delivered")
     s.p(f"Issue-for-construction drawing set for the {d['tier_label']}, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. {dwg_status}")
     s.table(["Sheet", "Title", "Scale"], sheets)
-    s.p("Document set (indexed binder, encrypted USB in the controls cabinet, and the gateway share, per docs/TURNOVER.md):")
+    s.p("Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):")
     s.ul([
         "At order: this proposal, risk acknowledgement, site requirements form (docs/SITE_REQUIREMENTS.md) for signature",
         "At engineering release (H4): frozen configuration JSON with derived sizing, IFC drawing set with CTQ/CTP callouts, priced bill of materials with confirmation status, arc-flash and coordination study, PE anchorage calculation, compliance pack, FAT/SAT procedure",
         "At FAT (H13): signed commissioning report (JSON + PDF) with sweep CSVs, thermography, door-fan test, electrical and cooling test records",
         "At SAT (H19): site commissioning report, acoustic survey, final arc-flash labels, AHJ certificates",
-        "At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, gateway backup, password handover record, training sign-off, warranty certificates",
+        "At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, Pod certificate register, edge computer backup, password handover record, training sign-off, warranty certificates",
     ])
     sections.append(s)
 
@@ -697,7 +698,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
         s.kv([("Climate", clim["label"]), ("Design values", f"{clim['t_design_c']} °C / {clim['t_min_c']} °C, {clim['corrosion']}, {clim['wind_ms']} m/s")])
     base_rows = [["NFPA 70 (NEC)", "Listed dead-front gear, SCCR 65 kA, selective coordination, arc-flash labels", "Electrical inspection H10, AHJ at H18"],
                  ["NFPA 75 / 2001 / 72", "Non-combustible liner, VEWFD, clean agent with 10-min hold, EPO, HVAC shutdown", "Door-fan test, NFPA 72 record of completion at SAT"],
-                 ["UL 508A", "Controls panel built in a UL 508A shop", "Panel label and schedule"],
+                 ["UL 508A", "BEN Controller panel (PLCnext PLC, I/O, edge computer) built and labelled by a UL 508A shop" if d["controls_tier_resolved"] == "pro" else "BEN Controls Lite: DIN-rail cabinet of UL-listed components (RevPi, QUINT4, switch); no 508A panel label", "Panel label and schedule (CTQ-K6)" if d["controls_tier_resolved"] == "pro" else "Component listing marks (CTQ-K6)"],
                  ["ASHRAE TC 9.9", f"Class {d['ashrae_class']} alarm limits in the controls", "Load step test E3/E7 at FAT and SAT"],
                  ["AIM Act / EPA 608", "GWP < 700 A1 refrigerant or water loops; certified technicians", "Charge record per circuit"],
                  ["ISO 668 / 1496 / CSC", "One-trip high-cube container, PE-checked modifications, CSC decision at transport", "Weld inspection H7, weigh ticket"]]
@@ -759,7 +760,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
     s.kv([
         ("Workmanship warranty", f"{WARRANTY_WORKMANSHIP_MONTHS} months from SAT on the integration, wiring, piping, envelope and controls build"),
         ("Equipment warranty", f"Vendor warranties (UPS, cooling, CDU, batteries, fire panel, generator, servers) registered in the customer's name at turnover and passed through; minimum {WARRANTY_EQUIPMENT_MONTHS} months, longer where the vendor offers it"),
-        ("Controls software", "Signed firmware and gateway updates for the licence term; security fixes for the life of the licence"),
+        ("Controls software", "Signed Pod firmware, PLC project and edge computer updates for the licence term; security fixes for the life of the licence"),
         ("Support level in this option", {
             "hardware_only": "Remote email support during business hours for the warranty period; maintenance by the customer or a certified subcontractor per the schedule",
             "hardware_controls": "Remote dashboard access and business-hours support for the licence term; maintenance by the customer's technician with our remote review",
@@ -1069,6 +1070,7 @@ def _extended_fields(p: Proposal, base: Dict[str, Any], ms: Dict[str, Any], week
         "BATTERY_KWH": f"{d['battery_kwh']:g}", "CLIMATE_DESIGN_TEMP_C": str(clim["t_design_c"]), "COOLING_UNITS_TOTAL": str(d["cooling_units_total"]),
         "GENERATOR_KW": f"{math.ceil(d['total_kw'] * 1.25 / 10) * 10:g}" if gen else "0", "GLYCOL_PCT": "35" if clim["t_min_c"] <= -20 else "25",
         "NFPA855_PACKAGE": str(bool(d.get("nfpa_855_scope"))).lower(), "NODE_COUNT": str(1 + math.ceil(cfg["racks"] / 2)),
+        "POD_COUNT": str(d.get("pods", 3 if tier == "micro" else cfg["racks"] * 2 + 2)), "CONTROLS_TIER_LABEL": d.get("controls_label", "BEN Controls Pro" if tier in ("ben20", "ben40") else "BEN Controls Lite"),
         "PUE_ESTIMATE": f"{d['pue_estimate']:.3f}", "TOTAL_KVA": f"{d['total_kva']:g}", "UPS_KVA_EACH": str(d["ups_kva_each"]), "UPS_MODULES": str(d["ups_modules"]),
         "CORROSIVITY_CLASS": clim["corrosion"], "WIND_SPEED": f"{clim['wind_ms']} m/s (ASCE 7 basic; confirm per site)",
         # pricing by module

@@ -3,10 +3,13 @@
 | Item | Value | Depends on |
 | --- | --- | --- |
 | Lighthouse build BEN Micro + BEN 20 | Converts simulation-verified claims to hardware-verified | Funding, site |
-| ESP32 cross-build in CI with cached toolchain | Firmware verified on target | Network access to Espressif registry or vendored toolchain |
+| EFR32MG24 / Gecko SDK cross-build in CI with a vendored toolchain; OpenThread integration test on two xG24 kits | BEN Pod firmware verified on target | Vendored Simplicity SDK; two Explorer Kits |
+| Secure provisioning cell: PKI issuing CA, J-Link fixture, Secure Vault certificate injection, attestation check in the commissioning script (CTQ-K5) | Every Pod attests; rogue join rejected (E12) | First Pod PCBAs (email 14), HSM token |
+| PLCnext project for the AXC F 2152 (interlocks, failover, watchdog relay) and the RevPi equivalent for BEN Controls Lite; OPC UA / Modbus map to the edge computer | PLC watchdog proven (CTP-K2) | One PLC starter kit, one RevPi Connect 4 |
+| Dashboard mesh health panel (topology, parent, link quality, attestation, battery) and E13 heal-time report | Mesh resilience visible and testable | Pod firmware status fields |
 | 3-D CFD (OpenFOAM) for BEN 40 liquid + air hybrid | Absolute temperatures, not relative | Compute, validation data from lighthouse |
-| Modbus TCP server / SNMP agent on the gateway for customer BMS | Integration with existing facilities | Register map decision |
-| UL 508A listing of controls panel; FCC Part 15 for node carrier | Sellable in most US jurisdictions without exception | Prototype hardware |
+| Modbus TCP server / SNMP agent on the edge computer for customer BMS | Integration with existing facilities | Register map decision |
+| UL 508A listing of the BEN Controller panel through the panel partner (email 17); FCC Part 15 B SDoC for the assembled Pod (modular approval covers the radio) | Sellable in most US jurisdictions without exception | Prototype hardware; panel partner |
 | Mechanical UPS sizing tool (cooling ride-through) in selector | Lets customers price the ride-through option explicitly | Vendor data for fan/pump inrush |
 | Solar + battery sizing for off-grid profile | Completes the off-grid promise | Irradiance data source |
 | Managed-service SOC 2 program | Enterprise and healthcare sales | Ops team |

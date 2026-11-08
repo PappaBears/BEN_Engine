@@ -21,4 +21,4 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install platformio
-      - run: cd firmware/ben-node && (pio test -e native || make -C . test)
+      - run: cd firmware/ben-pod && (pio test -e native || make -C . test)

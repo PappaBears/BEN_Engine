@@ -607,7 +607,7 @@ async def sim_mode(body: Dict[str, Any]):
     RT.gateway_url = str(body.get("gateway_url", RT.gateway_url) or "")
     note = None
     if mode == "live":
-        note = "Live mode records the gateway URL only; this build has no gateway adapter connected, so the twin keeps simulating."
+        note = "Live mode records the BEN Controller (edge computer) URL only; this build has no live adapter connected, so the twin keeps simulating."
     return {"mode": RT.mode, "gateway_url": RT.gateway_url, "note": note}
 
 
@@ -848,7 +848,7 @@ def _chan_unit(name: str) -> str:
 
 
 def _io_fleet():
-    """One ben_engine.sim_nodes.NodeFleet per twin build (virtual BEN nodes on an in-process bus)."""
+    """One ben_engine.sim_nodes.NodeFleet per twin build (virtual BEN Pods on an in-process bus)."""
     mod = _require("sim_nodes")
     if RT.io_fleet is None:
         fleet_cls = getattr(mod, "NodeFleet", None)
@@ -874,7 +874,7 @@ async def io_status():
             channels = [{"id": k, "value": v, "raw": tel["raw"].get(k), "unit": _chan_unit(k), "cal": node.cal.get(k)}
                         for k, v in tel["ch"].items() if not k.startswith("relay")]
             outputs = [{"id": r, "value": node.outputs[r], "function": mod_fn(r)} for r in node.outputs]
-            nodes.append({"id": node.node_id, "kind": node.kind, "racks": list(status.get("racks", [])), "ip": status.get("ip"),
+            nodes.append({"id": node.node_id, "kind": node.kind, "device": status.get("device", "pod"), "attested": status.get("attested", True), "racks": list(status.get("racks", [])), "ip": status.get("ip"),
                           "status": status, "cal_id": tel.get("cal_id"), "seq": tel.get("seq"), "ts": tel.get("ts"),
                           "topic": node.topic("telemetry"), "channels": channels, "outputs": outputs, "online": True,
                           "identify": node.identify_until_s > node.uptime_s})
@@ -892,7 +892,7 @@ def mod_fn(relay: str) -> str:
 
 @app.post("/api/io/test")
 async def io_test(body: Dict[str, Any]):
-    """Send a PROTOCOL.md cmd to a virtual node: {node, channel, value} sets a relay;
+    """Send a PROTOCOL.md cmd to a virtual BEN Pod (node id): {node, channel, value} sets a relay;
     {node, op: identify|get_cal|tare|reboot|set_cal, channel?, gain?, offset?} sends that op."""
     fleet = _io_fleet()
     node_id = body.get("node")

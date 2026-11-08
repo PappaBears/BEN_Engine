@@ -50,7 +50,8 @@ def _ads_raw(ma: float) -> int:
 
 
 class SimNode:
-    """One virtual BEN Node. ``kind`` is 'room' or 'rack'."""
+    """One virtual BEN Pod (logical node id ``nodeN``). ``kind`` is 'room' or 'rack'; the status carries
+    ``device: "pod"`` and ``attested: True`` as a real Pod on the BEN Mesh would (Secure Vault attestation at join)."""
 
     def __init__(self, node_id: str, kind: str, rack_indices: Tuple[int, ...] = (), unit: str = UNIT_DEFAULT,
                  seed: int = 0, on_output: Optional[Callable[[str, str, int], None]] = None,
@@ -142,7 +143,8 @@ class SimNode:
     def status(self) -> Dict[str, Any]:
         return {"fw": FW_VERSION, "uptime_s": round(self.uptime_s, 1), "rssi": -55 - int(self.rng.random() * 3),
                 "ip": self.ip, "heap": 180_000 - 16 * self.seq % 4000, "errors": list(self.errors),
-                "node_id": self.node_id, "kind": self.kind, "racks": [i + 1 for i in self.rack_indices]}
+                "node_id": self.node_id, "kind": self.kind, "racks": [i + 1 for i in self.rack_indices],
+                "device": "pod", "attested": True, "mesh": {"role": "router" if self.kind == "room" else "end_device", "lqi": 3, "parent": None if self.kind == "room" else "node1"}}
 
     # ---------------------------------------------------------------- commands
     def command(self, cmd: Dict[str, Any]) -> Dict[str, Any]:

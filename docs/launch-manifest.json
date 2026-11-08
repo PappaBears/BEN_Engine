@@ -26,13 +26,14 @@
     {"name": "Commissioning script FAT/SAT with signed report", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["commissioning-sim-e2e"]},
     {"name": "Dashboard with 3-D twin, walkthrough, sweeps, I/O test, export, proposal panel", "status": "verified", "evidence": ["docs/VALIDATION.md", "docs/media/screens/desktop-exterior-iso.png"], "check_ids": ["python-suite"]},
     {"name": "Proposal generator and deal package assembler", "status": "verified", "evidence": ["docs/proposals/README.md", "docs/VALIDATION.md"], "check_ids": ["python-suite"]},
-    {"name": "Firmware core (calibration, telemetry, commands, buffering, failsafe)", "status": "verified", "evidence": ["firmware/README.md"], "check_ids": ["firmware-host-tests"]},
-    {"name": "Firmware ESP32 cross-build and hardware layer", "status": "blocked", "evidence": ["firmware/README.md"]},
-    {"name": "Gateway package on Raspberry Pi 5", "status": "implemented_unverified", "evidence": ["firmware/ben-gateway/README.md"]},
+    {"name": "BEN Pod firmware core (calibration, telemetry, commands, buffering, failsafe)", "status": "verified", "evidence": ["firmware/README.md"], "check_ids": ["firmware-host-tests"]},
+    {"name": "BEN Pod EFR32MG24 / OpenThread cross-build, Secure Vault provisioning and attestation", "status": "blocked", "evidence": ["firmware/README.md", "docs/CONTROLS_HARDWARE_DECISION.md"]},
+    {"name": "BEN Controller: edge computer image (OnLogic Karbon 400 / Revolution Pi) and PLCnext project", "status": "implemented_unverified", "evidence": ["firmware/ben-edge/README.md", "docs/CONTROLS_HARDWARE_DECISION.md"]},
+    {"name": "Controls hardware platform decided and costed (BEN Controls Lite / Pro, BEN Mesh)", "status": "verified", "evidence": ["docs/CONTROLS_HARDWARE_DECISION.md", "purchasing/SOURCING_NOTES.md"], "check_ids": ["python-suite"]},
     {"name": "IFC drawings, renders, STE assembly, SQAM generated from configuration", "status": "verified", "evidence": ["design/drawings/INTERFERENCE_CHECKS.md", "docs/SQAM.md"], "check_ids": ["python-suite"]},
     {"name": "BOM with price confidence and RFQ queue", "status": "verified", "evidence": ["docs/BOM.md", "purchasing/SOURCING_NOTES.md"], "check_ids": ["python-suite"]},
     {"name": "Two-sided contract templates with LD flow-down", "status": "implemented_unverified", "evidence": ["docs/contracts/README.md"]},
     {"name": "Product page with profile picker and risks before price", "status": "verified", "evidence": ["docs/media/screens/web-hero.png", "docs/VALIDATION.md"], "check_ids": ["selector-parity"]},
-    {"name": "Live gateway / hardware telemetry", "status": "planned", "evidence": ["docs/ROADMAP.md"]}
+    {"name": "Live BEN Controller / hardware telemetry", "status": "planned", "evidence": ["docs/ROADMAP.md"]}
   ]
 }

@@ -139,7 +139,7 @@ function evidence(ids, st) {
     return h('tr', {}, h('td', { class: 'id' }, s.id), h('td', { class: 'mono' }, val), h('td', { class: 'u' }, s.u95 ? `±${s.u95}` : ''), h('td', { class: 'u' }, s.node));
   }).filter(Boolean);
   if (!rows.length) return h('p', { class: 'muted' }, 'No sensors on this object.');
-  return h('div', {}, h('h4', {}, 'Evidence'), h('table', { class: 'kv evidence' }, h('tr', {}, h('td', {}, 'sensor'), h('td', {}, 'value'), h('td', {}, 'U95'), h('td', {}, 'node')), ...rows),
+  return h('div', {}, h('h4', {}, 'Evidence'), h('table', { class: 'kv evidence' }, h('tr', {}, h('td', {}, 'sensor'), h('td', {}, 'value'), h('td', {}, 'U95'), h('td', {}, 'Pod')), ...rows),
     h('p', { class: 'muted', style: { fontSize: '11px', margin: '6px 0 0' } }, `last update ${fmt.iso(st.wall_ts)} · sim t ${fmt.hms(st.t)}`));
 }
 
@@ -212,7 +212,7 @@ function renderInspector() {
     case 'sensor': {
       const s = store.sensors.find(x => x.id === sel.id); title = sel.id; tag = s ? s.kind : 'sensor';
       const v = sensorValue(sel.id, st);
-      body = [kv([['Value', s && s.unit === 'bool' ? (v ? 'ACTIVE' : 'clear') : `${fmt.num(v, 2)} ${s ? s.unit : ''}`], ['Uncertainty U95 (k=2)', s && s.u95 ? `±${s.u95} ${s.unit}` : '—'], ['Node', s ? s.node : '—'],
+      body = [kv([['Value', s && s.unit === 'bool' ? (v ? 'ACTIVE' : 'clear') : `${fmt.num(v, 2)} ${s ? s.unit : ''}`], ['Uncertainty U95 (k=2)', s && s.u95 ? `±${s.u95} ${s.unit}` : '—'], ['Pod', s ? s.node : '—'],
         ['Location (x, y, z)', s ? s.location_m.map(n => n.toFixed(2)).join(', ') + ' m' : '—'], ['Last update', fmt.iso(st.wall_ts)], ['Calibration', 'cal_id sim-default']])];
       break;
     }

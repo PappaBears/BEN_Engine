@@ -10,7 +10,7 @@ bash scripts/run_dashboard.sh         # http://localhost:8080
 ```bash
 PYTHONPATH=software pytest tests -q --ignore=tests/e2e
 bash tests/e2e/run_e2e.sh             # Playwright, writes docs/media/screens
-cd firmware/ben-node && pio test -e native
+cd firmware/ben-pod && pio test -e native
 ```
 
 ## Regenerate generated deliverables
@@ -22,7 +22,7 @@ python scripts/unit_economics.py       # refreshes VC table + web/assets/pricing
 ```
 
 ## On a gateway
-See `firmware/ben-gateway/README.md`: install, services, logs (`journalctl -u ben-api`), nightly backup location, restore procedure (`ben-restore <backup.tar>`), firmware OTA.
+See `firmware/ben-edge/README.md` (BEN Controller edge computer image; Revolution Pi on BEN Controls Lite): install, services, logs (`journalctl -u ben-api`), nightly backup location, restore procedure (`ben-restore <backup.tar>`), firmware OTA.
 
 ## Backups and recovery
 Git holds code, docs and generated artifacts. It does **not** hold a unit's telemetry database or calibration records; those live on the gateway and in its nightly backup. Recovery drill is part of commissioning step 10.

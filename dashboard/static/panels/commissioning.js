@@ -11,7 +11,7 @@ export default {
     linkEl = h('div', {});
     runBtn = h('button', { class: 'btn btn-primary', id: 'btn-cx-run', onClick: run }, 'Run commissioning in sim');
     el.append(h('h3', {}, 'Script'), h('div', { class: 'row' }, runBtn), statusEl, linkEl, h('h3', {}, 'Steps'), stepsEl,
-      h('p', { class: 'muted', style: { fontSize: '12px' } }, 'The same script runs on site against the gateway; here every step exercises the digital twin and produces a signed report.'));
+      h('p', { class: 'muted', style: { fontSize: '12px' } }, 'The same script runs on site against the BEN Controller; here every step exercises the digital twin and produces a signed report.'));
     poll();
   },
 };

@@ -1,6 +1,6 @@
 # VALIDATION — what was run, what was observed, what was not
 
-Environment: Linux cloud container, Python 3.13.18, Node 22.23, Chromium via Playwright (software WebGL), no hardware, no ESP32 toolchain (download blocked by network policy), vendor websites reachable only through web search/fetch. Dates: 2026-11-07 to 2026-11-08.
+Environment: Linux cloud container, Python 3.13.18, Node 22.23, Chromium via Playwright (software WebGL), no hardware, no EFR32 / Gecko SDK toolchain (download blocked by network policy), vendor websites reachable only through web search/fetch. Dates: 2026-11-07 to 2026-11-08.
 
 Labels: **verified** = run here and observed · **implemented, unverified** = code exists, needs device/credential/service · **simulated** = explicitly fake · **blocked** · **deferred**.
 
@@ -9,7 +9,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 | Check | Command | Observed |
 | --- | --- | --- |
 | Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **113 passed** in 8.7 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, bom, selector parity, api, proposal, package, export) |
-| Firmware host tests | `cd firmware/ben-node && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
+| Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
 | Build contract | `build_control.py run` (skill helper) | python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben40 all **pass** (report under `.schreiber-ai/`, git-ignored) |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |
 | Product page render | `node scripts/shoot_web.mjs` | desktop and 390 px render, selector interactions work, validation error path shown, no horizontal overflow after fix; 404s only for screenshots not yet produced at that time |
@@ -32,7 +32,7 @@ Calibration budgets computed (k = 2): DS18B20 ±0.17 K, SHT45 T ±0.14 K, SHT45 
 
 Screenshots inspected by eye: `docs/media/screens/desktop-exterior-iso.png`, `interior-walkthrough.png`, `alarms.png`, `sweeps.png`, `selector-micro.png`, `selector-ben40.png`, `narrow-390.png`, `live-hot-aisle.png`, `proposal-panel.png`, `web-hero.png`, `web-configure.png`, `web-narrow.png`, `proposal-1.png`, `proposal-2.png`. Fixes made from looking are listed in `docs/PROJECT_NOTES.md`.
 
-Not verified: pointer-lock mouse look (needs a real user gesture), a live gateway connection (no hardware), GPU rendering performance (software WebGL here).
+Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Controller connection (no hardware), GPU rendering performance (software WebGL here).
 
 ## 4. Generated deliverables
 
@@ -51,15 +51,16 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live gatewa
 
 ## 5. Implemented, unverified
 
-- ESP32 HAL and `main.cpp` against real Arduino/ESP-IDF library APIs (never compiled; toolchain download blocked). First `pio run -e olimex_esp32_poe_iso` will need fixes.
-- Gateway package on a Raspberry Pi 5 (package names, VLAN config, nftables rules).
+- EFR32MG24 HAL (`hal_efr32`) and `main.cpp` against the real Gecko SDK / OpenThread APIs (never compiled; toolchain not available). The first build for the MGM240P will need fixes; Secure Vault provisioning and attestation have not run on silicon.
+- Edge computer image on an OnLogic Karbon 400 (TPM measured boot, LUKS sealing, OTBR with two RCPs, package names, VLAN config, nftables rules) and the Revolution Pi image for BEN Controls Lite.
+- PLCnext project (interlocks, watchdog relay) on an AXC F 2152; UL 508A panel build; FCC Part 15 B test of the assembled Pod.
 - Modbus/SNMP adapters for third-party equipment (interfaces described, not coded).
 - Any physical behaviour: thermal time constants, ride-through, fan curves, pressure, acoustics.
 - Contract templates (counsel review), compliance edition years listed as unconfirmed in `docs/COMPLIANCE.md` §13.
 
 ## 6. Blocked / deferred
 
-- ESP32 cross-build: blocked (network). Greenfield factory study: deferred by decision. 3-D CFD: deferred. UL 508A / FCC listings: need hardware.
+- EFR32 build: blocked (toolchain). Controls hardware (PLC, edge computer, Pods) priced, not purchased. Greenfield factory study: deferred by decision. 3-D CFD: deferred. UL 508A / FCC listings: need hardware.
 
 ## 7. Least accurate, in order
 

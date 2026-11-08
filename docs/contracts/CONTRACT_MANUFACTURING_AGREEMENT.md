@@ -17,7 +17,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **[SCHREIBER_
 
 1.3 "**Consigned Materials**" means materials Schreiber AI supplies to Manufacturer at no charge for incorporation into Units, listed in Annex B.
 
-1.4 "**Controls Kit**" means the Consigned UL 508A controls panel (or the panel built by Manufacturer if Manufacturer is the listed panel shop under Section 8.3), gateway, BEN Nodes, sensors, cabling kit, signed firmware on media, calibration references and node certificates.
+1.4 "**Controls Kit**" means the Consigned **BEN Controller** (BEN Controls Pro: the UL 508A listed panel with the Phoenix Contact PLCnext AXC F 2152 controller, Axioline F I/O, QUINT4 24 VDC supplies, SPD, FL SWITCH 2008 and the OnLogic Karbon 400 edge computer, imaged and TPM-enrolled, or the panel built by Manufacturer if Manufacturer is the listed panel shop under Section 8.3; BEN Controls Lite: the DIN-rail cabinet with the Revolution Pi RevPi Connect 4, DIO/AIO, supply and switch), the **BEN Pods** (provisioned with their device certificates at Schreiber AI's provisioning cell, calibrated, with probe strings and enclosures), the border router radios, the industrial transmitters (Pt1000, Setra 264, Vaisala HMW90, RLE LD2100 and leak cable), the RS-485 / 24 VDC cabling kit, signed firmware and the PLC project on media, calibration references and the Pod certificate register.
 
 1.5 "**Purchased Materials**" means materials Manufacturer buys for Units under Section 4.
 
@@ -66,7 +66,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **[SCHREIBER_
 
 4.2 **Purchased Materials.** Manufacturer buys the remaining BOM lines (container or cabinet, structural steel, insulation, liner, doors, coatings, racks, containment kits, trays, lighting, wire and raceway, panelboards and breakers unless consigned, PDUs, transformers, cooling units unless consigned, piping, refrigerant, glycol, fire system components unless by Schreiber AI's contractor) **from the manufacturers and part numbers in the BOM or the approved alternates column**, under `docs/contracts/SUPPLIER_TERMS.md` or terms at least as protective, with certificates of conformance and UL listings as that document's Appendix requires. Substitution without written approval is a Nonconformance.
 
-4.3 **Receiving.** All materials are receiving-inspected (Q-01 for the enclosure; receiving log for others) against the packing list, the BOM part number, the listing mark and visible damage. Serial numbers of UPS, batteries, cooling units, CDU, PDUs, fire panel, gateway and nodes are recorded in the as-built BOM.
+4.3 **Receiving.** All materials are receiving-inspected (Q-01 for the enclosure; receiving log for others) against the packing list, the BOM part number, the listing mark and visible damage. Serial numbers of UPS, batteries, cooling units, CDU, PDUs, fire panel, BEN Controller panel, PLC, edge computer and every BEN Pod (serial, EUI-64, certificate fingerprint) are recorded in the as-built BOM.
 
 4.4 **Pass-through of OEM warranties.** Manufacturer assigns to Schreiber AI (for onward assignment to the End Customer) all OEM warranties on Purchased Materials and provides the registration data at FAT.
 
@@ -304,9 +304,9 @@ Manufacturer carries and provides certificates for: commercial general liability
 | Item | Quantity per Unit | Delivered to Facility by | Storage requirement |
 | --- | --- | --- | --- |
 | UL 508A controls panel (if not built by Manufacturer) | 1 | [CONSIGNED_DATE_PANEL] | Indoor, dry |
-| Gateway (Raspberry Pi 5, SSD, PSU) imaged and sealed | 1 + 1 spare | [CONSIGNED_DATE_GATEWAY] | Indoor, ESD |
-| BEN Nodes programmed with signed firmware and factory `cal_id` | [NODE_COUNT] + spares per `docs/MAINTENANCE.md` Section 7 | [CONSIGNED_DATE_NODES] | Indoor, ESD |
-| Sensor kit (DS18B20 strings, SHT45, SDP810, rope leak, door reed, 4–20 mA shunts) | per Unit | with nodes | Indoor |
+| BEN Controller: UL 508A panel with PLC, I/O, supplies, switch and edge computer (imaged, TPM-enrolled, sealed) — or Lite cabinet with RevPi | 1 + 1 spare edge computer | [CONSIGNED_DATE_GATEWAY] | Indoor, ESD |
+| BEN Pods provisioned with device certificates, signed firmware and factory `cal_id`, with probe strings, enclosures and border router radios | [POD_COUNT] + spares per `docs/MAINTENANCE.md` Section 7 | [CONSIGNED_DATE_NODES] | Indoor, ESD; Pod W batteries fitted at FAT |
+| Sensor kit (Pt1000 probe strings, SDP810, Setra 264 / Vaisala HMW90 / RLE LD2100 on Pro, rope leak, door reed) | per Unit | with Pods | Indoor |
 | Calibration references (for Schreiber AI's use at W12/FAT) | 1 set | with commissioning lead | Returned after FAT |
 | Labels, placards, arc-flash provisional labels, document pocket, laminated procedures | 1 set | [CONSIGNED_DATE_LABELS] | Indoor |
 | Long-lead OEM equipment bought by Schreiber AI (as Build Order states): UPS, battery cabinets, in-row units, CDU, dry cooler, switchgear, generator | per Configuration | [CONSIGNED_DATE_OEM] | Per OEM; batteries per NFPA 855 storage guidance |

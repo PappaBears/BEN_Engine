@@ -27,7 +27,7 @@ Capitalised terms have these meanings throughout this Agreement and every SOW.
 
 1.3 "**ASHRAE Class**" means the thermal envelope (A1, A2, A3 or A4, or W-class for liquid-cooled racks) set in the Configuration for the Unit, per ASHRAE TC 9.9 Thermal Guidelines.
 
-1.4 "**BEN Controls**" means Schreiber AI's controls layer for a Unit: BEN Node firmware, the gateway image and `ben_engine` software, the dashboard, the digital twin, the commissioning, calibration and analysis tools, their documentation (`spec/PROTOCOL.md`, `spec/INTERFACES.md`) and all updates.
+1.4 "**BEN Controls**" means Schreiber AI's controls layer for a Unit: BEN Pod firmware, the BEN Controller image (edge computer and PLC project, or Revolution Pi on BEN Controls Lite) and `ben_engine` software, the dashboard, the digital twin, the commissioning, calibration and analysis tools, their documentation (`spec/PROTOCOL.md`, `spec/INTERFACES.md`) and all updates.
 
 1.5 "**Business Day**" means Monday to Friday excluding United States federal holidays.
 
@@ -216,7 +216,7 @@ Capitalised terms have these meanings throughout this Agreement and every SOW.
 
 10.2 **OEM pass-through.** Purchased components carry their OEM warranties, which Schreiber AI registers in Customer's name at Turnover (Turnover Package item E1) and passes through to Customer. Schreiber AI will administer OEM claims during the workmanship warranty and, under Managed Services, for the service term. Schreiber AI does not extend an OEM warranty.
 
-10.3 **BEN Controls warranty.** BEN Controls software is warranted under the Software Licence. BEN Node and gateway hardware is covered by the RMA procedure in the Warranty Terms.
+10.3 **BEN Controls warranty.** BEN Controls software is warranted under the Software Licence. BEN Pod and edge computer hardware is covered by the RMA procedure in the Warranty Terms.
 
 10.4 **Exclusions.** The warranty does not cover defects or damage caused by: operating outside the ASHRAE Class or the IT kW in the Configuration; outdoor exposure beyond the climate package and ISO 9223 corrosivity class in the Configuration; failure to perform the Maintenance Schedule (or, under Managed Services, refusal of access for it); modification, repair or addition of batteries, refrigerant equipment, firmware or software by anyone other than Schreiber AI or its approved subcontractor; moving the Unit without Schreiber AI; Customer's IT equipment; utility power quality outside `docs/SITE_REQUIREMENTS.md` Section 5; Site conditions differing from the signed Site Requirements; fire, flood, wind, seismic or other events beyond the design values in the Configuration; or normal wear of consumables (filters, batteries, capacitors, gaskets, sealant, desiccants, lamps).
 

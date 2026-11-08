@@ -2,7 +2,7 @@
 // purpose, and the two or three most relevant live values. Also drives keyboard cycling.
 import { api, h, fmt, sensorValue } from './util.js';
 
-let bomRows = [], bomCfgKey = '', tipEl = null, store = null, scene = null, current = null;
+let bomRows = [], bomCfgKey = '', bomLoaded = false, tipEl = null, store = null, scene = null, current = null;
 
 // Catalog code preferences per component type; the first code present in /api/bom wins.
 const CODES = {
@@ -25,7 +25,7 @@ const CODES = {
   tray: ['STR-TRAY', 'PWR-FEEDER'],
   containment: ['STR-CONT-DOOR', 'STR-CONT-FRAME'],
   leak_rope: ['CTL-LEAK', 'CTL-LEAK-LEADER'],
-  sensor_temperature: ['CTL-DS18B20', 'CTL-POD'],
+  sensor_temperature: ['CTL-PT1000', 'CTL-POD'],
   sensor_humidity: ['CTL-SHT45', 'CTL-POD'],
   sensor_pressure: ['CTL-SDP810', 'CTL-POD'],
   sensor_power: ['PWR-METER', 'PWR-CT'],
@@ -44,9 +44,10 @@ function findPart(prefs) {
 export async function loadBom(cfg) {
   const key = JSON.stringify(cfg);
   if (key === bomCfgKey) return;
-  bomCfgKey = key;
-  try { const b = await api('/api/bom'); bomRows = b.lines || []; }
-  catch (e) { bomRows = []; }
+  bomCfgKey = key; bomLoaded = false;
+  try { const b = await api('/api/bom'); if (bomCfgKey !== key) return; bomRows = b.lines || []; bomLoaded = true; }
+  catch (e) { if (bomCfgKey === key) { bomRows = []; bomLoaded = true; } }
+  if (current && tipEl && !tipEl.hidden) render(current); // refresh an open tooltip with the part line
 }
 
 /** Registry entry for a hovered object: name, tag, part preference list, purpose line, live values. */
@@ -133,7 +134,7 @@ function describe(hv) {
       const s = store.sensors.find(x => x.id === hv.id) || { kind: 'temperature', unit: '', u95: 0, node: '?' };
       const v = sensorValue(hv.id, st);
       name = `BEN Pod · ${hv.id}`; tag = s.kind; codes = CODES[`sensor_${s.kind}`] || CODES.pod;
-      const what = { temperature: 'DS18B20 probe on a BEN Pod: 1-Wire temperature at this point, calibrated in a stirred bath.', humidity: 'SHT45 on the room BEN Pod: humidity for condensation and ASHRAE envelope checks.', pressure: 'SDP810 on the room BEN Pod: cold-to-hot aisle ΔP that proves containment and filter state.', power: 'Utility meter (Class 0.5) read by the BEN Controller: the PUE denominator.', leak: 'Leak rope input on the BEN Pod.', contact: 'Reed contact on the door, read by the BEN Pod.' }[s.kind];
+      const what = { temperature: 'Pt1000 class A probe on a BEN Pod: 3-wire RTD temperature at this point, calibrated in a stirred bath.', humidity: 'SHT45 on the room BEN Pod: humidity for condensation and ASHRAE envelope checks.', pressure: 'SDP810 on the room BEN Pod: cold-to-hot aisle ΔP that proves containment and filter state.', power: 'Utility meter (Class 0.5) read by the BEN Controller: the PUE denominator.', leak: 'Leak rope input on the BEN Pod.', contact: 'Reed contact on the door, read by the BEN Pod.' }[s.kind];
       desc = what || 'Sensor channel on a BEN Pod.';
       L('value', s.unit === 'bool' ? (v ? 'ACTIVE' : 'clear') : `${fmt.num(v, 2)} ${s.unit}${s.u95 ? ` ± ${s.u95}` : ''}`, s.unit === 'bool' && v ? 'warn' : ''); L('pod', s.node); L('updated', fmt.clock(st.wall_ts));
       break;
@@ -190,5 +191,5 @@ export function initTooltip({ store: st, scene: sc }) {
     else if (e.key === 'Escape') { scene.clearHover(); }
   });
   canvas.addEventListener('blur', () => { if (current && current.source === 'keyboard') scene.clearHover(); });
-  return { describe, loadBom, get current() { return current; } };
+  return { describe, loadBom, get current() { return current; }, get bomLoaded() { return bomLoaded; }, get bomRows() { return bomRows.length; } };
 }

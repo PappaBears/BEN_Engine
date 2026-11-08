@@ -1,0 +1,88 @@
+address,name,type,rw,scale,unit,description
+40001,PLC_HEARTBEAT,uint16,R,1,,increments every 100 ms cycle; edge alarms if frozen 3 s
+40002,PLC_MODE,enum,R,1,,low byte 0 off 1 auto 2 manual 3 test 4 fault; bit 8 = LITE (RevPi software controller)
+40003,PLC_PROJECT_CRC,uint16,R,1,,CRC-16 of loaded project; edge compares with commissioned value (attested)
+40004,EDGE_WATCHDOG,uint16,W,1,,edge writes rising counter every 1 s; PLC sets EDGE_LOST when unchanged 30 s
+40005,EDGE_LOST,bool,R,1,,1 = PLC on its own setpoints; edge trim ignored
+40006,SUPPLY_TRIM_x10,int16,W,0.1,K,edge supply setpoint trim -20..+20; clamped; ignored when EDGE_LOST
+40007,TEST_REQUEST,enum,W,1,,0 none 1 failover sweep 2 UPS ride-through 3 generator exercise; accepted only in AUTO with no alarm; cleared by PLC
+40010,COOL_CMD,bitfield,R,1,,bit n = cooling unit n+1 commanded run
+40011,COOL_RUN,bitfield,R,1,,bit n = unit n+1 run feedback
+40012,COOL_FAULT,bitfield,R,1,,bit n = unit n+1 fault (contact or comms loss)
+40013,COOL_LEAD,uint16,R,1,,index 1..N of current lead unit (weekly rotation)
+40014,COOL_N_REQUIRED,uint16,R,1,,units required for current load incl. redundancy
+40015,COOL_FAILOVER_CNT,uint16,R,1,,failovers since power-up
+40016,COOL_LAST_FAILOVER_S,uint16,R,1,s,seconds since last failover (saturates)
+40017,COOL_CMD_HI,bitfield,R,1,,reserved: units 17-32
+40018,COOL_RUN_HI,bitfield,R,1,,reserved: units 17-32
+40020,LEAK_ZONE,bitfield,R,1,,bit n = hardwired leak zone n+1 wet (SeaHawk)
+40021,ISO_VALVE_CMD,bitfield,R,1,,bit n = isolation valve n+1 commanded closed
+40022,ISO_VALVE_CLOSED,bitfield,R,1,,bit n = valve n+1 closed limit switch
+40023,ISO_VALVE_FAULT,bitfield,R,1,,bit n = valve did not reach limit within 30 s
+40024,CDU_PUMP_STOP,bool,R,1,,1 = PLC stopped CDU pumps (leak in zone whose valve failed)
+40030,DOOR_STATE,bitfield,R,1,,bit n = door n+1 open
+40031,DOOR_OPEN_S,uint16,R,1,s,seconds longest-open door has been open
+40032,EPO_LOOP_OK,bool,R,1,,1 = EPO loop closed (MONITOR ONLY)
+40033,FIRE_PANEL,bitfield,R,1,,bit0 alarm bit1 trouble bit2 released bit3 supervisory (aux contacts; monitor only)
+40040,ATS_SOURCE,enum,R,1,,0 none 1 utility 2 generator 3 in transfer
+40041,GEN_STATE,enum,R,1,,0 off 1 starting 2 running 3 cooldown 4 fault 5 not ready
+40042,GEN_RUN_S,uint16,R,1,s,seconds in current generator run
+40043,UPS_ON_BATTERY,bool,R,1,,UPS dry contact
+40044,UTILITY_OK,bool,R,1,,ATS utility-available contact
+40050,IT_KW_x10,uint16,R,0.1,kW,IT load from branch meter
+40051,SUPPLY_C_x10,int16,R,0.1,degC,cooling supply temperature (lead unit)
+40052,RETURN_C_x10,int16,R,0.1,degC,return temperature
+40053,OUTDOOR_C_x10,int16,R,0.1,degC,outdoor Pt1000
+40054,AISLE_DP_x10,int16,R,0.1,Pa,Setra 264 / Dwyer MS2 differential pressure
+40055,RH_x10,uint16,R,0.1,%RH,Vaisala HMD relative humidity
+40060,RTD_01_x100,int16,R,0.01,degC,Pt1000 string input 1 (AXL F RTD4) -> plcN T_in_1
+40061,RTD_02_x100,int16,R,0.01,degC,Pt1000 input 2
+40062,RTD_03_x100,int16,R,0.01,degC,Pt1000 input 3
+40063,RTD_04_x100,int16,R,0.01,degC,Pt1000 input 4
+40064,RTD_05_x100,int16,R,0.01,degC,Pt1000 input 5
+40065,RTD_06_x100,int16,R,0.01,degC,Pt1000 input 6
+40066,RTD_07_x100,int16,R,0.01,degC,Pt1000 input 7
+40067,RTD_08_x100,int16,R,0.01,degC,Pt1000 input 8
+40068,RTD_09_x100,int16,R,0.01,degC,Pt1000 input 9
+40069,RTD_10_x100,int16,R,0.01,degC,Pt1000 input 10
+40070,RTD_11_x100,int16,R,0.01,degC,Pt1000 input 11
+40071,RTD_12_x100,int16,R,0.01,degC,Pt1000 input 12
+40072,RTD_13_x100,int16,R,0.01,degC,Pt1000 input 13
+40073,RTD_14_x100,int16,R,0.01,degC,Pt1000 input 14
+40074,RTD_15_x100,int16,R,0.01,degC,Pt1000 input 15
+40075,RTD_16_x100,int16,R,0.01,degC,Pt1000 input 16
+40076,RTD_17_x100,int16,R,0.01,degC,Pt1000 input 17
+40077,RTD_18_x100,int16,R,0.01,degC,Pt1000 input 18
+40078,RTD_19_x100,int16,R,0.01,degC,Pt1000 input 19
+40079,RTD_20_x100,int16,R,0.01,degC,Pt1000 input 20
+40080,RTD_21_x100,int16,R,0.01,degC,Pt1000 input 21
+40081,RTD_22_x100,int16,R,0.01,degC,Pt1000 input 22
+40082,RTD_23_x100,int16,R,0.01,degC,Pt1000 input 23
+40083,RTD_24_x100,int16,R,0.01,degC,Pt1000 input 24
+40084,RTD_25_x100,int16,R,0.01,degC,Pt1000 input 25
+40085,RTD_26_x100,int16,R,0.01,degC,Pt1000 input 26
+40086,RTD_27_x100,int16,R,0.01,degC,Pt1000 input 27
+40087,RTD_28_x100,int16,R,0.01,degC,Pt1000 input 28
+40088,RTD_29_x100,int16,R,0.01,degC,Pt1000 input 29
+40089,RTD_30_x100,int16,R,0.01,degC,Pt1000 input 30
+40090,RTD_31_x100,int16,R,0.01,degC,Pt1000 input 31
+40091,RTD_32_x100,int16,R,0.01,degC,Pt1000 input 32
+40100,AI_01_uA,uint16,R,0.001,mA,4-20 mA input 1 (AXL F AI4 I 1H) -> plcN ai0_mA
+40101,AI_02_uA,uint16,R,0.001,mA,4-20 mA input 2
+40102,AI_03_uA,uint16,R,0.001,mA,4-20 mA input 3
+40103,AI_04_uA,uint16,R,0.001,mA,4-20 mA input 4
+40104,AI_05_uA,uint16,R,0.001,mA,4-20 mA input 5
+40105,AI_06_uA,uint16,R,0.001,mA,4-20 mA input 6
+40106,AI_07_uA,uint16,R,0.001,mA,4-20 mA input 7
+40107,AI_08_uA,uint16,R,0.001,mA,4-20 mA input 8
+40108,AI_09_uA,uint16,R,0.001,mA,4-20 mA input 9
+40109,AI_10_uA,uint16,R,0.001,mA,4-20 mA input 10
+40110,AI_11_uA,uint16,R,0.001,mA,4-20 mA input 11
+40111,AI_12_uA,uint16,R,0.001,mA,4-20 mA input 12
+40112,AI_13_uA,uint16,R,0.001,mA,4-20 mA input 13
+40113,AI_14_uA,uint16,R,0.001,mA,4-20 mA input 14
+40114,AI_15_uA,uint16,R,0.001,mA,4-20 mA input 15
+40115,AI_16_uA,uint16,R,0.001,mA,4-20 mA input 16
+40120,ALARM_WORD,bitfield,R,1,,bit0 cooling capacity lost 1 all units faulted 2 leak isolation 3 valve fault 4 door>5min 5 EPO open 6 fire alarm 7 gen fault 8 ATS on gen 9 edge lost 10 PSU redundancy lost 11 24V UPS on battery
+40121,PSU_REDUNDANCY_OK,bool,R,1,,24 VDC redundancy module OK contact
+40122,PANEL_TEMP_C_x10,int16,R,0.1,degC,panel internal temperature

@@ -23,8 +23,9 @@
 | Dashboard: 3-D twin, walkthrough, guided tour, sweeps, fault injection, I/O test, calibration, CFD, export, **proposal** | `dashboard/`, `api.py` | verified (26 API tests, Playwright e2e with screenshots) |
 | Proposal generator: selector → 16-section customer proposal, md/html/json, contract pre-fill | `proposal.py`, `docs/proposals/` | verified (16 tests; rendered and inspected) |
 | Deal package assembler: customer package + partner package as zips | `package.py` | verified (tests; sample built) |
-| Firmware: BEN Node core (calibration, telemetry, commands, ring buffer, failsafe) | `firmware/ben-node` | verified on host (37 unit tests); **ESP32 cross-build unverified** |
-| Gateway package (Pi 5: broker, services, firewall, backups) | `firmware/ben-gateway` | implemented, unverified on hardware |
+| Firmware: BEN Pod core (calibration, telemetry, commands, ring buffer, failsafe) on Silicon Labs MGM240P / Thread | `firmware/ben-pod` | verified on host (37 unit tests); **EFR32MG24 cross-build and Secure Vault attestation unverified** |
+| BEN Controller: industrial edge computer image (OnLogic Karbon 400, TPM: broker, OTBR, services, firewall, backups) + PLCnext PLC project (interlocks, watchdog); Revolution Pi image for BEN Controls Lite | `firmware/ben-edge` | implemented, unverified on hardware |
+| Controls hardware platform: BEN Controls Pro (PLCnext AXC F 2152 + Axioline I/O in a UL 508A panel) and BEN Controls Lite (RevPi Connect 4), BEN Pods on BEN Mesh, priced in the catalog, selected by `Config.controls_tier` | `docs/CONTROLS_HARDWARE_DECISION.md`, `purchasing/parts_catalog.json` | decided and costed; hardware not yet built |
 | IFC drawing set (7 sheets × 4 tiers) with CTQ/CTP tables, interference checks | `design/drawings/` | verified (generated, inspected) |
 | Concept assembly renders and ASD-STE100 assembly instructions, QC forms, CTQ cards | `design/renders/`, `design/assembly/` | verified (generated; STE rules checked by script) |
 | Supplier Quality Assurance Manual generated from the CTQ register | `docs/SQAM.md` | verified (generated) |
@@ -56,7 +57,7 @@ PYTHONPATH=software python -m ben_engine.cfd --tier ben20 --png /tmp/cfd.png
 PYTHONPATH=software python -m ben_engine.proposal --tier ben20 --profile healthcare --option managed --customer "Acme Clinic" --site "Austin, TX" --out /tmp/p.md --html /tmp/p.html
 PYTHONPATH=software python -m ben_engine.package --tier ben20 --profile healthcare --option managed --customer "Acme Clinic" --site "Austin, TX"
 PYTHONPATH=software python -m ben_engine.bom --all
-cd firmware/ben-node && make test
+cd firmware/ben-pod && make test
 ```
 
 ## The product family
@@ -84,16 +85,16 @@ flowchart LR
   CFG --> COMP[Compliance pack · risk list]
 ```
 
-Full architecture, trust boundaries and failure behaviour: `docs/ARCHITECTURE.md`. Protocol between nodes and gateway: `spec/PROTOCOL.md`.
+Full architecture, trust boundaries and failure behaviour: `docs/ARCHITECTURE.md`. Protocol between BEN Pods, the PLC and the edge computer: `spec/PROTOCOL.md`.
 
 ## Deliverable map
 
-- **Engineering:** `design/DESIGN_BASIS.md`, `design/drawings/<tier>/`, `design/drawings/INTERFERENCE_CHECKS.md`, `design/specs/` (node and gateway spec sheets, controls spec, one-line wiring SVGs), `design/assembly/` (STE instructions, QC forms, CTQ cards)
+- **Engineering:** `design/DESIGN_BASIS.md`, `design/drawings/<tier>/`, `design/drawings/INTERFERENCE_CHECKS.md`, `design/specs/` (BEN Pod and BEN Controller spec sheets, controls spec, one-line wiring SVGs), `design/assembly/` (STE instructions, QC forms, CTQ cards)
 - **Quality for third parties:** `docs/SQAM.md`, `docs/MANUFACTURING_STRATEGY.md`, `docs/PROCESS_FLOW.md`
 - **Operations:** `docs/COMPLIANCE.md`, `docs/RISK_REGISTER.md`, `docs/SITE_REQUIREMENTS.md`, `docs/TURNOVER.md`, `docs/MAINTENANCE.md`, `docs/BUILD_AND_WIRING.md`, `docs/TEST_GUIDE.md`, `docs/CYBERSECURITY.md`, `docs/ANALYSIS_AND_CALIBRATION.md`
 - **Commercial:** `docs/proposals/` (samples), `docs/contracts/` (templates and `fields.json`), `purchasing/` (catalog, BOMs, RFQ queue, sourcing notes), `docs/investors/` (VC proposition, market sources, deck)
 - **Marketing:** `web/index.html` (product page), `web/kit/` (brand guide, marketing kit, logo, wordmark)
-- **Firmware:** `firmware/README.md`, `firmware/ben-node/`, `firmware/ben-gateway/`
+- **Firmware:** `firmware/README.md`, `firmware/ben-pod/`, `firmware/ben-edge/`
 - **Record:** `docs/BRIEF.md`, `docs/PROJECT_STATE.md`, `docs/PROJECT_NOTES.md`, `docs/TASKS.md`, `docs/VALIDATION.md`, `docs/ROADMAP.md`, `docs/FAQ.md`
 
 ## Tests and evidence
@@ -101,14 +102,14 @@ Full architecture, trust boundaries and failure behaviour: `docs/ARCHITECTURE.md
 ```bash
 PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e   # python suite
 bash tests/e2e/run_e2e.sh                                          # Playwright, ~13 min under software WebGL
-cd firmware/ben-node && make test                                  # 37 host unit tests
+cd firmware/ben-pod && make test                                   # 37 host unit tests
 ```
 
 Observed results and screenshots: `docs/VALIDATION.md`, `docs/media/screens/`.
 
 ## Operations, checkpoints, recovery
 
-See `docs/OPERATIONS.md`. Code and generated documents are in git; a deployed unit's telemetry database lives on its gateway with a nightly backup (`firmware/ben-gateway`). Licence of this repository is unresolved; the owner has not chosen one.
+See `docs/OPERATIONS.md`. Code and generated documents are in git; a deployed unit's telemetry database lives on its edge computer with a nightly backup (`firmware/ben-edge`). Licence of this repository is unresolved; the owner has not chosen one.
 
 ## Decks
 

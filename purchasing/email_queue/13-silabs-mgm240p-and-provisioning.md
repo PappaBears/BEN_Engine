@@ -8,7 +8,7 @@ Prepared: 2026-11-08
 
 Hello,
 
-I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). The controls layer is an industrial platform: a PLC or Revolution Pi controller, an industrial edge computer, and our own secure sensing mesh (BEN Mesh) built on Silicon Labs MGM240P Thread modules. We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
+I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (a 5 kW outdoor cabinet, 30 / 150 / 500 kW relocatable modules and a 2 MW prefabricated center). The controls layer is an industrial platform: a PLC or Revolution Pi controller, an industrial edge computer, and our own secure sensing mesh (BEN Mesh) built on Silicon Labs MGM240P Thread modules. We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
 The BEN Pod (our sensor/IO board, two load options: Pod W wireless and Pod E wired RS-485/Ethernet) uses the MGM240PB32VNA3R Thread/802.15.4 module (EFR32MG24, Secure Vault High, PCB antenna, FCC/IC/CE modular approval). Our border router uses the same radio as an RCP on USB. Each Pod receives a per-device X.509 certificate from Schreiber AI's PKI at provisioning and attests at network join; keys never leave the chip. Distributor prices seen 2026-11-08: Mouser $9.86 (T&R, 2,099 in stock), DigiKey $5.65 at 1,000 (cut tape, 12-week lead on EU sites), Symmetry $11.03.

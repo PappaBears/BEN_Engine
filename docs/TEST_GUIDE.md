@@ -2,9 +2,9 @@
 
 **Owner:** Schreiber AI engineering. **Rule:** every experiment runs **first in the digital twin** (`ben_engine.twin.Twin`, faults via `tw.inject(...)`) so the expected curve is known before anyone touches the real unit; then at **FAT** (factory mode: load banks, shop power) and, where marked, again at **SAT** (site mode: real utility, real outdoor air). The commissioning script `software/ben_engine/commissioning.py` executes the experiments marked "scripted" and writes a signed report; the others are run by hand and the data attached.
 
-Channel names are from `spec/PROTOCOL.md`: node telemetry `T_in_1..4`, `T_out_1..4`, `T_ref`, `RH`, `dP_aisle`, `leak`, `door`, `ai0..3_mA`, `pulse_kwh`; equipment telemetry (`ben/<unit>/equip/<id>/telemetry`): `kw`, `kva`, `v_ab`, `i_a`, `supply_c`, `return_c`, `fan_pct`, `soc_pct`, `runtime_min`, `alarm[]`; twin/dashboard state: `rack_inlet_c[]`, `rack_outlet_c[]`, `aisle_dp_pa`, `power.utility_kw`, `power.pdu_kw[]`, `power.ups_on_battery`, `pue`.
+Channel names are from `spec/PROTOCOL.md`: BEN Pod telemetry `T_in_1..4`, `T_out_1..4`, `T_ref`, `RH`, `dP_aisle`, `leak`, `door`, `ai0..3_mA`, `pulse_kwh`; equipment telemetry (`ben/<unit>/equip/<id>/telemetry`): `kw`, `kva`, `v_ab`, `i_a`, `supply_c`, `return_c`, `fan_pct`, `soc_pct`, `runtime_min`, `alarm[]`; twin/dashboard state: `rack_inlet_c[]`, `rack_outlet_c[]`, `aisle_dp_pa`, `power.utility_kw`, `power.pdu_kw[]`, `power.ups_on_battery`, `pue`.
 
-Data rate for all experiments: node telemetry at 1 Hz (set 2 Hz for E3/E5 transients), equipment at 1–10 s, outdoor temperature from the site weather sensor or the dry-cooler inlet probe. All data is exported as CSV (`GET /api/export.csv`) and kept with the report.
+Data rate for all experiments: Pod telemetry at 1 Hz (set 2 Hz for E3/E5 transients), equipment at 1–10 s, outdoor temperature from the site weather sensor or the dry-cooler inlet probe. All data is exported as CSV (`GET /api/export.csv`) and kept with the report.
 
 Summary:
 
@@ -21,7 +21,8 @@ Summary:
 | E9 | Power meter vs PDU sum reconciliation | twin, FAT, SAT | yes | Metering is right; PUE is honest |
 | E10 | Acoustic survey at property line | SAT | no | Noise ordinance compliance |
 | E11 | 48-hour burn-in | FAT (24 h minimum) / SAT (48 h) | yes | Infant mortality caught; stability |
-| E12 | Cyber: port scan and failsafe on gateway loss | twin, FAT, SAT | yes | No open attack surface; loss of gateway is safe |
+| E12 | Cyber: port scan, Pod attestation, rogue-join rejection and failsafe on controller loss | twin, FAT, SAT | yes | No open attack surface; only attested Pods join; loss of the edge computer or PLC is safe |
+| E13 | Mesh resilience: pull a router Pod, measure heal time | twin (model), FAT, SAT | partly | BEN Mesh heals around a lost router without data loss |
 
 Common "what to do if it fails": stop, record, do not adjust more than one thing, re-run on the twin with the suspected fault injected to see whether the twin reproduces the real data — if it does not, the model is wrong and `analysis.py` must be refit; if it does, fix the hardware cause and repeat.
 
@@ -34,12 +35,12 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 | **Purpose** | Verify that every temperature and humidity sensor agrees when there is no reason for them to differ, and that calibration coefficients (`cal_id`) are loaded. |
 | **Hypothesis** | With IT load off, cooling fans on low (mixing) and compressors off for ≥ 60 minutes, the container air is isothermal within 0.3 °C; all `T_in_*`, `T_out_*` and `T_ref` read within their combined k=2 uncertainty (±0.25 °C DS18B20, ±0.15 °C SHT45 → pair limit 0.3 °C). |
 | **Setup** | Unit closed, doors shut, IT load 0 (load banks off), cooling units in "fan only" at 30 %, lights off (lights add ~0.3 kW), outdoor temperature between 10 and 30 °C (otherwise the envelope gain creates a gradient — record `outdoor_c`). Twin: `tw.set_it_load(0.0)`, cooling fan-only mode, run 3,600 s. |
-| **Instrumentation** | All node channels at 1 Hz; one traceable reference probe (handheld, ±0.1 °C) placed next to `T_ref`, then moved to two inlet positions for 5 minutes each. |
-| **Procedure** | 1. Confirm `cal_id` on every node matches the calibration certificates. 2. Wait 60 min, logging. 3. Take the last 10 minutes; compute mean and standard deviation per channel. 4. Compute each channel's deviation from the all-channel median and from the reference probe. 5. Repeat with fans off for 10 min to see stratification appear (expected: top − bottom rises to 0.5–1.5 °C, proving the three-height layout sees it). |
+| **Instrumentation** | All Pod channels at 1 Hz; one traceable reference probe (handheld, ±0.1 °C) placed next to `T_ref`, then moved to two inlet positions for 5 minutes each. |
+| **Procedure** | 1. Confirm `cal_id` on every Pod matches the calibration certificates. 2. Wait 60 min, logging. 3. Take the last 10 minutes; compute mean and standard deviation per channel. 4. Compute each channel's deviation from the all-channel median and from the reference probe. 5. Repeat with fans off for 10 min to see stratification appear (expected: top − bottom rises to 0.5–1.5 °C, proving the three-height layout sees it). |
 | **Data to record** | 10-min means/SD per channel; reference readings with time; `outdoor_c`; fan %; `RH` at supply and return; raw ADC counts (`raw`) for later re-processing. |
 | **Analysis** | Deviation table; flag channels outside ±0.3 °C from median; compute RH consistency: humidity ratio from (T, RH) at supply and return must match within 0.3 g/kg. |
-| **Pass** | ≥ 95 % of channels within ±0.3 °C of median and the reference; no channel beyond ±0.5 °C; RH humidity-ratio match within 0.3 g/kg; `cal_id` verified on 100 % of nodes. |
-| **If it fails** | Single channel out: check mounting (touching metal? near a light?), then swap the sensor with a spare and re-run; if the deviation moves with the sensor, recalibrate/replace; if it stays, it is a placement effect — fix placement. Many channels out with a pattern by height: the room is not isothermal — extend mixing time or wait for milder outdoor temperature. Whole node offset: `cal_id` wrong — reload coefficients. |
+| **Pass** | ≥ 95 % of channels within ±0.3 °C of median and the reference; no channel beyond ±0.5 °C; RH humidity-ratio match within 0.3 g/kg; `cal_id` verified on 100 % of Pods. |
+| **If it fails** | Single channel out: check mounting (touching metal? near a light?), then swap the sensor with a spare and re-run; if the deviation moves with the sensor, recalibrate/replace; if it stays, it is a placement effect — fix placement. Many channels out with a pattern by height: the room is not isothermal — extend mixing time or wait for milder outdoor temperature. Whole Pod offset: `cal_id` wrong — reload coefficients. |
 
 ## E2 — dP tare and fan-off zero
 
@@ -62,7 +63,7 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 | **Purpose** | Measure how fast the room responds to load, how much hot air leaks back to the inlets, and whether the cooling capacity in `config.derived()` is real. |
 | **Hypothesis** | A step from 0 to 50 % and 50 to 100 % of `it_kw` with cooling in automatic produces an inlet temperature rise that settles with a time constant τ of 3–8 minutes (air-cooled container, small thermal mass) and a settled inlet rise ≤ 2 °C at 100 %; recirculation ratio (fraction of rack inlet air that is rack outlet air) ≤ 10 % with containment closed. |
 | **Setup** | Resistive load banks in the racks (or server heaters) wired to the rack PDUs in the same positions as real IT; airflow through the load banks front-to-back at roughly 125 cfm/kW (match server airflow, otherwise ΔT is unrepresentative). Cooling in auto with commissioning setpoints. Twin: `tw.set_it_load(0.5)` then `1.0`, dt = 1 s. |
-| **Instrumentation** | `T_in_1..3` per rack (three heights), `T_out_*`, `T_ref`, `supply_c`, `return_c`, `fan_pct`, `kw` per cooling unit, `pdu_kw[]`, `utility_kw`, `dP_aisle`, `outdoor_c`; 2 Hz on nodes. |
+| **Instrumentation** | `T_in_1..3` per rack (three heights), `T_out_*`, `T_ref`, `supply_c`, `return_c`, `fan_pct`, `kw` per cooling unit, `pdu_kw[]`, `utility_kw`, `dP_aisle`, `outdoor_c`; 2 Hz on Pods. |
 | **Procedure** | 1. Idle 30 min (E1 condition). 2. Step to 50 %; hold until all inlets change < 0.1 °C per 5 min (settled), minimum 45 min. 3. Step to 100 %; hold until settled, minimum 60 min. 4. Step down to 0; log the decay 45 min. 5. At 100 % settled, record the top/middle/bottom inlet spread per rack. |
 | **Data to record** | Full time series; settled values at each level; `outdoor_c`; cooling unit on/off states and fan %. |
 | **Analysis** | **Time constant:** fit the inlet rise to T(t) = T₀ + ΔT·(1 − e^(−t/τ)) per rack; report τ and ΔT. **Recirculation ratio** r = (T_in − T_supply) / (T_out − T_supply) per rack at settled 100 % (a mixing balance: inlet air is supply air plus a fraction r of outlet air). **Capacity check:** Σ cooling `kw` (sensible, from vendor curve or from airflow × ΔT) vs Σ `pdu_kw` + lights/fan heat; and heat balance closure within 10 %. **Rack ΔT** = mean(T_out) − mean(T_in): should be 10–14 K at 125 cfm/kW. Compare every curve with the twin prediction; store the fit coefficients for `analysis.py`. |
@@ -118,11 +119,11 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 | **Purpose** | Set the filter dP alarm threshold on real data and show how much capacity is lost with loaded filters. |
 | **Hypothesis** | Blanking 50 % of a cooling unit's filter face area roughly doubles its filter dP at constant fan speed (dP ∝ velocity² through the remaining area), reduces airflow by 15–30 % at constant fan command, and the unit's EC fans compensate by raising speed up to their limit; at 75 % blank-off, supply airflow falls enough that inlet temperatures rise ≥ 1 °C at 100 % load. |
 | **Setup** | 100 % load; cardboard blank-off sheets cut to 25/50/75 % of filter face per unit. Twin: `tw.inject("filter_clog", unit=k, fraction=f)`. |
-| **Instrumentation** | Unit filter dP (vendor Modbus point or a second SDP810 across the filter on a spare node), `fan_pct`, unit `kw`, `supply_c`, inlets, `dP_aisle`. |
+| **Instrumentation** | Unit filter dP (vendor Modbus point or a second SDP810 across the filter on a spare Pod), `fan_pct`, unit `kw`, `supply_c`, inlets, `dP_aisle`. |
 | **Procedure** | For one unit: 0 → 25 → 50 → 75 % blank-off, 15 min each, then clear. Repeat on one more unit to confirm. |
 | **Data to record** | Filter dP, fan %, airflow (if the unit reports it), supply temperature, worst inlet, `dP_aisle`, at each level. |
 | **Analysis** | Plot filter dP vs blank-off fraction (expect ∝ 1/(1−f)²); identify the blank-off at which inlets start to rise; set the "replace filter" alarm at the filter dP corresponding to ~50 % blockage and the "critical" alarm at the point of inlet rise. |
-| **Pass** | Alarm thresholds derived and written into the gateway config with the supporting plot; no inlet exceeds the recommended max at 50 % blank-off on one unit (N+1 should cover); twin reproduces the trend. |
+| **Pass** | Alarm thresholds derived and written into the edge computer config with the supporting plot; no inlet exceeds the recommended max at 50 % blank-off on one unit (N+1 should cover); twin reproduces the trend. |
 | **If it fails** | Inlets rise already at 25 %: airflow is marginal — check fan curves, containment leakage (E3), and consider lower filter grade (MERV 8 instead of 13 where outdoor air is not introduced). |
 
 ## E8 — Outdoor temperature derate
@@ -172,28 +173,44 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 | | |
 | --- | --- |
 | **Purpose** | Catch infant failures and slow drifts before the customer's IT goes in; produce the baseline the weekly remote checks compare against. |
-| **Hypothesis** | Over 48 h at a load profile cycling 30 → 100 → 30 % every 4 h, no alarm occurs, no node resets, inlet temperatures track load without drift, UPS stays at 100 % SOC, and all redundant sensor pairs stay within 0.3 °C. |
+| **Hypothesis** | Over 48 h at a load profile cycling 30 → 100 → 30 % every 4 h, no alarm occurs, no Pod resets, inlet temperatures track load without drift, UPS stays at 100 % SOC, and all redundant sensor pairs stay within 0.3 °C. |
 | **Setup** | Load banks on an automatic profile (or the dashboard sweep `POST /api/sweep {"name":"burnin48"}`); FAT runs a minimum 24 h version, SAT the full 48 h. |
-| **Instrumentation** | Everything; node `status` (uptime, heap, rssi/ip, errors) at 10 s. |
+| **Instrumentation** | Everything; Pod `status` (uptime, heap, link quality, parent, attestation, battery, errors) at 10 s. |
 | **Procedure** | Start the sweep; review at 12 h intervals remotely; hands-off otherwise. |
-| **Data to record** | Full telemetry; alarm log; node status log; cooling unit cycle counts; UPS log. |
-| **Analysis** | `analysis.py` burn-in report: drift per channel (linear fit over 48 h after removing load correlation), alarm count, node resets (uptime discontinuities), heap trend (memory leak check), cooling cycle counts (short-cycling), heat balance per 4 h block. |
-| **Pass** | Zero node resets; zero unexplained alarms; channel drift ≤ 0.2 °C/48 h; heap stable (≤ 5 % decline); no cooling unit > 6 starts/h; heat balance within 10 % in every block. |
-| **If it fails** | Node reset: PoE budget, firmware watchdog, brown-out — fix root cause and re-run 24 h. Short-cycling: deadband/staging settings. Drift: sensor or placement — E1. |
+| **Data to record** | Full telemetry; alarm log; Pod status log; cooling unit cycle counts; UPS log. |
+| **Analysis** | `analysis.py` burn-in report: drift per channel (linear fit over 48 h after removing load correlation), alarm count, Pod resets (uptime discontinuities), heap trend (memory leak check), cooling cycle counts (short-cycling), heat balance per 4 h block. |
+| **Pass** | Zero Pod resets; zero unexplained alarms; channel drift ≤ 0.2 °C/48 h; heap stable (≤ 5 % decline); no cooling unit > 6 starts/h; heat balance within 10 % in every block. |
+| **If it fails** | Pod reset: battery / 24 VDC drop, firmware watchdog, brown-out — fix root cause and re-run 24 h. Short-cycling: deadband/staging settings. Drift: sensor or placement — E1. |
 
-## E12 — Cyber: port scan and failsafe on gateway loss
+## E12 — Cyber: port scan, Pod attestation, rogue-join rejection and failsafe on controller loss
 
 | | |
 | --- | --- |
-| **Purpose** | Prove the controls network exposes nothing it should not, that default credentials are gone, and that losing the gateway or the controls network leaves the physical plant safe. |
-| **Hypothesis** | From the customer LAN side of the firewall, no BEN controls port is reachable; from inside the controls LAN only the documented services answer (MQTT 8883 with TLS and client certs, dashboard HTTPS 443, SSH 22 key-only if enabled); no device answers to default credentials; pulling the gateway keeps nodes measuring and buffering for 1 h and leaves outputs in last state except `failsafe` outputs, which drop (cooling-enable relay wired so cooling stays ON). |
-| **Setup** | Laptop with nmap and a credential-check script; permission in writing from the customer for the SAT scan; the twin for the failsafe sequence (`tw.inject("gateway_loss")` or stopping the broker in sim). |
-| **Instrumentation** | nmap outputs; MQTT broker logs; node `status` and buffered telemetry; cooling unit run state (observed physically); dashboard alarm log. |
-| **Procedure** | 1. From customer LAN: `nmap -sS -sU -p- <controls subnet>` — expect no response/filtered. 2. From controls LAN: full TCP/UDP scan of every device (gateway, switch, nodes, UPS, cooling, PDU, fire-panel gateway if any); list open ports and compare with the allowed list in `CYBERSECURITY.md`. 3. Default-credential attempt on every web/SNMP/Modbus interface (vendor defaults list). 4. Verify firmware signature check: attempt to OTA an unsigned image → must be rejected and logged. 5. Power off the gateway for 15 min: observe nodes (LED/status), cooling stays on, `failsafe` relay drops, fire panel unaffected; restore and confirm buffered data arrives with correct `ts`/`seq` and no gaps. 6. Unplug the controls switch uplink to the customer LAN: dashboard still works locally, alarms still raised locally. |
-| **Data to record** | Scan outputs (saved), credential attempt results, OTA rejection log, timeline of gateway-loss test, gap analysis of telemetry after restore. |
-| **Analysis** | Open-port list vs allow-list; any default credential success = fail; buffer completeness = (expected samples − missing)/expected. |
-| **Pass** | Zero unexpected open ports; zero default credentials; unsigned OTA rejected; cooling ran continuously through gateway loss; buffered data ≥ 99 % complete; alarms raised locally with uplink down; SNMP v1/v2c disabled or read-only community changed; all vendor web interfaces on HTTPS or disabled. |
-| **If it fails** | Close ports / disable services; change credentials and record in the handover; if a vendor device cannot be secured, isolate it in its own VLAN with an ACL and document the residual risk; repeat the scan. |
+| **Purpose** | Prove the controls network exposes nothing it should not, that default credentials are gone, that only Pods with a Schreiber AI certificate and a valid attestation can join BEN Mesh, and that losing the edge computer or the PLC leaves the physical plant safe. |
+| **Hypothesis** | From the customer LAN side of the firewall, no BEN controls port is reachable; from inside the controls LAN only the documented services answer (MQTT 8883 with TLS and client certs, dashboard HTTPS 443, PLC Modbus/OPC UA from the edge computer only, SSH 22 key-only if enabled); no device answers to default credentials; every Pod reports `attested: true` with a firmware hash on the release list; an unprovisioned Pod (blank Secure Vault) and a Pod with a self-signed certificate are both rejected at join and logged; pulling the edge computer keeps Pods measuring and buffering for 1 h and the PLC holding the interlocks; stopping the PLC (or RevPi) drops the watchdog relay within 5 s with cooling staying ON. |
+| **Setup** | Laptop with nmap and a credential-check script; permission in writing from the customer for the SAT scan; two "rogue" Pods from the engineering kit (one blank, one with a test-CA certificate); the twin for the failsafe sequence (`tw.inject("gateway_loss")` or stopping the broker in sim). |
+| **Instrumentation** | nmap outputs; MQTT broker and OTBR logs (join attempts); Pod `status` (attestation state, parent, link quality) and buffered telemetry; PLC diagnostic log and watchdog relay state; cooling unit run state (observed physically); dashboard alarm and mesh health panels. |
+| **Procedure** | 1. From customer LAN: `nmap -sS -sU -p- <controls subnet>` — expect no response/filtered. 2. From controls LAN: full TCP/UDP scan of every device (edge computer, PLC, switch, Pod E, UPS, cooling, PDU, leak controller, fire-panel gateway if any); list open ports and compare with the allowed list in `CYBERSECURITY.md` §3. 3. Default-credential attempt on every web/SNMP/Modbus interface (vendor defaults list) including the PLC web UI (must be disabled). 4. Verify firmware signature check: attempt to OTA an unsigned image to one Pod → must be rejected and logged. 5. **Attestation:** run `python -m ben_engine.commissioning --stage provisioning-check`; confirm 100 % of Pods attested with a release-list firmware hash and a certificate chaining to the Schreiber AI CA. 6. **Rogue join:** power the blank Pod and the test-CA Pod within 2 m of a router Pod for 10 min each; both must be rejected (no network key issued, no broker session), with a join-rejection event on the dashboard. 7. Power off the edge computer for 15 min: observe Pods (status LED), PLC keeps interlocks, cooling stays on, fire panel unaffected; restore and confirm buffered data arrives with correct `ts`/`seq` and no gaps. 8. Stop the PLC (pull the Axioline bus power) or the RevPi on Lite: watchdog relay drops within 5 s, cooling stays ON (fail-ON wiring), alarm raised by the edge computer; restore. 9. Unplug the controls switch uplink to the customer LAN: dashboard still works locally, alarms still raised locally. 10. (Pro) Confirm the edge computer's TPM PCR values match the FAT baseline. |
+| **Data to record** | Scan outputs (saved), credential attempt results, OTA rejection log, attestation report, join-rejection log entries with timestamps, timeline of edge-computer-loss and PLC-loss tests, gap analysis of telemetry after restore, PCR baseline comparison. |
+| **Analysis** | Open-port list vs allow-list; any default credential success = fail; any rogue join accepted = fail; attested share must be 100 %; buffer completeness = (expected samples − missing)/expected; watchdog drop time from the relay contact log. |
+| **Pass** | Zero unexpected open ports; zero default credentials; unsigned OTA rejected; 100 % Pods attested; both rogue Pods rejected and logged; cooling ran continuously through edge computer loss and PLC loss; watchdog relay dropped ≤ 5 s; buffered data ≥ 99 % complete; alarms raised locally with uplink down; SNMP v1/v2c disabled or read-only community changed; all vendor web interfaces on HTTPS or disabled; PCRs match baseline. |
+| **If it fails** | Close ports / disable services; change credentials and record in the handover; a Pod that does not attest is replaced with a spare and returned (never re-flashed in the field); if a rogue Pod joined, the Thread network key is rotated from the edge computer and the commissioner settings reviewed before any other test; if a vendor device cannot be secured, isolate it in its own VLAN with an ACL and document the residual risk; repeat. |
+
+---
+
+## E13 — Mesh resilience: pull a router Pod, measure heal time
+
+| | |
+| --- | --- |
+| **Purpose** | Prove BEN Mesh (Thread) heals around a lost router Pod and a lost border router radio without losing telemetry, so a single Pod failure or battery change never blinds a rack. |
+| **Hypothesis** | With the placement rules in `BUILD_AND_WIRING.md` §6 (every battery Pod within range of ≥ 2 router-eligible Pods, two RCPs on BEN 20/40), removing any one router Pod causes its children to re-attach to another parent within 60 s (Thread parent search; target < 30 s) with no telemetry gap longer than the ring-buffer catch-up, and removing one RCP causes no gap at all on BEN 20/40 (second border router) or a ≤ 2 min gap with full buffer catch-up on single-RCP units. |
+| **Setup** | Fully commissioned mesh (E12 step 5 passed); dashboard mesh health panel open (topology, parent, link quality per Pod); a stopwatch; the unit at idle or low load. |
+| **Instrumentation** | Pod `status` at 10 s (parent, link quality, role); OTBR topology dump every 10 s; broker message log per Pod; alarm log. |
+| **Procedure** | 1. Record the topology: which Pods are routers, which are children of which parent. 2. Identify the router Pod with the most children (usually the room Pod E or a 24 VDC Pod W). Remove its power (or pull it off the rail and open the battery door). Start the stopwatch. 3. Record, per orphaned child, the time until it reports a new parent and the time until its telemetry resumes at the broker. 4. Leave it out for 15 min; confirm no sensor-loss alarm escalates beyond "Pod offline" for the removed Pod itself, and that the twin keeps running on neighbouring sensors. 5. Restore the Pod; confirm it re-attests and rejoins as a router within 2 min. 6. Repeat for a second router Pod at the far end of the row. 7. Unplug RCP 1 from the edge computer for 10 min; record any gap; restore; on BEN 20/40 repeat with RCP 2. 8. Export the CSV for the whole window. |
+| **Data to record** | Topology before/after each step; per-Pod re-attach time and telemetry resume time; gap analysis per channel from the CSV (`seq` continuity); alarm log; RCP events. |
+| **Analysis** | Heal time = max over children of (new parent time − removal time); data completeness per channel over the window; any child that failed to re-attach = placement defect (shadowed by racks, only one parent in range). |
+| **Pass** | Every orphaned child re-attached ≤ 60 s (record the value; target ≤ 30 s); telemetry completeness ≥ 99.5 % per channel over the window after buffer catch-up; no false alarm other than the removed Pod's own offline event; removed Pod re-attests on return; RCP loss on BEN 20/40 produced no gap; on single-RCP units the gap was ≤ 2 min and fully back-filled. |
+| **If it fails** | A child with no second parent: add a 24 VDC-powered Pod W as a router above the rack line or move the Pod per the spacing rule; a child with link quality 1 to its only parent: re-site away from the metal rack top; heal time > 60 s on every child: check the Thread network's router count (target ≥ 3 inside a 20 ft unit) and the RCP placement; after any change repeat E13 from step 1. |
 
 ---
 
@@ -201,13 +218,13 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 
 ```
 # twin (simulation) — run everything, produce the expected curves
-python -m ben_engine.commissioning --mode sim --config unit.json --experiments E1,E2,E3,E4,E5,E6,E7,E9,E11,E12
+python -m ben_engine.commissioning --mode sim --config unit.json --experiments E1,E2,E3,E4,E5,E6,E7,E9,E11,E12,E13
 
 # factory acceptance test
-python -m ben_engine.commissioning --mode factory --config unit.json --experiments E1,E2,E3,E4,E5,E7,E9,E11,E12 --burnin-hours 24
+python -m ben_engine.commissioning --mode factory --config unit.json --experiments E1,E2,E3,E4,E5,E7,E9,E11,E12,E13 --burnin-hours 24
 
 # site acceptance test
-python -m ben_engine.commissioning --mode site --config unit.json --experiments E1,E2,E3r,E4,E5,E6,E9,E12 --burnin-hours 48
+python -m ben_engine.commissioning --mode site --config unit.json --experiments E1,E2,E3r,E4,E5,E6,E9,E12,E13 --burnin-hours 48
 ```
 
 The report is signed JSON (hash of the data files plus the engineer's key) and a PDF. E8 and E10 are attached as separate reports with their own data files. The twin run is kept beside the real run so every plot in the report shows "predicted" and "measured".

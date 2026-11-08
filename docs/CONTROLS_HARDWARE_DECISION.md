@@ -16,6 +16,21 @@ The first pass used a Raspberry Pi 5 gateway and ESP32 hobby boards as sensor no
 
 Life safety (smoke detection, clean-agent release, EPO) stays hardwired and is only *monitored* by the PLC through dry contacts. That rule does not change.
 
+### 2a. Two controls tiers (operator amendment, 2026-11-08)
+
+Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`; `auto` resolves to Lite for BEN Micro, Pro for BEN 20/40, and for BEN 10 Lite unless the profile is healthcare, public sector or AI training (then Pro). `Config.derived()["controls_tier_resolved"]` carries the result; `applies_to_controls` on every CTL catalog line filters the BOM; the proposal and the product page name the tier.
+
+| | **BEN Controls Lite** (BEN Micro; selectable on BEN 10) | **BEN Controls Pro** (BEN 20/40; selectable on BEN 10) |
+| --- | --- | --- |
+| Controller | **Revolution Pi RevPi Connect 4** (KUNBUS; industrial, UL/CE listed, DIN rail, Compute Module 4 based) with **RevPi DIO** and **RevPi AIO** modules; alternate RevPi Connect S | **Phoenix Contact PLCnext AXC F 2152** with **Axioline F** I/O (DI8/DO8, RTD4, AI4) in a **UL 508A** listed panel |
+| Edge computer | The same RevPi runs `ben_engine`, the broker and the Thread border router | **OnLogic Karbon 400** (TPM 2.0, measured boot) on the panel DIN rail |
+| Interlocks | In software on the RevPi behind its **hardware watchdog relay**; no PLC | Deterministic PLC logic; PLC watchdog relay; edge computer loss changes nothing in the interlocks |
+| Sensing | Same **BEN Pods on BEN Mesh** (MGM240P, Secure Vault High), 3 Pods on Micro, 2 per rack + 2 on BEN 10 | Same Pods, 2 per rack + 2, plus wired industrial transmitters on the PLC (Pt1000 supply/return, Setra 264, Vaisala HMW90, RLE LD2100) |
+| Panel | DIN-rail cabinet of listed components (no 508A label; stated in the proposal) | UL 508A panel by the panel partner, SCCR label (CTQ-K6) |
+| Software, protocol, dashboard, BEN Care | Identical | Identical |
+| Life safety | Hardwired, monitored by dry contacts | Hardwired, monitored by dry contacts |
+| Controls cost per unit (preset BOM) | Micro ≈ $4.3k, BEN 10 ≈ $4.8k | BEN 20 ≈ $16.5k, BEN 40 ≈ $20.0k |
+
 ## 3. BEN Mesh and BEN Pod (what we build ourselves)
 
 **Why a mesh at all.** Wiring 6 probes per rack × 12 racks plus outdoor equipment is 80+ runs of shielded cable, terminations and labels; it is the most error-prone, least repeatable part of a controls install, and it is the part that cannot move when the container moves. A secure, self-healing, IP-native mesh removes it, and it is the same hardware for the Micro cabinet, the dry cooler on the roof, the generator on the pad and the fleet.

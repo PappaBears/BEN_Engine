@@ -36,7 +36,7 @@ sweeps, selector micro / BEN 40, 390 px narrow) and 24 ordered guided-tour frame
 
 | Area | Simulation mode (default) | Live (gateway) |
 | --- | --- | --- |
-| Telemetry | One `ben_engine.twin.Twin` stepped by the server at 1 Hz real time; `POST /api/sim/speed {x}` runs 1–60 simulated s per real s. State is pushed on `WS /ws/state` once per second. | The gateway process normalises MQTT node telemetry and Modbus/SNMP equipment data onto the same `twin/state` shape (see `spec/PROTOCOL.md`, adapters in `firmware/ben-gateway`). |
+| Telemetry | One `ben_engine.twin.Twin` stepped by the server at 1 Hz real time; `POST /api/sim/speed {x}` runs 1–60 simulated s per real s. State is pushed on `WS /ws/state` once per second. | The BEN Controller edge computer normalises MQTT Pod telemetry (BEN Mesh), PLC data and Modbus/SNMP equipment data onto the same `twin/state` shape (see `spec/PROTOCOL.md`, adapters in `firmware/ben-edge`). |
 | Sensors | `Twin.sensors()` positions, uncertainties (U95, k=2) and node assignment; values carry Gaussian sensor noise and the injected `sensor_drift`. | Real DS18B20 / SHT45 / SDP810 / ADS1115 channels per node; same ids. |
 | Alarms | Computed by the twin from the ASHRAE class of the mission profile. | Gateway alarm engine, same ids/severities. |
 | I/O test | `ben_engine.sim_nodes.NodeFleet`: virtual BEN nodes answer `set_output`, `identify`, `tare`, `get_cal`, `set_cal`, `reboot` on an in-process bus and report raw ADC counts next to calibrated values. | Same commands over MQTT `ben/<unit>/node/<id>/cmd`, acks on `/ack`; latency is the real round trip. |
@@ -50,7 +50,7 @@ sweeps, selector micro / BEN 40, 390 px narrow) and 24 ordered guided-tour frame
 setting exists so the UI can be pointed at a gateway: `POST /api/sim/mode {"mode":"live",
 "gateway_url":"http://10.77.0.1:8080"}` records the URL and flips the status strip to LIVE; the
 twin keeps simulating and the response says so. On a gateway you run this same server; the MQTT and
-Modbus adapters described in `firmware/ben-gateway` feed `RT.twin`'s state in place of `Twin.step()`.
+Modbus adapters described in `firmware/ben-edge` feed `RT.twin`'s state in place of `Twin.step()`.
 
 ## Layout
 

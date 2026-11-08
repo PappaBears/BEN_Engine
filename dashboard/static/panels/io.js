@@ -4,14 +4,14 @@ import { api, h, fmt } from '../util.js';
 let root = null, nodesEl = null, logEl = null, noteEl = null, timer = null;
 
 export default {
-  id: 'io', label: 'I/O Test', title: 'Node I/O test (virtual nodes in simulation)',
+  id: 'io', label: 'I/O Test', title: 'BEN Pod I/O test (virtual Pods in simulation)',
   mount(el) {
     root = el;
     noteEl = h('div', { class: 'note', hidden: true });
     nodesEl = h('div', { id: 'io-nodes' });
     logEl = h('div', { id: 'io-log' });
-    el.append(h('h3', {}, 'Nodes and channels'), noteEl, nodesEl, h('h3', {}, 'Command acknowledgements'), logEl,
-      h('p', { class: 'muted', style: { fontSize: '12px' } }, 'Raw = ADC counts / bus value as sent by the node; calibrated = after gain and offset (cal_id). In simulation the virtual nodes answer over an in-process bus; on hardware the same commands go over MQTT (spec/PROTOCOL.md).'));
+    el.append(h('h3', {}, 'Pods and channels'), noteEl, nodesEl, h('h3', {}, 'Command acknowledgements'), logEl,
+      h('p', { class: 'muted', style: { fontSize: '12px' } }, 'Raw = ADC counts / bus value as sent by the Pod; calibrated = after gain and offset (cal_id). In simulation the virtual Pods answer over an in-process bus; on hardware the same commands go over MQTT on the BEN Mesh (spec/PROTOCOL.md).'));
     refresh();
   },
   update() { if (!timer) timer = setTimeout(() => { timer = null; refresh(); }, 2000); },
@@ -27,7 +27,7 @@ async function refresh() {
   } catch (e) {
     noteEl.hidden = false;
     noteEl.className = 'note ' + (e.status === 503 ? 'warn' : '');
-    noteEl.textContent = e.status === 503 ? `${e.message}. The I/O test needs ben_engine.sim_nodes (virtual BEN nodes); the panel will populate as soon as that module lands.` : e.message;
+    noteEl.textContent = e.status === 503 ? `${e.message}. The I/O test needs ben_engine.sim_nodes (virtual BEN Pods); the panel will populate as soon as that module lands.` : e.message;
     nodesEl.replaceChildren();
   }
 }
@@ -43,14 +43,14 @@ function asList(nodes) {
 
 function renderNodes(nodes) {
   const list = asList(nodes);
-  if (!list.length) { nodesEl.replaceChildren(h('div', { class: 'note' }, 'No virtual nodes reported.')); return; }
+  if (!list.length) { nodesEl.replaceChildren(h('div', { class: 'note' }, 'No virtual Pods reported.')); return; }
   nodesEl.replaceChildren(...list.map(n => {
     const id = n.id || n.node_id || n.name;
     const chans = asList(n.channels || n.ch || n.inputs || {});
     const outs = asList(n.outputs || n.relays || {});
     const status = n.status || {};
     return h('div', { class: 'tile', style: { marginBottom: '8px' }, 'data-node': id },
-      h('div', { class: 'row', style: { justifyContent: 'space-between' } }, h('b', {}, id), h('span', { class: 'muted mono', style: { fontSize: '11px', flex: '0 0 auto' } }, [status.fw && `fw ${status.fw}`, status.rssi !== undefined && `${status.rssi} dBm`, n.online === false ? 'OFFLINE' : 'online'].filter(Boolean).join(' · '))),
+      h('div', { class: 'row', style: { justifyContent: 'space-between' } }, h('b', {}, id), h('span', { class: 'muted mono', style: { fontSize: '11px', flex: '0 0 auto' } }, [status.fw && `fw ${status.fw}`, status.rssi !== undefined && `${status.rssi} dBm`, n.attested === true ? 'attested' : (n.attested === false ? 'NOT ATTESTED' : null), n.online === false ? 'OFFLINE' : 'online'].filter(Boolean).join(' · '))),
       h('div', { class: 'row', style: { margin: '6px 0' } },
         h('button', { class: 'btn btn-sm', onClick: () => cmd(id, 'identify') }, 'Identify'),
         h('button', { class: 'btn btn-sm', onClick: () => cmd(id, 'get_cal') }, 'Get cal'),
@@ -65,7 +65,7 @@ const fmtv = (v) => v === undefined || v === null ? '—' : (typeof v === 'numbe
 
 function renderLog(log) {
   if (!log.length) { logEl.replaceChildren(h('div', { class: 'note' }, 'No commands sent yet.')); return; }
-  logEl.replaceChildren(h('table', { class: 'data' }, h('thead', {}, h('tr', {}, h('th', {}, 'time'), h('th', {}, 'node'), h('th', {}, 'command'), h('th', {}, 'ack'), h('th', {}, 'latency'))),
+  logEl.replaceChildren(h('table', { class: 'data' }, h('thead', {}, h('tr', {}, h('th', {}, 'time'), h('th', {}, 'Pod'), h('th', {}, 'command'), h('th', {}, 'ack'), h('th', {}, 'latency'))),
     h('tbody', {}, ...log.slice(0, 12).map(e => h('tr', {}, h('td', { class: 'mono muted' }, fmt.clock(e.ts)), h('td', { class: 'mono' }, e.node), h('td', { class: 'mono' }, e.op ? e.op + (e.channel ? ` ${e.channel}` : '') : `${e.channel}=${e.value}`), h('td', { class: (e.ack && e.ack.ok === false) ? 'fail' : 'pass' }, e.ack && e.ack.ok === false ? 'NAK' : 'ok'), h('td', { class: 'num' }, `${fmt.num(e.latency_ms, 1)} ms`))))));
 }
 

@@ -49,7 +49,7 @@ The CSV hash printed inside the Commissioning Report must equal the CSV SHA-256 
 | Step | Name | Result | Key values | Deviation / Punch List ref |
 | --- | --- | --- | --- | --- |
 | 1 | Pre-power visual checklist | [FAT_STEP1_RESULT] | items confirmed [FAT_STEP1_ITEMS] | |
-| 2 | Node discovery and firmware versions | [FAT_STEP2_RESULT] | nodes [FAT_STEP2_NODES] / expected [NODE_COUNT]; firmware [FIRMWARE_VERSION] | |
+| 2 | Pod discovery, attestation and firmware versions | [FAT_STEP2_RESULT] | Pods attested [FAT_STEP2_NODES] / expected [POD_COUNT] (node ids [NODE_COUNT]); firmware [FIRMWARE_VERSION] | |
 | 3 | Sensor sanity at idle | [FAT_STEP3_RESULT] | inlet spread [FAT_STEP3_SPREAD_K] K; RH [FAT_STEP3_RH] %; dP after tare [FAT_STEP3_DP] Pa | |
 | 4 | I/O point-to-point | [FAT_STEP4_RESULT] | points [FAT_STEP4_POINTS]; failed [FAT_STEP4_FAILED] | |
 | 5 | Power chain: meter vs PDU sum | [FAT_STEP5_RESULT] | disagreement [FAT_STEP5_DISAGREEMENT_PCT] %; PUE [FAT_STEP5_PUE] | |
@@ -151,7 +151,7 @@ Hash verified with `sha256sum` by both Parties at signing: [SAT_HASH_VERIFIED] (
 | Step | Name | Result | Key values | Deviation / Punch List ref |
 | --- | --- | --- | --- | --- |
 | 1 | Pre-power visual checklist | [SAT_STEP1_RESULT] | | |
-| 2 | Node discovery and firmware versions | [SAT_STEP2_RESULT] | nodes [SAT_STEP2_NODES] / [NODE_COUNT]; firmware [FIRMWARE_VERSION] | |
+| 2 | Pod discovery, attestation and firmware versions | [SAT_STEP2_RESULT] | Pods attested [SAT_STEP2_NODES] / [POD_COUNT]; firmware [FIRMWARE_VERSION] | |
 | 3 | Sensor sanity at idle | [SAT_STEP3_RESULT] | spread [SAT_STEP3_SPREAD_K] K; RH [SAT_STEP3_RH] %; dP [SAT_STEP3_DP] Pa | |
 | 4 | I/O point-to-point | [SAT_STEP4_RESULT] | points [SAT_STEP4_POINTS]; failed [SAT_STEP4_FAILED] | |
 | 5 | Power chain: meter vs PDU sum | [SAT_STEP5_RESULT] | disagreement [SAT_STEP5_DISAGREEMENT_PCT] %; **measured PUE [SAT_STEP5_PUE]** (Proposal estimate [PUE_ESTIMATE]) | |

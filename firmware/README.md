@@ -1,180 +1,189 @@
-# BEN Engine firmware — build, test, flash, provision, secure
+# BEN Engine firmware and controls software — build, test, flash, provision, secure
 
-Two parts live here:
+Industrial platform per `docs/CONTROLS_HARDWARE_DECISION.md`. Three parts live here:
 
-| Directory | What it is | Build state on 2026-11-07 |
+| Directory | What it is | Build state on 2026-11-08 |
 | --- | --- | --- |
-| `ben-node/` | BEN Node v1 firmware: ESP32 on an **Olimex ESP32-POE-ISO** carrier, PlatformIO, Arduino framework. Implements `spec/PROTOCOL.md` exactly. | **Core compiled and unit-tested on the host (37/37 pass). ESP32 cross-build NOT performed** — the `espressif32` platform download is blocked on the build host (see "What was compiled here"). |
-| `ben-gateway/` | Raspberry Pi 5 gateway package (Mosquitto, chrony, `ben_engine.api` service, firewall, backup). Not ESP code. | Implemented, syntax-checked, **unverified on hardware**. See its own README. |
+| `ben-pod/` | **BEN Pod v1** firmware: Silicon Labs **MGM240P** (EFR32MG24, Secure Vault High) on our PCB, Thread/IPv6, MQTT over mutual TLS. Pod E (24 VDC/PoE, Ethernet + RS-485, 2 relays) and Pod W (Thread only, battery or 24 VDC). Implements `spec/PROTOCOL.md` v1.1. | **Core compiled and unit-tested on the host (37/37 pass). EFR32 cross-build NOT performed** — no Simplicity SDK / arm-none-eabi toolchain on the build host (see "What was compiled here"). |
+| `ben-edge/` | Edge computer package for the **BEN Controller** data half: OnLogic Karbon 400 (Pro) or RevPi Connect 4 (`lite/`, Lite). Mosquitto mTLS, OTBR, chrony, `ben_engine.api`, PLC bridge, nftables, TPM/LUKS, backup. Not firmware. | Implemented, `bash -n` clean, **unverified on hardware**. See its README. |
+| `ben-plc/` | **PLCnext AXC F 2152** project skeleton (Pro): interlock program in IEC 61131-3 ST, Modbus register map, program structure. On Lite the same logic runs as `software/ben_engine/interlocks.py` (16 host tests pass). | ST written, **not compiled** (no PLCnext Engineer here). Python reference tested. |
 
-## Architecture of the node firmware
+History: this directory replaced the hobby-grade targets on 2026-11-08. The earlier ESP32 HAL (`hal_esp32.*`,
+Olimex carrier) and the Raspberry Pi gateway package were **replaced** by `hal_efr32.*` and `ben-edge/`; no
+file here targets them any more. This paragraph is the only place the old names appear.
+
+## Architecture of the Pod firmware
 
 ```
-src/main.cpp            ESP32 only (guarded #ifdef ARDUINO): sensor drivers, pin map, MQTT/Ethernet, serial provisioning
-                        native branch: 10 s simulation using the mock HAL (what `pio run -e native` / `make sim` builds)
-lib/benhal/hal.h        abstract HAL: Clock, Gpio, I2cBus, OneWireBus, Nvs, Net, System
-lib/benhal/hal_esp32.*  Arduino/ESP-IDF implementation (ETH + PubSubClient + Preferences + Update + SNTP)
-lib/benhal/hal_mock.h   in-memory implementation for tests
-lib/bencore/            platform independent, zero external dependencies:
-  channels.*            channel map (T_in_1..4, T_out_1..4, T_ref, RH, dP_aisle, leak, door, ai0..3_mA, relay1..4, pulse_kwh),
-                        gain/offset calibration applied in the node, cal_id, NVS load/save
+src/main.cpp            EFR32 branch (#ifdef BEN_TARGET_EFR32): Thread join/attach, SNTP over Thread, sensors (SHT45, SDP810,
+                        ADS124S08 Pt1000 ADC), attestation intercept, LEDs, 4-bit DIP
+                        native branch: 10 s simulation using the mock HAL (what `make sim` builds)
+lib/benhal/hal.h        abstract HAL: Clock, Gpio, I2cBus, OneWireBus, Nvs, Net, System  (unchanged)
+lib/benhal/hal_efr32.*  Simplicity SDK + OpenThread implementation: sl_sleeptimer, em_gpio via a logical pin table,
+                        sl_i2cspm, NVM3, MQTT 3.1.1 over mbedTLS/PSA over otTcp, Gecko Bootloader OTA, PSA attestation
+lib/benhal/hal_mock.h   in-memory implementation for tests  (unchanged)
+lib/bencore/            platform independent, zero external dependencies — UNCHANGED (comments only):
+  channels.*            channel map, gain/offset calibration applied in the Pod, cal_id, NVS load/save
   telemetry.*           telemetry + status JSON exactly as PROTOCOL.md; topic builder
-  commands.*            cmd parser (set_output/get_cal/set_cal/tare/identify/reboot/ota) + ack JSON; rejects malformed input
-  ringbuf.*             1 h @ 1 Hz ring buffer of 44-byte packed records (3600 x 44 B = 158 400 B, static)
-  outputs.*             relay outputs; failsafe rule (60 s without gateway -> failsafe relays drop, others hold)
-  alarms.*              local ASHRAE A1 thresholds with hold times (gateway stays the alarm system of record)
-  timesync.*            SNTP anchor + monotonic millis; ts=0 and clock_valid=false until synced; step counter
+  commands.*            cmd parser (set_output/get_cal/set_cal/tare/identify/reboot/ota) + ack JSON
+  ringbuf.*             1 h @ 1 Hz ring buffer of 44-byte packed records (158 400 B, static)
+  outputs.*             relay outputs; failsafe rule (60 s without broker -> failsafe relays drop, others hold)
+  alarms.*              local ASHRAE A1 thresholds with hold times (edge stays the alarm system of record)
+  timesync.*            SNTP anchor + monotonic millis; ts=0 and clock_valid=false until synced
   node_app.*            orchestration: 1 Hz telemetry, 10 s retained status, buffering, ordered replay, cmd->ack
-  json_mini.h           fixed-buffer JSON writer and flat-object reader (same bytes on ESP32 and host)
-test/test_core/         Unity tests (37)
+  json_mini.h           fixed-buffer JSON writer and flat-object reader (same bytes on target and host)
+test/test_core/         Unity tests (37)  (unchanged)
 test/support/unity.h    Unity-compatible shim used only by the Makefile fallback
-Makefile                host fallback build when the PlatformIO `native` platform cannot be downloaded
+Makefile                host build: make test / make sim
+platformio.ini          env `native` (host) and `mgm240p` (cross-compile against a Simplicity SDK checkout; limited PlatformIO support)
+gecko/ben_pod.slcp      Simplicity Studio 5 / SLC project (the supported target build)
+gecko/CMakeLists.txt    Silicon Labs CMake flow on top of `slc generate -o cmake`
 ```
 
-Why no ArduinoJson in the core: the protocol needs flat objects and one level of nesting; an in-house
-writer/reader keeps `lib/bencore` dependency-free so the identical bytes are tested on the host. ArduinoJson
-stays in `platformio.ini` for anything main.cpp may need later (none today).
+The PROTOCOL.md v1.1 status fields (`cert_id`, `attested`, `parent`, `lqi`, `path`) and the `attest` op are
+produced in `main.cpp`/`hal_efr32.cpp`, **outside** `bencore`, so the core and its 37 tests did not change.
+`bencore` still names the outputs `relay1..4` with logical pins 32/33/14/15; `hal_efr32.cpp` maps 32/33 to
+the two Pod E relay drivers and leaves 14/15 unconnected. `relay1` is no longer "cooling enable" in the
+system (that is a PLC output now); on a Pod it is a general-purpose failsafe relay (beacon/fan boost).
 
-Memory note: the Olimex ESP32-POE-ISO carries a classic ESP32-WROOM (520 kB SRAM, no PSRAM); the 158 kB ring
-buffer plus the Arduino Ethernet/MQTT stacks fit but leave roughly 100 kB of heap. If the v1.1 custom carrier
-moves to ESP32-S3 with PSRAM (the brief's intent), raise `BEN_RING_SECONDS` freely. **The ESP32 heap figure is
-an estimate, not measured.**
+Memory note: MGM240P = 1.5 MB flash / 256 kB RAM. Ring buffer 155 kB + OpenThread FTD ≈ 40 kB + mbedTLS
+≈ 20 kB + app leaves ≈ 30 kB (**estimate, not measured**). Use `BEN_RING_SECONDS=1800` if the first link
+map says otherwise; the sleepy Pod W build (MTD) is ~15 kB smaller.
 
 ## Build
 
 ```bash
-cd firmware/ben-node
-pio run -e olimex_esp32_poe_iso                 # ESP32 image  -> .pio/build/olimex_esp32_poe_iso/firmware.bin
-pio run -e olimex_esp32_poe_iso -t upload       # flash over USB (CH340/CP2102 on the Olimex board)
-pio device monitor -b 115200                    # serial console
-pio run -e native                               # host build of the simulation
-make sim                                        # same, without PlatformIO platforms
+cd firmware/ben-pod
+make test                                   # host: 37 unit tests (what ran here)
+make sim                                    # host: 10 s simulation of the core
+# target (needs Simplicity SDK 2024.6 + arm-none-eabi-gcc 12 + Simplicity Commander):
+slc generate -p gecko/ben_pod.slcp -d gecko/build/gen -o cmake --with mgm240pb32vna
+cmake -S gecko -B gecko/build -G Ninja -DCMAKE_TOOLCHAIN_FILE=$BEN_SISDK/cmake/toolchain.cmake -DBEN_SISDK=$BEN_SISDK
+cmake --build gecko/build                   # -> gecko/build/ben_pod.s37
+commander gbl create ben_pod.gbl --app gecko/build/ben_pod.s37 --sign ben-pod-signing-key.pem   # signed OTA image
+commander flash --device EFR32MG24B310F1536IM48 gecko/build/ben_pod.s37                        # J-Link / WSTK
+pio run -e mgm240p                          # alternative cross-compile (BEN_SISDK set; after slc generate)
 ```
 
 ## Test
 
 ```bash
-cd firmware/ben-node
-pio test -e native            # preferred: PlatformIO native + real Unity
-make test                     # fallback: host g++ + test/support/unity.h shim (what ran here)
+cd firmware/ben-pod && make test            # host g++ + test/support/unity.h shim
+pio test -e native                          # same tests with real Unity when the native platform is available
+cd ../.. && python3 -m pytest tests/test_interlocks.py   # interlock reference (16)
 ```
 
 ### What was compiled here (honest record)
 
-Host: Linux, `g++` (GCC) with `-std=c++17 -Wall -Wextra`, PlatformIO Core 6.2.0, network-restricted.
+Host: Linux x86-64, `g++` (GCC) `-std=c++17 -Wall -Wextra`, Python 3 + pytest. No Silicon Labs toolchain,
+no PlatformIO platforms (network-restricted), no PLCnext Engineer.
 
 ```
-$ pio pkg install -g -p espressif32                 -> Platform Manager: Installing espressif32 / HTTPClientError
-$ pio pkg install -g -p "platformio/espressif32"    -> HTTPClientError
-$ pio pkg install -g -p native                      -> HTTPClientError
-$ pio test -e native                                -> Collected 1 tests / Platform Manager: Installing native / HTTPClientError
-$ pio run -e native                                 -> Platform Manager: Installing native / HTTPClientError
-$ make clean && make test
+$ cd firmware/ben-pod && make clean && make test
   ... 37 test lines ...:PASS
   -----------------------
   37 Tests 0 Failures 0 Ignored
   OK
 $ make sim
-  BEN Node 1.0.0 native simulation: 5 s online, 3 s offline, 2 s online
-  ... 13 messages printed (10 telemetry incl. 4 with "replay":true, 2 status, 1 ack) ...
+  BEN Pod 1.0.0 native simulation: 5 s online, 3 s offline, 2 s online
+  ... 13 messages (10 telemetry incl. 4 with "replay":true, 2 status, 1 ack) ...
   published: 10 telemetry, 2 status, 1 ack; buffered now: 0; replayed: 4; seq=10
+$ python3 -m pytest tests/test_interlocks.py -q
+  16 passed
+$ bash -n firmware/ben-edge/install.sh firmware/ben-edge/lite/install.sh …    (all clean)
 ```
 
-So: `lib/bencore` + `lib/benhal/hal_mock.h` + `src/main.cpp` (native branch) compiled with zero warnings and all
-37 unit tests pass. **`lib/benhal/hal_esp32.cpp` and the ESP32 branch of `src/main.cpp` have never been compiled**:
-they are written against the espressif32 Arduino core 2.x / ESP-IDF 4.4 APIs (`ETH.begin` LAN8720 signature,
-`sntp_*`, `Update`, `Preferences`, Adafruit SHT4x/ADS1X15, Sensirion I2C SDP 0.1.x) and the first `pio run -e
-olimex_esp32_poe_iso` on a connected machine will very likely need small signature fixes. Library version pins in
-`platformio.ini` are the current majors; adjust if the registry resolves differently.
+So: `lib/bencore` + `lib/benhal/hal_mock.h` + `src/main.cpp` (native branch) compiled with zero warnings and
+all 37 unit tests pass. **`lib/benhal/hal_efr32.cpp`, the EFR32 branch of `src/main.cpp`, `gecko/ben_pod.slcp`,
+`gecko/CMakeLists.txt` and the `mgm240p` PlatformIO env have never been compiled.** They are written against
+Simplicity SDK 2024.6 / OpenThread 2024-Q2 APIs (`otTcp*`, `otSntpClientQuery`, `otJoinerStart`, `nvm3_*`,
+`sl_sleeptimer_*`, `I2CSPM_Transfer`, `SPIDRV_M*`, `bootloader_*`, `psa_sign_message`,
+`mbedtls_pk_setup_opaque`) and the first build in Simplicity Studio will need signature fixes and a real
+`ota_coap.c` (CoAP block-wise fetch, stubbed to return false). `BenInterlocks.st` has never been compiled either.
 
-Tests cover: calibration apply/reject/NVS round-trip, tare (incl. gain interaction and non-tareable channels),
-telemetry JSON byte-exact against the PROTOCOL.md example, status JSON, topic builder, JSON escaping, command parsing
-for every op and 19 malformed inputs, ack JSON for every op (ok and error shapes), ring-buffer record size/pack/unpack/
-wrap/1 h capacity, failsafe at exactly 60 s, link-down, `millis()` wrap, alarm hold times, SNTP anchoring and
-step detection, and the app end to end (1 Hz publish with sequence numbers, 90 s offline buffering, ordered
-replay with original timestamps, cmd routing/ack, DIP provisioning, unsynced-clock status).
+Tests cover: calibration apply/reject/NVS round-trip, tare, telemetry JSON byte-exact against PROTOCOL.md,
+status JSON, topic builder, JSON escaping, command parsing for every op and 19 malformed inputs, ack JSON,
+ring buffer pack/unpack/wrap/1 h capacity, failsafe at exactly 60 s, link-down, `millis()` wrap, alarm hold
+times, SNTP anchoring and step detection, and the app end to end (1 Hz publish, 90 s offline buffering,
+ordered replay with original timestamps, cmd routing/ack, DIP provisioning, unsynced-clock status).
 
 ## Protocol behaviours worth knowing (beyond PROTOCOL.md's text)
 
-- `ts` is 0 and status carries `"clock_valid":false` until the first SNTP fix from the gateway (10.20.0.1).
-- Replayed records (flushed after a gateway loss) carry their original `ts`/`seq`, an empty `"raw":{}` and
-  `"replay":true`, because the compact ring record stores calibrated values only. Live records always include raw counts.
-- While a backlog exists, new live samples are appended behind it, so `seq` is strictly increasing on the wire.
-- `status` is retained; the MQTT last-will publishes a status with `"errors":["offline (last will)"]` if the TCP session dies.
-- Failsafe: `relay1` (cooling enable) is `failsafe=true` and drops 60 s after the last gateway contact or at once on link
-  loss; `relay2..4` hold. Commands received during the loss are remembered and applied on restore. Table in `CONTROLS_SPEC.md`.
-- Acks for errors are `{"id":"…","ok":false,"error":"…"}`; a command with no `id` is acked with `"id":""`.
-- `set_cal` rejects gain outside 0.5–2.0 (a real sensor never needs more) and persists to NVS immediately.
-- Status also carries `buffered` (ring depth) and `clock_valid`; both are additive to PROTOCOL.md.
+- `ts` is 0 and status carries `"clock_valid":false` until the first SNTP fix from the edge (`fd00:ben::1`).
+- Replayed records carry their original `ts`/`seq`, an empty `"raw":{}` and `"replay":true`.
+- `status` is retained; the MQTT last-will publishes `"errors":["offline (last will)"]` if the TLS session dies.
+- Failsafe: outputs marked `failsafe` drop 60 s after the last broker contact or at once on link loss; others hold.
+- `set_cal` rejects gain outside 0.5–2.0 and persists to NVM3 immediately.
+- `attest` is answered by `main.cpp` (not `bencore`): `{"ok":true,"result":{"sig":…,"fw_hash":…,"boot":"verified","cert_id":…}}`.
 
-## Pin map (Olimex ESP32-POE-ISO)
+## Pin map (BEN Pod v1 PCB, MGM240P) — logical id → port/pin, table in `hal_efr32.cpp`
 
-Ethernet owns GPIO 0, 12, 17, 18, 19, 21, 22, 23, 25, 26, 27; UART0 owns 1, 3. Everything else is used:
+| Function | Logical | MGM240P pin | Notes |
+| --- | --- | --- | --- |
+| RELAY1 / RELAY2 (Pod E only) | 32 / 33 | PB0 / PB1 | coil drivers, 10 A relays; relay1 failsafe |
+| LEAK comparator | 36 | PC0 | resistive rope, HIGH = wet |
+| DOOR dry contact | 39 | PC1 | pull-up, HIGH = open |
+| S0 PULSE (opto) | 34 | PC2 | falling edge |
+| DI2 / EPO monitor | 35 | PC3 | **monitor only** |
+| IDENT LED / LINK LED | 2 / 3 | PD2 / PD3 | IDENT: solid = identify, 1 Hz = broker lost, blip = normal |
+| DIP 0..3 | 5..8 | PA5..PA8 | 4-bit node id override (bench); unit id always from provisioning |
+| RTD ADC CS / DRDY | 40 / 41 | PA0 / PA4 | ADS124S08 on SPI (`spidrv_rtd`) |
+| I²C SDA/SCL | — | PC4 / PC5 | `i2cspm_sensor`: SHT45 0x44, SDP810 0x25 |
+| Pod E: LAN8742 nRST / RS-485 DE | 42 / 43 | PB2 / PB3 | Ethernet PHY over RMII (EFR32MG24 has no MAC: Pod E uses a W5500/KSZ SPI MAC+PHY — **open design item**), RS-485 on USART1 |
+| SWD / secure debug | — | PF0/PF1 | locked after provisioning (Secure Vault debug lock, unlock via signed challenge) |
 
-| Function | GPIO | Notes |
-| --- | --- | --- |
-| DS18B20 1-Wire | 4 | one 4.7 kΩ pull-up to 3V3 at the terminal block; up to 8 sensors, 12-bit |
-| I²C SDA / SCL | 13 / 16 | UEXT; SHT45 (0x44), SDP810 (0x25), ADS1115 (0x48) |
-| relay1 cooling enable (failsafe) | 32 | relay module input, active high |
-| relay2 lights | 33 | |
-| relay3 fan boost | 14 | |
-| relay4 spare | 15 | strapping pin: driver input has a pull-down |
-| leak rope | 36 | input only; 100 k / 10 k divider from the rope's 3V3 excitation; HIGH = wet |
-| door reed | 39 | input only; external 10 kΩ pull-up; HIGH = open |
-| meter S0 pulse | 34 | input only, IRQ on falling edge; shares BUT1 (pressing it counts one pulse) |
-| EPO / fire loop aux contact | 35 | **monitor only**; open the board's BAT_SENS jumper; reported as an error string |
-| IDENT LED | 2 | solid = identify, 1 Hz blink = gateway lost, 50 ms blip every 2 s = normal |
-| spare / 1-bit DIP | 5 | low at boot forces `node1` (the 4-bit DIP lives on the v1.1 custom carrier via PCF8574) |
+## Secure provisioning cell (how a Pod gets its certificate)
 
-## Provisioning (how a node gets its unit / node id)
+Two accepted routes; the per-Pod record (serial, EUI-64, certificate serial = `cert_id`, PSKd, firmware hash,
+operator, date) is written to the Schreiber AI device registry either way.
 
-Primary: **serial provisioning** over the USB console at 115200 8N1. The gateway installer prints one line per node;
-paste it:
+**Route A — Silicon Labs Custom Part Manufacturing Service (CPMS).** Silicon Labs programs each MGM240P at
+their factory with: our Gecko Bootloader (signed, secure boot enabled, anti-rollback on), the public signing
+key in the Secure Element's OTP, a **device identity key pair generated inside Secure Vault** and a device
+certificate chained to a Silicon Labs-held intermediate that we cross-sign into the Schreiber AI Device CA,
+secure debug lock enabled, tamper response configured. Modules arrive provisioned; our line only adds the
+application image, the PSKd label and the registry entry. Preferred above ~2 000 units/yr.
 
-```
-PROV unit=ben20-0007 node=node3 broker=10.20.0.1 user=node3 pass=Xk3…   -> "PROV OK, rebooting"
-ID?                                                                     -> unit=… node=… broker=… fw=1.0.0
-FACTORY                                                                 -> erases identity + cal_id, reboots
-```
+**Route B — in-house provisioning over SWD with an HSM-held CA.** Fixture: bed-of-nails, Simplicity Commander
++ J-Link, an **HSM (YubiHSM 2 / Nitrokey HSM, or the cloud KMS at Schreiber AI)** that holds the Device CA
+private key and the firmware signing key, air-gapped PC. Steps per Pod, scripted and logged:
+1. `commander security genkey --type ecc-p256` on the device → device key pair generated **in the Secure Element**; the public key is read back; the private key never leaves the chip.
+2. The PC builds a CSR (`CN=pod-<serial>`), the HSM signs it with the Device CA (5 y validity) → certificate written to NVM3 (`cert_pem`) with the Device CA chain (`ca_pem`) and `cert_id`.
+3. `commander security writekey --sign ben-pod-signing-pubkey.pem` → signing public key into SE OTP; `commander security writeconfig --configfile secure_boot_antirollback.json` → secure boot + anti-rollback **ON (irreversible)**.
+4. Flash Gecko Bootloader + signed application; `commander security lockdebug` with a device-specific unlock token escrowed in the HSM.
+5. Derive PSKd = base32(HMAC(registry secret, serial))[:8]; print the label (serial, EUI-64, PSKd QR); `nvm3 set pskd`.
+6. Power-cycle; verify `boot: verified`, read `cert_id`, run the self-test, record everything in the registry. Tamper: a Pod with `boot != verified` or an unknown `cert_id` is quarantined.
 
-Identity, broker credentials, calibration and `tel_ms` live in NVS namespace `ben`. Secondary: a DIP switch.
-On the Olimex carrier only GPIO 5 is free, so it is a single bit (`node1` override, useful on a bench). The
-v1.1 custom carrier has a 4-position DIP read through a PCF8574 and `NodeApp::provision_from_dip(0..15)`
-already supports it. DIP never sets the unit id; that always comes from `PROV`.
+## Signed firmware (Gecko Bootloader, ECDSA P-256, anti-rollback)
 
-## OTA
+- The Gecko Bootloader is built with **secure boot enforced** (`BOOTLOADER_ENFORCE_SIGNED_UPGRADE`,
+  `BOOTLOADER_ENFORCE_SECURE_BOOT`), ECDSA P-256 signature check over the application image and the GBL upgrade
+  file, and **certificate-based anti-rollback**: every release carries a monotonically increasing version in
+  `ApplicationProperties_t`; the bootloader refuses a lower one. The Secure Element's secure boot verifies the
+  bootloader itself (root of trust in OTP).
+- Signing key: generated once in the HSM; never on a build server; the build pipeline submits the hash and
+  receives the signature (`commander gbl create --sign` against a PKCS#11 slot). Public key in SE OTP (step 3 above).
+- Release manifest: `{version, sha256, signature, min_hw_rev, date}` signed by the release key; the edge
+  computer verifies it before offering the image to Pods.
 
-The gateway publishes `{"op":"ota","url":"https://10.30.0.1:8000/fw/ben-node-1.0.1.bin","sha256":"…"}`. The node
-streams the image into the inactive OTA partition while hashing it, aborts unless the SHA-256 matches, acks
-`{"ota":"started"}` and restarts after the ack is on the wire. With Secure Boot v2 on, the bootloader additionally
-refuses an unsigned image, so a correct hash of a wrong image still cannot run. Roll back by publishing the previous
-image; the app marks the running image valid after its first successful telemetry publish (`esp_ota_mark_app_valid_cancel_rollback`
-is the one call still to add in `hal_esp32.cpp` once the toolchain builds).
+## OTA over Thread
 
-## Security: signed images and encrypted flash (documented procedure, not yet executed)
+1. The edge publishes `{"op":"ota","url":"coap://[fd00:ben::1]/fw/ben-pod-1.0.1.gbl","sha256":"…"}` on the Pod's `cmd` topic (Pod E on Ethernet may receive an `https://10.20.0.1:8443/…` URL instead).
+2. The Pod fetches the GBL **CoAP block-wise (Block2, 1024 B)** over Thread into **bootloader storage slot 0** while hashing; sleepy Pods fetch at their poll rate (a 400 kB image takes ~10 min at 1 s polls — acceptable; the edge upgrades Pods one or two at a time so the mesh stays available).
+3. Hash mismatch → slot erased, ack `ok:false`. Hash OK → `bootloader_verifyImage` checks the **ECDSA signature and the anti-rollback version**; a correct hash of a wrong or old image never runs.
+4. Ack `{"ota":"started"}`, reboot; the bootloader swaps; the app marks itself good after its first successful telemetry publish (else the bootloader falls back to the previous image).
+5. The edge waits for the new `status.fw` and `attested:true` before the next Pod. Rollback = publish the previous *higher-numbered* rollback build (anti-rollback forbids older versions; keep a "1.0.1-rollback → 1.0.2" release ready).
 
-Controls layer rule set (CONTROLS_SPEC.md): no cloud dependency, signed firmware, local-first data.
+## Pod E wired path: PoE and RS-485
 
-1. **Generate the signing key once, offline, at Schreiber AI** — never on a build server:
-   `espsecure.py generate_signing_key --version 2 ben-node-secure-boot-v2.pem` (RSA-3072). Store in the HSM/password manager; back up on paper.
-2. **Sign every release:** `espsecure.py sign_data --version 2 --keyfile ben-node-secure-boot-v2.pem --output firmware-signed.bin firmware.bin`
-   (PlatformIO can do this automatically with `board_build.secure_boot = true` and `CONFIG_SECURE_SIGNED_APPS_RSA_SCHEME` in `sdkconfig.defaults`).
-3. **Burn the public key digest** into eFuse on each node during factory programming (irreversible):
-   `espefuse.py --port … burn_key BLOCK2 ben-node-secure-boot-v2-pubdigest.bin SECURE_BOOT_DIGEST0` and `espefuse.py burn_efuse SECURE_BOOT_EN`.
-   Also burn `DIS_USB_JTAG` / `DIS_PAD_JTAG` and set `JTAG_SEL_ENABLE=0` so the debug port is closed.
-4. **Flash encryption (release mode):** `espefuse.py burn_efuse SPI_BOOT_CRYPT_CNT 7` and `DIS_DOWNLOAD_MANUAL_ENCRYPT`; let the
-   chip generate its own key in eFuse (`BLOCK_KEY0`, purpose `XTS_AES_128_KEY`) so no key ever leaves the device. NVS (which holds broker
-   credentials and calibration) then lives in encrypted flash; enable `nvs_encryption` in `sdkconfig.defaults`.
-5. **Verify:** `espefuse.py summary` shows `SECURE_BOOT_EN = 1`, `SPI_BOOT_CRYPT_CNT = 7`; `esptool.py read_flash` of the app region returns ciphertext;
-   an unsigned image fails to boot with `secure boot verification failed`.
-6. **Process:** one eFuse-burn station in production, a checklist signed per serial number, and the public digest recorded in the unit's turnover package.
-
-Classic ESP32 (the Olimex carrier) supports Secure Boot v2 only on chip revision 3 (ECO3) and later; check with
-`esptool.py chip_id`. ESP32-S3 (v1.1 carrier) supports it on all revisions.
+- **Power:** 802.3af PD (Si3402 class 0 controller, isolated flyback to 3.3 V/5 V) **or** 24 VDC terminal (reverse-protected, 1 A fuse). Either source; PoE preferred where the controls switch has PoE.
+- **Ethernet:** the EFR32MG24 has no Ethernet MAC; Pod E uses a **W5500 SPI MAC+PHY** (10/100, hardware TCP/IP offload) — the schematic note says "LAN8742 PHY", which only works with an external MAC; the layout review must pick W5500 (simplest) or KSZ8851 (MAC+PHY, SPI). Firmware path: MQTT/TLS over the W5500 socket instead of otTcp; `Efr32Net::path()` reports `"eth"`.
+- **RS-485 Modbus RTU** (USART1 + isolated transceiver, 120 Ω end termination jumper): the Pod is a Modbus **slave** to the PLC (Pro) or RevPi (Lite); registers 30001.. mirror the channel table (T_in ×100, RH ×10, dP ×10, leak, door, relays) so the PLC can use a Pod's readings in an interlock without the mesh. Thread stays the telemetry path to the edge; when Thread is down Pod E telemetry goes over Ethernet; when both are down the PLC still reads it over RS-485.
+- Isolation: Ethernet/PoE 1.5 kV magnetics, RS-485 2.5 kV, relays 4 kV coil-contact.
 
 ## Protocol conformance quick check (host)
 
 ```bash
-cd firmware/ben-node && make sim | head -3
+cd firmware/ben-pod && make sim | head -3
 ```
 prints a telemetry message that can be diffed against the example in `spec/PROTOCOL.md` key for key.

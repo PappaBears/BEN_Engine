@@ -292,7 +292,7 @@ fleet's `discover()`.
 
 ```
 python -m ben_engine.commissioning --sim --tier ben20 --yes --out report.md --operator "Name"
-python -m ben_engine.commissioning --live --url http://ben-gateway.local:8000 --out report.md
+python -m ben_engine.commissioning --live --url http://ben-controller.local:8000 --out report.md
 ```
 
 Ten steps, each with recorded values and PASS/FAIL, then a markdown report with a step table,

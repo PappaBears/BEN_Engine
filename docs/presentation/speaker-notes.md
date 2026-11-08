@@ -36,11 +36,11 @@ Sensors chosen for the quantities we predict, with uncertainty budgets, tares an
 
 Two budget claims in PROTOCOL.md were not met by the computed budgets (RH and dP); they are left as findings in docs/ANALYSIS_AND_CALIBRATION.md rather than quietly edited.
 
-## 7. Controls: open, local-first, hardwired life safety
+## 7. Controls: industrial platform, BEN Mesh, hardwired life safety
 
-Raspberry Pi 5 gateway, ESP32 PoE nodes, MQTT/JSON, Modbus/SNMP to third-party gear.
+BEN Controls Pro: Phoenix Contact PLCnext PLC in a UL 508A panel + OnLogic edge computer (TPM). BEN Controls Lite: Revolution Pi for the Micro. Both: our BEN Pods on a secure Thread mesh.
 
-Be precise: the ESP32 HAL has never been compiled against the real libraries. First pio run on hardware will need fixes. Everything platform-independent is tested.
+Be precise: the EFR32/OpenThread HAL has never been compiled against the real SDK and attestation has not run on silicon. The PLC, edge computer and Pods are priced in the BOM (controls +0.3 to +0.9 % of a unit) and not yet bought. Everything platform-independent is tested. Decision record: docs/CONTROLS_HARDWARE_DECISION.md.
 
 ## 8. Build it with workers who have minimal experience
 

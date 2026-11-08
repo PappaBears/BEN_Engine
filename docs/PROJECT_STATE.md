@@ -17,7 +17,7 @@ The full acceptance list in `docs/BRIEF.md` §5 (22 deliverables after the mid-s
 | Handoff complete | README, VALIDATION, manifest, push | README.md, docs/launch-manifest.json, git log | done |
 
 ## Constraints
-No hardware here; ESP32 toolchain download blocked (network policy); vendor sites not reachable by curl, only through web search/fetch. No money spent; no emails sent (drafts only).
+No hardware here; EFR32 / Gecko SDK toolchain not available (network policy); vendor sites not reachable by curl, only through web search/fetch. No money spent; no emails sent (drafts only).
 
 ## Latest checkpoint
 `main` on github.com/PappaBears/BEN_Engine; see `git log`. Restore: clone the tag/commit and run the Quickstart commands in README.md.
@@ -26,4 +26,4 @@ No hardware here; ESP32 toolchain download blocked (network policy); vendor site
 None blocking. Items that stay unverified without hardware are listed in `docs/VALIDATION.md`.
 
 ## Next exact action
-Operator decisions: (1) forward the 16 RFQ Gmail drafts, (2) choose the first contract manufacturer from `docs/MANUFACTURING_STRATEGY.md` §3.1 and send the RFI, (3) counsel review of `docs/contracts/`, (4) fund the two lighthouse units. Engineering next: compile firmware on a real ESP32-POE-ISO and fix the HAL against real library APIs.
+Operator decisions: (1) forward the 16 RFQ Gmail drafts, (2) choose the first contract manufacturer from `docs/MANUFACTURING_STRATEGY.md` §3.1 and send the RFI, (3) counsel review of `docs/contracts/`, (4) fund the two lighthouse units. Engineering next: controls platform is now PLCnext + OnLogic Karbon 400 + BEN Pods (MGM240P) with a Revolution Pi Lite tier (`docs/CONTROLS_HARDWARE_DECISION.md`, 2026-11-08): forward RFQs 13, 14, 17, 18; build the first Pod PCBAs and compile the firmware on an xG24 kit; fix the HAL against the real Gecko SDK / OpenThread APIs; stand up the provisioning cell.

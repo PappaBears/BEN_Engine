@@ -1,4 +1,4 @@
-# Schreiber AI — BEN Engine proposal SAI-MICRO-20261108-C6D4D2A1
+# Schreiber AI — BEN Engine proposal SAI-MICRO-20261108-B68A69F9
 
 *BEN Micro · Private cloud / ERP · Riverside Dental Group · Boise, ID · 2026-11-08 · valid until 2027-01-07*
 
@@ -16,10 +16,10 @@
 | Purchase option | Hardware only |
 | Date | 2026-11-08 |
 | Valid until | 2027-01-07 (60 days) |
-| Proposal ID | SAI-MICRO-20261108-C6D4D2A1 |
+| Proposal ID | SAI-MICRO-20261108-B68A69F9 |
 | Configuration | 5 kW IT in 1 rack(s), Cabinet DX air conditioner, N+1, 10 min UPS |
 
-AI infrastructure that arrives finished. This proposal is generated from configuration version 13c7ed1f; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
+AI infrastructure that arrives finished. This proposal is generated from configuration version 496eca62; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
 
 ## 2. Executive summary
 
@@ -55,6 +55,7 @@ What this means for you: the environmental class sets the alarm limits your IT w
 | Row fit | fits | single row 1900 mm vs interior 1000 mm |
 | Cooling electrical | 1.92 kW | COP 2.6 at design point |
 | Total electrical demand | 7.5 kW / 7.9 kVA | IT + cooling + 2 % house + 0.5 kW controls, pf 0.95 |
+| Controls tier | BEN Controls Lite | Revolution Pi RevPi Connect 4 + DIO/AIO (DIN rail, listed), software interlocks behind a hardware watchdog relay; 3 BEN Pods on the BEN Mesh (Thread, Secure Vault); selectable with controls_tier (docs/CONTROLS_HARDWARE_DECISION.md 2a) |
 | Service | 208/240 V 1ph, 50 A breaker | calculated 41 A at 80 % continuous, rounded to the next frame |
 | UPS | 2 x 6 kVA | IT only with 15 % headroom, N+1 |
 | Battery | 0.9 kWh lithium (LFP) | 10 min at IT load, 90 % depth of discharge |
@@ -112,17 +113,17 @@ Explicitly excluded:
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
 | Hardware only | $183,483 | $36,697 | - | 1 yr | $183,483 | 68 / 0 / 32 % | 41 | PROPOSED |
-| Hardware + BEN Controls | $187,614 | $37,523 | $1,200 | 1 yr | $188,814 | 69 / 0 / 31 % | 64 | alternative |
-| White-label | $187,614 | $37,523 | $1,500 | 1 yr | $189,114 | 69 / 0 / 31 % | 64 | alternative |
-| Managed service | $187,614 | $37,523 | $2,700 | 3 yr | $195,714 | 69 / 0 / 31 % | 64 | alternative |
+| Hardware + BEN Controls | $189,411 | $37,882 | $1,200 | 1 yr | $190,611 | 68 / 0 / 32 % | 62 | alternative |
+| White-label | $189,411 | $37,882 | $1,500 | 1 yr | $190,911 | 68 / 0 / 32 % | 62 | alternative |
+| Managed service | $189,411 | $37,882 | $2,700 | 3 yr | $197,511 | 68 / 0 / 32 % | 62 | alternative |
 
 Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 5 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $187,614 | $2,700 | $190,314 |
-| 3 years | $187,614 | $8,100 | $195,714 |
-| 5 years | $187,614 | $13,500 | $201,114 |
+| 1 year | $189,411 | $2,700 | $192,111 |
+| 3 years | $189,411 | $8,100 | $197,511 |
+| 5 years | $189,411 | $13,500 | $202,911 |
 
 Payment milestones for the proposed option (Hardware only, capital $183,483):
 
@@ -178,13 +179,13 @@ Issue-for-construction drawing set for the BEN Micro, regenerated from the froze
 | M-001 | Cooling P&ID (sheet 6/7) | NTS |
 | C-001 | Controls layout (sheet 7/7) | see sheet |
 
-Document set (indexed binder, encrypted USB in the controls cabinet, and the gateway share, per docs/TURNOVER.md):
+Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):
 
 - At order: this proposal, risk acknowledgement, site requirements form (docs/SITE_REQUIREMENTS.md) for signature
 - At engineering release (H4): frozen configuration JSON with derived sizing, IFC drawing set with CTQ/CTP callouts, priced bill of materials with confirmation status, arc-flash and coordination study, PE anchorage calculation, compliance pack, FAT/SAT procedure
 - At FAT (H13): signed commissioning report (JSON + PDF) with sweep CSVs, thermography, door-fan test, electrical and cooling test records
 - At SAT (H19): site commissioning report, acoustic survey, final arc-flash labels, AHJ certificates
-- At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, gateway backup, password handover record, training sign-off, warranty certificates
+- At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, Pod certificate register, edge computer backup, password handover record, training sign-off, warranty certificates
 
 ## 9. Compliance pack for this profile
 
@@ -214,7 +215,7 @@ Baseline matrix lines that apply to every unit:
 |---|---|---|
 | NFPA 70 (NEC) | Listed dead-front gear, SCCR 65 kA, selective coordination, arc-flash labels | Electrical inspection H10, AHJ at H18 |
 | NFPA 75 / 2001 / 72 | Non-combustible liner, VEWFD, clean agent with 10-min hold, EPO, HVAC shutdown | Door-fan test, NFPA 72 record of completion at SAT |
-| UL 508A | Controls panel built in a UL 508A shop | Panel label and schedule |
+| UL 508A | BEN Controls Lite: DIN-rail cabinet of UL-listed components (RevPi, QUINT4, switch); no 508A panel label | Component listing marks (CTQ-K6) |
 | ASHRAE TC 9.9 | Class A2 alarm limits in the controls | Load step test E3/E7 at FAT and SAT |
 | AIM Act / EPA 608 | GWP < 700 A1 refrigerant or water loops; certified technicians | Charge record per circuit |
 | ISO 668 / 1496 / CSC | One-trip high-cube container, PE-checked modifications, CSC decision at transport | Weld inspection H7, weigh ticket |
@@ -285,7 +286,7 @@ Acceptance is by the commissioning script (software/ben_engine/commissioning.py)
 | Step | Test | Pass criterion |
 |---|---|---|
 | 1 | Pre-power visual checklist | Every checklist item answered yes by the operator; no open item |
-| 2 | Node discovery and firmware versions | All nodes answer; firmware versions and hashes match the release record |
+| 2 | Pod discovery, attestation and firmware versions | All BEN Pods answer and attest; firmware versions and hashes match the release record |
 | 3 | Sensor sanity at idle | Rack inlet temperatures within 2 K of each other; RH plausible; aisle dP tared |
 | 4 | I/O point-to-point test | Every relay toggles and reads back; every contact (door, leak, EPO) reads correctly |
 | 5 | Power chain: utility meter vs PDU sum | Meter agrees with the PDU sum within 3 % after metered cooling, house and UPS losses |
@@ -303,7 +304,7 @@ Pass criteria specific to this configuration: rack inlets within ASHRAE A2 at 5 
 |---|---|
 | Workmanship warranty | 24 months from SAT on the integration, wiring, piping, envelope and controls build |
 | Equipment warranty | Vendor warranties (UPS, cooling, CDU, batteries, fire panel, generator, servers) registered in the customer's name at turnover and passed through; minimum 12 months, longer where the vendor offers it |
-| Controls software | Signed firmware and gateway updates for the licence term; security fixes for the life of the licence |
+| Controls software | Signed Pod firmware, PLC project and edge computer updates for the licence term; security fixes for the life of the licence |
 | Support level in this option | Remote email support during business hours for the warranty period; maintenance by the customer or a certified subcontractor per the schedule |
 
 Maintenance schedule (docs/MAINTENANCE.md; intervals for temperate climate, climate add-ons shorten some intervals; task counts per interval):
@@ -314,7 +315,7 @@ Maintenance schedule (docs/MAINTENANCE.md; intervals for temperate climate, clim
 | Monthly — L (1–2 hours on site) with R review | Local technician (L) with remote review | 8 |
 | Quarterly — L + S | Local technician + certified subcontractor (L + S) | 6 |
 | Semi-annual | Certified subcontractor (S) with record; remote (R) for controls | 4 |
-| Annual | Certified subcontractor (S) with record; remote (R) for controls | 8 |
+| Annual | Certified subcontractor (S) with record; remote (R) for controls | 9 |
 | 3-year | Certified subcontractor (S) with record; remote (R) for controls | 4 |
 | 5-year | Certified subcontractor (S) with record; remote (R) for controls | 6 |
 
@@ -353,7 +354,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-MICRO-20261108-C6D4D2A1) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-MICRO-20261108-B68A69F9) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
@@ -363,4 +364,4 @@ By signing, the customer accepts this proposal (SAI-MICRO-20261108-C6D4D2A1) and
 | Schreiber AI — compliance |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-MICRO-20261108-C6D4D2A1. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-MICRO-20261108-B68A69F9. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

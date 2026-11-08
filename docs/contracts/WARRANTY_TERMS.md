@@ -41,9 +41,9 @@
 | Cooling module: RDHx, CDU, dry cooler, manifolds | 12 months installation and glycol loop | [OEM_WARRANTY_CDU_TERM] [OEM_WARRANTY_CDU_ID] | Glycol concentration, pH and inhibitor per quarterly fluid report |
 | Containment, racks | 12 months | Racks [OEM_WARRANTY_RACK_TERM] (often lifetime structural on major brands) [OEM_WARRANTY_RACK_ID] | Seismic kits installed per Q-05 |
 | Fire detection and suppression | 12 months integration (dry-contact monitoring, HVAC shutdown wiring) | Fire panel [OEM_WARRANTY_FIRE_TERM] [OEM_WARRANTY_FIRE_ID]; agent system per licensed contractor [FIRE_CONTRACTOR_NAME] warranty [FIRE_CONTRACTOR_WARRANTY_TERM] | Semi-annual NFPA 2001 inspection is a condition; agent recharge after discharge is not a warranty item unless the discharge was caused by a defect |
-| Controls module: UL 508A panel, PoE switch, power supply, relays, firewall | 12 months | Switch and power supply per OEM | |
-| Controls module: BEN Nodes (Schreiber AI assembly) | **24 months** ([NODE_WARRANTY_MONTHS]) hardware, RMA under Section 7 | Olimex carrier and sensors per their OEMs | Sensors (DS18B20, SHT45, SDP810) are calibrated consumables; drift beyond specification after 12 months is a calibration item, not a defect |
-| Controls module: gateway (Raspberry Pi 5, SSD, PSU) | 12 months, RMA under Section 7 | Per OEM | Gateway image and database are restored from backup (Turnover G2) |
+| Controls module: BEN Controller panel (UL 508A panel build, PLCnext PLC and Axioline I/O, QUINT4 supplies, SPD, switch, relays, firewall) or BEN Controls Lite cabinet (RevPi Connect 4, DIO/AIO, supply, switch) | 12 months on the build; PLC, I/O, RevPi, supplies and switch per OEM (Phoenix Contact, KUNBUS, Moxa) | OEM warranties assigned to Customer | Panel wiring and labelling are workmanship (Section 3) |
+| Controls module: BEN Pods (Schreiber AI design, contract-manufactured, provisioned) | **24 months** ([NODE_WARRANTY_MONTHS]) hardware, RMA under Section 7 | MGM240P module and sensors per their OEMs | Pt1000 strings, SHT45, SDP810 and the industrial transmitters are calibrated consumables; drift beyond specification after 12 months is a calibration item, not a defect; Pod W batteries are consumables (3–5 yr) |
+| Controls module: edge computer (OnLogic Karbon 400, TPM, NVMe) | 12 months, RMA under Section 7; OEM extended warranty where purchased | Per OEM | Edge image and database are restored from backup (Turnover G2); TPM re-enrolment is part of the swap |
 | BEN Controls software | Per Software Licence Section 12 | Open Components per their licences | |
 | Compute module (if ordered) | 12 months installation and cabling | Servers and switches per OEM [OEM_WARRANTY_COMPUTE_TERM] [OEM_WARRANTY_COMPUTE_ID] | Customer-supplied compute is not covered |
 | Site works by Schreiber AI (turnkey only) | 12 months | Concrete and materials per subcontractor | Customer-built pad is not covered |
@@ -73,11 +73,11 @@ The warranties in Sections 1 and 2 apply only while all of the following are tru
 
 4.4 Work on refrigerant circuits is performed by EPA 608 certified technicians; work on power conductors by licensed electricians; work on the fire system by a licensed fire protection contractor; welding on the frame by a certified welder; and all such work is recorded.
 
-4.5 Only Schreiber AI-approved spares and OEM parts are installed; only Signed Images are installed on nodes and the gateway.
+4.5 Only Schreiber AI-approved spares and OEM parts are installed; only Signed Images are installed on Pods, the PLC and the edge computer.
 
 4.6 Customer responds to Critical and Major alarms as described in the O&M manual (or Managed Services do so) and does not silence or disable alarms.
 
-4.7 The gateway database backup target is maintained so that calibration and maintenance records are recoverable.
+4.7 The edge computer database backup target is maintained so that calibration and maintenance records are recoverable.
 
 ## 5. What voids the warranty
 
@@ -105,7 +105,7 @@ The warranty does not cover, and Schreiber AI may void the affected part of the 
 
 6.1 **Notice.** Customer notifies Schreiber AI of a suspected defect by the ticket portal [OPS_PORTAL_URL], email [WARRANTY_EMAIL] or phone [OPS_CENTER_PHONE] within 10 Business Days of discovery, with: Unit serial, alarm IDs or dashboard screenshots, the time of the event, photographs, and any maintenance records relevant to the affected subsystem. Under Managed Services, Schreiber AI's own alarm handling is notice.
 
-6.2 **Acknowledgement and triage.** Schreiber AI acknowledges within 1 Business Day (Critical safety or availability defects: 4 hours), reviews the gateway data (Customer grants read access to the diagnostics export or enables the remote support path for the case), and tells Customer within 3 Business Days whether the defect is covered, needs a site visit, or is excluded and why.
+6.2 **Acknowledgement and triage.** Schreiber AI acknowledges within 1 Business Day (Critical safety or availability defects: 4 hours), reviews the edge computer data (Customer grants read access to the diagnostics export or enables the remote support path for the case), and tells Customer within 3 Business Days whether the defect is covered, needs a site visit, or is excluded and why.
 
 6.3 **Response times for covered defects.**
 
@@ -124,17 +124,17 @@ The warranty does not cover, and Schreiber AI may void the affected part of the 
 
 6.7 **Replaced parts.** Replaced parts become Schreiber AI's property for failure analysis unless the OEM requires their return or Customer's security policy requires destruction on site (storage media are always sanitised or destroyed on site per NIST SP 800-88).
 
-## 7. RMA procedure for BEN Nodes and gateways
+## 7. RMA procedure for BEN Pods and edge computers
 
-7.1 **Scope.** BEN Nodes (ESP32-S3 on Olimex ESP32-POE-ISO carrier with Schreiber AI carrier board, sensors and enclosure) and gateways (Raspberry Pi 5, SSD, PSU, case) supplied with the Unit or as spares.
+7.1 **Scope.** BEN Pods (Schreiber AI PCBA with MGM240P module, sensors, enclosure; Pod W and Pod E) and edge computers (OnLogic Karbon 400 with NVMe, or RevPi Connect 4 on BEN Controls Lite) supplied with the Unit or as spares. PLC and I/O modules follow the Phoenix Contact OEM RMA with Schreiber AI handling the claim.
 
-7.2 **Diagnosis.** Customer (or Schreiber AI under Managed Services) confirms the fault from the dashboard: node `status` shows `errors[]`, node offline with PoE confirmed at the switch port, channel reading outside range after sensor swap, relay not reading back in the I/O test, or gateway failing its watchdog or A/B boot.
+7.2 **Diagnosis.** Customer (or Schreiber AI under Managed Services) confirms the fault from the dashboard: Pod `status` shows `errors[]`, Pod offline with power / battery confirmed and two router neighbours in range (mesh health panel), Pod fails attestation, channel reading outside range after sensor swap, relay not reading back in the I/O test, or the edge computer failing its watchdog, A/B boot or TPM measurement.
 
-7.3 **Swap first.** The spare node from the on-site kit (programmed and calibrated as "spare, unassigned") is installed in the failed node's position, assigned its node_id and `cal_id` from the gateway, and verified with the I/O test and sensor spot-check. Swap time is about 10 minutes. For a gateway, the spare gateway is imaged from the backup (Turnover G2) and verified by step 2 (node discovery).
+7.3 **Swap first.** The spare Pod from the on-site kit (provisioned with its own certificate, calibrated as "spare, unassigned") is clipped into the failed Pod's position, joins the mesh and attests, is assigned its node_id and `cal_id` from the edge computer, and verified with the I/O test and sensor spot-check. Swap time is about 5 minutes; no wiring on a Pod W. A Pod that fails attestation is never re-flashed in the field. For an edge computer, the spare is imaged from the backup (Turnover G2), its TPM enrolled, and verified by step 2 (Pod discovery and attestation).
 
-7.4 **RMA request.** Customer requests an RMA number at [RMA_EMAIL] or the portal with: Unit serial, node_id or gateway serial, firmware version, fault description, dashboard export of the node's last 24 hours of `status` and `telemetry`, and photographs. Schreiber AI issues the RMA number and a prepaid label within 2 Business Days.
+7.4 **RMA request.** Customer requests an RMA number at [RMA_EMAIL] or the portal with: Unit serial, Pod serial / node_id or edge computer serial, firmware version, attestation state, fault description, dashboard export of the Pod's last 24 hours of `status` and `telemetry`, and photographs. Schreiber AI issues the RMA number and a prepaid label within 2 Business Days.
 
-7.5 **Shipment.** The failed item is shipped in the spare's packaging. Nodes contain no batteries; gateways' SSDs are **removed and retained by Customer** (or sanitised per NIST SP 800-88 and the certificate attached) before shipment, so no Customer Data leaves the Site. Schreiber AI ships the replacement spare, programmed with the current signed firmware and a factory calibration with its `cal_id`, within [RMA_REPLACEMENT_DAYS] Business Days of issuing the RMA (advance replacement) so the kit is replenished before the failed unit arrives.
+7.5 **Shipment.** The failed item is shipped in the spare's packaging. Pod W batteries (2 × AA lithium) are removed before shipment; edge computers' NVMe drives are **removed and retained by Customer** (or sanitised per NIST SP 800-88 and the certificate attached) before shipment, so no Customer Data leaves the Site. Schreiber AI ships the replacement spare, provisioned with its own device certificate, the current signed firmware and a factory calibration with its `cal_id`, within [RMA_REPLACEMENT_DAYS] Business Days of issuing the RMA (advance replacement) so the kit is replenished before the failed unit arrives.
 
 7.6 **Analysis.** Schreiber AI reports the failure cause within 20 Business Days. Failures caused by excluded causes (water, over-voltage on a field terminal, physical damage, unsigned firmware attempt) are charged at the spare-part price in the SOW.
 

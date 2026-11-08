@@ -4669,7 +4669,7 @@
   },
   {
    "name": "NODE_COUNT",
-   "description": "BEN Node count = 1 + ceil(racks/2)",
+   "description": "Logical node-id count = 1 + ceil(racks/2) (room node + one per rack pair); physical BEN Pods are POD_COUNT",
    "type": "integer",
    "default": null,
    "source": "derived",
@@ -4681,7 +4681,7 @@
   },
   {
    "name": "NODE_WARRANTY_MONTHS",
-   "description": "BEN Node hardware warranty months",
+   "description": "BEN Pod hardware warranty months",
    "type": "integer",
    "default": 24,
    "source": "default",
@@ -9241,6 +9241,28 @@
    "source": "manual",
    "documents": [
     "INTEGRATOR_AGREEMENT.md"
+   ]
+  },
+  {
+   "name": "POD_COUNT",
+   "description": "BEN Pod count = racks*2 + 2 (cold face, hot face per rack + room + outdoor); BEN Micro 3",
+   "type": "integer",
+   "default": null,
+   "source": "derived",
+   "documents": [
+    "ACCEPTANCE_CERTIFICATES.md",
+    "CONTRACT_MANUFACTURING_AGREEMENT.md",
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
+   "name": "CONTROLS_TIER_LABEL",
+   "description": "Resolved controls tier label: BEN Controls Lite (Revolution Pi + Pods) or BEN Controls Pro (PLCnext + UL 508A panel + edge computer + Pods)",
+   "type": "string",
+   "default": null,
+   "source": "derived",
+   "documents": [
+    "SOW_TEMPLATE.md"
    ]
   }
  ]

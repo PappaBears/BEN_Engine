@@ -1,14 +1,14 @@
-# Northwind Partners — BEN Engine proposal SAI-BEN40-20261108-6F99E124
+# Northwind Partners — BEN Engine proposal SAI-BEN40-20261108-8DBFA6B3
 
-*BEN 40 · AI training pod · Northwind Partners (for Helix Labs) · Phoenix, AZ · 2026-11-08 · valid until 2027-01-07*
+*BEN 40 · AI training pod · Northwind Partners for Helix Labs · Phoenix, AZ · 2026-11-08 · valid until 2027-01-07*
 
 ## 1. Cover
 
 | Item | Value |
 |---|---|
-| Proposal | BEN Engine BEN 40 for Northwind Partners (for Helix Labs) |
+| Proposal | BEN Engine BEN 40 for Northwind Partners for Helix Labs |
 | Prepared by | Northwind Partners (engineering by Schreiber AI) |
-| Customer | Northwind Partners (for Helix Labs) |
+| Customer | Northwind Partners for Helix Labs |
 | Site | Phoenix, AZ |
 | Tier | BEN 40 — 40 ft high-cube ISO container |
 | Mission profile | AI training pod (ai_training) |
@@ -16,18 +16,18 @@
 | Purchase option | White-label |
 | Date | 2026-11-08 |
 | Valid until | 2027-01-07 (60 days) |
-| Proposal ID | SAI-BEN40-20261108-6F99E124 |
+| Proposal ID | SAI-BEN40-20261108-8DBFA6B3 |
 | Configuration | 500 kW IT in 9 rack(s), Direct liquid cooling + CDU + dry cooler, N+1, 10 min UPS |
 
-AI infrastructure that arrives finished. This proposal is generated from configuration version 0d39936b; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
+AI infrastructure that arrives finished. This proposal is generated from configuration version 3f252cc4; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
 
 ## 2. Executive summary
 
-Northwind Partners (for Helix Labs) needs 500 kW of IT capacity for a AI training pod workload at Phoenix, AZ. We propose one BEN 40: a 40 ft high-cube ISO container fitted out as a complete data center with 9 rack(s), Direct liquid cooling + CDU + dry cooler with N+1 redundancy, a 2 x 605 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
+Northwind Partners for Helix Labs needs 500 kW of IT capacity for a AI training pod workload at Phoenix, AZ. We propose one BEN 40: a 40 ft high-cube ISO container fitted out as a complete data center with 9 rack(s), Direct liquid cooling + CDU + dry cooler with N+1 redundancy, a 2 x 605 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
 
 The unit arrives finished and factory-tested. It needs a pad, a 1000 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the white-label option: $14,009,046 capital ($28,018 per kW IT) plus $37,500 per year (White-label licence under the Northwind Partners brand). 92 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 8 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the white-label option: $14,037,148 capital ($28,074 per kW IT) plus $37,500 per year (White-label licence under the Northwind Partners brand). 88 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 12 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 34 weeks, set by the longest-lead item (16 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -55,6 +55,7 @@ What this means for you: the environmental class sets the alarm limits your IT w
 | Row fit | fits | single row 7700 mm vs interior 11850 mm |
 | Cooling electrical | 41.67 kW | COP 12.0 at design point |
 | Total electrical demand | 552.2 kW / 581.2 kVA | IT + cooling + 2 % house + 0.5 kW controls, pf 0.95 |
+| Controls tier | BEN Controls Pro | PLCnext AXC F 2152 + Axioline I/O in a UL 508A BEN Controller panel, OnLogic Karbon 400 edge computer (TPM 2.0); 20 BEN Pods on the BEN Mesh (Thread, Secure Vault); selectable with controls_tier (docs/CONTROLS_HARDWARE_DECISION.md 2a) |
 | Service | 480 V 3ph, 1000 A breaker | calculated 874 A at 80 % continuous, rounded to the next frame |
 | UPS | 2 x 605 kVA | IT only with 15 % headroom, N+1 |
 | Battery | 92.6 kWh lithium (LFP) | 10 min at IT load, 90 % depth of discharge |
@@ -68,23 +69,23 @@ What this means for you: the environmental class sets the alarm limits your IT w
 
 | Module | Status | BOM lines | Sell price |
 |---|---|---|---|
-| Power module | included | 15 lines | $805,892 |
+| Power module | included | 15 lines | $815,847 |
 | Cooling module | included | 5 lines | $810,208 |
 | Compute module | included | 5 lines | $12,055,162 |
-| Controls module | included | 23 lines | $9,140 |
+| Controls module | included | 29 lines | $27,286 |
 | Structure (container / cabinet) | included | 12 lines | $76,975 |
 | Envelope (insulation, liner, coatings) | included | 12 lines | $15,590 |
 | Fire detection and suppression | included | 7 lines | $65,503 |
 | Site kit (anchors, embeds, signage) | included | 8 lines | $88,056 |
 | Build labour, FAT, logistics | included | 8 lines | $82,521 |
 
-Top 15 lines of the 95-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
+Top 15 lines of the 101-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
 | CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Supermicro SYS-821GE-TNHR | 36 ea | $11,795,000 | confirmed | 10 |
 | CLG-CDU | Row CDU 450-750 kW liquid-to-liquid (DLC) | Vertiv / CoolIT XDU450 / CHx750 | 3 ea | $625,000 | estimate | 16 |
-| PWR-UPS-GVS100 | Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8 | Schneider Electric GVSUPS100KGS | 8 ea | $462,267 | confirmed | 10 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | Schneider Electric GVSUPS150KHS (configure-to-order) | 5 ea | $472,222 | estimate | 14 |
 | PWR-BATT-LI | Galaxy Lithium-ion battery cabinet UL, 16 x 2.04 kWh modules (32.6 kWh) | Schneider Electric LIBSESMG16UL | 3 ea | $230,075 | confirmed | 10 |
 | CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 9 ea | $224,988 | confirmed | 3 |
 | CLG-DRYCOOLER | Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol | Guntner / Alfa Laval GFD / Solar G | 575 kW | $87,847 | estimate | 14 |
@@ -111,27 +112,27 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $13,999,906 | $28,000 | - | 1 yr | $13,999,906 | 92 / 0 / 8 % | 72 | alternative |
-| Hardware + BEN Controls | $14,009,046 | $28,018 | $30,000 | 1 yr | $14,039,046 | 92 / 0 / 8 % | 95 | alternative |
-| White-label | $14,009,046 | $28,018 | $37,500 | 1 yr | $14,046,546 | 92 / 0 / 8 % | 95 | PROPOSED |
-| Managed service | $14,009,046 | $28,018 | $270,000 | 3 yr | $14,819,046 | 92 / 0 / 8 % | 95 | alternative |
+| Hardware only | $14,009,862 | $28,020 | - | 1 yr | $14,009,862 | 88 / 0 / 12 % | 72 | alternative |
+| Hardware + BEN Controls | $14,037,148 | $28,074 | $30,000 | 1 yr | $14,067,148 | 88 / 0 / 12 % | 101 | alternative |
+| White-label | $14,037,148 | $28,074 | $37,500 | 1 yr | $14,074,648 | 88 / 0 / 12 % | 101 | PROPOSED |
+| Managed service | $14,037,148 | $28,074 | $270,000 | 3 yr | $14,847,148 | 88 / 0 / 12 % | 101 | alternative |
 
 Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Northwind Partners brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 500 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $14,009,046 | $270,000 | $14,279,046 |
-| 3 years | $14,009,046 | $810,000 | $14,819,046 |
-| 5 years | $14,009,046 | $1,350,000 | $15,359,046 |
+| 1 year | $14,037,148 | $270,000 | $14,307,148 |
+| 3 years | $14,037,148 | $810,000 | $14,847,148 |
+| 5 years | $14,037,148 | $1,350,000 | $15,387,148 |
 
-Payment milestones for the proposed option (White-label, capital $14,009,046):
+Payment milestones for the proposed option (White-label, capital $14,037,148):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $4,202,714 | 7 |
-| Factory acceptance test (H13) | 40 % | $5,603,619 | 29 |
-| Site acceptance test (H19) | 25 % | $3,502,262 | 33 |
-| Turnover (W20) | 5 % | $700,452 | 34 |
+| Engineering release (H4) | 30 % | $4,211,144 | 7 |
+| Factory acceptance test (H13) | 40 % | $5,614,859 | 29 |
+| Site acceptance test (H19) | 25 % | $3,509,287 | 33 |
+| Turnover (W20) | 5 % | $701,857 | 34 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -159,10 +160,10 @@ Long-lead items (ordered at engineering release):
 | Code | Item | Vendor | Qty | Lead time (weeks) |
 |---|---|---|---|---|
 | CLG-CDU | Row CDU 450-750 kW liquid-to-liquid (DLC) | Vertiv / CoolIT sales | 3 ea | 16 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | AVENDOR | 5 ea | 14 |
 | CLG-DRYCOOLER | Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol | Guntner / Alfa Laval rep | 575 kW | 14 |
 | CLG-MANIFOLD | Rack coolant manifold pair + QD hose kit (DLC) | CoolIT / Staubli | 9 per rack | 12 |
 | CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Uvation | 36 ea | 10 |
-| PWR-UPS-GVS100 | Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8 | AVENDOR | 8 ea | 10 |
 
 ## 8. Drawings and documents delivered
 
@@ -178,13 +179,13 @@ Issue-for-construction drawing set for the BEN 40, regenerated from the frozen c
 | M-001 | Cooling P&ID (sheet 6/7) | NTS |
 | C-001 | Controls layout (sheet 7/7) | see sheet |
 
-Document set (indexed binder, encrypted USB in the controls cabinet, and the gateway share, per docs/TURNOVER.md):
+Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):
 
 - At order: this proposal, risk acknowledgement, site requirements form (docs/SITE_REQUIREMENTS.md) for signature
 - At engineering release (H4): frozen configuration JSON with derived sizing, IFC drawing set with CTQ/CTP callouts, priced bill of materials with confirmation status, arc-flash and coordination study, PE anchorage calculation, compliance pack, FAT/SAT procedure
 - At FAT (H13): signed commissioning report (JSON + PDF) with sweep CSVs, thermography, door-fan test, electrical and cooling test records
 - At SAT (H19): site commissioning report, acoustic survey, final arc-flash labels, AHJ certificates
-- At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, gateway backup, password handover record, training sign-off, warranty certificates
+- At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, Pod certificate register, edge computer backup, password handover record, training sign-off, warranty certificates
 
 ## 9. Compliance pack for this profile
 
@@ -214,7 +215,7 @@ Baseline matrix lines that apply to every unit:
 |---|---|---|
 | NFPA 70 (NEC) | Listed dead-front gear, SCCR 65 kA, selective coordination, arc-flash labels | Electrical inspection H10, AHJ at H18 |
 | NFPA 75 / 2001 / 72 | Non-combustible liner, VEWFD, clean agent with 10-min hold, EPO, HVAC shutdown | Door-fan test, NFPA 72 record of completion at SAT |
-| UL 508A | Controls panel built in a UL 508A shop | Panel label and schedule |
+| UL 508A | BEN Controller panel (PLCnext PLC, I/O, edge computer) built and labelled by a UL 508A shop | Panel label and schedule (CTQ-K6) |
 | ASHRAE TC 9.9 | Class A1 alarm limits in the controls | Load step test E3/E7 at FAT and SAT |
 | AIM Act / EPA 608 | GWP < 700 A1 refrigerant or water loops; certified technicians | Charge record per circuit |
 | ISO 668 / 1496 / CSC | One-trip high-cube container, PE-checked modifications, CSC decision at transport | Weld inspection H7, weigh ticket |
@@ -286,7 +287,7 @@ Acceptance is by the commissioning script (software/ben_engine/commissioning.py)
 | Step | Test | Pass criterion |
 |---|---|---|
 | 1 | Pre-power visual checklist | Every checklist item answered yes by the operator; no open item |
-| 2 | Node discovery and firmware versions | All nodes answer; firmware versions and hashes match the release record |
+| 2 | Pod discovery, attestation and firmware versions | All BEN Pods answer and attest; firmware versions and hashes match the release record |
 | 3 | Sensor sanity at idle | Rack inlet temperatures within 2 K of each other; RH plausible; aisle dP tared |
 | 4 | I/O point-to-point test | Every relay toggles and reads back; every contact (door, leak, EPO) reads correctly |
 | 5 | Power chain: utility meter vs PDU sum | Meter agrees with the PDU sum within 3 % after metered cooling, house and UPS losses |
@@ -304,7 +305,7 @@ Pass criteria specific to this configuration: rack inlets within ASHRAE A1 at 50
 |---|---|
 | Workmanship warranty | 24 months from SAT on the integration, wiring, piping, envelope and controls build |
 | Equipment warranty | Vendor warranties (UPS, cooling, CDU, batteries, fire panel, generator, servers) registered in the customer's name at turnover and passed through; minimum 12 months, longer where the vendor offers it |
-| Controls software | Signed firmware and gateway updates for the licence term; security fixes for the life of the licence |
+| Controls software | Signed Pod firmware, PLC project and edge computer updates for the licence term; security fixes for the life of the licence |
 | Support level in this option | Second-line engineering support to Northwind Partners; partner delivers first-line support under its own brand |
 
 Maintenance schedule (docs/MAINTENANCE.md; intervals for temperate climate, climate add-ons shorten some intervals; task counts per interval):
@@ -315,7 +316,7 @@ Maintenance schedule (docs/MAINTENANCE.md; intervals for temperate climate, clim
 | Monthly — L (1–2 hours on site) with R review | Local technician (L) with remote review | 8 |
 | Quarterly — L + S | Local technician + certified subcontractor (L + S) | 6 |
 | Semi-annual | Certified subcontractor (S) with record; remote (R) for controls | 4 |
-| Annual | Certified subcontractor (S) with record; remote (R) for controls | 8 |
+| Annual | Certified subcontractor (S) with record; remote (R) for controls | 9 |
 | 3-year | Certified subcontractor (S) with record; remote (R) for controls | 4 |
 | 5-year | Certified subcontractor (S) with record; remote (R) for controls | 6 |
 
@@ -343,7 +344,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 ## 15. Assumptions and what is not included
 
 - Configuration as on the cover: 500 kW IT, 9 rack(s), Direct liquid cooling + CDU + dry cooler, N+1, climate Hot / arid; any change is priced as a change order
-- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 92 % confirmed, 0 % list, 8 % estimate for this option; the estimate share is re-priced at engineering release
+- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 88 % confirmed, 0 % list, 12 % estimate for this option; the estimate share is re-priced at engineering release
 - Gross margin 28% on hardware and build labour; controls licence $30,000/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
@@ -354,15 +355,15 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-BEN40-20261108-6F99E124) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-BEN40-20261108-8DBFA6B3) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
-| Customer authorised representative, Northwind Partners (for Helix Labs) |  |  |  |
+| Customer authorised representative, Northwind Partners for Helix Labs |  |  |  |
 | Schreiber AI — sales |  |  |  |
 | Schreiber AI — engineering |  |  |  |
 | Schreiber AI — compliance |  |  |  |
 | Partner, Northwind Partners |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-BEN40-20261108-6F99E124. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-BEN40-20261108-8DBFA6B3. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

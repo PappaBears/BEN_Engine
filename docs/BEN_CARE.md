@@ -19,7 +19,7 @@
 
 | Plan | Who watches | What is included | Price basis |
 | --- | --- | --- | --- |
-| **Care Essential** (included with BEN Controls) | Customer | Twin, alarms with minutes-to-limit, sweeps on demand, calibration tools, CSV/JSON export, local dashboard, software updates for the update period | Controls licence per tier per year |
+| **Care Essential** (included with BEN Controls Lite and Pro; the hardware tier changes the controller, not the care layer) | Customer | Twin, alarms with minutes-to-limit, sweeps on demand, calibration tools, CSV/JSON export, local dashboard, software updates for the update period | Controls licence per tier per year |
 | **Care Managed** | Schreiber AI operations centre | Everything in Essential plus 24 × 7 monitoring, monthly proof-of-redundancy run and signed report, drift-triggered calibration visits, maintenance scheduling and execution per `docs/MAINTENANCE.md`, firmware and security patching, monthly PUE/availability report, outbound-only support tunnel the customer switches on | USD per kW-month on design IT load (`docs/contracts/MANAGED_SERVICES_SLA.md`) |
 | **Care Partner** (white-label) | Integrator L1, Schreiber AI L2/L3 | Care Managed delivered under the partner's brand with Schreiber AI behind it; fleet view for the partner | Wholesale rate per kW-month + licence |
 
