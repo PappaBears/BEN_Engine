@@ -12,7 +12,7 @@
    "max_racks": 1,
    "rack_u": 24,
    "it_kw_min": 2,
-   "it_kw_max": 6,
+   "it_kw_max": 5,
    "default_cooling": "cabinet_dx",
    "voltage": "208/240 V 1ph",
    "tare_kg": 320
@@ -25,12 +25,12 @@
    "ext_h_m": 2.896,
    "int_l_m": 2.7,
    "int_w_m": 2.2,
-   "int_h_m": 2.55,
+   "int_h_m": 2.49,
    "max_racks": 2,
    "rack_u": 42,
    "it_kw_min": 10,
    "it_kw_max": 30,
-   "default_cooling": "inrow_dx",
+   "default_cooling": "inrow_dx_300",
    "voltage": "208 V 3ph",
    "tare_kg": 1300
   },
@@ -42,12 +42,12 @@
    "ext_h_m": 2.896,
    "int_l_m": 5.75,
    "int_w_m": 2.2,
-   "int_h_m": 2.55,
+   "int_h_m": 2.49,
    "max_racks": 6,
    "rack_u": 42,
    "it_kw_min": 50,
    "it_kw_max": 150,
-   "default_cooling": "inrow_dx",
+   "default_cooling": "rdhx_drycooler",
    "voltage": "480 V 3ph",
    "tare_kg": 2400
   },
@@ -59,7 +59,7 @@
    "ext_h_m": 2.896,
    "int_l_m": 11.85,
    "int_w_m": 2.2,
-   "int_h_m": 2.55,
+   "int_h_m": 2.49,
    "max_racks": 12,
    "rack_u": 48,
    "it_kw_min": 150,
@@ -75,28 +75,45 @@
    "unit_kw": 5.8,
    "cop": 2.6,
    "medium": "air",
-   "max_rack_kw": 6
+   "max_rack_kw": 5,
+   "width_mm": 400,
+   "mass_kg": 60
   },
   "inrow_dx": {
-   "label": "In-row DX cooling unit",
+   "label": "In-row DX cooling unit (600 mm, 30 kW)",
    "unit_kw": 30.0,
    "cop": 3.2,
    "medium": "air",
-   "max_rack_kw": 30
+   "max_rack_kw": 30,
+   "width_mm": 600,
+   "mass_kg": 250
+  },
+  "inrow_dx_300": {
+   "label": "In-row DX cooling unit (300 mm, 20 kW)",
+   "unit_kw": 20.0,
+   "cop": 3.1,
+   "medium": "air",
+   "max_rack_kw": 20,
+   "width_mm": 300,
+   "mass_kg": 180
   },
   "rdhx_drycooler": {
    "label": "Rear-door heat exchanger + dry cooler",
    "unit_kw": 35.0,
    "cop": 8.0,
    "medium": "water",
-   "max_rack_kw": 40
+   "max_rack_kw": 40,
+   "width_mm": 0,
+   "mass_kg": 150
   },
   "dlc_cdu": {
    "label": "Direct liquid cooling + CDU + dry cooler",
    "unit_kw": 300.0,
    "cop": 12.0,
    "medium": "liquid",
-   "max_rack_kw": 80
+   "max_rack_kw": 80,
+   "width_mm": 600,
+   "mass_kg": 400
   }
  },
  "profiles": {

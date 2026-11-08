@@ -49,6 +49,7 @@
       "enum": [
         "cabinet_dx",
         "inrow_dx",
+        "inrow_dx_300",
         "rdhx_drycooler",
         "dlc_cdu"
       ]
@@ -105,7 +106,7 @@
   "x-tier-limits": {
     "micro": {
       "it_kw_min": 2,
-      "it_kw_max": 6,
+      "it_kw_max": 5,
       "max_racks": 1
     },
     "ben10": {
@@ -126,11 +127,15 @@
   },
   "x-cooling-limits": {
     "cabinet_dx": {
-      "max_rack_kw": 6,
+      "max_rack_kw": 5,
       "medium": "air"
     },
     "inrow_dx": {
       "max_rack_kw": 30,
+      "medium": "air"
+    },
+    "inrow_dx_300": {
+      "max_rack_kw": 20,
       "medium": "air"
     },
     "rdhx_drycooler": {

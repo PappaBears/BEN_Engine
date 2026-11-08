@@ -1,0 +1,15 @@
+[Unit]
+Description=BEN Engine gateway firewall (nftables ruleset) — Schreiber AI
+Before=network-pre.target mosquitto.service ben-api.service
+Wants=network-pre.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/ben/nftables.conf
+ExecReload=/usr/sbin/nft -f /etc/ben/nftables.conf
+ExecStop=/usr/sbin/nft flush ruleset
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0B1018">
+<title>BEN Engine</title>
+<link rel="icon" href="logo-sai.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" class="app">
+  <header class="topbar">
+    <a class="brand" href="./" title="Schreiber AI">
+      <img src="logo-sai.svg" alt="Schreiber AI" width="34" height="34">
+      <span class="wordmark"><b>BEN</b> Engine</span>
+      <span class="brand-sub" id="brand-sub">Business Edge Node · Schreiber AI</span>
+    </a>
+    <div class="topbar-right">
+      <span class="pill" id="pill-tier">—</span>
+      <span class="pill pill-muted" id="pill-site">Demo site</span>
+      <button class="btn btn-ghost" id="btn-help" title="Keyboard help">?</button>
+    </div>
+  </header>
+
+  <aside class="rail" id="rail">
+    <nav class="tabs" id="tabs" aria-label="Panels"></nav>
+    <section class="panel" id="panel" aria-live="polite"></section>
+  </aside>
+
+  <main class="viewport" id="viewport">
+    <canvas id="scene" aria-label="3D digital twin"></canvas>
+    <div class="view-toolbar" id="view-toolbar">
+      <div class="seg" role="group" aria-label="Camera">
+        <button data-cam="exterior_iso" class="active">Exterior</button>
+        <button data-cam="cold_aisle">Cold aisle</button>
+        <button data-cam="hot_aisle">Hot aisle</button>
+        <button data-cam="power_room">Power</button>
+        <button data-cam="roof">Roof</button>
+      </div>
+      <div class="seg" role="group" aria-label="Modes">
+        <button id="btn-walk" title="First person (W A S D, mouse look, Esc exits)">Walkthrough</button>
+        <button id="btn-tour" title="Guided tour with captions">Guided tour</button>
+        <button id="btn-cutaway" title="Hide roof and near wall">Cutaway</button>
+        <button id="btn-doors" title="Open / close the doors">Doors</button>
+      </div>
+    </div>
+    <div class="caption" id="tour-caption" hidden></div>
+    <div class="walk-hint" id="walk-hint" hidden>Click the scene to look around · W A S D move · Shift run · Esc exit</div>
+    <div class="scene-legend" id="scene-legend">
+      <span><i style="background:#66E3FF"></i>cold aisle</span>
+      <span><i style="background:#FFC66D"></i>hot aisle</span>
+      <span><i style="background:#6EE7A8"></i>power flow</span>
+      <span><i style="background:#FF707D"></i>alarm</span>
+    </div>
+  </main>
+
+  <aside class="inspector" id="inspector">
+    <h2 class="inspector-title" id="insp-title">Container</h2>
+    <div id="insp-body" class="insp-body"></div>
+  </aside>
+
+  <footer class="statusbar" id="statusbar">
+    <span class="status-item" id="st-conn"><i class="dot"></i><span>connecting…</span></span>
+    <span class="status-item" id="st-mode">SIM</span>
+    <label class="status-item speed">×<output id="st-speed-val">1</output>
+      <input type="range" id="st-speed" min="1" max="60" step="1" value="1" aria-label="Simulation speed">
+    </label>
+    <span class="status-item mono" id="st-simt" title="Simulated time">t 00:00:00</span>
+    <span class="status-item mono" id="st-step" title="Age of the latest twin step">step —</span>
+    <span class="status-item mono right" id="st-clock">—</span>
+  </footer>
+
+  <dialog id="help" class="help">
+    <h3>Keyboard & mouse</h3>
+    <table>
+      <tr><td>Drag / wheel</td><td>Orbit, zoom (orbit mode)</td></tr>
+      <tr><td>Click object</td><td>Inspect it (racks, cooling, UPS, sensors…)</td></tr>
+      <tr><td>1 – 5</td><td>Camera presets</td></tr>
+      <tr><td>F</td><td>Walkthrough (first person). W A S D move, Shift run, mouse look, Esc exit</td></tr>
+      <tr><td>G</td><td>Guided tour on / off</td></tr>
+      <tr><td>C</td><td>Cutaway on / off</td></tr>
+      <tr><td>Esc</td><td>Leave walkthrough / tour</td></tr>
+    </table>
+    <p class="muted">Motion (particles, pulses, tour) is reduced when your OS asks for reduced motion.</p>
+    <form method="dialog"><button class="btn">Close</button></form>
+  </dialog>
+</div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

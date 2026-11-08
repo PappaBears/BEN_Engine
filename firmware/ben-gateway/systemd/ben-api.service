@@ -1,0 +1,31 @@
+# BEN Engine gateway — ben_engine API / data service
+[Unit]
+Description=BEN Engine controls API (ben_engine.api) — Schreiber AI
+Documentation=file:///opt/ben_engine/firmware/ben-gateway/README.md
+After=network-online.target mosquitto.service chrony.service
+Wants=network-online.target mosquitto.service
+
+[Service]
+Type=simple
+User=ben
+Group=ben
+WorkingDirectory=/opt/ben_engine/software
+EnvironmentFile=/etc/ben/ben.env
+ExecStart=/opt/ben_engine/.venv/bin/python -m uvicorn ben_engine.api:app --host 10.30.0.1 --port 8000 --proxy-headers
+Restart=always
+RestartSec=3
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/ben /var/log/ben
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryMax=1G
+StandardOutput=append:/var/log/ben/api.log
+StandardError=append:/var/log/ben/api.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=BEN Engine nightly SQLite backup to USB/NAS — Schreiber AI
+After=ben-api.service
+
+[Service]
+Type=oneshot
+User=ben
+Group=ben
+EnvironmentFile=/etc/ben/ben.env
+ExecStart=/opt/ben_engine/firmware/ben-gateway/scripts/ben-backup.sh
+StandardOutput=append:/var/log/ben/backup.log
+StandardError=append:/var/log/ben/backup.log

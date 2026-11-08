@@ -14,7 +14,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Literal, Dict, Any, List
 
 Tier = Literal["micro", "ben10", "ben20", "ben40"]
-Cooling = Literal["cabinet_dx", "inrow_dx", "rdhx_drycooler", "dlc_cdu"]
+Cooling = Literal["cabinet_dx", "inrow_dx", "inrow_dx_300", "rdhx_drycooler", "dlc_cdu"]
 Redundancy = Literal["N", "N+1", "2N"]
 Climate = Literal["temperate", "hot_arid", "hot_humid", "cold", "coastal", "high_altitude"]
 Profile = Literal[
@@ -30,27 +30,27 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
         "label": "BEN Micro", "enclosure": "Outdoor 24U NEMA 3R cabinet on skid",
         "ext_l_m": 1.20, "ext_w_m": 1.00, "ext_h_m": 1.80,
         "int_l_m": 1.00, "int_w_m": 0.80, "int_h_m": 1.40,
-        "max_racks": 1, "rack_u": 24, "it_kw_min": 2, "it_kw_max": 6,
+        "max_racks": 1, "rack_u": 24, "it_kw_min": 2, "it_kw_max": 5,
         "default_cooling": "cabinet_dx", "voltage": "208/240 V 1ph", "tare_kg": 320,
     },
     "ben10": {
         "label": "BEN 10", "enclosure": "10 ft high-cube ISO container",
         "ext_l_m": 2.991, "ext_w_m": 2.438, "ext_h_m": 2.896,
-        "int_l_m": 2.70, "int_w_m": 2.20, "int_h_m": 2.55,
+        "int_l_m": 2.70, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 2, "rack_u": 42, "it_kw_min": 10, "it_kw_max": 30,
-        "default_cooling": "inrow_dx", "voltage": "208 V 3ph", "tare_kg": 1300,
+        "default_cooling": "inrow_dx_300", "voltage": "208 V 3ph", "tare_kg": 1300,
     },
     "ben20": {
         "label": "BEN 20", "enclosure": "20 ft high-cube ISO container",
         "ext_l_m": 6.058, "ext_w_m": 2.438, "ext_h_m": 2.896,
-        "int_l_m": 5.75, "int_w_m": 2.20, "int_h_m": 2.55,
+        "int_l_m": 5.75, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 6, "rack_u": 42, "it_kw_min": 50, "it_kw_max": 150,
-        "default_cooling": "inrow_dx", "voltage": "480 V 3ph", "tare_kg": 2400,
+        "default_cooling": "rdhx_drycooler", "voltage": "480 V 3ph", "tare_kg": 2400,
     },
     "ben40": {
         "label": "BEN 40", "enclosure": "40 ft high-cube ISO container",
         "ext_l_m": 12.192, "ext_w_m": 2.438, "ext_h_m": 2.896,
-        "int_l_m": 11.85, "int_w_m": 2.20, "int_h_m": 2.55,
+        "int_l_m": 11.85, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 12, "rack_u": 48, "it_kw_min": 150, "it_kw_max": 500,
         "default_cooling": "dlc_cdu", "voltage": "480 V 3ph", "tare_kg": 3900,
     },
@@ -58,10 +58,11 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
 
 COOLING_LIBRARY: Dict[str, Dict[str, Any]] = {
     # unit_kw: sensible cooling per unit at ASHRAE A1 conditions; cop at design point
-    "cabinet_dx":     {"label": "Cabinet DX air conditioner", "unit_kw": 5.8,  "cop": 2.6, "medium": "air",   "max_rack_kw": 6},
-    "inrow_dx":       {"label": "In-row DX cooling unit",      "unit_kw": 30.0, "cop": 3.2, "medium": "air",   "max_rack_kw": 30},
-    "rdhx_drycooler": {"label": "Rear-door heat exchanger + dry cooler", "unit_kw": 35.0, "cop": 8.0, "medium": "water", "max_rack_kw": 40},
-    "dlc_cdu":        {"label": "Direct liquid cooling + CDU + dry cooler", "unit_kw": 300.0, "cop": 12.0, "medium": "liquid", "max_rack_kw": 80},
+    "cabinet_dx":     {"label": "Cabinet DX air conditioner", "unit_kw": 5.8,  "cop": 2.6, "medium": "air",   "max_rack_kw": 5,  "width_mm": 400, "mass_kg": 60},
+    "inrow_dx":       {"label": "In-row DX cooling unit (600 mm, 30 kW)", "unit_kw": 30.0, "cop": 3.2, "medium": "air",   "max_rack_kw": 30, "width_mm": 600, "mass_kg": 250},
+    "inrow_dx_300":   {"label": "In-row DX cooling unit (300 mm, 20 kW)", "unit_kw": 20.0, "cop": 3.1, "medium": "air",   "max_rack_kw": 20, "width_mm": 300, "mass_kg": 180},
+    "rdhx_drycooler": {"label": "Rear-door heat exchanger + dry cooler", "unit_kw": 35.0, "cop": 8.0, "medium": "water", "max_rack_kw": 40, "width_mm": 0, "mass_kg": 150},
+    "dlc_cdu":        {"label": "Direct liquid cooling + CDU + dry cooler", "unit_kw": 300.0, "cop": 12.0, "medium": "liquid", "max_rack_kw": 80, "width_mm": 600, "mass_kg": 400},
 }
 
 PROFILE_DEFAULTS: Dict[str, Dict[str, Any]] = {
@@ -131,6 +132,10 @@ class Config:
         for s in self.subsystems:
             if s not in ("power", "cooling", "compute", "controls"):
                 errs.append(f"unknown subsystem {s}")
+        if not errs and self.tier != "micro":
+            d = self.derived()
+            if not d["row_fits"]:
+                errs.append(f"single row of {self.racks} racks + {d['cooling_units_total']} cooling units is {d['row_length_mm']} mm, exceeds interior {int(TIER_GEOMETRY[self.tier]['int_l_m']*1000)} mm; use fewer racks, rear-door or liquid cooling")
         return errs
 
     # ------------------------------------------------------------ derived sizing
@@ -192,7 +197,7 @@ class Config:
         airflow_cfm = self.it_kw * 125 if cl["medium"] == "air" else self.it_kw * 40
 
         # structural: payload
-        payload_kg = self.racks * (400 if self.tier == "micro" else 900) + n_units_total * (250 if cl["medium"] == "air" else 400) + ups_modules * 350 + battery_kwh * 8
+        payload_kg = self.racks * (400 if self.tier == "micro" else 900) + n_units_total * cl["mass_kg"] + ups_modules * (120 if self.tier == "micro" else 350) + battery_kwh * 8
         gross_kg = payload_kg + g["tare_kg"]
 
         # envelope solar/transmission gain, R-value 3.5 m2K/W (100 mm PIR), ΔT at design
@@ -200,6 +205,10 @@ class Config:
         envelope_gain_kw = (area_m2 * (clim["t_design_c"] - 22) / 3.5 + 0.3 * clim["solar_w_m2"] * g["ext_l_m"] * g["ext_w_m"] * 0.25) / 1000
 
         pue_est = round(total_kw / self.it_kw + 0.03, 3)  # +0.03 UPS loss
+        # single-row length check (racks 600 mm + in-row units + 500 mm end zone) vs interior length
+        row_len_mm = self.racks * 600 + (n_units_total * cl["width_mm"] if cl["medium"] == "air" or cl["medium"] == "liquid" else 0) + 500
+        row_fits = (self.tier == "micro") or (row_len_mm <= g["int_l_m"] * 1000)
+        nfpa_855 = battery_kwh >= 20.0
 
         return {
             "tier_label": g["label"], "enclosure": g["enclosure"],
@@ -212,6 +221,7 @@ class Config:
             "ups_modules": ups_modules, "ups_kva_each": round(ups_kva_each), "battery_kwh": round(battery_kwh, 1),
             "airflow_cfm": round(airflow_cfm), "payload_kg": round(payload_kg), "gross_kg": round(gross_kg),
             "envelope_gain_kw": round(envelope_gain_kw, 2), "pue_estimate": pue_est,
+            "row_length_mm": int(row_len_mm), "row_fits": row_fits, "nfpa_855_scope": nfpa_855,
             "ashrae_class": PROFILE_DEFAULTS[self.profile]["ashrae"],
             "climate": clim, "geometry": g,
         }
@@ -240,6 +250,11 @@ class Config:
         cfg = cls(tier=tier, profile=profile, it_kw=float(round(it_kw)), racks=racks,
                   cooling=cooling, redundancy=p["redundancy"], climate=climate,
                   generator=profile in ("healthcare", "public_sector", "off_grid"))
+        if tier != "micro":
+            for alt in (cooling, "inrow_dx_300", "rdhx_drycooler", "dlc_cdu"):
+                cfg.cooling = alt
+                if not cfg.validate():
+                    break
         return cfg
 
 
@@ -273,7 +288,7 @@ def main(argv=None):
     else:
         print(f"{d['tier_label']} — {PROFILE_DEFAULTS[cfg.profile]['label']} — {cfg.it_kw} kW IT in {cfg.racks} racks")
         for k in ("per_rack_kw", "cooling_label", "cooling_units_total", "total_kw", "voltage", "service_breaker_a",
-                  "ups_modules", "ups_kva_each", "battery_kwh", "airflow_cfm", "gross_kg", "pue_estimate"):
+                  "ups_modules", "ups_kva_each", "battery_kwh", "airflow_cfm", "gross_kg", "pue_estimate", "row_length_mm", "row_fits", "nfpa_855_scope"):
             print(f"  {k:24s} {d[k]}")
     return 0
 

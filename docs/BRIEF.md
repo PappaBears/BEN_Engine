@@ -70,6 +70,10 @@ list that must be disclosed on the product page before purchase.
 | 16 | Venture capital proposition and deck | `docs/investors/` | Problem, solution, market, business model, unit economics from the BOM, ask, use of funds |
 | 17 | Simulated end-to-end test | `tests/test_e2e.py` | Config → twin → commissioning → sweep → CSV; passes in CI |
 | 18 | Honest final report | `docs/VALIDATION.md` | Verified / unverified / least accurate stated per capability |
+| 19 | Proposal generator: selector → complete customer proposal | `software/ben_engine/proposal.py`, `docs/proposals/` | One command produces scope, price by purchase option, schedule, drawings list, compliance pack, risks, site requirements, acceptance, terms |
+| 20 | Paperwork set, two-sided | `docs/contracts/` | Customer: MSA, SOW, change order, acceptance certificates, software licence, SLA, warranty, NDA. Partner/supply: integrator agreement, contract manufacturing agreement, supplier PO terms with delivery liquidated damages flowing back-to-back; customer scope-change and delay clauses |
+| 21 | Manufacturing strategy: third-party first | `docs/MANUFACTURING_STRATEGY.md`, revised `docs/PROCESS_FLOW.md` | Contract manufacturers and integrators build; Schreiber AI is design authority, controls, commissioning and operations; greenfield factory is a later study |
+| 22 | Deal package assembler | `software/ben_engine/package.py` | One command assembles the customer deal package and the partner onboarding package for a configuration |
 
 ## 6. Constraints the operator set
 
@@ -93,6 +97,8 @@ list that must be disclosed on the product page before purchase.
 8. **Decommissioning and relocation**: containers move; the design must survive a second deployment.
 9. **Data recovery is separate from code recovery**: the gateway database needs its own backup plan.
 10. **An investor-grade proposition** (added at the operator's request mid-session).
+11. **Proposal-level output from the selector** and the **two-sided paperwork** (customer deals; integrator, contract-manufacturer and supplier agreements) with liquidated damages and scope-change rules that flow back-to-back (added mid-session).
+12. **Third-party manufacturing first**, greenfield factory later (added mid-session).
 
 ## 8. Original request (verbatim, preserved)
 

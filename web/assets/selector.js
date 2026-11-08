@@ -15,6 +15,10 @@ export function validate(cfg, cat) {
   }
   if (cfg.tier === 'micro' && cfg.cooling !== 'cabinet_dx') errs.push('BEN Micro uses cabinet_dx cooling only');
   if (cfg.tier !== 'micro' && cfg.cooling === 'cabinet_dx') errs.push('cabinet_dx is for BEN Micro only');
+  if (!errs.length && cfg.tier !== 'micro') {
+    const d = derived(cfg, cat);
+    if (!d.row_fits) errs.push(`single row of ${cfg.racks} racks + ${d.cooling_units_total} cooling units is ${d.row_length_mm} mm, exceeds interior ${Math.round(g.int_l_m * 1000)} mm; use fewer racks, rear-door or liquid cooling`);
+  }
   return errs;
 }
 
@@ -40,7 +44,10 @@ export function derived(cfg, cat) {
   const ups_minutes = cfg.ups_minutes ?? 10;
   const batteryKwh = cfg.it_kw * ups_minutes / 60 / 0.9;
   const airflow = cl.medium === 'air' ? cfg.it_kw * 125 : cfg.it_kw * 40;
-  const payload = cfg.racks * (cfg.tier === 'micro' ? 400 : 900) + nTotal * (cl.medium === 'air' ? 250 : 400) + upsModules * 350 + batteryKwh * 8;
+  const payload = cfg.racks * (cfg.tier === 'micro' ? 400 : 900) + nTotal * cl.mass_kg + upsModules * (cfg.tier === 'micro' ? 120 : 350) + batteryKwh * 8;
+  const rowLen = cfg.racks * 600 + ((cl.medium === 'air' || cl.medium === 'liquid') ? nTotal * cl.width_mm : 0) + 500;
+  const rowFits = cfg.tier === 'micro' || rowLen <= g.int_l_m * 1000;
+  const nfpa855 = batteryKwh >= 20;
   const gross = payload + g.tare_kg;
   const area = 2 * (g.ext_l_m * g.ext_h_m + g.ext_w_m * g.ext_h_m) + g.ext_l_m * g.ext_w_m;
   const envGain = (area * (clim.t_design_c - 22) / 3.5 + 0.3 * clim.solar_w_m2 * g.ext_l_m * g.ext_w_m * 0.25) / 1000;
@@ -53,6 +60,7 @@ export function derived(cfg, cat) {
     ups_modules: upsModules, ups_kva_each: Math.round(upsN), battery_kwh: +batteryKwh.toFixed(1),
     airflow_cfm: Math.round(airflow), payload_kg: Math.round(payload), gross_kg: Math.round(gross),
     envelope_gain_kw: +envGain.toFixed(2), pue_estimate: +(totalKw / cfg.it_kw + 0.03).toFixed(3),
+    row_length_mm: Math.trunc(rowLen), row_fits: rowFits, nfpa_855_scope: nfpa855,
     ashrae_class: cat.profiles[cfg.profile].ashrae,
   };
 }
@@ -63,7 +71,9 @@ export function preset(tier, profile = 'ai_inference', climate = 'temperate', ca
   const racks = Math.max(1, Math.min(g.max_racks, Math.ceil(itKw / p.rack_kw)));
   let cooling = g.default_cooling;
   if (tier !== 'micro' && itKw / racks > cat.cooling[cooling].max_rack_kw) cooling = 'dlc_cdu';
-  return { tier, profile, it_kw: Math.round(itKw), racks, cooling, redundancy: p.redundancy, climate,
+  const cfg = { tier, profile, it_kw: Math.round(itKw), racks, cooling, redundancy: p.redundancy, climate,
     subsystems: ['power', 'cooling', 'compute', 'controls'], white_label: false, brand: 'Schreiber AI', ups_minutes: 10,
     generator: ['healthcare', 'public_sector', 'off_grid'].includes(profile), site_name: 'Demo site' };
+  if (tier !== 'micro') for (const alt of [cooling, 'inrow_dx_300', 'rdhx_drycooler', 'dlc_cdu']) { cfg.cooling = alt; if (!validate(cfg, cat).length) break; }
+  return cfg;
 }

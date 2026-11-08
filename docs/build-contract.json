@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "source_paths": ["software", "tests", "firmware/ben-node/lib", "firmware/ben-node/src", "firmware/ben-node/test", "firmware/ben-node/Makefile", "web/assets", "dashboard/static", "purchasing/parts_catalog.json", "requirements.txt", "pyproject.toml"],
+  "checks": [
+    {"id": "python-suite", "kind": "behavior", "command": ["python3", "-m", "pytest", "tests", "-q", "--ignore=tests/e2e", "-p", "no:cacheprovider"], "timeout_seconds": 600},
+    {"id": "selector-parity", "kind": "integration", "command": ["python3", "-m", "pytest", "tests/test_selector_parity.py", "-q", "-p", "no:cacheprovider"], "timeout_seconds": 120},
+    {"id": "firmware-host-tests", "kind": "behavior", "command": ["make", "-C", "firmware/ben-node", "test"], "timeout_seconds": 300},
+    {"id": "commissioning-sim-e2e", "kind": "behavior", "command": ["python3", "-m", "ben_engine.commissioning", "--sim", "--tier", "ben20", "--yes", "--out", ".schreiber-ai/commissioning-ben20.md"], "timeout_seconds": 300},
+    {"id": "sweeps-ben40", "kind": "behavior", "command": ["python3", "-m", "ben_engine.sweeps", "--tier", "ben40"], "timeout_seconds": 300}
+  ]
+}
