@@ -14,22 +14,22 @@
 
 | Capability | Where | Status |
 | --- | --- | --- |
-| Configuration model: tiers, profiles, climates, sizing, validation (rows that do not fit are rejected) | `software/ben_engine/config.py`, `spec/` | verified (tests, 5 tiers × 8 profiles × climates × 3 hardening levels; BEN 2000 downstream generators pending, see VALIDATION §4a) |
+| Configuration model: tiers, profiles, climates, sizing, validation (rows that do not fit are rejected) | `software/ben_engine/config.py`, `spec/` | verified (tests, 5 tiers × 8 profiles × climates × 3 hardening levels, BEN 2000 included downstream: drawings, BOM, twin, CFD, sweeps, commissioning) |
 | Digital twin: thermal + power chain, 7 faults, ASHRAE-class alarms | `software/ben_engine/twin.py` | verified in simulation |
 | 2-D thermal lattice-Boltzmann CFD per tier, recirculation profile into the twin | `software/ben_engine/cfd.py` | verified (runs, converges); relative tool only |
 | Calibration (GUM budgets, tares, placement effects) and analysis (parameter fit, 95 % prediction intervals, ride-through) | `calibration.py`, `analysis.py` | verified on synthetic data |
 | Automated sweeps with pass/fail and CSV | `sweeps.py` | verified (6/6 pass on BEN 150) |
 | Commissioning script, FAT/SAT, signed report with SHA-256 | `commissioning.py` | verified in simulation (10/10 steps) |
-| Dashboard: 3-D twin, walkthrough, guided tour, sweeps, fault injection, I/O test, calibration, CFD, export, **proposal** | `dashboard/`, `api.py` | verified (26 API tests, Playwright e2e with screenshots) |
+| Dashboard: 3-D twin, walkthrough, guided tour, hover tooltips with part and live values, sweeps, fault injection, I/O test, calibration, CFD, export, **proposal** | `dashboard/`, `api.py` | verified (26 API tests, Playwright e2e with screenshots) |
 | Proposal generator: selector → 16-section customer proposal, md/html/json, contract pre-fill | `proposal.py`, `docs/proposals/` | verified (16 tests; rendered and inspected) |
 | Deal package assembler: customer package + partner package as zips | `package.py` | verified (tests; sample built) |
 | Firmware: BEN Pod core (calibration, telemetry, commands, ring buffer, failsafe) on Silicon Labs MGM240P / Thread | `firmware/ben-pod` | verified on host (37 unit tests); **EFR32MG24 cross-build and Secure Vault attestation unverified** |
 | BEN Controller: industrial edge computer image (OnLogic Karbon 400, TPM: broker, OTBR, services, firewall, backups) + PLCnext PLC project (interlocks, watchdog); Revolution Pi image for BEN Controls Lite | `firmware/ben-edge` | implemented, unverified on hardware |
 | Controls hardware platform: BEN Controls Pro (PLCnext AXC F 2152 + Axioline I/O in a UL 508A panel) and BEN Controls Lite (RevPi Connect 4), BEN Pods on BEN Mesh, priced in the catalog, selected by `Config.controls_tier` | `docs/CONTROLS_HARDWARE_DECISION.md`, `purchasing/parts_catalog.json` | decided and costed; hardware not yet built |
-| IFC drawing set (7 sheets × 4 tiers) with CTQ/CTP tables, interference checks | `design/drawings/` | verified (generated, inspected) |
+| IFC drawing set (42 sheets: 7 per tier, 14 for BEN 2000 with site plan A-000 and per-module sheets) with CTQ/CTP tables, interference checks | `design/drawings/` | verified (generated, inspected) |
 | Concept assembly renders and ASD-STE100 assembly instructions, QC forms, CTQ cards | `design/renders/`, `design/assembly/` | verified (generated; STE rules checked by script) |
 | Supplier Quality Assurance Manual generated from the CTQ register | `docs/SQAM.md` | verified (generated) |
-| Bill of materials with price confidence (confirmed / list / estimate) and 16 queued RFQ emails | `purchasing/`, `docs/BOM.md` | verified (21 tests); prices are listings, not quotes |
+| Bill of materials with price confidence (confirmed / list / estimate) and 21 queued RFQ emails | `purchasing/`, `docs/BOM.md` | verified (30 tests); prices are listings, not quotes |
 | Compliance matrix, risk register, process flow (third-party manufacturing), site requirements, turnover, maintenance, build & wiring, test guide, cybersecurity | `docs/` | written; edition years checked where possible |
 | Two-sided paperwork: MSA, SOW, change order, acceptance, licence, SLA, warranty, NDA, integrator, contract manufacturing, supplier terms | `docs/contracts/` | templates for counsel review |
 | Product page with mission profile picker, risks before price, configurator | `web/` | verified (rendered desktop + 390 px) |

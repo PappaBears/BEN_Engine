@@ -1,12 +1,12 @@
 // Render an HTML proposal to PNG for visual inspection.
-// Usage: node scripts/shoot_proposal.mjs [docs/proposals/sample-ben20-healthcare.html] [outPrefix]
+// Usage: node scripts/shoot_proposal.mjs [docs/proposals/sample-ben150-healthcare.html] [outPrefix]
 // Writes docs/media/screens/proposal-1.png (cover + section 2) and proposal-2.png (sections 3-4) at 1240 px wide.
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
 import fs from 'node:fs';
 import path from 'node:path';
 
-const file = process.argv[2] || 'docs/proposals/sample-ben20-healthcare.html';
+const file = process.argv[2] || 'docs/proposals/sample-ben150-healthcare.html';
 const prefix = process.argv[3] || 'docs/media/screens/proposal';
 fs.mkdirSync(path.dirname(prefix), { recursive: true });
 const browser = await chromium.launch({ args: ['--no-sandbox'] });

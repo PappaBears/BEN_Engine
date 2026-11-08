@@ -13,9 +13,9 @@ This folder holds the commercial paperwork for BEN Engine as a **two-sided syste
 | 2 | `SOW_TEMPLATE.md` | Statement of Work per Unit: configuration, scope by module, schedule, hold/witness points, acceptance table (10 commissioning steps), pricing, Change Order log | Schreiber AI, Customer | Customer |
 | 3 | `CHANGE_ORDER.md` | Change Order form: price impact, schedule impact, re-baselined dates, delay classification | Both (PMs up to authority limit) | Customer (also used with Integrators) |
 | 4 | `ACCEPTANCE_CERTIFICATES.md` | FAT, SAT and Turnover certificates with report and CSV SHA-256, QC forms, Punch List, financial close-out | Schreiber AI ENG, Factory/CM QC, Customer, AHJ acknowledgement | Customer |
-| 5 | `SOFTWARE_LICENSE_BEN_CONTROLS.md` | Licence for node firmware, gateway image, dashboard: Type A perpetual per-Unit, Type B subscription (managed), Type C white-label; escrow; telemetry opt-in | Schreiber AI, Licensee (Customer or Integrator) | Customer / Integrator |
+| 5 | `SOFTWARE_LICENSE_BEN_CONTROLS.md` | Licence for BEN Pod firmware, BEN Controller (edge computer and PLC) image, dashboard: Type A perpetual per-Unit, Type B subscription (managed), Type C white-label; escrow; telemetry opt-in | Schreiber AI, Licensee (Customer or Integrator) | Customer / Integrator |
 | 6 | `MANAGED_SERVICES_SLA.md` | Managed service: monitoring hours, alarm response by severity, maintenance per `docs/MAINTENANCE.md`, reporting, availability definition and exclusions, service credits, $/kW-month pricing | Schreiber AI, Customer | Customer |
-| 7 | `WARRANTY_TERMS.md` | Warranty certificate: 12-month workmanship, module table, OEM pass-through, exclusions, what voids it, claim procedure, BEN Node RMA | Issued by Schreiber AI | Customer |
+| 7 | `WARRANTY_TERMS.md` | Warranty certificate: 12-month workmanship, module table, OEM pass-through, exclusions, what voids it, claim procedure, hose-test condition for H1–H3 envelopes, BEN Pod RMA | Issued by Schreiber AI | Customer |
 | 8 | `NDA_MUTUAL.md` | Short mutual NDA for Stage 1 and for prospective partners | Both | Both |
 | 9 | `INTEGRATOR_AGREEMENT.md` | Channel / white-label Integrator Agreement: appointment, certification, hold points they may not self-perform, QC forms Q-01…Q-12, discount schedule, branding, licence pass-through, support tiers, warranty flow, back-to-back LDs | Schreiber AI, Integrator | Supply |
 | 10 | `CONTRACT_MANUFACTURING_AGREEMENT.md` | Build-shop agreement: build to IFC drawings and STE instructions, consigned vs purchased materials, quality plan with hold points and PPAP-lite, FAT at their facility, NCR and rework, LDs, IP, tooling, licensed trades, UL 508A, exit assistance, price per Unit by tier | Schreiber AI, Manufacturer | Supply |
@@ -100,8 +100,8 @@ The matrix states who owes whom what for each cause of delay, and which clause c
 | 1 | `NDA_MUTUAL.md` | CRM | Both | 1 |
 | 2 | Proposal with risk register extract and risk acknowledgement | Selector (`config.json`), `docs/RISK_REGISTER.md` | Customer | 2 |
 | 3 | `MSA.md` (once per Customer) | fields.json entity block | Both | 2 |
-| 4 | `docs/SITE_REQUIREMENTS.md` (SOW Annex A) | Site survey | Customer, Customer's electrician, Schreiber AI ENG and Compliance | 3 (H3) |
-| 5 | `SOW_TEMPLATE.md` with Annexes B–H | Proposal, `config.json`, price table, schedule from `docs/PROCESS_FLOW.md` durations | Both | Order |
+| 4 | `docs/SITE_REQUIREMENTS.md` (SOW Annex A); for BEN 2000 also the building-permit pre-application, utility MV service application and plant-yard plan | Site survey | Customer, Customer's electrician, Schreiber AI ENG and Compliance | 3 (H3) |
+| 5 | `SOW_TEMPLATE.md` with Annexes B–H (tier, `[HARDENING_LEVEL]` H1/H2/H3 and the hardening test rows in the acceptance table) | Proposal, `config.json`, price table, schedule from `docs/PROCESS_FLOW.md` durations | Both | Order |
 | 6 | `SOFTWARE_LICENSE_BEN_CONTROLS.md` order form (SOW Annex F) | Delivery model | Both | Order |
 | 7 | `MANAGED_SERVICES_SLA.md` (SOW Annex E) if managed | IT kW, profile, climate | Both | Order |
 | 8 | Remote support consent form (SOW Annex G); regulated-data addendum (Annex H) if needed | Profile | Customer | Order / Turnover |
@@ -110,7 +110,7 @@ The matrix states who owes whom what for each cause of delay, and which clause c
 | 11 | `ACCEPTANCE_CERTIFICATES.md` Part B (SAT) | Commissioning Report (site mode), AHJ certificates | ENG, Customer, fire marshal acknowledgement | 19 (H19) |
 | 12 | `ACCEPTANCE_CERTIFICATES.md` Part C (Turnover) and `WARRANTY_TERMS.md` certificate | `docs/TURNOVER.md` checklist, OEM registrations | ENG, Customer | 20 (W20) |
 | 13 | Credential handover record (`docs/TURNOVER.md` Section 3) | — | ENG, Customer | 20 |
-| 14 | Monthly SLA reports; warranty claims; RMAs | Gateway data | — | 21 |
+| 14 | Monthly SLA reports; warranty claims; RMAs; hose test repeated every 3 years and after relocation (all hardening levels), shield integrity test annually at H3 | Edge computer data, maintenance records | — | 21 |
 
 ### 5.2 Integrator onboarding
 
@@ -121,7 +121,7 @@ The matrix states who owes whom what for each cause of delay, and which clause c
 | 3 | `INTEGRATOR_AGREEMENT.md` with Annex 1 (SOW changes) and Annex 2 (rates) | Discount tier set from committed volume (3.2); exclusivity only with minimum commitment (2.4) |
 | 4 | `SOFTWARE_LICENSE_BEN_CONTROLS.md` Type C master, with Brand File approval (8.3) and remote endpoint election (7.3) | Full source licence and own signing key optional (7.4) |
 | 5 | Certification roster: sales engineer, PM, 2 field technicians, commissioning lead, L1 support engineer | Section 4.1; certificates with expiry in the portal |
-| 6 | First Integrator Order; Schreiber AI witnesses all hold points of the first `[FIRST_UNITS_MANDATORY_WITNESS]` Units per Tier and every BEN 500 | Section 5.2 |
+| 6 | First Integrator Order; Schreiber AI witnesses all hold points of the first `[FIRST_UNITS_MANDATORY_WITNESS]` Units per Tier and every BEN 500 and BEN 2000 | Section 5.2 |
 | 7 | Integrator's End Customer contract template reviewed for the mandatory flow-down provisions | Section 6.2 |
 | 8 | Marketing materials and Brand File approved | Sections 8, 14 |
 
@@ -134,7 +134,7 @@ The matrix states who owes whom what for each cause of delay, and which clause c
 | 3 | Quotation with 90-day price hold, country of origin, listing evidence, lead time, cancellation charges disclosed, STEP files and register maps | Sections 2.2, 2.3(e), 8.2, Q2 |
 | 4 | First-article approval for new part numbers / manufacturers / revisions | Q3.7 |
 | 5 | PO referencing `SUPPLIER_TERMS.md` rev, Delivery Date, LD rate and cap, required documents | Q4 PO face |
-| 6 | Insurance certificate; SDS; RoHS/REACH declarations; UL 9540A report for batteries; AIM Act statement for cooling | Sections 11, Q3 |
+| 6 | Insurance certificate; SDS; RoHS/REACH declarations; UL 9540A report for batteries; AIM Act statement for cooling; UL 752, ASTM F3038 and IEEE 299 / MIL-STD-188-125-1 certificates for H2/H3 hardening lines | Sections 11, Q3 |
 | 7 | Quarterly performance review; SCARs | Q3.8, Q3.10 |
 
 ### 5.4 Contract manufacturer onboarding
@@ -142,7 +142,7 @@ The matrix states who owes whom what for each cause of delay, and which clause c
 | Step | Document | Notes |
 | --- | --- | --- |
 | 1 | `NDA_MUTUAL.md` | Before the Build Package is shown |
-| 2 | Qualification audit of the Facility: WPS/PQR and welder certs, CWI, electrical and HVAC licences, EPA 608 certificates, fire contractor, UL 508A status, calibrated gauges, lifting equipment, shop power and load banks, quality system, insurance | `CONTRACT_MANUFACTURING_AGREEMENT.md` 3.1, 8, 13 |
+| 2 | Qualification audit of the Facility (container shops for BEN 30/150/500; prefabricated modular-building manufacturers for BEN 2000, `docs/MANUFACTURING_STRATEGY.md` §3.2): WPS/PQR and welder certs, CWI, electrical and HVAC licences, EPA 608 certificates, fire contractor, UL 508A status, calibrated gauges, lifting equipment, shop power and load banks, quality system, insurance | `CONTRACT_MANUFACTURING_AGREEMENT.md` 3.1, 8, 13 |
 | 3 | `CONTRACT_MANUFACTURING_AGREEMENT.md` with Annex B (consigned), Annex C (tooling), Annex D (rates) and price per Unit by tier (11.1) | LD rate and cap set back-to-back with the MSA (9.4, 9.7) |
 | 4 | Build Package release per Tier: drawings, STE instructions, QC forms, BOM with purchased/consigned split, wiring and torque tables, PE calc, FAT procedure | Section 1.2 |
 | 5 | First Build Order (Annex A) = First Article with full PPAP-lite documentation and Schreiber AI attendance at every hold and witness point | Section 3.2, 3.3 |
@@ -158,7 +158,7 @@ The complete list is `docs/contracts/fields.json` (one entry per field: `name`, 
 | --- | --- | --- |
 | `SCHREIBER_*`, `CUSTOMER_*`, `INTEGRATOR_*`, `CM_*`, `SUPPLIER_*`, `COUNTERPARTY_*`, `LICENSEE_*` | Party identity, signatories, notices | `SCHREIBER_ENTITY_NAME`, `CUSTOMER_SIGNATORY_TITLE`, `CM_FACILITY_ADDRESS` |
 | `*_ID` | Document identifiers | `MSA_ID`, `SOW_ID`, `PROPOSAL_ID`, `CONFIG_ID`, `CO_NUMBER`, `PO_NUMBER`, `BUILD_ORDER_ID`, `FAT_CERT_ID`, `SAT_CERT_ID`, `TURNOVER_CERT_ID`, `WARRANTY_CERT_ID`, `LICENSE_ID`, `SLA_ID`, `NDA_ID` |
-| Configuration fields (match `spec/ben-config.schema.json`) | Copied from `config.json` | `TIER`, `PROFILE`, `IT_KW`, `RACKS`, `COOLING`, `REDUNDANCY`, `CLIMATE`, `SUBSYSTEMS`, `WHITE_LABEL`, `BRAND_NAME`, `UPS_MINUTES`, `GENERATOR`, `SITE_NAME`, `CONFIG_JSON` |
+| Configuration fields (match `spec/ben-config.schema.json`) | Copied from `config.json` | `TIER`, `HARDENING_LEVEL`, `PROFILE`, `IT_KW`, `RACKS`, `COOLING`, `REDUNDANCY`, `CLIMATE`, `SUBSYSTEMS`, `WHITE_LABEL`, `BRAND_NAME`, `UPS_MINUTES`, `GENERATOR`, `SITE_NAME`, `CONFIG_JSON` |
 | Derived sizing | From `config.derived()` | `ASHRAE_CLASS`, `ASHRAE_MAX_C`, `SERVICE_VOLTAGE`, `SERVICE_BREAKER_A`, `TOTAL_KVA`, `UPS_MODULES`, `UPS_KVA_EACH`, `BATTERY_KWH`, `NFPA855_PACKAGE`, `COOLING_UNITS_TOTAL`, `NODE_COUNT`, `PUE_ESTIMATE`, `GROSS_MASS_KG` |
 | `PRICE_*`, `MILESTONE_*`, `CONTRACT_VALUE_TOTAL`, `CURRENCY` | Money | `PRICE_TOTAL`, `MILESTONE_1_PCT`, `MILESTONE_3_AMOUNT` |
 | `DATE_*_BASELINE`, `DATE_*_CURRENT`, `CO_NEW_DATE_*` | Schedule | `DATE_FAT_BASELINE`, `DATE_SAT_CURRENT`, `CO_NEW_DATE_TURNOVER` |

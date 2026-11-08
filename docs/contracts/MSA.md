@@ -11,7 +11,7 @@ This Master Services Agreement ("**Agreement**") is between **[SCHREIBER_ENTITY_
 
 ## Background
 
-A. Schreiber AI designs, builds (directly or through Contract Manufacturers), commissions and, where ordered, operates BEN Engine modular data centers in four tiers: BEN 5, BEN 30, BEN 150 and BEN 500, each with selectable Power, Cooling, Compute and Controls modules and the BEN Controls software layer.
+A. Schreiber AI designs, builds (directly or through Contract Manufacturers), commissions and, where ordered, operates BEN Engine modular data centers in five tiers: BEN 5, BEN 30, BEN 150, BEN 500 and the 2 MW BEN 2000 prefabricated hall, each at hardening level H1, H2 or H3 and each with selectable Power, Cooling, Compute and Controls modules and the BEN Controls software layer.
 
 B. Customer wishes to purchase one or more Units and related Services from time to time by signing Statements of Work under this Agreement.
 

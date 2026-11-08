@@ -22,7 +22,7 @@
 | Remote monitoring | Watches the Unit through the outbound remote support path during Monitoring Hours; triages alarms; dispatches | Section 2, 3 |
 | Preventive maintenance | Performs or procures every task in `docs/MAINTENANCE.md` at its interval, including climate add-ons for [CLIMATE] | Section 4 |
 | Calibration | Annual sensor calibration (or trigger-based earlier), new `cal_id`, certificates | Section 4.3 |
-| Firmware and software | Signed node firmware, gateway image and `ben_engine` updates; vendor equipment firmware review | Section 5 |
+| Firmware and software | Signed BEN Pod firmware, edge computer (gateway) image and `ben_engine` updates; vendor equipment firmware review | Section 5 |
 | Corrective maintenance | Diagnoses and repairs faults; manages OEM warranty claims; installs spares | Section 3, 6 |
 | Reporting | Monthly report with PUE, availability, alarms, maintenance done, calibration status, CSV | Section 7 |
 | Compliance records | Keeps refrigerant, fire inspection, electrical, battery and generator records; annual compliance review | Section 4.5 |

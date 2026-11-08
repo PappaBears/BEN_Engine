@@ -34,7 +34,7 @@
         "Building, not equipment: IBC Group B / F-1 permit, NFPA 855 battery rooms, NFPA 110 Level 1, SPCC for 48 h fuel, ASHRAE 188 water plan for adiabatic coolers",
         "Schedule ≈ 52 weeks: utility MV service (26–52 wk) on the critical path, civil 20 wk, module set 3 days, hall join and E15 seal test, E16 transfer test at SAT"
       ],
-      "notes": "python -m ben_engine.config --tier ben2000 prints these numbers. Twin, CFD per module, drawings (site plan A-000 + per-module sheets) and BOM for BEN 2000 are marked pending in docs/VALIDATION.md until the core and catalog work lands; do not claim them verified. Built by modular-building manufacturers (MANUFACTURING_STRATEGY.md section 3.2)."
+      "notes": "python -m ben_engine.config --tier ben2000 prints these numbers. Twin, CFD per module, drawings (site plan A-000 + per-module sheets) and BOM-ben2000 are generated and run in simulation (docs/VALIDATION.md section 4a); every physical value (module mass, water use, utility lead time, module pricing) is unverified, so say sized and documented, not proven. Built by modular-building manufacturers (MANUFACTURING_STRATEGY.md section 3.2)."
     },
     {
       "title": "Element-proof and hardened",

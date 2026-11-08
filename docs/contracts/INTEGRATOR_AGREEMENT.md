@@ -19,7 +19,7 @@ This Channel and White-Label Integrator Agreement ("**Agreement**") is between *
 
 1.4 "**Certified Personnel**" means Integrator employees who hold current Schreiber AI certification under Section 4.
 
-1.5 "**Controls Kit**" means the UL 508A controls panel, gateway, BEN Nodes, sensors, firmware and licences supplied by Schreiber AI for a Unit.
+1.5 "**Controls Kit**" means the UL 508A controls panel, edge computer, BEN Pods, sensors, firmware and licences supplied by Schreiber AI for a Unit.
 
 1.6 "**Territory**" means [TERRITORY].
 

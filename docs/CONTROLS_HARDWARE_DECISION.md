@@ -18,9 +18,9 @@ Life safety (smoke detection, clean-agent release, EPO) stays hardwired and is o
 
 ### 2a. Two controls tiers (operator amendment, 2026-11-08)
 
-Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`; `auto` resolves to Lite for BEN 5, Pro for BEN 150/500, and for BEN 30 Lite unless the profile is healthcare, public sector or AI training (then Pro). `Config.derived()["controls_tier_resolved"]` carries the result; `applies_to_controls` on every CTL catalog line filters the BOM; the proposal and the product page name the tier.
+Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`; `auto` resolves to Lite for BEN 5, Pro for BEN 150/500/2000, and for BEN 30 Lite unless the profile is healthcare, public sector or AI training (then Pro). `Config.derived()["controls_tier_resolved"]` carries the result; `applies_to_controls` on every CTL catalog line filters the BOM; the proposal and the product page name the tier.
 
-| | **BEN Controls Lite** (BEN 5; selectable on BEN 30) | **BEN Controls Pro** (BEN 150/500; selectable on BEN 30) |
+| | **BEN Controls Lite** (BEN 5; selectable on BEN 30) | **BEN Controls Pro** (BEN 150/500/2000; selectable on BEN 30) |
 | --- | --- | --- |
 | Controller | **Revolution Pi RevPi Connect 4** (KUNBUS; industrial, UL/CE listed, DIN rail, Compute Module 4 based) with **RevPi DIO** and **RevPi AIO** modules; alternate RevPi Connect S | **Phoenix Contact PLCnext AXC F 2152** with **Axioline F** I/O (DI8/DO8, RTD4, AI4) in a **UL 508A** listed panel |
 | Edge computer | The same RevPi runs `ben_engine`, the broker and the Thread border router | **OnLogic Karbon 400** (TPM 2.0, measured boot) on the panel DIN rail |
@@ -29,7 +29,7 @@ Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`
 | Panel | DIN-rail cabinet of listed components (no 508A label; stated in the proposal) | UL 508A panel by the panel partner, SCCR label (CTQ-K6) |
 | Software, protocol, dashboard, BEN Care | Identical | Identical |
 | Life safety | Hardwired, monitored by dry contacts | Hardwired, monitored by dry contacts |
-| Controls cost per unit (preset BOM) | BEN 5 ≈ $4.3k, BEN 30 ≈ $4.8k | BEN 150 ≈ $16.5k, BEN 500 ≈ $20.0k |
+| Controls cost per unit (preset BOM) | BEN 5 ≈ $4.3k, BEN 30 ≈ $4.8k | BEN 150 ≈ $16.5k, BEN 500 ≈ $20.0k, BEN 2000 ≈ $62k (4 PLCs, 2 edge computers, 3 border routers) |
 
 ## 3. BEN Mesh and BEN Pod (what we build ourselves)
 
@@ -49,7 +49,7 @@ Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`
 - DIN-rail and rack-rail enclosure, IP40 indoor / IP65 outdoor variant, −40…70 °C.
 - Firmware: the existing `bencore` library (calibration, telemetry JSON, commands, ring buffer, failsafe, alarms) is unchanged; the HAL targets Silicon Labs Gecko SDK / OpenThread instead of ESP-IDF. Native host tests remain the acceptance for the core.
 
-**Border router.** OpenThread Border Router on the edge computer with an MGM240P radio co-processor (RCP) on USB/UART; two RCPs for redundancy on BEN 150/500.
+**Border router.** OpenThread Border Router on the edge computer with an MGM240P radio co-processor (RCP) on USB/UART; two RCPs for redundancy on BEN 150/500; BEN 2000 runs three border routers (one per module) with two RCPs each.
 
 ## 4. BEN Care — the digital care layer, and what nobody else does
 

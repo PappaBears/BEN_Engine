@@ -18,7 +18,7 @@
     {"kind": "poster", "path": "docs/media/demo-poster.png"}
   ],
   "capabilities": [
-    {"name": "Configuration model sizes and validates all tiers/profiles/climates", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["python-suite", "selector-parity"]},
+    {"name": "Configuration model sizes and validates all five tiers (BEN 5 to BEN 2000), profiles, climates and hardening levels H1-H3", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["python-suite", "selector-parity"]},
     {"name": "Digital twin with faults and ASHRAE alarms", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["python-suite", "sweeps-ben500"]},
     {"name": "2-D lattice-Boltzmann CFD per tier", "status": "verified", "evidence": ["docs/VALIDATION.md", "docs/ANALYSIS_AND_CALIBRATION.md"], "check_ids": ["python-suite"]},
     {"name": "Calibration budgets and predictive analysis", "status": "verified", "evidence": ["docs/ANALYSIS_AND_CALIBRATION.md"], "check_ids": ["python-suite"]},

@@ -8,7 +8,7 @@
 
 **Is it weatherproof? What are H1, H2 and H3?** Every tier is element-proof by default: NEMA 4X / IP66 envelope, hose-tested per UL 50E type 4X (test E14), corrosion class C3. **H2 Severe environment** adds a 600 mm flood plinth, C5-M marine coating, sand/dust filtration, 67 m/s wind hardware and anodes for coastal, desert, arctic and hurricane sites. **H3 Hardened / government** adds UL 752 ballistic panels, ASTM F3038 forced-entry doors, IK10, a mantrap, two-factor access, tamper detection and an optional HEMP shield (MIL-STD-188-125-1) with TEMPEST-ready separation. The old rain-only 3R rating is no longer used anywhere. The configurator has a Hardening select; the config recommends H2 for severe climates and offers H3 for public-sector profiles.
 
-**Can I try it without hardware?** Yes. `bash scripts/run_dashboard.sh` starts the dashboard in simulation mode with the twin, virtual Pods for I/O tests, sweeps, CFD, calibration and CSV export. Everything shown is labelled simulation.
+**Can I try it without hardware?** Yes. `bash scripts/run_dashboard.sh` starts the dashboard in simulation mode with the twin, virtual Pods for I/O tests, sweeps, CFD, calibration and CSV export; hover any rack, cooling unit or Pod in the 3-D scene for its BOM part and live values. Everything shown is labelled simulation.
 
 **What runs on a real unit?** The same `ben_engine.api` on an industrial edge computer (OnLogic Karbon 400 with TPM 2.0; on BEN Controls Lite, a Revolution Pi RevPi Connect 4) reading BEN Pods over MQTT on a Thread/IPv6 mesh, a Phoenix Contact PLCnext PLC over Modbus TCP/OPC UA for the interlocks, and third-party equipment over Modbus/SNMP. The edge image is in `firmware/ben-edge` and is marked implemented, unverified on hardware. Two controls tiers, Lite and Pro, are described in `docs/CONTROLS_HARDWARE_DECISION.md` §2a.
 
@@ -22,9 +22,9 @@
 
 **Is the CFD real?** It is a real 2-D thermal lattice-Boltzmann solver, run per tier, useful for ranking layouts and scenario deltas (fan turn-down, failed unit, door open). It is not a 3-D absolute-temperature prediction and says so.
 
-**Where do prices come from?** `purchasing/parts_catalog.json`, 113 parts, each with vendor, URL, price and a status: confirmed (seen on a distributor listing on 2026-11-07), list, or estimate (with basis). The BOM and the proposal show the share of each. Nothing is a quote until the queued RFQ emails are answered.
+**Where do prices come from?** `purchasing/parts_catalog.json`, 204 parts (12 of them withdrawn or factory-tooling lines), each with vendor, URL, price and a status: confirmed (seen on a distributor listing on 2026-11-07/08), list, or estimate (with basis). Totals per tier are in `docs/BOM.md` (BEN 5 $132k, BEN 30 $666k, BEN 150 $1.89 M, BEN 500 $4.45 M, BEN 2000 $40.4 M, reference compute included). The BOM and the proposal show the share of each. Nothing is a quote until the queued RFQ emails are answered.
 
-**Were any emails sent?** No. 15 RFQs were created as Gmail drafts addressed to Ben@SchreiberAI.com and as files in `purchasing/email_queue/`. Ben forwards them.
+**Were any emails sent?** No. 21 RFQs were created as Gmail drafts addressed to Ben@SchreiberAI.com and as files in `purchasing/email_queue/`. Ben forwards them.
 
 **Why rear-door heat exchangers on BEN 150 instead of in-row DX?** The drawing generator's interference check showed five racks plus 600 mm in-row units do not fit a 20 ft row at 96 kW. The configuration model now rejects rows that do not fit and the preset falls back through 300 mm in-row, rear-door, then liquid.
 

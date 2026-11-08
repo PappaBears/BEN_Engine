@@ -12,7 +12,7 @@ edge software and the same BEN Pods on the BEN Mesh**; they differ in what execu
 | Tier | Fitted to | Controller | Interlocks run in | I/O |
 | --- | --- | --- | --- | --- |
 | **BEN Controls Lite** | BEN 5; optional on BEN 30 | **KUNBUS Revolution Pi RevPi Connect 4** (or Connect S), industrial DIN-rail, UL/CE, running `ben_engine` edge software **and** the software interlock controller (`ben_engine/interlocks.py`) with a **hardware watchdog relay** (RevPi watchdog → relay in the cooling-enable chain) | software, on the RevPi (`firmware/ben-edge/lite`) | RevPi DIO / AIO modules via piControl; transmitters and SeaHawk contacts on DIO/AIO; no PLC |
-| **BEN Controls Pro** | BEN 150 / BEN 500; optional on BEN 30 | **Phoenix Contact PLCnext AXC F 2152** PLC + **Axioline F** I/O for control; **OnLogic Karbon 400** edge computer for data/twin/broker/border router | IEC 61131-3 on the PLC (`firmware/ben-plc`), executable reference = the same Python class | Axioline F modules |
+| **BEN Controls Pro** | BEN 150 / BEN 500 / BEN 2000; optional on BEN 30 | **Phoenix Contact PLCnext AXC F 2152** PLC + **Axioline F** I/O for control; **OnLogic Karbon 400** edge computer for data/twin/broker/border router | IEC 61131-3 on the PLC (`firmware/ben-plc`), executable reference = the same Python class | Axioline F modules |
 
 In **Lite** the "PLC register map" below is **served by the RevPi software controller** itself (a Modbus
 TCP server on the RevPi, same addresses, same meanings; `ben/<unit>/plc/interlocks` is published from the

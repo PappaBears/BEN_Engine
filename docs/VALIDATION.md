@@ -38,15 +38,15 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 
 | Deliverable | Command | Observed |
 | --- | --- | --- |
-| Drawings | `python design/drawings/gen_drawings.py` | 5 tiers; BEN 2000 adds A-000 site plan and per-module A-001/A-002 sheets (41 sheets total, SVG+PNG), INDEX.md per tier, INTERFERENCE_CHECKS.md (BEN 2000 rows: no FAIL); red deviation notes: none after the configuration changes; remaining FAILs are informative (NEC 110.26 condition 2 not required, two-row layouts rejected by design) plus BEN 500 rack-top clearance 290 vs 300 mm (resolution printed on sheet) |
-| Renders | `python design/renders/gen_renders.py` | 32 stage PNGs + 4 contact sheets; labelled concept renders |
-| Assembly | `python design/assembly/gen_assembly.py` | 4 STE documents; 0 instructions over 20 words; banned-word check passes; all item codes reconciled with the catalog |
-| SQAM | `python design/gen_sqam.py` | 405 lines; CTQ/CTP register per tier (BEN 5 27, BEN 30 38, BEN 150 38, BEN 500 39 items) |
-| BOM | `python -m ben_engine.bom --all` | BEN 5 64 lines $135 k (69 % confirmed); BEN 30 90 lines $660 k (81 %); BEN 150 94 lines $1.87 M (79 %); BEN 500 95 lines $4.43 M (83 %). "Confirmed" = distributor listing seen in search results on 2026-11-07, not a quote |
-| Proposals | `python -m ben_engine.proposal …` | 4 samples in `docs/proposals/`; BEN 150 healthcare managed: $1.89 M capital, $27 k/yr, 34 weeks to in-service |
+| Drawings | `python design/drawings/gen_drawings.py` | 5 tiers; BEN 2000 adds A-000 site plan and per-module A-001/A-002 sheets (42 sheets total, SVG+PNG), INDEX.md per tier, INTERFERENCE_CHECKS.md (BEN 2000 rows: no FAIL); red deviation notes: none after the configuration changes; remaining FAILs are informative (NEC 110.26 condition 2 not required, two-row layouts rejected by design) plus BEN 500 rack-top clearance 290 vs 300 mm (resolution printed on sheet) |
+| Renders | `python design/renders/gen_renders.py` | 40 stage PNGs + 5 contact sheets (8 stages × 5 tiers); labelled concept renders |
+| Assembly | `python design/assembly/gen_assembly.py` | 5 STE documents (one per tier) with CTQ cards and QC forms; 0 instructions over 20 words; banned-word check passes; all item codes reconciled with the catalog |
+| SQAM | `python design/gen_sqam.py` | 472 lines; CTQ/CTP register per tier (BEN 5 32, BEN 30 42, BEN 150 42, BEN 500 43, BEN 2000 44 items) |
+| BOM | `python -m ben_engine.bom --all` | BEN 5 65 lines $132 k (60 % confirmed); BEN 30 92 lines $666 k (80 %); BEN 150 104 lines $1.89 M (79 %); BEN 500 105 lines $4.45 M (83 %); BEN 2000 94 lines $40.4 M (73 %). "Confirmed" = distributor listing seen in search results on 2026-11-07/08, not a quote |
+| Proposals | `python -m ben_engine.proposal …` | 5 samples in `docs/proposals/` (one per tier); BEN 150 healthcare managed: $1.89 M capital, $27 k/yr, 34 weeks to in-service |
 | Packages | `python -m ben_engine.package …` | customer package 22 files, partner package 21 files, 0 missing; zips built; MANIFEST lists per-document unfilled fields |
 | Contract pre-fill | `proposal.known_fields_report` | 369 of 891 vocabulary fields filled from a proposal (BEN 150 healthcare sample); remaining fields belong to later stages (commissioning report 128, turnover 63, CRM 62, change order 59, QC forms 24, counsel 8). MSA draft has 15 fields left (customer identity, arbitration venue); SOW draft 47 |
-| Decks | `build_presentation.py` | 12 + 12 slides with notes; visual review of the HTML decks **not performed** |
+| Decks | `build_presentation.py` | 14 (product) + 13 (investor) slides with notes; rendered with Playwright and inspected 2026-11-08 (`docs/media/screens/deck-*.png`) |
 | Demo GIF | `make_demo_gif.py` | 24 real tour frames, 6 s, 4.5 MB |
 
 ## 4a. Generation 2 (power-based tiers, BEN 2000, hardening) — observed 2026-11-08

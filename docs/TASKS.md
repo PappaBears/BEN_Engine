@@ -2,7 +2,7 @@
 
 | ID | Outcome | Owner | Status | Acceptance / evidence |
 | --- | --- | --- | --- | --- |
-| T1 | Brief, config model, skeleton | lead | done | `docs/BRIEF.md`, `software/ben_engine/config.py` sizing runs for 4 tiers |
+| T1 | Brief, config model, skeleton | lead | done | `docs/BRIEF.md`, `software/ben_engine/config.py` sizing runs for 5 tiers |
 | T2 | Twin, CFD, calibration, analysis, sweeps, commissioning | agent A | done | `pytest tests` |
 | T3 | Firmware node + gateway + specs + wiring one-lines | agent B | done | `pio test -e native` |
 | T4 | Dashboard + API + 3D + e2e | agent C | done | `tests/test_api.py`, `tests/e2e/run_e2e.sh`, screenshots |
