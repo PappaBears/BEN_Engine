@@ -95,7 +95,7 @@ HARDENING: Dict[str, Dict[str, Any]] = {
 
 COOLING_LIBRARY: Dict[str, Dict[str, Any]] = {
     # unit_kw: sensible cooling per unit at ASHRAE A1 conditions; cop at design point
-    "cabinet_dx":     {"label": "Cabinet DX air conditioner", "unit_kw": 5.8,  "cop": 2.6, "medium": "air",   "max_rack_kw": 5,  "width_mm": 400, "mass_kg": 60},
+    "cabinet_dx":     {"label": "Cabinet DX air conditioner (R-513A, 5.5 kW)", "unit_kw": 5.5,  "cop": 2.6, "medium": "air",   "max_rack_kw": 5,  "width_mm": 400, "mass_kg": 60},
     "inrow_dx":       {"label": "In-row DX cooling unit (600 mm, 30 kW)", "unit_kw": 30.0, "cop": 3.2, "medium": "air",   "max_rack_kw": 30, "width_mm": 600, "mass_kg": 250},
     "inrow_dx_300":   {"label": "In-row DX cooling unit (300 mm, 20 kW)", "unit_kw": 20.0, "cop": 3.1, "medium": "air",   "max_rack_kw": 20, "width_mm": 300, "mass_kg": 180},
     "rdhx_drycooler": {"label": "Rear-door heat exchanger + dry cooler", "unit_kw": 35.0, "cop": 8.0, "medium": "water", "max_rack_kw": 40, "width_mm": 0, "mass_kg": 150},

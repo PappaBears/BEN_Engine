@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "run_id": "da0dbb7db12740dc80a1923afdf4023a",
-  "created_at": "2026-11-08T12:46:43.352845+00:00",
+  "run_id": "76fee68cfcaf456da795618e88af108f",
+  "created_at": "2026-11-08T17:46:16.872734+00:00",
   "contract": "docs/build-contract.json",
   "sources": {
     "dashboard/static/app.js": "471a3fa443e57599572b4255d3f7c354b918002445141a06682da2c822fe36e5",
@@ -51,7 +51,7 @@
     "firmware/ben-pod/src/main.cpp": "23819aa6d60731425a97c831579aa2a29a212eb930d81a593738d07050f97882",
     "firmware/ben-pod/test/support/unity.h": "564c975b738eb8e7baddd4aa228443c426354b1f3963ec9cbe2a6d077b0da4c2",
     "firmware/ben-pod/test/test_core/test_main.cpp": "add8e870310f940e22d254fbc85568268382c0a3ebca6292f6e6393658697384",
-    "purchasing/parts_catalog.json": "4bed7284527e08fc040bf73582f6ad14d3f7babc78d2310a68961215b6c2d665",
+    "purchasing/parts_catalog.json": "a5d23b49d2da3e9df18d3ed5044a2f9e661a563646984c356a4c419256578a3e",
     "pyproject.toml": "ece6d76a223d4241648239719c0b008132087f1bfd67f23f85b977d68540ffb6",
     "requirements.txt": "09165997ee1add9f8b63f6c059a58ca4da1918f06f3937c8bad3d04892dc5690",
     "software/ben_engine/__init__.py": "7209932bccc2dd19e83cc28c0d663622bf30113fe7751184e2e332fcfb7baf54",
@@ -61,7 +61,7 @@
     "software/ben_engine/calibration.py": "9904e7dc245e0d689bce693b1e03df06f44af587b871c9f1e077f6ebf8bc5594",
     "software/ben_engine/cfd.py": "64b7ae7c34f9e076a1c85c5da34880d80d9f238f4dc6b653f02f3c960e722e24",
     "software/ben_engine/commissioning.py": "9ebb8e0ec0081d4dbe05b22c19a8b0af2ccd4ddcc155325c286483fc41cfdf1b",
-    "software/ben_engine/config.py": "f8ca9b8e355ac4577e103a8bab7479a4a28ff42f8597e98f9cf7ef9d83edf33c",
+    "software/ben_engine/config.py": "16b88913987942336342dec5426fb3781c11a377fdf9cba356f213597188de83",
     "software/ben_engine/export.py": "073a8a34f0029440ab8397670e7acf951f7cc735c6a09d568ce213afa69bb372",
     "software/ben_engine/interlocks.py": "9003477defed4183a7247c155ff18fd25e44dd909494a9620be10f2e0939d733",
     "software/ben_engine/package.py": "bac2df57e57aa50719f8dce59822390263c8ec9af23d1e5731e21022f6ee0f20",
@@ -91,13 +91,13 @@
     "tests/test_sim_nodes.py": "0e425877609133418cd016a06c709074e7884f4bd85d5ca11ccfe1ee9fc91664",
     "tests/test_sweeps.py": "d2d8def53110d60c02cb301831b8ec4d845c1235aebdf713d86e24e81cede957",
     "tests/test_twin.py": "a6f2c69bc77509cf59f3f275bb772cd4462bad99a80ec9fc59354e918e9e99e3",
-    "web/assets/catalog.json": "4c7b6fd8ad47d16cfb38aa5cb8b28e29c98bc047ef675518cc5b0fdb51dc7a56",
+    "web/assets/catalog.json": "2f4d9155ebc06da8eb13078853e29dfcbb65ca9e18f5873ec89c23aebd324f5d",
     "web/assets/hero-ben150.svg": "b32d885b89bed9534461415eddb8526d97566c8965e064f056eaad2c2aa2dbaf",
     "web/assets/hero-ben2000.svg": "458814919ba46440447dcd591aa792ba48315ef3ceed5bd358756e704eb71eea",
     "web/assets/hero-ben30.svg": "3a32a9caefb8c652ed1974dc755f08c04bda1b1b6fe9299ed19de24a75ef2a35",
     "web/assets/hero-ben5.svg": "b529da13d9bc1ec1a51ba9b118b55497cc4dbfc3549a777d1dbe8e8a7dfc4824",
     "web/assets/hero-ben500.svg": "92c8367bd74af7f9f344b31e9015b46d3534b433014fbad1773c2fc10ba9482b",
-    "web/assets/pricing.json": "29efd0a41f3914f10881da74b5dd022dda748a2ebc1d7a2a6bc1322a9a77f910",
+    "web/assets/pricing.json": "6274a91af3fa4a76ee4f087c7f680dc881de3eef4e90a9d7ece596a89d2d78fd",
     "web/assets/risks.json": "d04b6379fc476f6ee630439c30313d4b5932d44656d41e3009886f4ca9a2049c",
     "web/assets/selector.js": "b3c15894c456d80ffb06b4dba949a20c4730d2ccb70c460e3acefffad9287519",
     "web/assets/site.css": "e70077270531dabd2daf2eeedb1c981f2d41dfc5811f0884a4dcc2153cec7296",
@@ -120,12 +120,12 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T12:46:18.930145+00:00",
-      "finished_at": "2026-11-08T12:46:34.400680+00:00",
+      "started_at": "2026-11-08T17:45:48.034711+00:00",
+      "finished_at": "2026-11-08T17:46:06.213468+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/python-suite.log",
-      "log_sha256": "133129e33d9a58959c56363e04b21bf913cd91d2605005cd8811071e8f895782"
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/python-suite.log",
+      "log_sha256": "a5d34da43f5fdbafd400df117efc3b9f5e8498fc9c952009c479eb1c5ff4badd"
     },
     {
       "id": "selector-parity",
@@ -141,12 +141,12 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T12:46:34.400894+00:00",
-      "finished_at": "2026-11-08T12:46:35.217407+00:00",
+      "started_at": "2026-11-08T17:46:06.213630+00:00",
+      "finished_at": "2026-11-08T17:46:07.181315+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/selector-parity.log",
-      "log_sha256": "793172cea1a3c0ec9a4a66e92a7dcf526149750b8b093a927afc5027b01537bc"
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/selector-parity.log",
+      "log_sha256": "543df23b421183f96154fc945c14277d243a6783f8bff82084c12a577e1942ef"
     },
     {
       "id": "firmware-host-tests",
@@ -157,11 +157,11 @@
         "firmware/ben-pod",
         "test"
       ],
-      "started_at": "2026-11-08T12:46:35.217596+00:00",
-      "finished_at": "2026-11-08T12:46:35.633663+00:00",
+      "started_at": "2026-11-08T17:46:07.181458+00:00",
+      "finished_at": "2026-11-08T17:46:07.750094+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/firmware-host-tests.log",
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/firmware-host-tests.log",
       "log_sha256": "27a44d615c4e437a3b08ede18a79aacc61b623428759197203209eefab07eadb"
     },
     {
@@ -180,11 +180,11 @@
         "--out",
         ".schreiber-ai/commissioning-ben150.md"
       ],
-      "started_at": "2026-11-08T12:46:35.633861+00:00",
-      "finished_at": "2026-11-08T12:46:35.948934+00:00",
+      "started_at": "2026-11-08T17:46:07.750310+00:00",
+      "finished_at": "2026-11-08T17:46:08.115489+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/commissioning-sim-e2e.log",
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/commissioning-sim-e2e.log",
       "log_sha256": "fb9507d45273d0c655fa30836d49d92935605fa73b11f2546628f27a36ce4c7c"
     },
     {
@@ -199,11 +199,11 @@
         "--tier",
         "ben500"
       ],
-      "started_at": "2026-11-08T12:46:35.949129+00:00",
-      "finished_at": "2026-11-08T12:46:36.464850+00:00",
+      "started_at": "2026-11-08T17:46:08.115626+00:00",
+      "finished_at": "2026-11-08T17:46:08.832380+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/sweeps-ben500.log",
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/sweeps-ben500.log",
       "log_sha256": "d24e0aa7b1fb3d4be37a4a4d350adc5d86bde9ad70cd61cecb1bfb07bbeaaaaa"
     },
     {
@@ -213,12 +213,12 @@
         "python3",
         "scripts/audit.py"
       ],
-      "started_at": "2026-11-08T12:46:36.465009+00:00",
-      "finished_at": "2026-11-08T12:46:41.350078+00:00",
+      "started_at": "2026-11-08T17:46:08.832819+00:00",
+      "finished_at": "2026-11-08T17:46:14.571869+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/audit-mechanical.log",
-      "log_sha256": "46694b30784dfc39107fc2955448b0aebff3bf1963dc2a3a818f21394fd12ded"
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/audit-mechanical.log",
+      "log_sha256": "106e4cce6a4555d15db9ea27265b2c1ddc24b6283c44721e10a53451098d11e3"
     },
     {
       "id": "links",
@@ -227,11 +227,11 @@
         "python3",
         "scripts/check_links.py"
       ],
-      "started_at": "2026-11-08T12:46:41.350278+00:00",
-      "finished_at": "2026-11-08T12:46:41.465078+00:00",
+      "started_at": "2026-11-08T17:46:14.572026+00:00",
+      "finished_at": "2026-11-08T17:46:14.739892+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/links.log",
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/links.log",
       "log_sha256": "68b8c4590c5b15afae81e6631f69f73cb90c8774da230606961b86e1498b0841"
     },
     {
@@ -248,12 +248,12 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T12:46:41.465348+00:00",
-      "finished_at": "2026-11-08T12:46:43.336343+00:00",
+      "started_at": "2026-11-08T17:46:14.740071+00:00",
+      "finished_at": "2026-11-08T17:46:16.861727+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/sim-e2e-pytest.log",
-      "log_sha256": "1622f7d6ba5ab433872a70a196a157edc115730b5b12e3f1b482affd72256083"
+      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/sim-e2e-pytest.log",
+      "log_sha256": "9204e7dab924eb2df47592acaa87de4df3764a5df8ccb7c17cbb9fec6219a379"
     }
   ]
 }

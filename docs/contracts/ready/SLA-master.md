@@ -1,7 +1,7 @@
 # Managed Services Agreement and Service Level Agreement (SLA) — BEN Engine
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/MANAGED_SERVICES_SLA.md` · Template rev 9fed473
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/MANAGED_SERVICES_SLA.md` · Template rev 7f10d34
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. This SLA is attached to a SOW as Annex E when the delivery model is "managed" or Managed Services are ordered later. Delete this box before signature.
 
 **SLA ID:** [SLA_ID]

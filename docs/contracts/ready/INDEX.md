@@ -1,4 +1,4 @@
-# Paperwork ready set — generated 2026-11-08 (template rev 9fed473)
+# Paperwork ready set — generated 2026-11-08 (template rev 7f10d34)
 
 Schreiber AI's side and every policy number are filled; counterparty identity, addresses, dates and counsel choices stay as `[FIELD]` until known. Templates are not legal advice; counsel reviews before signature (`docs/contracts/README.md` §7). Regenerate with `python scripts/prepare_paperwork.py` after editing `purchasing/counterparties.json`.
 

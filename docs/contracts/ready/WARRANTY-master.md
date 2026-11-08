@@ -1,7 +1,7 @@
 # Warranty Terms — BEN Engine Unit and Modules
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/WARRANTY_TERMS.md` · Template rev 9fed473
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/WARRANTY_TERMS.md` · Template rev 7f10d34
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. These Warranty Terms are incorporated into the MSA (Section 10) and issued as the warranty certificate in the Turnover Package (item E2). Delete this box before issue.
 
 **Warranty certificate ID:** [WARRANTY_CERT_ID]

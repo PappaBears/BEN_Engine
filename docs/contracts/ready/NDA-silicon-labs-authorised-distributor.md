@@ -1,7 +1,7 @@
 # Mutual Non-Disclosure Agreement — BEN Engine
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/NDA_MUTUAL.md` · Template rev 9fed473
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/NDA_MUTUAL.md` · Template rev 7f10d34
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Used at Process Stage 1 (Inquiry) before the selector, site survey or any drawing, BOM price or firmware detail is shared, and with prospective integrators, contract manufacturers and suppliers. Delete this box before signature.
 
 **NDA ID:** NDA-2026-SILICON-LABS-AUTHORI

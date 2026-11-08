@@ -1,7 +1,7 @@
 # Channel and White-Label Integrator Agreement — BEN Engine
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/INTEGRATOR_AGREEMENT.md` · Template rev 9fed473
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/INTEGRATOR_AGREEMENT.md` · Template rev 7f10d34
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Used when an MEP firm, systems integrator or regional partner sells, installs and supports BEN Engine Units under its own brand or Schreiber AI's. Delete this box before signature.
 
 **Agreement ID:** [INTEGRATOR_AGREEMENT_ID]

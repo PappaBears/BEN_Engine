@@ -159,8 +159,8 @@
  },
  "cooling": {
   "cabinet_dx": {
-   "label": "Cabinet DX air conditioner",
-   "unit_kw": 5.8,
+   "label": "Cabinet DX air conditioner (R-513A, 5.5 kW)",
+   "unit_kw": 5.5,
    "cop": 2.6,
    "medium": "air",
    "max_rack_kw": 5,

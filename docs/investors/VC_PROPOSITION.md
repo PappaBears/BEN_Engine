@@ -69,7 +69,7 @@ Unit economics are derived from the bill of materials in `docs/BOM.md`. The tabl
 <!-- UNIT_ECONOMICS_TABLE -->
 | Tier (preset) | IT kW | BOM cost (all modules) | Sell price (28 % GM) | Infrastructure-only sell price (no compute) | Gross profit | Confirmed / list / estimate share of cost | Controls licence /yr | Managed service /yr | Price per kW IT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| BEN 5 | 5 | $132,082 | $183,447 | $131,645 | $51,365 | 60 % / 0 % / 39 % | $1,200 | $2,700 | $36,689 |
+| BEN 5 | 5 | $132,082 | $183,447 | $131,645 | $51,365 | 46 % / 0 % / 53 % | $1,200 | $2,700 | $36,689 |
 | BEN 30 | 30 | $666,059 | $925,082 | $287,365 | $259,023 | 79 % / 0 % / 21 % | $4,800 | $16,200 | $30,836 |
 | BEN 150 | 96 | $1,889,829 | $2,624,763 | $637,617 | $734,934 | 78 % / 0 % / 22 % | $12,000 | $51,840 | $27,341 |
 | BEN 500 | 192 | $4,935,406 | $6,854,731 | $1,302,432 | $1,919,325 | 84 % / 0 % / 16 % | $30,000 | $103,680 | $35,702 |

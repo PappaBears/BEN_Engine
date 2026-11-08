@@ -1,33 +1,33 @@
-# Schreiber AI — BEN Engine proposal SAI-BEN5-20261108-B7B31441
+# Schreiber AI — BEN Engine proposal SAI-BEN5-20261108-FE7A6B93
 
-*BEN 5 · Private cloud / ERP · Riverside Dental Group · Boise, ID · 2026-11-08 · valid until 2027-01-07*
+*BEN 5 · Private cloud / ERP · Sample Customer · Sample Site · 2026-11-08 · valid until 2027-01-07*
 
 ## 1. Cover
 
 | Item | Value |
 |---|---|
-| Proposal | BEN Engine BEN 5 for Riverside Dental Group |
+| Proposal | BEN Engine BEN 5 for Sample Customer |
 | Prepared by | Schreiber AI |
-| Customer | Riverside Dental Group |
-| Site | Boise, ID |
+| Customer | Sample Customer |
+| Site | Sample Site |
 | Tier | BEN 5 — Outdoor 24U NEMA 4X / IP66 cabinet on skid |
 | Mission profile | Private cloud / ERP (private_cloud) |
 | Climate package | Temperate |
 | Purchase option | Hardware only |
 | Date | 2026-11-08 |
 | Valid until | 2027-01-07 (60 days) |
-| Proposal ID | SAI-BEN5-20261108-B7B31441 |
-| Configuration | 5 kW IT in 1 rack(s), Cabinet DX air conditioner, N+1, 10 min UPS |
+| Proposal ID | SAI-BEN5-20261108-FE7A6B93 |
+| Configuration | 5 kW IT in 1 rack(s), Cabinet DX air conditioner (R-513A, 5.5 kW), N+1, 10 min UPS |
 
-AI infrastructure that arrives finished. This proposal is generated from configuration version e98c49c1; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
+AI infrastructure that arrives finished. This proposal is generated from configuration version 91d634d1; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
 
 ## 2. Executive summary
 
-Riverside Dental Group needs 5 kW of IT capacity for a Private cloud / ERP workload at Boise, ID. We propose one BEN 5: a Outdoor 24U NEMA 4X / IP66 cabinet on skid fitted out as a complete data center with 1 rack(s), Cabinet DX air conditioner with N+1 redundancy, a 2 x 6 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
+Sample Customer needs 5 kW of IT capacity for a Private cloud / ERP workload at Sample Site. We propose one BEN 5: a Outdoor 24U NEMA 4X / IP66 cabinet on skid fitted out as a complete data center with 1 rack(s), Cabinet DX air conditioner (R-513A, 5.5 kW) with N+1 redundancy, a 2 x 6 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
 
 The unit arrives finished and factory-tested. It needs a pad, a 50 A 208/240 V 1ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the hardware only option: $177,569 capital ($35,514 per kW IT). 60 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 40 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the hardware only option: $177,569 capital ($35,514 per kW IT). 46 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 54 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 16 weeks, set by the longest-lead item (8 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -40,7 +40,7 @@ Order to in-service: about 16 weeks, set by the longest-lead item (8 weeks) and 
 | Redundancy | N+1: one spare cooling unit and one spare UPS module; any single unit can fail or be serviced with no loss of capacity |
 | Design rack density | 5.0 kW per rack (profile default 10 kW) |
 | Climate package | Temperate: design outdoor 35 °C / minimum -15 °C, solar 800 W/m², corrosion class ISO 9223 C3, basic wind 47 m/s (ASCE 7) |
-| Cooling derate at design day | 1.000 -> 5.8 kW per unit; 2 units installed for 1 required |
+| Cooling derate at design day | 1.000 -> 5.5 kW per unit; 2 units installed for 1 required |
 | Generator | not included (option) |
 
 What this means for you: the environmental class sets the alarm limits your IT will be held to; the redundancy level sets what happens when a component fails; the climate package sets the coatings, anchorage, condensation control and cooling capacity margins built into the unit. All three are fixed at engineering release and verified at the factory and site acceptance tests.
@@ -51,7 +51,7 @@ What this means for you: the environmental class sets the alarm limits your IT w
 |---|---|---|
 | Enclosure | Outdoor 24U NEMA 4X / IP66 cabinet on skid | External 1.2 x 1.0 x 1.8 m; interior 1.0 x 0.8 x 1.4 m |
 | IT load | 5 kW in 1 rack(s) of 24 U | 5.0 kW per rack; tier range 2–5 kW |
-| Cooling | 2 x Cabinet DX air conditioner | 1 required at 5.8 kW each (derate 1.0), N+1 |
+| Cooling | 2 x Cabinet DX air conditioner (R-513A, 5.5 kW) | 1 required at 5.5 kW each (derate 1.0), N+1 |
 | Row fit | fits | 1 row(s) of 1 racks, 1900 mm per row vs interior 1000 mm |
 | Cooling electrical | 1.92 kW | COP 2.6 at design point |
 | Total electrical demand | 7.5 kW / 7.9 kVA | IT + cooling + 2 % house + 0.5 kW controls, pf 0.95 |
@@ -87,7 +87,7 @@ Top 15 lines of the 44-line bill of materials for this option (sell price at 28%
 |---|---|---|---|---|---|---|
 | CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 2 ea | $49,997 | confirmed | 3 |
 | PWR-UPS-SRT6K | Smart-UPS SRT 6 kVA RM 208 V online double-conversion | APC by Schneider Electric SRT6KRMXLT | 2 ea | $26,900 | confirmed | 2 |
-| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit 5.8 kW, 400/480 V 3-ph | Rittal SK 3189.940 | 2 ea | $25,618 | confirmed | 8 |
+| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit, R-513A variant, 5.5 kW at L35/L35, 400/480 V 3-ph | Rittal SK 3189.940 series, R-513A variant (exact part number to be confirmed by Rittal in RFQ 03) | 2 ea | $25,618 | estimate | 8 |
 | STR-CAB24U | Outdoor NEMA 4X / IP66 24U cabinet, aluminium (UL 50E Type 4X), 300 mm plinth, two side cut-outs for cabinet coolers, compression-gasket door with 3-point latch (shell for BEN 5) | DDB Unlimited (alt: Great Lakes NEMA 4X, Purcell) OD-series 4X, 24U configured (OD-50DXC class) | 1 ea | $10,417 | estimate | 8 |
 | SVC-ELECTRICIAN | Licensed electrician (commercial journeyman, billed) | local electrical contractor ELEC-HR | 53 h | $8,097 | estimate | 1 |
 | PWR-UPS-SRT6K-XBP | Smart-UPS SRT 192 V external battery pack (for 10 min at 6 kW) | APC by Schneider Electric SRT192RMBP | 2 ea | $6,667 | estimate | 2 |
@@ -114,10 +114,10 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $177,569 | $35,514 | - | 1 yr | $177,569 | 60 / 0 / 40 % | 44 | PROPOSED |
-| Hardware + BEN Controls | $183,447 | $36,689 | $1,200 | 1 yr | $184,647 | 60 / 0 / 39 % | 65 | alternative |
-| White-label | $183,447 | $36,689 | $1,500 | 1 yr | $184,947 | 60 / 0 / 39 % | 65 | alternative |
-| Managed service | $183,447 | $36,689 | $2,700 | 3 yr | $191,547 | 60 / 0 / 39 % | 65 | alternative |
+| Hardware only | $177,569 | $35,514 | - | 1 yr | $177,569 | 46 / 0 / 54 % | 44 | PROPOSED |
+| Hardware + BEN Controls | $183,447 | $36,689 | $1,200 | 1 yr | $184,647 | 46 / 0 / 53 % | 65 | alternative |
+| White-label | $183,447 | $36,689 | $1,500 | 1 yr | $184,947 | 46 / 0 / 53 % | 65 | alternative |
+| Managed service | $183,447 | $36,689 | $2,700 | 3 yr | $191,547 | 46 / 0 / 53 % | 65 | alternative |
 
 Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 5 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
@@ -161,7 +161,7 @@ Long-lead items (ordered at engineering release):
 
 | Code | Item | Vendor | Qty | Lead time (weeks) |
 |---|---|---|---|---|
-| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit 5.8 kW, 400/480 V 3-ph | DigiKey (UK site, USD display) | 2 ea | 8 |
+| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit, R-513A variant, 5.5 kW at L35/L35, 400/480 V 3-ph | DigiKey (UK site, USD display) | 2 ea | 8 |
 | STR-CAB24U | Outdoor NEMA 4X / IP66 24U cabinet, aluminium (UL 50E Type 4X), 300 mm plinth, two side cut-outs for cabinet coolers, compression-gasket door with 3-point latch (shell for BEN 5) | DDB Unlimited / Radiogagas (reseller) | 1 ea | 8 |
 | SITE-FIBER | Fiber drop, handhole, 24-strand SM to demarc | local | 1 lot | 8 |
 | SITE-PERMIT | Building/electrical/fire permits, plan review, inspections | local | 1 lot | 6 |
@@ -169,7 +169,7 @@ Long-lead items (ordered at engineering release):
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 5, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUED FOR REVIEW — not for construction until checked — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
+Issue-for-construction drawing set for the BEN 5, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUED FOR REVIEW — not for construction until checked — Rev C, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
 
 | Sheet | Title | Scale |
 |---|---|---|
@@ -351,8 +351,8 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 15. Assumptions and what is not included
 
-- Configuration as on the cover: 5 kW IT, 1 rack(s), Cabinet DX air conditioner, N+1, climate Temperate; any change is priced as a change order
-- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 60 % confirmed, 0 % list, 40 % estimate for this option; the estimate share is re-priced at engineering release
+- Configuration as on the cover: 5 kW IT, 1 rack(s), Cabinet DX air conditioner (R-513A, 5.5 kW), N+1, climate Temperate; any change is priced as a change order
+- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 46 % confirmed, 0 % list, 54 % estimate for this option; the estimate share is re-priced at engineering release
 - Gross margin 28% on hardware and build labour; controls licence $1,200/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
@@ -363,14 +363,14 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-BEN5-20261108-B7B31441) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-BEN5-20261108-FE7A6B93) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
-| Customer authorised representative, Riverside Dental Group |  |  |  |
+| Customer authorised representative, Sample Customer |  |  |  |
 | Schreiber AI — sales |  |  |  |
 | Schreiber AI — engineering |  |  |  |
 | Schreiber AI — compliance |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-BEN5-20261108-B7B31441. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-BEN5-20261108-FE7A6B93. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

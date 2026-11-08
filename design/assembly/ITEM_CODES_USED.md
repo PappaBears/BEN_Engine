@@ -5,7 +5,7 @@ Generated 2026-11-08 by `design/assembly/gen_assembly.py`. Every code in the ass
 | Catalog code | Catalog name | Status | Used in assembly docs (tiers) | On drawings (tiers) | Working code it replaced |
 |---|---|---|---|---|---|
 | CLG-ADIABATIC | Adiabatic dry cooler bank, V-type, EC fans, glycol, wetted pre-cooling pads with water-fre | estimate |  | ben2000 |  |
-| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit 5.8 kW, 400/480 V 3-ph | confirmed | ben5, ben2000 | ben5 | CLG-001 |
+| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit, R-513A variant, 5.5 kW at L35/L35, 400/480 V  | estimate | ben5, ben2000 | ben5 | CLG-001 |
 | CLG-CDU | Row CDU 450-750 kW liquid-to-liquid (DLC) | estimate | ben500, ben2000 | ben2000, ben500 | CLG-020 |
 | CLG-CDU-RDHX | Row CDU 70-100 kW liquid-to-liquid for RDHx loop | estimate | ben150 | ben150 | CLG-030 |
 | CLG-COND | Outdoor air-cooled condensing unit for ACRD301S (30 kW), 460 V | estimate | ben30, ben500 | ben30, ben500 | CLG-015 |

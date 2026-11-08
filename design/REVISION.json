@@ -1,13 +1,34 @@
 {
-  "drawing_rev": "B",
+  "drawing_rev": "C",
   "issue_date": "2026-11-08",
-  "status": "ISSUE FOR CONSTRUCTION",
-  "checker": "Ben Schreiber",
-  "notes": "Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). The generation-1 container set (Rev A) is superseded; see superseded_set. Checked by Ben Schreiber (operator, design authority) on 2026-11-08 and issued for construction.",
-  "superseded_set": {
-    "letter": "A",
-    "date_text": "7 Nov 2026",
-    "notes": "Generation-1 container set (keys micro/ben10/ben20/ben40, Type 3R enclosures); superseded, do not build from it."
-  },
-  "checked_date": "2026-11-08"
+  "status": "ISSUED FOR REVIEW",
+  "checker": "",
+  "notes": "Rev C: design change DC-001 — BEN 5 cabinet air conditioner changed from the R-134a 5.8 kW variant (GWP 1430) to the R-513A 5.5 kW variant (GWP 631) to meet the AIM Act 700-GWP limit; cooling capacity rule updated (unit 5.5 kW, N+1 = 2 units); M-001 BEN 5 refrigerant note and schedule updated. No other technical change from Rev B. Requires check before construction.",
+  "checked_date": "",
+  "superseded_sets": [
+    {
+      "letter": "A",
+      "date_text": "7 Nov 2026",
+      "notes": "Generation-1 container set (keys micro/ben10/ben20/ben40, Type 3R enclosures); superseded, do not build from it."
+    },
+    {
+      "letter": "B",
+      "date_text": "8 Nov 2026",
+      "checked_by": "Ben Schreiber",
+      "notes": "Generation-2 set issued for construction 2026-11-08; superseded by Rev C for the BEN 5 refrigerant change only. Rev B sheets for BEN 30/150/500/2000 are technically unchanged in Rev C."
+    }
+  ],
+  "change_register": [
+    {
+      "id": "DC-001",
+      "date": "2026-11-08",
+      "sheets": [
+        "ben5/M-001",
+        "ben5/A-002 schedule"
+      ],
+      "reason": "AIM Act < 700 GWP (COMPLIANCE §0 finding 2); audit F-07",
+      "requested_by": "compliance",
+      "approved_by": ""
+    }
+  ]
 }

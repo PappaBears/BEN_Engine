@@ -1,4 +1,4 @@
-# BEN 5 — drawing set, Rev B (ISSUE FOR CONSTRUCTION)
+# BEN 5 — drawing set, Rev C (ISSUED FOR REVIEW)
 
 Generated 2026-11-08 by `design/drawings/gen_drawings.py` from `Config.preset('ben5')`; revision from `design/REVISION.json`.
 Configuration: ben5 | ai_inference | 5 kW IT | 1 racks | cooling cabinet_dx | N+1 | temperate | H1
@@ -14,12 +14,11 @@ Enclosure: Outdoor 24U NEMA 4X / IP66 cabinet on skid — NEMA 4X / IP66 (H1 Sta
 | M-001 | Cooling P&ID (sheet 6/7) | NTS | [M-001.svg](M-001.svg), [M-001.png](M-001.png) |
 | C-001 | Controls layout (sheet 7/7) | see sheet | [C-001.svg](C-001.svg), [C-001.png](C-001.png) |
 
-Status: **ISSUE FOR CONSTRUCTION** — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: Ben Schreiber.
+Status: **ISSUED FOR REVIEW — not for construction until checked** — Rev C, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
 
 | Rev | Date | Description | Checked |
 |---|---|---|---|
-| A | 7 Nov 2026 | Generation-1 container set (keys micro/ben10/ben20/ben40, Type 3R enclosures); superseded, do not build from it. | — |
-| B | 2026-11-08 | Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). | Ben Schreiber |
+| C | 2026-11-08 | Rev C: design change DC-001 — BEN 5 cabinet air conditioner changed from the R-134a 5.8 kW variant (GWP 1430) to the R-513A 5.5 kW variant (GWP 631) to meet the AIM Act 700-GWP limit; cooling capacity rule updated (unit 5.5 kW, N+1 = 2 units); M-001 BEN 5 refrigerant note and schedule updated. | not checked |
 
 ## Interference checks for this tier
 

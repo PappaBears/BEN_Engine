@@ -1,7 +1,7 @@
 # Contract Manufacturing Agreement — BEN Engine Build Shop
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · Template rev 9fed473
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · Template rev 7f10d34
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Used with the third-party container modification shop, electrical integrator or UL 508A panel shop that builds Units for Schreiber AI (the operator's decision to manufacture with third parties first). Delete this box before signature.
 
 **Agreement ID:** [CM_AGREEMENT_ID]

@@ -11,9 +11,9 @@
    },
    "cooling": {
     "total": 25617.555555555555,
-    "confirmed": 25617.555555555555,
+    "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 0.0
+    "estimate": 25617.555555555555
    },
    "compute": {
     "total": 51802.77777777778,
