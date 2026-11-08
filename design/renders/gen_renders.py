@@ -3,8 +3,10 @@
 Eight isometric stage renders per tier, Schreiber AI dark style, built with matplotlib
 Poly3DCollection from the same layout engine the IFC drawings use (design/layout.py).
 
-Run:  python design/renders/gen_renders.py [--tier ben20]
+Run:  python design/renders/gen_renders.py [--tier ben150]
 Output: design/renders/<tier>/stage-N.png (1600 px wide) and contact-sheet.png
+Tiers: ben5 cabinet, ben30/ben150/ben500 ISO-frame modules, ben2000 hall (bays set and joined, rows, CDU row ends, fan wall,
+power module and plant yard in the complete view).
 """
 from __future__ import annotations
 
@@ -27,6 +29,16 @@ BRAND = {"graphite": "#0B1018", "slate": "#152234", "panel": "#1B2B42", "text": 
          "cyan": "#66E3FF", "amber": "#FFC66D", "red": "#FF707D", "green": "#6EE7A8", "purple": "#C7A6FF"}
 KIND_COLOR = {"rack": BRAND["cyan"], "cooling": BRAND["green"], "power": BRAND["amber"], "controls": BRAND["purple"],
               "fire": BRAND["red"], "structure": BRAND["muted"], "tray": "#DCE6F2", "envelope": "#5C7391"}
+STAGES_HALL = [
+    (1, "Sections set and joined", "9 road sections on grade beams, bay joints sealed and bonded (CTP-J1), power module set"),
+    (2, "Envelope check", "Factory-finished panels: seams sealed, IP66 hose test on every penetration (CTQ-A4), doors gasketed"),
+    (3, "Slab fit-out", "Rack anchor layout, overhead tray, leak rope, manifold and busway hangers"),
+    (4, "Racks", "48 racks in 4 rows, anchored to the slab, rails plumb"),
+    (5, "Containment and cooling", "Hot-aisle pods, CDU row ends on the ring header, DLC manifolds, fan walls"),
+    (6, "Power", "Row busways A/B, EPO; power module: switchgear, UPS 2N, battery rooms (HOLD: electrician / NETA)"),
+    (7, "Controls and sensors", "BEN Pods on every rack, PLC per module, BEN Controller, probes at 0.4 / 1.2 / 1.8 m, dP, leak, door"),
+    (8, "Complete center", "Hall closed, power module, MV pad, generators, fuel, adiabatic dry coolers, pump skid"),
+]
 STAGES = [
     (1, "Empty container", "Receiving inspection, shell survey, cutouts marked"),
     (2, "Insulation and liner", "100 mm PIR, vapour-tight liner, door seals"),
@@ -90,8 +102,8 @@ def draw_shell(ax, lay: L.Layout, stage: int):
     Lm, W, H = lay.L, lay.W, lay.H
     wall = (lay.ext_w - W) / 2
     endw = (lay.ext_l - Lm) / 2
-    roof_t = lay.ext_h - H - 198 - 100 if lay.is_container else 60
-    fl = 198 + 100 if lay.is_container else 60   # floor structure below finished floor
+    roof_t = (lay.ext_h - H - 198 - 100) if lay.is_container else (300 if lay.is_hall else 60)
+    fl = (198 + 100) if lay.is_container else (300 if lay.is_hall else 60)   # floor structure below finished floor
     shell = "#243752"
     # floor slab (structure)
     add_box(ax, -endw, -wall, -fl, Lm + endw, W + wall, 0, shell, alpha=0.95, edge="#3A5070", lw=0.4, zs=-10)
@@ -100,7 +112,7 @@ def draw_shell(ax, lay: L.Layout, stage: int):
     add_box(ax, Lm, -wall, 0, Lm + endw, W + wall, H, shell, alpha=0.85, edge="#3A5070", lw=0.4, zs=-9)
     # corrugation lines on the rack wall
     segs = []
-    pitch = 280 if lay.is_container else 150
+    pitch = 280 if lay.is_container else (1000 if lay.is_hall else 150)
     x = pitch / 2
     while x < Lm:
         segs.append([(x, -wall / 2, 0), (x, -wall / 2, H)]); x += pitch
@@ -110,6 +122,10 @@ def draw_shell(ax, lay: L.Layout, stage: int):
         add_box(ax, -endw, -wall, H, Lm + endw, W + wall, H + roof_t, shell, alpha=0.35 if stage == 1 else 0.9, edge="#3A5070", lw=0.4, zs=20)
         add_box(ax, -endw, W, 0, Lm + endw, W + wall, H, shell, alpha=0.25 if stage == 1 else 0.9, edge="#3A5070", lw=0.4, zs=19)
         add_box(ax, -endw, -wall, 0, 0, W + wall, H, "#2E4461", alpha=0.6 if stage == 1 else 0.95, edge="#3A5070", lw=0.4, zs=19)
+        if lay.is_hall:
+            add_box(ax, -endw - 2, W / 2 - 1500, 0, -endw, W / 2 + 1500, 2400, "#1B2B42", alpha=1, edge=BRAND["muted"], lw=0.6, zs=20)
+            for jx in lay.module_x:
+                add_lines(ax, [[(jx, -wall, H + roof_t + 1), (jx, W + wall, H + roof_t + 1)], [(jx, W + wall + 1, 0), (jx, W + wall + 1, H + roof_t)]], BRAND["red"], lw=1.0, ls="--")
         if lay.is_container:
             # door split and lock bars on the door end
             add_lines(ax, [[(-endw - 1, W / 2, 100), (-endw - 1, W / 2, H - 100)]], BRAND["muted"], lw=1.0)
@@ -135,7 +151,7 @@ def draw_envelope(ax, lay: L.Layout, highlight: bool):
     a = 0.95 if highlight else 0.5
     pir = "#D9B86A" if highlight else "#8A7A52"
     liner = "#D6E2F0" if highlight else "#6E7F96"
-    t = 100 if lay.is_container else 40
+    t = 100 if lay.is_container or lay.is_hall else 40
     # PIR on rack wall and end wall (behind liner), liner shown on half the wall to reveal the build-up
     add_box(ax, 0, -t - 1, 0, Lm, -1, H, pir, alpha=a, zs=-5)
     add_box(ax, Lm + 1, 0, 0, Lm + t + 1, W, H, pir, alpha=a, zs=-5)
@@ -156,6 +172,13 @@ def draw_item(ax, it: L.Item, lay: L.Layout, highlight: bool):
         pts = [(100, 100, 15), (Lm - 100, 100, 15), (Lm - 100, W - 100, 15), (100, W - 100, 15), (100, 100, 15)]
         add_lines(ax, [list(zip(pts[:-1], pts[1:]))[i] for i in range(4)], BRAND["red"], lw=1.6 if highlight else 0.8, alpha=1 if highlight else 0.5)
         return
+    if it.tag.startswith("HAC") and lay.is_hall:
+        add_box(ax, it.x0, it.y0, it.z0, it.x1, it.y1, it.z1, BRAND["green"], alpha=0.25 if highlight else 0.12, edge=BRAND["green"] if highlight else (0, 0, 0, 0), lw=0.5, zs=5)
+        return
+    if it.tag in ("VEST", "STG", "YARD", "CRANE"):
+        if it.tag == "VEST":
+            add_box(ax, it.x0, it.y0, it.z0, it.x1, it.y1, it.z1, "#2E4461", alpha=0.5 if highlight else 0.3, edge=BRAND["muted"], lw=0.4, zs=2)
+        return
     if it.tag == "HAC":
         # containment: top panels over the plenum+rack top, from rack top to ceiling, translucent
         racks = lay.by_kind("rack")
@@ -170,7 +193,7 @@ def draw_item(ax, it: L.Item, lay: L.Layout, highlight: bool):
         add_box(ax, it.x0, it.y1 - 15, it.z0, it.x1, it.y1, it.z1, col, alpha=a, zs=8)
         add_box(ax, it.x0, it.y0, it.z0, it.x1, it.y1, it.z0 + 10, col, alpha=a * 0.8, zs=8)
         return
-    if it.tag == "FC":
+    if it.tag == "FC" and racks_first(lay):
         racks = lay.by_kind("rack")
         r = racks[0]
         feet = (r.y0 + 100, r.y1 - 100) if lay.notes.get("plenum", 0) else (r.y0 + 300, r.y1 - 100)
@@ -183,9 +206,12 @@ def draw_item(ax, it: L.Item, lay: L.Layout, highlight: bool):
         return
     zs = 2 if it.mount == "floor" else 6
     add_box(ax, it.x0, it.y0, it.z0, it.x1, it.y1, it.z1, col, alpha=a, edge=edge, lw=0.5 if highlight else 0.3, zs=zs)
-    if it.kind == "rack" and lay.is_container:
-        # door perforation hint: darker front panel
-        add_box(ax, it.x0 + 20, it.y1 - 12, 60, it.x1 - 20, it.y1 + 2, it.z1 - 60, "#0B1018", alpha=0.35 if highlight else 0.2, zs=4)
+    if it.kind == "rack" and (lay.is_container or lay.is_hall):
+        # door perforation hint: darker front panel on the service face
+        if it.front == "-y":
+            add_box(ax, it.x0 + 20, it.y0 - 2, 60, it.x1 - 20, it.y0 + 12, it.z1 - 60, "#0B1018", alpha=0.35 if highlight else 0.2, zs=4)
+        else:
+            add_box(ax, it.x0 + 20, it.y1 - 12, 60, it.x1 - 20, it.y1 + 2, it.z1 - 60, "#0B1018", alpha=0.35 if highlight else 0.2, zs=4)
         if lay.notes.get("cooling_resolved") == "rdhx_drycooler":
             add_box(ax, it.x0, it.y0, 0, it.x1, it.y0 + 200, it.z1, BRAND["green"], alpha=a * 0.8, zs=3)
     if highlight and it.mount in ("floor", "wall", "roof"):
@@ -193,6 +219,10 @@ def draw_item(ax, it: L.Item, lay: L.Layout, highlight: bool):
         cx, cy = it.cx, it.cy
         add_lines(ax, [[(cx, cy, it.z1 + 150), (cx, cy, it.z1 + 650)]], BRAND["cyan"], lw=1.0, ls=":")
         ax.scatter([cx], [cy], [it.z1 + 650], color=BRAND["cyan"], s=12, depthshade=False)
+
+
+def racks_first(lay):
+    return bool(lay.by_kind("rack"))
 
 
 def draw_sensors(ax, lay: L.Layout, highlight: bool):
@@ -218,8 +248,8 @@ def render_stage(lay: L.Layout, n: int, out_png: str):
             for it in stage_items(lay, k):
                 if n == 8 and it.mount in ("ext", "roof"):
                     draw_item(ax, it, lay, highlight=False)
-                elif it.mount == "ext" and n < 8 and it.kind != "power":
-                    continue   # dry cooler and exterior AC only in the complete view
+                elif it.mount == "ext" and n < 8 and (it.kind != "power" or lay.is_hall):
+                    continue   # dry cooler, exterior AC and the plant yard only in the complete view
                 else:
                     draw_item(ax, it, lay, highlight=(n == k))
     if n >= 7:
@@ -234,16 +264,24 @@ def render_stage(lay: L.Layout, n: int, out_png: str):
     # camera & aspect
     ext = max(Lm + 1500, W + 2500, H + 1500)
     pad_x = 600 if lay.is_container else 300
-    ax.set_xlim(-pad_x, Lm + pad_x * (3 if n == 8 and lay.find("DC1") else 1))
-    ax.set_ylim(-800, W + 1200)
-    ax.set_zlim(-300, H + 1000)
+    if lay.is_hall and n == 8:
+        exts = [i for i in lay.items if i.mount == "ext" and i.tag not in ("CRANE",)]
+        ax.set_xlim(min(i.x0 for i in exts) - 2000, max(i.x1 for i in exts) + 2000)
+        ax.set_ylim(min(i.y0 for i in exts) - 2000, max(i.y1 for i in exts) + 2000)
+        ax.set_zlim(-300, H + 6000)
+    elif lay.is_hall:
+        ax.set_xlim(-pad_x, Lm + pad_x); ax.set_ylim(-800, W + 1200); ax.set_zlim(-300, H + 1500)
+    else:
+        ax.set_xlim(-pad_x, Lm + pad_x * (3 if n == 8 and lay.find("DC1") else 1))
+        ax.set_ylim(-800, W + 1200)
+        ax.set_zlim(-300, H + 1000)
     xr = ax.get_xlim(); yr = ax.get_ylim(); zr = ax.get_zlim()
     ax.set_box_aspect((xr[1] - xr[0], yr[1] - yr[0], (zr[1] - zr[0]) * 1.0))
-    ax.view_init(elev=24, azim=-128)
+    ax.view_init(elev=24 if not (lay.is_hall and n == 8) else 32, azim=-128)
     ax.dist = 7.5 if hasattr(ax, "dist") else None
     # side panel text
-    stage_no, title, sub = STAGES[n - 1]
-    if not lay.is_container:
+    stage_no, title, sub = (STAGES_HALL if lay.is_hall else STAGES)[n - 1]
+    if lay.is_cabinet:
         sub = sub.replace("0.4 / 1.2 / 1.8 m", "0.3 / 0.7 / 1.1 m").replace("100 mm PIR", "40 mm PIR").replace("C100 channels under the row, overhead trays, leak rope", "Skid, rails, leak rope")
     fig.text(0.80, 0.90, "BEN Engine", color=BRAND["cyan"], fontsize=13, fontweight="bold")
     fig.text(0.80, 0.865, lay.d["tier_label"] + "  —  assembly sequence", color=BRAND["text"], fontsize=11)
@@ -260,16 +298,18 @@ def render_stage(lay: L.Layout, n: int, out_png: str):
         key = it.label
         seen[key] = seen.get(key, 0) + 1
     if n == 1:
-        seen = {lay.d["enclosure"]: 1, "Corner castings / CSC plate check": 1}
+        seen = {lay.d["enclosure"][:52]: 1, ("Section joints sealed + bonded (CTP-J1)" if lay.is_hall else "Corner castings / CSC plate check"): 1}
     if n == 2:
-        seen = {"PIR insulation 100 mm (40 mm cabinet)": 1, "Steel liner, sealed joints": 1, "Floor build-up 100 mm": 1, "Door seals": 1}
+        seen = ({"Factory PIR sandwich panels, seams sealed": 1, "IP66 hose test every penetration (CTQ-A4)": 1, "Compression-gasket doors (CTQ-C3)": 1, f"Hardening {lay.cfg.hardening}": 1} if lay.is_hall else
+                {"PIR insulation 100 mm (40 mm cabinet)": 1, "Steel liner, sealed joints": 1, "Floor build-up 100 mm": 1, "IP66 gasketed penetrations + door seals": 1})
     if n == 8:
-        seen = {"Roof closed, penetrations sealed": 1, "Brand panel bonded + riveted": 1, "Exterior: service section, condensers / dry cooler": 1}
+        seen = ({"Hall closed, IP66 envelope": 1, "Power module: SWGR A/B, UPS 2N, batteries": 1, "MV pad: switchgear + 2 transformers": 1, "3 generators N+1, fuel tank": 1, "5 adiabatic dry coolers + pump skid": 1} if lay.is_hall else
+                {"Roof closed, penetrations sealed": 1, "Brand panel bonded + riveted": 1, "Exterior: service section NEMA 4X, condensers / dry cooler": 1})
     for lab, cnt in list(seen.items())[:14]:
         fig.text(0.80, y, f"{cnt} x  {lab[:52]}", color=BRAND["text"], fontsize=8); y -= 0.022
     d = lay.d
     fig.text(0.80, 0.26, "Configuration", color=BRAND["muted"], fontsize=8)
-    cfg_lines = [f"{lay.cfg.it_kw:.0f} kW IT in {lay.cfg.racks} racks ({d['per_rack_kw']} kW/rack)",
+    cfg_lines = [f"{lay.cfg.it_kw:.0f} kW IT in {lay.cfg.racks} racks ({d['per_rack_kw']} kW/rack), {d['hardening_label']}",
                  f"Cooling: {L.COOLING_LIBRARY[lay.notes.get('cooling_resolved', lay.cfg.cooling)]['label']}",
                  f"Power: {d['voltage']}, {d['service_breaker_a']} A, UPS {d['ups_modules']} x {d['ups_kva_each']} kVA",
                  f"Interior {Lm:.0f} x {W:.0f} x {H:.0f} mm, gross {d['gross_kg']} kg"]
@@ -308,10 +348,10 @@ def contact_sheet(out_dir, lay):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tier", choices=list(L.TIER_GEOMETRY), action="append")
+    ap.add_argument("--tier", choices=list(L.TIER_GEOMETRY) + list(L.TIER_ALIASES), action="append")
     ap.add_argument("--stage", type=int, action="append")
     a = ap.parse_args(argv)
-    for t in a.tier or list(L.TIER_GEOMETRY):
+    for t in [L.canonical_tier(x) for x in a.tier] if a.tier else list(L.TIER_GEOMETRY):
         lay = L.resolve(t)
         out = os.path.join(HERE, t)
         os.makedirs(out, exist_ok=True)

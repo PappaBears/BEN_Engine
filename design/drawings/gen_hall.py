@@ -753,7 +753,7 @@ def sheet_s001(lay, out, ctx: Ctx, n):
     vb.leader(560, -100, 18, -8, "M12 adhesive anchor 110 embed, 85 N·m, 4 per rack (CTP-S2)", h=1.7, c=CTP_C)
     vb.leader(350, 8, 18, 12, "Rack base plate on 2 mm anti-static vinyl; grout where > 3 mm", h=1.7)
     sx2 = ox
-    dy_c = dy - 118
+    dy_c = dy - 190
     sh.view_title(sx2, dy_c, "DETAIL C — SEISMIC: EQUIPMENT ANCHOR SCHEDULE", "NTS")
     rows = [["Rack 48U (1,000 kg)", "4 x M12 adhesive", "110", "85"], ["CDU 300 kW", "4 x M16 adhesive", "150", "210"], ["Fan wall", "6 x M16 adhesive", "150", "210"],
             ["UPS frame / battery cabinet", "4 x M16 per mfr", "150", "210"], ["Switchgear section", "per mfr seismic cert", "-", "-"], ["Section rail bracket", "M20 adhesive @ 2 m", "200", "410"]]
