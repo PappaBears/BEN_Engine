@@ -16,10 +16,11 @@
   "properties": {
     "tier": {
       "enum": [
-        "micro",
-        "ben10",
-        "ben20",
-        "ben40"
+        "ben5",
+        "ben30",
+        "ben150",
+        "ben500",
+        "ben2000"
       ],
       "description": "Enclosure tier"
     },
@@ -112,25 +113,30 @@
     }
   },
   "x-tier-limits": {
-    "micro": {
+    "ben5": {
       "it_kw_min": 2,
       "it_kw_max": 5,
       "max_racks": 1
     },
-    "ben10": {
+    "ben30": {
       "it_kw_min": 10,
       "it_kw_max": 30,
       "max_racks": 2
     },
-    "ben20": {
+    "ben150": {
       "it_kw_min": 50,
       "it_kw_max": 150,
       "max_racks": 6
     },
-    "ben40": {
+    "ben500": {
       "it_kw_min": 150,
       "it_kw_max": 500,
       "max_racks": 12
+    },
+    "ben2000": {
+      "it_kw_min": 800,
+      "it_kw_max": 2000,
+      "max_racks": 48
     }
   },
   "x-cooling-limits": {

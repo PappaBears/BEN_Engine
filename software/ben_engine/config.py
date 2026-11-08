@@ -13,7 +13,15 @@ import math
 from dataclasses import dataclass, field, asdict
 from typing import Literal, Dict, Any, List
 
-Tier = Literal["micro", "ben10", "ben20", "ben40"]
+Tier = Literal["ben5", "ben30", "ben150", "ben500", "ben2000"]
+Hardening = Literal["H1", "H2", "H3"]
+
+# Generation-1 keys (container-length names) are accepted everywhere and normalised to the power-based keys.
+TIER_ALIASES: Dict[str, str] = {"micro": "ben5", "ben10": "ben30", "ben20": "ben150", "ben40": "ben500"}
+
+
+def canonical_tier(t: str) -> str:
+    return TIER_ALIASES.get(t, t)
 Cooling = Literal["cabinet_dx", "inrow_dx", "inrow_dx_300", "rdhx_drycooler", "dlc_cdu"]
 Redundancy = Literal["N", "N+1", "2N"]
 Climate = Literal["temperate", "hot_arid", "hot_humid", "cold", "coastal", "high_altitude"]
@@ -26,34 +34,61 @@ Subsystem = Literal["power", "cooling", "compute", "controls"]
 # ---------------------------------------------------------------- tier geometry
 # External ISO dimensions (ISO 668 high cube), internal usable after insulation + liner.
 TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
-    "micro": {
-        "label": "BEN Micro", "enclosure": "Outdoor 24U NEMA 3R cabinet on skid",
+    # Names follow nominal maximum IT power (docs/TIER_AND_ENCLOSURE_DECISION.md). Enclosures are element-proof
+    # (NEMA 4X / IP66) at hardening level H1; H2/H3 add severe-environment and hardened/government packages.
+    "ben5": {
+        "label": "BEN 5", "enclosure": "Outdoor 24U NEMA 4X / IP66 cabinet on skid",
+        "kind": "cabinet", "modules": 1,
         "ext_l_m": 1.20, "ext_w_m": 1.00, "ext_h_m": 1.80,
         "int_l_m": 1.00, "int_w_m": 0.80, "int_h_m": 1.40,
         "max_racks": 1, "rack_u": 24, "it_kw_min": 2, "it_kw_max": 5,
         "default_cooling": "cabinet_dx", "voltage": "208/240 V 1ph", "tare_kg": 320,
     },
-    "ben10": {
-        "label": "BEN 10", "enclosure": "10 ft high-cube ISO container",
+    "ben30": {
+        "label": "BEN 30", "enclosure": "10 ft high-cube ISO-frame module, sealed to IP66",
+        "kind": "module", "modules": 1,
         "ext_l_m": 2.991, "ext_w_m": 2.438, "ext_h_m": 2.896,
         "int_l_m": 2.70, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 2, "rack_u": 42, "it_kw_min": 10, "it_kw_max": 30,
         "default_cooling": "inrow_dx_300", "voltage": "208 V 3ph", "tare_kg": 1300,
     },
-    "ben20": {
-        "label": "BEN 20", "enclosure": "20 ft high-cube ISO container",
+    "ben150": {
+        "label": "BEN 150", "enclosure": "20 ft high-cube ISO-frame module, sealed to IP66",
+        "kind": "module", "modules": 1,
         "ext_l_m": 6.058, "ext_w_m": 2.438, "ext_h_m": 2.896,
         "int_l_m": 5.75, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 6, "rack_u": 42, "it_kw_min": 50, "it_kw_max": 150,
         "default_cooling": "rdhx_drycooler", "voltage": "480 V 3ph", "tare_kg": 2400,
     },
-    "ben40": {
-        "label": "BEN 40", "enclosure": "40 ft high-cube ISO container",
+    "ben500": {
+        "label": "BEN 500", "enclosure": "40 ft high-cube ISO-frame module, sealed to IP66",
+        "kind": "module", "modules": 1,
         "ext_l_m": 12.192, "ext_w_m": 2.438, "ext_h_m": 2.896,
         "int_l_m": 11.85, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 12, "rack_u": 48, "it_kw_min": 150, "it_kw_max": 500,
         "default_cooling": "dlc_cdu", "voltage": "480 V 3ph", "tare_kg": 3900,
     },
+    "ben2000": {
+        # Single 2 MW center: three site-joined wide-body modules (12.2 x 3.66 x 4.2 m each) form the IT hall,
+        # plus a separate power module and a plant yard. Interior dims are the joined hall.
+        "label": "BEN 2000", "enclosure": "Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) + power module + plant yard, IP66 envelope",
+        "kind": "hall", "modules": 3,
+        "ext_l_m": 36.6, "ext_w_m": 11.0, "ext_h_m": 4.2,
+        "int_l_m": 35.8, "int_w_m": 10.4, "int_h_m": 3.6,
+        "max_racks": 48, "rack_u": 48, "it_kw_min": 800, "it_kw_max": 2000,
+        "rows": 4,
+        "default_cooling": "dlc_cdu", "voltage": "12.47 kV MV service → 480 V 3ph", "tare_kg": 3 * 14000 + 18000,
+    },
+}
+
+HARDENING: Dict[str, Dict[str, Any]] = {
+    # docs/TIER_AND_ENCLOSURE_DECISION.md §3. Mass adder per m² of envelope and cost handled by catalog lines.
+    "H1": {"label": "H1 Standard", "rating": "NEMA 4X / IP66", "coating": "ISO 12944 C3", "wind_ms_min": 47, "mass_kg_m2": 0.0,
+           "features": ["hose-tested gasketed penetrations (UL 50E type 4X)", "compression-gasket doors, three-point latches", "positive-pressure interior", "door contacts"]},
+    "H2": {"label": "H2 Severe environment", "rating": "NEMA 4X / IP66 + flood plinth 600 mm", "coating": "ISO 12944 C5-M", "wind_ms_min": 67, "mass_kg_m2": 6.0,
+           "features": ["sand/dust ePM1 filtration with weather hoods", "hurricane-rated door hardware", "roof snow guards", "stainless fasteners, sacrificial anodes", "intrusion detection and lighting"]},
+    "H3": {"label": "H3 Hardened / government", "rating": "NEMA 4X / IP66 + ballistic (UL 752) + forced-entry (ASTM F3038) + HEMP shielding option (MIL-STD-188-125-1)", "coating": "ISO 12944 C5-M", "wind_ms_min": 67, "mass_kg_m2": 48.0,
+           "features": ["ballistic wall panels UL 752 level selectable", "IK10 impact doors, forced-entry rated", "80 dB shielded enclosure with filtered penetrations (option)", "TEMPEST-ready separation", "secure vestibule / mantrap", "two-factor access, tamper detection, audit trail in BEN Care", "CMMC / NIST 800-171 controls pack"]},
 }
 
 COOLING_LIBRARY: Dict[str, Dict[str, Any]] = {
@@ -71,10 +106,10 @@ CONTROLS_TIERS: Dict[str, Dict[str, Any]] = {
     "auto": {"label": "Automatic (by tier and profile)"},
     "lite": {"label": "BEN Controls Lite", "controller": "Revolution Pi RevPi Connect 4 + RevPi DIO/AIO (DIN rail, UL/CE listed)",
              "edge": "same RevPi runs ben_engine and the Thread border router", "panel": "DIN-rail cabinet, listed components",
-             "for": ["micro", "ben10"]},
+             "for": ["ben5", "ben30"]},
     "pro":  {"label": "BEN Controls Pro", "controller": "Phoenix Contact PLCnext AXC F 2152 + Axioline F I/O",
              "edge": "OnLogic Karbon 400 industrial edge computer (TPM 2.0)", "panel": "UL 508A listed BEN Controller panel",
-             "for": ["ben10", "ben20", "ben40"]},
+             "for": ["ben30", "ben150", "ben500", "ben2000"]},
 }
 # BEN 10 profiles that default to BEN Controls Pro
 CONTROLS_PRO_PROFILES = ("healthcare", "public_sector", "ai_training")
@@ -103,7 +138,7 @@ CLIMATE_DESIGN: Dict[str, Dict[str, Any]] = {
 
 @dataclass
 class Config:
-    tier: str = "ben20"
+    tier: str = "ben150"
     profile: str = "ai_inference"
     it_kw: float = 100.0
     racks: int = 5
@@ -120,6 +155,11 @@ class Config:
     # + RevPi DIO/AIO, BEN Pods on BEN Mesh), "pro" = BEN Controls Pro (PLCnext AXC F 2152 + Axioline F I/O in a UL 508A
     # panel + OnLogic Karbon 400 edge computer + BEN Pods). "auto" resolves by size and profile, see controls_tier_resolved().
     controls_tier: str = "auto"
+    # Enclosure hardening level (docs/TIER_AND_ENCLOSURE_DECISION.md §3): H1 standard IP66, H2 severe environment, H3 hardened/government.
+    hardening: str = "H1"
+
+    def __post_init__(self):
+        self.tier = canonical_tier(self.tier)
 
     # ------------------------------------------------------------ validation
     def validate(self) -> List[str]:
@@ -137,10 +177,14 @@ class Config:
             per_rack = self.it_kw / max(self.racks, 1)
             if per_rack > COOLING_LIBRARY[self.cooling]["max_rack_kw"]:
                 errs.append(f"{per_rack:.1f} kW/rack exceeds {COOLING_LIBRARY[self.cooling]['label']} limit of {COOLING_LIBRARY[self.cooling]['max_rack_kw']} kW/rack")
-        if self.tier == "micro" and self.cooling != "cabinet_dx":
-            errs.append("BEN Micro uses cabinet_dx cooling only")
-        if self.tier != "micro" and self.cooling == "cabinet_dx":
-            errs.append("cabinet_dx is for BEN Micro only")
+        if self.tier == "ben5" and self.cooling != "cabinet_dx":
+            errs.append("BEN 5 uses cabinet_dx cooling only")
+        if self.tier != "ben5" and self.cooling == "cabinet_dx":
+            errs.append("cabinet_dx is for BEN 5 only")
+        if self.tier == "ben2000" and self.cooling != "dlc_cdu":
+            errs.append("BEN 2000 is direct-liquid cooled (dlc_cdu)")
+        if self.hardening not in HARDENING:
+            errs.append(f"unknown hardening {self.hardening}")
         if self.profile not in PROFILE_DEFAULTS:
             errs.append(f"unknown profile {self.profile}")
         if self.climate not in CLIMATE_DESIGN:
@@ -152,23 +196,23 @@ class Config:
                 errs.append(f"unknown subsystem {s}")
         if self.controls_tier not in CONTROLS_TIERS:
             errs.append(f"unknown controls_tier {self.controls_tier}")
-        elif self.controls_tier == "lite" and self.tier in ("ben20", "ben40"):
-            errs.append("BEN Controls Lite is for BEN Micro and BEN 10 only; BEN 20/40 use BEN Controls Pro")
-        if not errs and self.tier != "micro":
+        elif self.controls_tier == "lite" and self.tier in ("ben150", "ben500", "ben2000"):
+            errs.append("BEN Controls Lite is for BEN 5 and BEN 30 only; BEN 150 and up use BEN Controls Pro")
+        if not errs and self.tier != "ben5":
             d = self.derived()
             if not d["row_fits"]:
-                errs.append(f"single row of {self.racks} racks + {d['cooling_units_total']} cooling units is {d['row_length_mm']} mm, exceeds interior {int(TIER_GEOMETRY[self.tier]['int_l_m']*1000)} mm; use fewer racks, rear-door or liquid cooling")
+                errs.append(f"{d['rows']} row(s) of {d['racks_per_row']} racks + cooling units is {d['row_length_mm']} mm per row, exceeds interior {int(TIER_GEOMETRY[self.tier]['int_l_m']*1000)} mm; use fewer racks, rear-door or liquid cooling")
         return errs
 
     # ------------------------------------------------------------ controls tier
     def controls_tier_resolved(self) -> str:
-        """Resolve ``controls_tier`` "auto": Lite for BEN Micro, Pro for BEN 20/40, and for BEN 10 Lite unless the
+        """Resolve ``controls_tier`` "auto": Lite for BEN 5, Pro for BEN 150/500/2000, and for BEN 30 Lite unless the
         profile is one where the buyer expects a PLC and a UL 508A panel (healthcare, public sector, AI training)."""
         if self.controls_tier in ("lite", "pro"):
             return self.controls_tier
-        if self.tier == "micro":
+        if self.tier == "ben5":
             return "lite"
-        if self.tier == "ben10":
+        if self.tier == "ben30":
             return "pro" if self.profile in CONTROLS_PRO_PROFILES else "lite"
         return "pro"
 
@@ -211,7 +255,12 @@ class Config:
             ups_modules = 1
             ups_kva_each = ups_kva_n
 
-        if g["voltage"].startswith("480"):
+        mv_service = g["voltage"].startswith("12.47")
+        if mv_service:
+            # medium-voltage service: pad-mount transformers at 480 V secondary, 2N at 2N/N+1 redundancy
+            v_ll = 480
+            service_amps = total_kva * 1000 / (math.sqrt(3) * v_ll) / 0.8
+        elif g["voltage"].startswith("480"):
             v_ll = 480
             service_amps = total_kva * 1000 / (math.sqrt(3) * v_ll) / 0.8
         elif g["voltage"].startswith("208 V 3"):
@@ -221,8 +270,19 @@ class Config:
             v_ll = 240
             service_amps = total_kva * 1000 / v_ll / 0.8
         # round up to standard breaker frames
-        frames = [30, 50, 60, 100, 150, 200, 225, 250, 400, 600, 800, 1000, 1200, 1600, 2000]
-        service_breaker = next((f for f in frames if f >= service_amps), 2000)
+        frames = [30, 50, 60, 100, 150, 200, 225, 250, 400, 600, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000]
+        service_breaker = next((f for f in frames if f >= service_amps), 4000)
+        # MV service: transformer count/size (2,500 kVA pad-mounts), 2N when redundancy is 2N or N+1
+        if mv_service:
+            xfmr_kva = 2500
+            xfmr_n = math.ceil(total_kva / (xfmr_kva * 0.9))
+            xfmr_total = xfmr_n * 2 if self.redundancy in ("2N", "N+1") else xfmr_n
+            gens_n = math.ceil(total_kw * 1.25 / 1250)
+            gens_total = gens_n + 1 if self.generator else 0
+        else:
+            xfmr_kva, xfmr_n, xfmr_total = 0, 0, 0
+            gens_n = math.ceil(total_kw * 1.25 / 50) * 0 + (1 if self.generator else 0)
+            gens_total = gens_n
 
         # battery energy for ups_minutes at IT load (lithium, 90 % DoD)
         battery_kwh = self.it_kw * self.ups_minutes / 60 / 0.9
@@ -230,22 +290,28 @@ class Config:
         # airflow: 125 cfm/kW typical at ΔT 12 K (air cooled)
         airflow_cfm = self.it_kw * 125 if cl["medium"] == "air" else self.it_kw * 40
 
-        # structural: payload
-        payload_kg = self.racks * (400 if self.tier == "micro" else 900) + n_units_total * cl["mass_kg"] + ups_modules * (120 if self.tier == "micro" else 350) + battery_kwh * 8
+        # structural: payload (+ hardening envelope mass)
+        area_m2 = 2 * (g["ext_l_m"] * g["ext_h_m"] + g["ext_w_m"] * g["ext_h_m"]) + g["ext_l_m"] * g["ext_w_m"]
+        hz = HARDENING[self.hardening]
+        payload_kg = self.racks * (400 if self.tier == "ben5" else 900) + n_units_total * cl["mass_kg"] + ups_modules * (120 if self.tier == "ben5" else 350) + battery_kwh * 8 + area_m2 * hz["mass_kg_m2"]
         gross_kg = payload_kg + g["tare_kg"]
 
         # envelope solar/transmission gain, R-value 3.5 m2K/W (100 mm PIR), ΔT at design
-        area_m2 = 2 * (g["ext_l_m"] * g["ext_h_m"] + g["ext_w_m"] * g["ext_h_m"]) + g["ext_l_m"] * g["ext_w_m"]
         envelope_gain_kw = (area_m2 * (clim["t_design_c"] - 22) / 3.5 + 0.3 * clim["solar_w_m2"] * g["ext_l_m"] * g["ext_w_m"] * 0.25) / 1000
 
         pue_est = round(total_kw / self.it_kw + 0.03, 3)  # +0.03 UPS loss
-        # single-row length check (racks 600 mm + in-row units + 500 mm end zone) vs interior length
-        row_len_mm = self.racks * 600 + (n_units_total * cl["width_mm"] if cl["medium"] == "air" or cl["medium"] == "liquid" else 0) + 500
-        row_fits = (self.tier == "micro") or (row_len_mm <= g["int_l_m"] * 1000)
+        # row length check per row (racks 600 mm + in-row/CDU units + 500 mm end zone) vs interior length
+        rows = g.get("rows", 1)
+        racks_per_row = math.ceil(self.racks / rows)
+        units_per_row = math.ceil(n_units_total / rows)
+        row_len_mm = racks_per_row * 600 + (units_per_row * cl["width_mm"] if cl["medium"] == "air" or cl["medium"] == "liquid" else 0) + 500
+        row_fits = (self.tier == "ben5") or (row_len_mm <= g["int_l_m"] * 1000)
         nfpa_855 = battery_kwh >= 20.0
-        # controls: tier and BEN Pod count (two per rack: cold face and hot face, + room + outdoor; Micro: 3)
+        # controls: tier and BEN Pod count (two per rack: cold face and hot face, + room + outdoor per module; BEN 5: 3)
         ct = self.controls_tier_resolved()
-        pods = 3 if self.tier == "micro" else self.racks * 2 + 2
+        pods = 3 if self.tier == "ben5" else self.racks * 2 + 2 * g["modules"]
+        # hardening and climate: H2 forced for severe climates unless the user chose H3
+        hardening_recommended = "H3" if self.profile == "public_sector" else ("H2" if self.climate in ("coastal", "hot_arid", "cold", "high_altitude", "hot_humid") else "H1")
 
         return {
             "tier_label": g["label"], "enclosure": g["enclosure"],
@@ -258,7 +324,12 @@ class Config:
             "ups_modules": ups_modules, "ups_kva_each": round(ups_kva_each), "battery_kwh": round(battery_kwh, 1),
             "airflow_cfm": round(airflow_cfm), "payload_kg": round(payload_kg), "gross_kg": round(gross_kg),
             "envelope_gain_kw": round(envelope_gain_kw, 2), "pue_estimate": pue_est,
-            "row_length_mm": int(row_len_mm), "row_fits": row_fits, "nfpa_855_scope": nfpa_855,
+            "row_length_mm": int(row_len_mm), "row_fits": row_fits, "rows": rows, "racks_per_row": racks_per_row, "nfpa_855_scope": nfpa_855,
+            "mv_service": mv_service, "transformer_kva": xfmr_kva, "transformers_total": xfmr_total,
+            "generators_total": gens_total, "generator_kw_each": 1250 if mv_service else (math.ceil(total_kw * 1.25 / 10) * 10 if self.generator else 0),
+            "modules": g["modules"], "kind": g["kind"],
+            "hardening": self.hardening, "hardening_label": hz["label"], "hardening_rating": hz["rating"], "hardening_coating": hz["coating"],
+            "hardening_recommended": hardening_recommended, "envelope_area_m2": round(area_m2, 1),
             "ashrae_class": PROFILE_DEFAULTS[self.profile]["ashrae"],
             "controls_tier_resolved": ct, "controls_label": CONTROLS_TIERS[ct]["label"],
             "pods": pods,
@@ -275,21 +346,31 @@ class Config:
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "Config":
         known = {k: v for k, v in d.items() if k in cls.__dataclass_fields__}
+        if "tier" in known:
+            known["tier"] = canonical_tier(str(known["tier"]))
         return cls(**known)
 
     @classmethod
-    def preset(cls, tier: str, profile: str = "ai_inference", climate: str = "temperate") -> "Config":
+    def preset(cls, tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None) -> "Config":
+        tier = canonical_tier(tier)
         g = TIER_GEOMETRY[tier]
         p = PROFILE_DEFAULTS[profile]
         it_kw = min(g["it_kw_max"], max(g["it_kw_min"], p["rack_kw"] * g["max_racks"] * 0.8))
+        if g["kind"] == "hall":
+            it_kw = 0.8 * g["it_kw_max"]  # a 2 MW center is sold near its nominal size; density follows from the profile
         racks = max(1, min(g["max_racks"], math.ceil(it_kw / p["rack_kw"])))
         cooling = g["default_cooling"]
-        if tier != "micro" and it_kw / racks > COOLING_LIBRARY[cooling]["max_rack_kw"]:
+        if tier != "ben5" and it_kw / racks > COOLING_LIBRARY[cooling]["max_rack_kw"]:
             cooling = "dlc_cdu"
+        if hardening is None:
+            hardening = "H3" if profile == "public_sector" else ("H2" if climate in ("coastal", "hot_arid", "cold", "high_altitude", "hot_humid") else "H1")
         cfg = cls(tier=tier, profile=profile, it_kw=float(round(it_kw)), racks=racks,
                   cooling=cooling, redundancy=p["redundancy"], climate=climate,
-                  generator=profile in ("healthcare", "public_sector", "off_grid"))
-        if tier != "micro":
+                  generator=(profile in ("healthcare", "public_sector", "off_grid")) or tier == "ben2000",
+                  hardening=hardening)
+        if tier == "ben2000":
+            cfg.cooling = "dlc_cdu"
+        elif tier != "ben5":
             for alt in (cooling, "inrow_dx_300", "rdhx_drycooler", "dlc_cdu"):
                 cfg.cooling = alt
                 if not cfg.validate():
@@ -303,7 +384,7 @@ PRESETS = {t: Config.preset(t) for t in TIER_GEOMETRY}
 def main(argv=None):
     import argparse
     ap = argparse.ArgumentParser(description="BEN Engine selector / sizing")
-    ap.add_argument("--tier", default="ben20", choices=list(TIER_GEOMETRY))
+    ap.add_argument("--tier", default="ben150", choices=list(TIER_GEOMETRY) + list(TIER_ALIASES))
     ap.add_argument("--profile", default="ai_inference", choices=list(PROFILE_DEFAULTS))
     ap.add_argument("--climate", default="temperate", choices=list(CLIMATE_DESIGN))
     ap.add_argument("--it-kw", type=float)
@@ -311,10 +392,11 @@ def main(argv=None):
     ap.add_argument("--cooling", choices=list(COOLING_LIBRARY))
     ap.add_argument("--redundancy", choices=["N", "N+1", "2N"])
     ap.add_argument("--controls-tier", dest="controls_tier", choices=list(CONTROLS_TIERS))
+    ap.add_argument("--hardening", choices=list(HARDENING))
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args(argv)
     cfg = Config.preset(a.tier, a.profile, a.climate)
-    for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier"):
+    for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier", "hardening"):
         v = getattr(a, k)
         if v is not None:
             setattr(cfg, k, v)
@@ -329,7 +411,7 @@ def main(argv=None):
         print(f"{d['tier_label']} — {PROFILE_DEFAULTS[cfg.profile]['label']} — {cfg.it_kw} kW IT in {cfg.racks} racks")
         for k in ("per_rack_kw", "cooling_label", "cooling_units_total", "total_kw", "voltage", "service_breaker_a",
                   "ups_modules", "ups_kva_each", "battery_kwh", "airflow_cfm", "gross_kg", "pue_estimate", "row_length_mm", "row_fits", "nfpa_855_scope",
-                  "controls_tier_resolved", "pods"):
+                  "controls_tier_resolved", "pods", "hardening_label", "transformers_total", "generators_total"):
             print(f"  {k:24s} {d[k]}")
     return 0
 

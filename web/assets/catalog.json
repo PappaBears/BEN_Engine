@@ -1,8 +1,10 @@
 {
  "tiers": {
-  "micro": {
-   "label": "BEN Micro",
-   "enclosure": "Outdoor 24U NEMA 3R cabinet on skid",
+  "ben5": {
+   "label": "BEN 5",
+   "enclosure": "Outdoor 24U NEMA 4X / IP66 cabinet on skid",
+   "kind": "cabinet",
+   "modules": 1,
    "ext_l_m": 1.2,
    "ext_w_m": 1.0,
    "ext_h_m": 1.8,
@@ -17,9 +19,11 @@
    "voltage": "208/240 V 1ph",
    "tare_kg": 320
   },
-  "ben10": {
-   "label": "BEN 10",
-   "enclosure": "10 ft high-cube ISO container",
+  "ben30": {
+   "label": "BEN 30",
+   "enclosure": "10 ft high-cube ISO-frame module, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
    "ext_l_m": 2.991,
    "ext_w_m": 2.438,
    "ext_h_m": 2.896,
@@ -34,9 +38,11 @@
    "voltage": "208 V 3ph",
    "tare_kg": 1300
   },
-  "ben20": {
-   "label": "BEN 20",
-   "enclosure": "20 ft high-cube ISO container",
+  "ben150": {
+   "label": "BEN 150",
+   "enclosure": "20 ft high-cube ISO-frame module, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
    "ext_l_m": 6.058,
    "ext_w_m": 2.438,
    "ext_h_m": 2.896,
@@ -51,9 +57,11 @@
    "voltage": "480 V 3ph",
    "tare_kg": 2400
   },
-  "ben40": {
-   "label": "BEN 40",
-   "enclosure": "40 ft high-cube ISO container",
+  "ben500": {
+   "label": "BEN 500",
+   "enclosure": "40 ft high-cube ISO-frame module, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
    "ext_l_m": 12.192,
    "ext_w_m": 2.438,
    "ext_h_m": 2.896,
@@ -67,6 +75,26 @@
    "default_cooling": "dlc_cdu",
    "voltage": "480 V 3ph",
    "tare_kg": 3900
+  },
+  "ben2000": {
+   "label": "BEN 2000",
+   "enclosure": "Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) + power module + plant yard, IP66 envelope",
+   "kind": "hall",
+   "modules": 3,
+   "ext_l_m": 36.6,
+   "ext_w_m": 11.0,
+   "ext_h_m": 4.2,
+   "int_l_m": 35.8,
+   "int_w_m": 10.4,
+   "int_h_m": 3.6,
+   "max_racks": 48,
+   "rack_u": 48,
+   "it_kw_min": 800,
+   "it_kw_max": 2000,
+   "rows": 4,
+   "default_cooling": "dlc_cdu",
+   "voltage": "12.47 kV MV service \u2192 480 V 3ph",
+   "tare_kg": 60000
   }
  },
  "cooling": {
@@ -226,8 +254,8 @@
    "edge": "same RevPi runs ben_engine and the Thread border router",
    "panel": "DIN-rail cabinet, listed components",
    "for": [
-    "micro",
-    "ben10"
+    "ben5",
+    "ben30"
    ]
   },
   "pro": {
@@ -236,9 +264,10 @@
    "edge": "OnLogic Karbon 400 industrial edge computer (TPM 2.0)",
    "panel": "UL 508A listed BEN Controller panel",
    "for": [
-    "ben10",
-    "ben20",
-    "ben40"
+    "ben30",
+    "ben150",
+    "ben500",
+    "ben2000"
    ]
   }
  },

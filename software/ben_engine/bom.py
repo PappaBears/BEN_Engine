@@ -33,7 +33,7 @@ import operator
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .config import Config, TIER_GEOMETRY
+from .config import canonical_tier, Config, TIER_GEOMETRY
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CATALOG_PATH = REPO_ROOT / "purchasing" / "parts_catalog.json"
@@ -108,6 +108,10 @@ def load_catalog(path: Path | str = CATALOG_PATH) -> List[Dict[str, Any]]:
         seen.add(p["code"])
         if p["price_status"] not in STATUSES:
             raise ValueError(f"{p['code']}: bad price_status {p['price_status']}")
+    for p in cat:
+        p["applies_to_tiers"] = sorted({canonical_tier(t) for t in p.get("applies_to_tiers", [])})
+        if "applies_to_controls" in p and not p["applies_to_controls"]:
+            del p["applies_to_controls"]
     return cat
 
 
