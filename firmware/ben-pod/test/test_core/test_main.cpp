@@ -204,10 +204,10 @@ void test_parse_set_cal_and_tare_and_ota() {
     TEST_ASSERT_TRUE(parse_command("{\"op\":\"tare\",\"ch\":\"dP_aisle\"}", 0, c));
     TEST_ASSERT_EQUAL(OP_TARE, c.op);
     std::string sha(64, 'a');
-    std::string ota = "{\"op\":\"ota\",\"url\":\"https://gw.ben.local/fw/ben-node-1.0.1.bin\",\"sha256\":\"" + sha + "\"}";
+    std::string ota = "{\"op\":\"ota\",\"url\":\"https://gw.ben.local/fw/ben-pod-1.0.1.bin\",\"sha256\":\"" + sha + "\"}";
     TEST_ASSERT_TRUE(parse_command(ota.c_str(), 0, c));
     TEST_ASSERT_EQUAL(OP_OTA, c.op);
-    TEST_ASSERT_EQUAL_STRING("https://gw.ben.local/fw/ben-node-1.0.1.bin", c.url);
+    TEST_ASSERT_EQUAL_STRING("https://gw.ben.local/fw/ben-pod-1.0.1.bin", c.url);
     TEST_ASSERT_TRUE(parse_command("{\"op\":\"identify\"}", 0, c));
     TEST_ASSERT_EQUAL(OP_IDENTIFY, c.op);
     TEST_ASSERT_TRUE(parse_command("{\"op\":\"reboot\"}", 0, c));

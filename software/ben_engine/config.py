@@ -113,7 +113,7 @@ CONTROLS_TIERS: Dict[str, Dict[str, Any]] = {
              "edge": "OnLogic Karbon 400 industrial edge computer (TPM 2.0)", "panel": "UL 508A listed BEN Controller panel",
              "for": ["ben30", "ben150", "ben500", "ben2000"]},
 }
-# BEN 10 profiles that default to BEN Controls Pro
+# BEN 30 profiles that default to BEN Controls Pro
 CONTROLS_PRO_PROFILES = ("healthcare", "public_sector", "ai_training")
 
 PROFILE_DEFAULTS: Dict[str, Dict[str, Any]] = {

@@ -7,7 +7,7 @@ spec/INTERFACES.md); the live adapter is a placeholder that checks the gateway a
 stops, because the live I/O and load-bank steps need a person on site.
 
     python -m ben_engine.commissioning --sim --tier ben150 --out /path/report.md [--yes] [--csv /path/data.csv]
-    python -m ben_engine.commissioning --live --url http://ben-gateway.local:8000 --out /path/report.md
+    python -m ben_engine.commissioning --live --url http://ben-edge.local:8000 --out /path/report.md
 
 Steps (each records values and PASS/FAIL):
  1  pre-power visual checklist (operator answers y/n; ``--yes`` auto-accepts in sim)

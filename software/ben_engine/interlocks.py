@@ -2,9 +2,9 @@
 
 This is the *same* logic that runs:
 
-* on **BEN Controls Lite** (BEN Micro / BEN 10) as a systemd service on the RevPi, driving RevPi DIO/AIO
+* on **BEN Controls Lite** (BEN 5 / BEN 30) as a systemd service on the RevPi, driving RevPi DIO/AIO
   through piControl, with the RevPi hardware watchdog relay in the cooling-enable chain;
-* on **BEN Controls Pro** (BEN 20/40) as IEC 61131-3 structured text on the PLCnext controller
+* on **BEN Controls Pro** (BEN 150/500) as IEC 61131-3 structured text on the PLCnext controller
   (`firmware/ben-plc/BenInterlocks.st`). The ST file is a transcription of this class; the unit tests in
   `tests/test_interlocks.py` are the acceptance for both.
 

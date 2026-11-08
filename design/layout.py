@@ -325,7 +325,7 @@ def _resolve_container(lay: Layout):
         items = []
         # power block nearest the door: UPS frame(s) (+ integrated battery) then battery cabinets
         ups_kva = d["ups_kva_each"]
-        rack_ups = ups_kva <= RACK_UPS_KVA_MAX   # BEN 10: 3 x 20 kVA rack modules in R1 (the catalog 93PM tower does not fit the row)
+        rack_ups = ups_kva <= RACK_UPS_KVA_MAX   # BEN 30: 3 x 20 kVA rack modules in R1 (the catalog 93PM tower does not fit the row)
         if not rack_ups:
             ups_key = "ups600" if ups_kva <= 150 else "ups800"
             frames = 2 if red == "2N" else 1

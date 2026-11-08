@@ -4,7 +4,7 @@
 
 **For** small and mid-size businesses, integrators and public-sector sites that want AI and IT on their own pad.
 **The problem:** cloud bills that scale with success, colocation priced for hyperscalers, server closets nobody commissioned.
-**The outcome:** a family of modular data centers (BEN 5 2–5 kW cabinet, BEN 30/150/500 sealed ISO-frame modules to 500 kW, and the 2 MW BEN 2000 prefabricated hall; every unit NEMA 4X / IP66 with H1/H2/H3 hardening) built from off-the-shelf enclosures, with Schreiber AI's controls layer, digital twin, commissioning script and a complete, generated deal package. Every drawing, part, price, alarm threshold and proposal comes from one configuration model.
+**The outcome:** all-in-one modular data centers, power, cooling, compute and controls in one sealed enclosure: the BEN 5 outdoor cabinet (2–5 kW) and the BEN 30, BEN 150 and BEN 500 ISO-frame modules (10 ft to 40 ft, 10 to 500 kW), every unit NEMA 4X / IP66 with H1/H2/H3 hardening, built from off-the-shelf enclosures, with Schreiber AI's controls layer, digital twin, commissioning script and a complete, generated deal package. Every drawing, part, price, alarm threshold and proposal comes from one configuration model. And when a customer needs a single 2 MW center, the same system scales to BEN 2000, a prefabricated hall sized, drawn and priced from the same model.
 
 ![BEN Engine dashboard guided tour: the 3-D twin of a BEN 150 with cutaway, racks, rear-door heat exchangers and roof dry coolers](docs/media/demo.gif)
 
@@ -63,6 +63,8 @@ cd firmware/ben-pod && make test
 ```
 
 ## The product family
+
+The core product is the all-in-one box, BEN 5 through BEN 500. BEN 2000 is the capability example: the same configuration model, controls and care layer scaled to a 2 MW hall.
 
 | Tier | Enclosure | IT load | Cooling (preset) | Power |
 | --- | --- | --- | --- | --- |

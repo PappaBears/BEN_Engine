@@ -8,7 +8,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 | Check | Command | Observed |
 | --- | --- | --- |
-| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **172 passed** in 16.6 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2) |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **178 passed** in 16.6 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2) |
 | Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
 | Build contract | `build_control.py run` (skill helper) | python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500 all **pass** (report under `.schreiber-ai/`, git-ignored) |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |

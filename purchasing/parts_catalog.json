@@ -1585,7 +1585,7 @@
  },
  {
   "code": "CTL-RCP",
-  "name": "xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 150/40",
+  "name": "xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 150/500",
   "manufacturer": "Silicon Labs",
   "mpn": "XG24-EK2703A",
   "vendor": "Silicon Labs / DigiKey",

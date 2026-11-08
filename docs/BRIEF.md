@@ -8,9 +8,10 @@ The original wording is preserved at the bottom so later sessions can check for 
 ## 1. One sentence
 
 Schreiber AI designs, builds, commissions and operates **BEN Engine** (Business Edge Node): a family of
-modular data centers built from sealed ISO-frame modules, outdoor cabinets and a prefabricated modular hall,
-sized from a single rack for a small business (BEN 5) through a 40 ft liquid-cooled AI pod (BEN 500) to a single
-2 MW center (BEN 2000), element-proof by default (NEMA 4X / IP66) and hardened on request, with Schreiber AI's control layer
+all-in-one modular data centers, power, cooling, compute and controls in one sealed enclosure, built from an
+outdoor cabinet (BEN 5, a single rack for a small business) and 10, 20 and 40 ft ISO-frame modules (BEN 30, BEN 150
+and the liquid-cooled BEN 500 AI pod), element-proof by default (NEMA 4X / IP66) and hardened on request, and
+scaling, when a customer needs it, to a single 2 MW center (BEN 2000, a prefabricated modular hall from the same model), with Schreiber AI's control layer
 (firmware, digital twin, dashboard, calibration and commissioning tooling) that customers can run
 white-label, with their own software, or as a full managed solution.
 
@@ -32,7 +33,7 @@ else (bill of materials, drawings, digital twin, dashboard 3D scene, commissioni
 compliance matrix) is generated from that configuration. Changing a value in the selector changes
 every downstream deliverable consistently.
 
-Names follow the nominal maximum IT kW (`docs/TIER_AND_ENCLOSURE_DECISION.md`); the enclosure is described by its size. Generation-1 keys (`micro`, `ben10`, `ben20`, `ben40`) still load through the alias map in `config.py`.
+Names follow the nominal maximum IT kW (`docs/TIER_AND_ENCLOSURE_DECISION.md`); the enclosure is described by its size. The core product is the all-in-one box, BEN 5 through BEN 500 (`positioning: core` in `TIER_GEOMETRY`); BEN 2000 is the capability example (`positioning: capability`): the same system scaled to a 2 MW hall, kept fully engineered but not the lead. Generation-1 keys (`micro`, `ben10`, `ben20`, `ben40`) still load through the alias map in `config.py`.
 
 | Tier | Enclosure (off the shelf, sealed to NEMA 4X / IP66) | IT load | Racks | Cooling | Power | Controls (default) |
 | --- | --- | --- | --- | --- | --- | --- |

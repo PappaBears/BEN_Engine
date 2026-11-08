@@ -2,7 +2,7 @@
 
 ## 1. BEN Engine, Business Edge Node
 
-A family of modular data centers named by IT power, from a sealed outdoor cabinet to a single 2 MW prefabricated center, with Schreiber AI's controls, twin and commissioning layer.
+All-in-one modular data centers named by IT power: power, cooling, compute and controls in one sealed enclosure, from an outdoor cabinet to a 40 ft liquid-cooled module, with Schreiber AI's controls, twin and commissioning layer. The same system scales to a 2 MW center.
 
 Audience: engineers, integrators, facilities leads. Names changed on 2026-11-08: the number is now the IT kW, not the container length (docs/TIER_AND_ENCLOSURE_DECISION.md); old keys still load. Set expectations: every number on these slides comes from code in the repository and the evidence file is docs/VALIDATION.md.
 
@@ -14,9 +14,9 @@ Walk the selector live on the product page (web/index.html) or the dashboard. Sh
 
 ## 3. BEN 2000: the single 2 MW center
 
-Not a container: a prefabricated, relocatable data hall of three site-joined wide-body modules, a power module and a plant yard.
+The capability example, not the lead product. Not a container: a prefabricated, relocatable data hall of three site-joined wide-body modules, a power module and a plant yard.
 
-python -m ben_engine.config --tier ben2000 prints these numbers. Twin, CFD per module, drawings (site plan A-000 + per-module sheets) and BOM for BEN 2000 are marked pending in docs/VALIDATION.md until the core and catalog work lands; do not claim them verified. Built by modular-building manufacturers (MANUFACTURING_STRATEGY.md section 3.2).
+python -m ben_engine.config --tier ben2000 prints these numbers. Twin, CFD per module, drawings (site plan A-000 + per-module sheets) and BOM-ben2000 are generated and run in simulation (docs/VALIDATION.md section 4a); every physical value (module mass, water use, utility lead time, module pricing) is unverified, so say sized and documented, not proven. Built by modular-building manufacturers (MANUFACTURING_STRATEGY.md section 3.2).
 
 ## 4. Element-proof and hardened
 

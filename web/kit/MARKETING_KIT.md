@@ -2,19 +2,20 @@
 
 ## One-liners
 - AI infrastructure that arrives finished.
+- The all-in-one data center: power, cooling, compute and controls in one sealed box.
 - Bringing AI back to every business.
 - A data center you can see, test and own before it ships.
 - Risks first. Price second. Box third.
 
 ## Elevator pitch (30 s)
-Most small and mid-size businesses want AI on their own data, but their only options are a public cloud bill that never ends or a server closet nobody maintains. BEN Engine is a modular data center built in an off-the-shelf container or outdoor cabinet, sized from one rack to a single 2 MW center, that Schreiber AI designs from a single configuration model, builds from Simplified Technical English instructions, tests with a commissioning script, and watches with a digital twin. Buy the whole thing, one module, or put your own brand on it.
+Most small and mid-size businesses want AI on their own data, but their only options are a public cloud bill that never ends or a server closet nobody maintains. BEN Engine is an all-in-one modular data center, power, cooling, compute and controls in one sealed off-the-shelf container or outdoor cabinet, sized from one rack to 500 kW (and, when you need it, the same system scales to a single 2 MW center), that Schreiber AI designs from a single configuration model, builds from Simplified Technical English instructions, tests with a commissioning script, and watches with a digital twin. Buy the whole thing, one module, or put your own brand on it.
 
 ## Audience one-pagers
 
 ### Business owner (SMB)
 **Headline:** Your AI, on your pad, watched by people who measure things.
 **Body:** You pick the mission profile. We tell you the risks before the price. The box arrives commissioned, with a signed test report and a dashboard you can read without a data-center background. Schreiber AI monitors it, or you do.
-**Proof points:** five tiers (BEN 5 to BEN 2000) from the same engineering model; every enclosure NEMA 4X / IP66, hose-tested, with H2/H3 hardening on request; upfront risk register; commissioning report with data; maintenance schedule for outdoor life.
+**Proof points:** four all-in-one tiers (BEN 5 to BEN 500) from the same engineering model, which also scales to the 2 MW BEN 2000; every enclosure NEMA 4X / IP66, hose-tested, with H2/H3 hardening on request; upfront risk register; commissioning report with data; maintenance schedule for outdoor life.
 **Call to action:** Build your configuration at schreiberai.com/ben and send it to Ben@SchreiberAI.com.
 
 ### Integrator / white-label partner

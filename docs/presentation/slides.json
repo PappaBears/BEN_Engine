@@ -4,12 +4,12 @@
   "slides": [
     {
       "title": "BEN Engine, Business Edge Node",
-      "message": "A family of modular data centers named by IT power, from a sealed outdoor cabinet to a single 2 MW prefabricated center, with Schreiber AI's controls, twin and commissioning layer.",
+      "message": "All-in-one modular data centers named by IT power: power, cooling, compute and controls in one sealed enclosure, from an outdoor cabinet to a 40 ft liquid-cooled module, with Schreiber AI's controls, twin and commissioning layer. The same system scales to a 2 MW center.",
       "bullets": [
-        "BEN 5 2–5 kW cabinet · BEN 30 10–30 kW (10 ft) · BEN 150 50–150 kW (20 ft) · BEN 500 150–500 kW (40 ft) · BEN 2000 800–2,000 kW prefabricated hall",
+        "Core, the all-in-one box: BEN 5 2–5 kW cabinet · BEN 30 10–30 kW (10 ft) · BEN 150 50–150 kW (20 ft) · BEN 500 150–500 kW (40 ft); capability example: BEN 2000 800–2,000 kW hall",
         "Every enclosure NEMA 4X / IP66, hose-tested; hardening H1 / H2 / H3 selectable",
         "Modules: Power, Cooling, Compute, Controls; buy one or all",
-        "Mission profiles set class, redundancy, climate, compliance pack and the risk list"
+        "Mission profiles set class, redundancy, climate, compliance and the risk list"
       ],
       "image": "../media/screens/desktop-exterior-iso.png",
       "image_alt": "BEN 500 isometric",
@@ -27,12 +27,12 @@
     },
     {
       "title": "BEN 2000: the single 2 MW center",
-      "message": "Not a container: a prefabricated, relocatable data hall of three site-joined wide-body modules, a power module and a plant yard.",
+      "message": "The capability example, not the lead product. Not a container: a prefabricated, relocatable data hall of three site-joined wide-body modules, a power module and a plant yard.",
       "bullets": [
         "Config: 1,600 kW IT in 48 racks (DLC), 12.47 kV MV service, 2 × 2,500 kVA transformers (2N), 2 × 2,000 kW UPS strings, 3 × 1,250 kW generators (N+1), 7 CDUs, PUE 1.13, 109 t",
         "Controls: one PLC per module plus a plant PLC, two edge computers, three border routers, 102 Pods; life safety per module, hardwired",
-        "Building, not equipment: IBC Group B / F-1 permit, NFPA 855 battery rooms, NFPA 110 Level 1, SPCC for 48 h fuel, ASHRAE 188 water plan for adiabatic coolers",
-        "Schedule ≈ 52 weeks: utility MV service (26–52 wk) on the critical path, civil 20 wk, module set 3 days, hall join and E15 seal test, E16 transfer test at SAT"
+        "A building, not equipment: IBC Group B / F-1 permit, NFPA 855 battery rooms, NFPA 110 Level 1, SPCC, ASHRAE 188 water plan",
+        "Schedule ≈ 52 weeks: utility MV service (26–52 wk) on the critical path; civil 20 wk, module set 3 days, E15 seal test, E16 transfer test at SAT"
       ],
       "notes": "python -m ben_engine.config --tier ben2000 prints these numbers. Twin, CFD per module, drawings (site plan A-000 + per-module sheets) and BOM-ben2000 are generated and run in simulation (docs/VALIDATION.md section 4a); every physical value (module mass, water use, utility lead time, module pricing) is unverified, so say sized and documented, not proven. Built by modular-building manufacturers (MANUFACTURING_STRATEGY.md section 3.2)."
     },
