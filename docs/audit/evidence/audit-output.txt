@@ -1,25 +1,25 @@
 $ /usr/local/bin/python3 scripts/audit.py
-# exit 0 · 2026-11-08T04:51:36+00:00
+# exit 0 · 2026-11-08T12:46:48+00:00
 BEN Engine audit — /home/user/ben_engine
-PASS A1    Brief §5 artifact paths exist (40/40)                                                           
-PASS A2    Launch manifest paths exist (24/24)                                                             
-PASS A2b   Manifest acceptance_ids exist in build-contract.json                                            
-PASS A3    Build-contract checks runnable as written (static)                                              
-PASS A4    Relative link check                                                                               | 152 markdown files, 131 relative targets checked, 0 broken
-WARN A5    Stale references only in explanatory context (18)                                                 | tests/test_bom.py:195 [NEMA 3R]; docs/BOM-ben30.md:107 [NEMA 3R]; docs/BOM-ben500.md:120 [NEMA 3R]; docs/BOM-ben150.md:119 [NEMA 3R]; docs/BOM-ben5.md:31 [NEMA 3R]; purchasing/parts_catalog.json:729 [NEMA 3R]; purchasing/parts_catalog.json:773 [NEMA 3R]; purchasing/parts_catalog.json:794 [NEMA 3R]; purchasing/parts_catalog.json:3275 [NEMA 3R]; purchasing/bom-ben5.csv:10 [NEMA 3R]; purchasing/SOURCING_NOTES.md:72 [NEMA 3R]; purchasing/EMAIL_QUEUE.md:30 [Olimex] …
-PASS A6a   Catalog: confirmed lines carry vendor_url + price_checked (50/50)                               
-PASS A6b   Catalog: estimate lines carry a price_source_note (144/144)                                     
-PASS A6c   Catalog: every line has lead_time_weeks (197/197)                                               
-PASS A6d   Catalog: confirmed URLs on marketplaces / aggregators / non-product pages (0)                   
-PASS A6e   Catalog: 'list' lines without vendor_url or price_checked (0)                                   
-PASS A7    fields.json covers every template [FIELD] token                                                   | tokens in templates 911, fields declared 911, _meta.field_count 911
-PASS A8    Test count in docs matches collected (185)                                                        | 185 collected; README/VALIDATION/PROJECT_STATE quote it
-PASS A9    Drawing SVG title blocks carry 'ISSUED FOR REVIEW' and 'Rev B' from design/REVISION.json (42/42)
-WARN A13a  Drawing set has a named checker (no; status ISSUED FOR REVIEW)                                    | Set stays ISSUED FOR REVIEW until a checker is named in design/REVISION.json
-PASS A13b  Rev B issue dates agree across REVISION.json, SQAM, QC forms, assembly, INDEX                     | {'design/REVISION.json': '2026-11-08', 'docs/SQAM.md': '2026-11-08', 'design/assembly/QC_FORMS.md': '2026-11-08', 'design/assembly/ASSEMBLY-ben150.md': '2026-11-08', 'design/drawings/ben150/INDEX.md': '2026-11-08'}
-PASS A10a  STE banned words in ASSEMBLY-*.md (0 hits; list from STE_STYLE.md rule 10: 12 words)            
-PASS A10b  STE instruction sentences over 20 words (0)                                                     
-PASS A11   Secrets / personal-data scan (0 hits)                                                           
-PASS A12   JSON files parse (22/22)                                                                        
+PASS A1    Brief §5 artifact paths exist (40/40)                                                                
+PASS A2    Launch manifest paths exist (24/24)                                                                  
+PASS A2b   Manifest acceptance_ids exist in build-contract.json                                                 
+PASS A3    Build-contract checks runnable as written (static)                                                   
+PASS A4    Relative link check                                                                                    | 152 markdown files, 131 relative targets checked, 0 broken
+WARN A5    Stale references only in explanatory context (17)                                                      | tests/test_bom.py:195 [NEMA 3R]; docs/BOM-ben30.md:107 [NEMA 3R]; docs/BOM-ben500.md:120 [NEMA 3R]; docs/BOM-ben150.md:119 [NEMA 3R]; docs/BOM-ben5.md:31 [NEMA 3R]; purchasing/parts_catalog.json:729 [NEMA 3R]; purchasing/parts_catalog.json:773 [NEMA 3R]; purchasing/parts_catalog.json:794 [NEMA 3R]; purchasing/parts_catalog.json:3275 [NEMA 3R]; purchasing/bom-ben5.csv:10 [NEMA 3R]; purchasing/SOURCING_NOTES.md:72 [NEMA 3R]; purchasing/EMAIL_QUEUE.md:30 [Olimex] …
+PASS A6a   Catalog: confirmed lines carry vendor_url + price_checked (50/50)                                    
+PASS A6b   Catalog: estimate lines carry a price_source_note (144/144)                                          
+PASS A6c   Catalog: every line has lead_time_weeks (197/197)                                                    
+PASS A6d   Catalog: confirmed URLs on marketplaces / aggregators / non-product pages (0)                        
+PASS A6e   Catalog: 'list' lines without vendor_url or price_checked (0)                                        
+PASS A7    fields.json covers every template [FIELD] token                                                        | tokens in templates 911, fields declared 911, _meta.field_count 911
+PASS A8    Test count in docs matches collected (185)                                                             | 185 collected; README/VALIDATION/PROJECT_STATE quote it
+PASS A9    Drawing SVG title blocks carry 'ISSUE FOR CONSTRUCTION' and 'Rev B' from design/REVISION.json (42/42)
+PASS A13a  Drawing set has a named checker (yes; status ISSUE FOR CONSTRUCTION)                                 
+PASS A13b  Rev B issue dates agree across REVISION.json, SQAM, QC forms, assembly, INDEX                          | {'design/REVISION.json': '2026-11-08', 'docs/SQAM.md': '2026-11-08', 'design/assembly/QC_FORMS.md': '2026-11-08', 'design/assembly/ASSEMBLY-ben150.md': '2026-11-08', 'design/drawings/ben150/INDEX.md': '2026-11-08'}
+PASS A10a  STE banned words in ASSEMBLY-*.md (0 hits; list from STE_STYLE.md rule 10: 12 words)                 
+PASS A10b  STE instruction sentences over 20 words (0)                                                          
+PASS A11   Secrets / personal-data scan (0 hits)                                                                
+PASS A12   JSON files parse (22/22)                                                                             
 
-Summary: 18 PASS, 2 WARN, 0 FAIL
+Summary: 19 PASS, 1 WARN, 0 FAIL

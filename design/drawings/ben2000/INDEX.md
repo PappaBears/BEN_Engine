@@ -1,4 +1,4 @@
-# BEN 2000 — drawing set, Rev B (ISSUED FOR REVIEW)
+# BEN 2000 — drawing set, Rev B (ISSUE FOR CONSTRUCTION)
 
 Generated 2026-11-08 by `design/drawings/gen_drawings.py` from `Config.preset('ben2000')`; revision from `design/REVISION.json`.
 Configuration: ben2000 | ai_inference | 1600 kW IT | 48 racks | cooling dlc_cdu | N+1 | temperate | H1
@@ -21,12 +21,12 @@ Enclosure: Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) +
 | M-001 | Cooling P&ID (sheet 13/14) | NTS | [M-001.svg](M-001.svg), [M-001.png](M-001.png) |
 | C-001 | Controls layout (sheet 14/14) | see sheet | [C-001.svg](C-001.svg), [C-001.png](C-001.png) |
 
-Status: **ISSUED FOR REVIEW — not for construction until checked** — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
+Status: **ISSUE FOR CONSTRUCTION** — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: Ben Schreiber.
 
 | Rev | Date | Description | Checked |
 |---|---|---|---|
 | A | 7 Nov 2026 | Generation-1 container set (keys micro/ben10/ben20/ben40, Type 3R enclosures); superseded, do not build from it. | — |
-| B | 2026-11-08 | Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). | not checked |
+| B | 2026-11-08 | Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). | Ben Schreiber |
 
 ## Interference checks for this tier
 

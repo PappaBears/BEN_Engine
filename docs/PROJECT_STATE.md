@@ -24,7 +24,7 @@ No hardware here; EFR32 / Gecko SDK toolchain not available (network policy); ve
 Tiers renamed by IT power (BEN 5/30/150/500) with aliases; BEN 2000 prefabricated 2 MW center added as the capability example (positioning per D36: the all-in-one boxes BEN 5–500 are the core product and lead every document; BEN 2000 is kept fully engineered as the upsell path); enclosures IP66 with hardening H1–H3; controls on an industrial platform (BEN Controls Lite/Pro, BEN Pod on BEN Mesh). 185 Python tests, 25/25 browser checks, 21 RFQ drafts queued.
 
 ## Audit (2026-11-08)
-Independent internal audit: 22 findings (4 major). All corrective actions worked; re-audit 17 PASS / 3 WARN / 0 FAIL. Open business items: name a drawing checker to re-issue Rev B as IFC; purchasing to confirm the BEN 5 cabinet AC refrigerant variant; counsel to align MSA 15.5 / licence 1.5 with the cybersecurity status table. Paperwork ready set in `docs/contracts/ready/`.
+Independent internal audit: 22 findings (4 major). All corrective actions worked; re-audit 17 PASS / 3 WARN / 0 FAIL. Drawing set Rev B checked by Ben Schreiber and issued for construction on 2026-11-08. Open business items: purchasing to confirm the BEN 5 cabinet AC refrigerant variant; counsel to align MSA 15.5 / licence 1.5 with the cybersecurity status table. Paperwork ready set in `docs/contracts/ready/`.
 
 ## Latest checkpoint
 `main` on github.com/PappaBears/BEN_Engine; see `git log`. Restore: clone the tag/commit and run the Quickstart commands in README.md.

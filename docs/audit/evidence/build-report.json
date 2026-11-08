@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "run_id": "3954013b609a4a629f0aba39d35c76ba",
-  "created_at": "2026-11-08T04:51:30.760383+00:00",
+  "run_id": "da0dbb7db12740dc80a1923afdf4023a",
+  "created_at": "2026-11-08T12:46:43.352845+00:00",
   "contract": "docs/build-contract.json",
   "sources": {
     "dashboard/static/app.js": "471a3fa443e57599572b4255d3f7c354b918002445141a06682da2c822fe36e5",
@@ -120,12 +120,12 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T04:51:02.724602+00:00",
-      "finished_at": "2026-11-08T04:51:21.106725+00:00",
+      "started_at": "2026-11-08T12:46:18.930145+00:00",
+      "finished_at": "2026-11-08T12:46:34.400680+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/python-suite.log",
-      "log_sha256": "f84d015244b995dc6e4f732da6487740b58b80c60ae8e1b056d42ea0e6c33bfe"
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/python-suite.log",
+      "log_sha256": "133129e33d9a58959c56363e04b21bf913cd91d2605005cd8811071e8f895782"
     },
     {
       "id": "selector-parity",
@@ -141,12 +141,12 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T04:51:21.106924+00:00",
-      "finished_at": "2026-11-08T04:51:22.175258+00:00",
+      "started_at": "2026-11-08T12:46:34.400894+00:00",
+      "finished_at": "2026-11-08T12:46:35.217407+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/selector-parity.log",
-      "log_sha256": "157972422a22dbb79dcddf297276da24920ac806078a3a00a76d639afe8a3f63"
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/selector-parity.log",
+      "log_sha256": "793172cea1a3c0ec9a4a66e92a7dcf526149750b8b093a927afc5027b01537bc"
     },
     {
       "id": "firmware-host-tests",
@@ -157,11 +157,11 @@
         "firmware/ben-pod",
         "test"
       ],
-      "started_at": "2026-11-08T04:51:22.175550+00:00",
-      "finished_at": "2026-11-08T04:51:22.183524+00:00",
+      "started_at": "2026-11-08T12:46:35.217596+00:00",
+      "finished_at": "2026-11-08T12:46:35.633663+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/firmware-host-tests.log",
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/firmware-host-tests.log",
       "log_sha256": "27a44d615c4e437a3b08ede18a79aacc61b623428759197203209eefab07eadb"
     },
     {
@@ -180,11 +180,11 @@
         "--out",
         ".schreiber-ai/commissioning-ben150.md"
       ],
-      "started_at": "2026-11-08T04:51:22.183676+00:00",
-      "finished_at": "2026-11-08T04:51:22.498972+00:00",
+      "started_at": "2026-11-08T12:46:35.633861+00:00",
+      "finished_at": "2026-11-08T12:46:35.948934+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/commissioning-sim-e2e.log",
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/commissioning-sim-e2e.log",
       "log_sha256": "fb9507d45273d0c655fa30836d49d92935605fa73b11f2546628f27a36ce4c7c"
     },
     {
@@ -199,11 +199,11 @@
         "--tier",
         "ben500"
       ],
-      "started_at": "2026-11-08T04:51:22.499146+00:00",
-      "finished_at": "2026-11-08T04:51:23.165969+00:00",
+      "started_at": "2026-11-08T12:46:35.949129+00:00",
+      "finished_at": "2026-11-08T12:46:36.464850+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/sweeps-ben500.log",
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/sweeps-ben500.log",
       "log_sha256": "d24e0aa7b1fb3d4be37a4a4d350adc5d86bde9ad70cd61cecb1bfb07bbeaaaaa"
     },
     {
@@ -213,12 +213,12 @@
         "python3",
         "scripts/audit.py"
       ],
-      "started_at": "2026-11-08T04:51:23.166134+00:00",
-      "finished_at": "2026-11-08T04:51:28.713526+00:00",
+      "started_at": "2026-11-08T12:46:36.465009+00:00",
+      "finished_at": "2026-11-08T12:46:41.350078+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/audit-mechanical.log",
-      "log_sha256": "f39425c4abade6aec479387bf6b8ebfead706ff3e9147c3c3b5abfd8e24fd7e0"
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/audit-mechanical.log",
+      "log_sha256": "46694b30784dfc39107fc2955448b0aebff3bf1963dc2a3a818f21394fd12ded"
     },
     {
       "id": "links",
@@ -227,11 +227,11 @@
         "python3",
         "scripts/check_links.py"
       ],
-      "started_at": "2026-11-08T04:51:28.713738+00:00",
-      "finished_at": "2026-11-08T04:51:28.828252+00:00",
+      "started_at": "2026-11-08T12:46:41.350278+00:00",
+      "finished_at": "2026-11-08T12:46:41.465078+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/links.log",
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/links.log",
       "log_sha256": "68b8c4590c5b15afae81e6631f69f73cb90c8774da230606961b86e1498b0841"
     },
     {
@@ -248,12 +248,12 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T04:51:28.828436+00:00",
-      "finished_at": "2026-11-08T04:51:30.750343+00:00",
+      "started_at": "2026-11-08T12:46:41.465348+00:00",
+      "finished_at": "2026-11-08T12:46:43.336343+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/3954013b609a4a629f0aba39d35c76ba/sim-e2e-pytest.log",
-      "log_sha256": "94297680997e04eb13360b1baf3702ba9fab9a4c97e9da9d9ae69f294038f771"
+      "log": ".schreiber-ai/runs/da0dbb7db12740dc80a1923afdf4023a/sim-e2e-pytest.log",
+      "log_sha256": "1622f7d6ba5ab433872a70a196a157edc115730b5b12e3f1b482affd72256083"
     }
   ]
 }

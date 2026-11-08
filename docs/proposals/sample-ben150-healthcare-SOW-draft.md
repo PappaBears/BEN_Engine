@@ -1,7 +1,7 @@
 # Statement of Work (SOW) — BEN Engine Unit
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOW_TEMPLATE.md` · Template rev 9fed473
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOW_TEMPLATE.md` · Template rev 705ee17
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. The configuration block in Section 2 is pasted verbatim from the frozen `config.json`. Delete this box before signature.
 
 **SOW ID:** SOW-BEN150-20261108-C10DE35C
@@ -21,7 +21,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 | Delivery model | Managed service (hardware only / hardware + BEN Controls / white-label / managed) |
 | Modules ordered | power, cooling, compute, controls (any of: power, cooling, compute, controls) |
 | White-label | false (yes / no); brand to apply: Schreiber AI |
-| Managed Services | true (yes / no); if yes, SLA `docs/contracts/MANAGED_SERVICES_SLA.md` rev 9fed473 attached, term 36 months |
+| Managed Services | true (yes / no); if yes, SLA `docs/contracts/MANAGED_SERVICES_SLA.md` rev 705ee17 attached, term 36 months |
 | Turnkey site works by Schreiber AI | no (yes / no / partial, list: [TURNKEY_SITE_WORKS_LIST]) |
 | Factory | [FACTORY_NAME], [FACTORY_ADDRESS] (Schreiber AI facility or Contract Manufacturer under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md`) |
 | Schreiber AI project manager | [SCHREIBER_PM_NAME], [SCHREIBER_PM_EMAIL], [SCHREIBER_PM_PHONE] |
@@ -86,17 +86,17 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 | Document | Revision |
 | --- | --- |
-| `docs/PROCESS_FLOW.md` | 9fed473 |
-| `docs/SITE_REQUIREMENTS.md` (signed copy attached as Annex A) | 9fed473 |
-| `docs/COMPLIANCE.md` compliance pack for profile healthcare | 9fed473 |
-| `docs/TEST_GUIDE.md` | 9fed473 |
-| `docs/TURNOVER.md` | 9fed473 |
-| `docs/MAINTENANCE.md` | 9fed473 |
-| `docs/RISK_REGISTER.md` (risk acknowledgement signed [RISK_ACK_DATE]) | 9fed473 |
-| `docs/CYBERSECURITY.md` | 9fed473 |
-| `design/assembly/QC_FORMS.md` (Q-01 to Q-12) | 9fed473 |
-| `spec/PROTOCOL.md`, `spec/INTERFACES.md` | 9fed473 |
-| Issue-for-construction drawing set `design/drawings/ben150/` | issued at H4, index IFR Rev B (2026-11-08) (9fed473) |
+| `docs/PROCESS_FLOW.md` | 705ee17 |
+| `docs/SITE_REQUIREMENTS.md` (signed copy attached as Annex A) | 705ee17 |
+| `docs/COMPLIANCE.md` compliance pack for profile healthcare | 705ee17 |
+| `docs/TEST_GUIDE.md` | 705ee17 |
+| `docs/TURNOVER.md` | 705ee17 |
+| `docs/MAINTENANCE.md` | 705ee17 |
+| `docs/RISK_REGISTER.md` (risk acknowledgement signed [RISK_ACK_DATE]) | 705ee17 |
+| `docs/CYBERSECURITY.md` | 705ee17 |
+| `design/assembly/QC_FORMS.md` (Q-01 to Q-12) | 705ee17 |
+| `spec/PROTOCOL.md`, `spec/INTERFACES.md` | 705ee17 |
+| Issue-for-construction drawing set `design/drawings/ben150/` | issued at H4, index IFC Rev B (2026-11-08) (705ee17) |
 
 ## 3. Scope by module
 

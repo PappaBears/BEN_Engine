@@ -1,7 +1,7 @@
 # Change Order — BEN Engine SOW
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CHANGE_ORDER.md` · Template rev 9fed473
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CHANGE_ORDER.md` · Template rev 705ee17
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. One form per change. Delete this box before signature.
 
 | Field | Value |

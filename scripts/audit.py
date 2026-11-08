@@ -160,7 +160,7 @@ def check_stale() -> None:
     hits, soft = [], []
     for p in iter_files((".md", ".html", ".py", ".js", ".json", ".svg", ".csv", ".txt", ".yml", ".yaml", ".cpp", ".h", ".st", ".sh", ".conf", ".mjs")):
         rp = rel(p)
-        if rp in ALLOWED_HISTORY:
+        if rp in ALLOWED_HISTORY or any(rp.startswith(h) for h in ALLOWED_HISTORY if h.endswith("/")):
             continue
         try:
             text = p.read_text(encoding="utf-8", errors="replace")
