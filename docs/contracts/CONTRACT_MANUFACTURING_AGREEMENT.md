@@ -111,7 +111,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **[SCHREIBER_
 | CTQ-E2 bonding | Every bond ≤ 0.1 Ω | Q-07 |
 | CTQ-E1 working space | NEC 110.26 clearances; vestibule 1.1 m (BEN 150/500) | Q-07 |
 | CTQ-K3 sensor placement and calibration check | Within ±0.25 °C after correction; `cal_id` stored | Q-08 |
-| CTP-K1 life-safety isolation | Dry contacts only to node; releasing circuit independent | Q-09 |
+| CTP-K1 life-safety isolation | Dry contacts only to the BEN Controller / BEN Pod; releasing circuit independent | Q-09 |
 | CTP-F1 hold time | ≥ 10 min at design concentration; certificate | Q-09 |
 | CTQ-E3 EPO | All IT power off < 1 s | Q-10 |
 | CTQ-A3 gross mass | Drawing value + 10 % max; weigh ticket | Q-11 |

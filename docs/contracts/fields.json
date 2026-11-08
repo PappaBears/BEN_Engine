@@ -28,7 +28,7 @@
    "finance": "finance",
    "calibration": "calibration.py output"
   },
-  "field_count": 891,
+  "field_count": 911,
   "back_to_back_ld_fields": [
    "CUSTOMER_LD_RATE_PCT_PER_WEEK",
    "CUSTOMER_LD_CAP_PCT",

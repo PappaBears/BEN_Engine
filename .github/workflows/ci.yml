@@ -13,6 +13,8 @@ jobs:
         with: { python-version: "3.12" }
       - run: pip install -r requirements.txt
       - run: PYTHONPATH=software pytest tests -q --ignore=tests/e2e
+      - run: python scripts/check_links.py
+      - run: python scripts/audit.py
   firmware-native:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -20,5 +22,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install platformio
-      - run: cd firmware/ben-pod && (pio test -e native || make -C . test)
+      - run: make -C firmware/ben-pod test

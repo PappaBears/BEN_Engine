@@ -10,7 +10,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 | --- | --- | --- |
 | Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **178 passed** in 16.6 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2) |
 | Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
-| Build contract | `build_control.py run` (skill helper) | python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500 all **pass** (report under `.schreiber-ai/`, git-ignored) |
+| Build contract | `build_control.py run` (skill helper) | eight checks: python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500, sim-e2e-pytest, links, audit-mechanical. Commands carry their own `PYTHONPATH` so they run from a clean clone (audit F-01). Latest report stored at `docs/audit/evidence/build-report.json` |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |
 | Product page render | `node scripts/shoot_web.mjs` | desktop and 390 px render, selector interactions work, validation error path shown, no horizontal overflow after fix; 404s only for screenshots not yet produced at that time |
 
@@ -20,9 +20,9 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 `python -m ben_engine.sweeps --tier ben150` and `--tier ben500`: all 6 sweeps PASS.
 
-`python -m ben_engine.cfd --tier ben150`: grid 232 × 90 at 25 mm, flow converged in 2750 steps, 14.6 s; design case recirculation ≈ 0 with containment closed and supply > demand; fan turn-down to 0.9 or one failed unit gives 30–40 % recirculation at the end racks and max inlet 31–32 °C. Lattice Reynolds ≈ 70 vs ≈ 1e5 real: relative tool.
+`python -m ben_engine.cfd --tier ben150`: grid 232 × 90 at 25 mm, flow converged in 2500 steps, 12.5 s; design case recirculation ≈ 0 with containment closed and supply > demand; fan turn-down to 0.9 or one failed unit gives 30–40 % recirculation at the end racks and max inlet 31–32 °C. Lattice Reynolds ≈ 70 vs ≈ 1e5 real: relative tool.
 
-`python -m ben_engine.analysis --tier ben150 --load 1.0 --outdoor 35`: fitter recovers synthetic truth (recirculation 0.12, bypass 0.15 well determined; envelope UA and rack mass weakly identifiable, flagged); prediction "rack 5 inlet 22.3 ± 0.2 °C at 100 % on a 35 °C day; 2.0 min ride-through".
+`python -m ben_engine.analysis --tier ben150 --load 1.0 --outdoor 35`: fitter recovers synthetic truth (recirculation 0.12, bypass 0.15 well determined; envelope UA and rack mass weakly identifiable, flagged); prediction "rack 5 inlet 24.4 ± 0.2 °C at 100 % on a 35 °C day; 4.5 min ride-through (rear-door cooling preset; the earlier 22.3 °C / 2.0 min figure was for the retired in-row preset)".
 
 Calibration budgets computed (k = 2): DS18B20 ±0.17 K, SHT45 T ±0.14 K, SHT45 RH ±1.71 %RH (protocol claim 1.5 not met), SDP810 ±0.46 Pa at 12 Pa (claim 0.4 not met), 4–20 mA loop ±0.025 mA (claim 0.02 not met unless loop-calibrated), power class 0.5 ±0.9 % of reading. Left as findings.
 
@@ -44,8 +44,8 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 | SQAM | `python design/gen_sqam.py` | 472 lines; CTQ/CTP register per tier (BEN 5 32, BEN 30 42, BEN 150 42, BEN 500 43, BEN 2000 44 items) |
 | BOM | `python -m ben_engine.bom --all` | BEN 5 65 lines $132 k (60 % confirmed); BEN 30 92 lines $666 k (80 %); BEN 150 104 lines $1.89 M (79 %); BEN 500 105 lines $4.45 M (83 %); BEN 2000 94 lines $40.4 M (73 %). "Confirmed" = distributor listing seen in search results on 2026-11-07/08, not a quote |
 | Proposals | `python -m ben_engine.proposal …` | 5 samples in `docs/proposals/` (one per tier); BEN 150 healthcare managed: $1.89 M capital, $27 k/yr, 34 weeks to in-service |
-| Packages | `python -m ben_engine.package …` | customer package 22 files, partner package 21 files, 0 missing; zips built; MANIFEST lists per-document unfilled fields |
-| Contract pre-fill | `proposal.known_fields_report` | 369 of 891 vocabulary fields filled from a proposal (BEN 150 healthcare sample); remaining fields belong to later stages (commissioning report 128, turnover 63, CRM 62, change order 59, QC forms 24, counsel 8). MSA draft has 15 fields left (customer identity, arbitration venue); SOW draft 47 |
+| Packages | `python -m ben_engine.package …` | customer package 22 files, partner package 21 files, 0 missing after the BEN-POD spec path fix (audit F-04c); zips built; MANIFEST lists per-document unfilled fields |
+| Contract pre-fill | `proposal.known_fields_report` | of the 911 vocabulary fields filled from a proposal (BEN 150 healthcare sample); remaining fields belong to later stages (commissioning report 128, turnover 63, CRM 62, change order 59, QC forms 24, counsel 8). MSA draft has 15 fields left (customer identity, arbitration venue); SOW draft 47 |
 | Decks | `build_presentation.py` | 14 (product) + 13 (investor) slides with notes; rendered with Playwright and inspected 2026-11-08 (`docs/media/screens/deck-*.png`) |
 | Demo GIF | `make_demo_gif.py` | 24 real tour frames, 6 s, 4.5 MB |
 
@@ -79,3 +79,6 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 5. Estimate-status prices: CDU, rear-door heat exchangers, dry coolers, generators, 150 kW UPS frame, site civil, labour rates.
 6. Assembly time estimates (scaled, not from a labour study) and MTBF (parts-count prediction).
 7. Market sizes (vendor research with 2–4× spread; ranges quoted).
+
+## 8. Audit trail
+An independent internal audit (`docs/audit/AUDIT_REPORT_2026-11-08.md`, 22 findings, 4 major) was run against this ledger on 2026-11-08. Corrective actions and their closure status are recorded in `docs/audit/CAPA_LOG.md`; the mechanical checks are rerun by `python scripts/audit.py` (also in CI) and the evidence of the latest run is stored under `docs/audit/evidence/`.

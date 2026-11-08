@@ -10,7 +10,7 @@ bash scripts/run_dashboard.sh         # http://localhost:8080
 ```bash
 PYTHONPATH=software pytest tests -q --ignore=tests/e2e
 bash tests/e2e/run_e2e.sh             # Playwright, writes docs/media/screens
-cd firmware/ben-pod && pio test -e native
+cd firmware/ben-pod && make test
 ```
 
 ## Regenerate generated deliverables

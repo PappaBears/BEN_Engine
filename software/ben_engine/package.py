@@ -54,7 +54,7 @@ PARTNER_DOCS = [
     ("docs/TEST_GUIDE.md", "build/TEST_GUIDE.md", False),
     ("design/DESIGN_BASIS.md", "design/DESIGN_BASIS.md", False),
     ("design/specs/CONTROLS_SPEC.md", "design/CONTROLS_SPEC.md", False),
-    ("design/specs/BEN-NODE-v1.md", "design/BEN-NODE-v1.md", False),
+    ("design/specs/BEN-POD-v1.md", "design/BEN-POD-v1.md", False),
 ]
 
 

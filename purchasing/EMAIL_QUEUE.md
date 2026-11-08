@@ -27,7 +27,7 @@ One file per supplier question. Each is addressed **To: Ben@SchreiberAI.com** so
 | 21 | [21-hardening-ballistic-emp-vendors.md](email_queue/21-hardening-ballistic-emp-vendors.md) | hardening vendors (UL 752 ballistic, ASTM F3038 doors, HEMP shielding, flood plinth, C5-M coating) | RFQ: enclosure hardening packages for modular data centers: UL 752 ballistic panels, ASTM F3038 forced-entry doors, HEMP shielding (MIL-STD-188-125-1), flood plinths, C5-M coatings | H2/H3 catalog lines are all estimates; vendor certificates are required with every shipment. |
 
 
-Gmail drafts: created in the schreibears@gmail.com account for 01–12, 15, 16 (2026-11-07/08) and for the controls-platform set 13, 14, 17, 18 and the generation-2 set 19, 20, 21 (2026-11-08); the old Olimex draft was deleted. All addressed to Ben@SchreiberAI.com, nothing sent; each draft names the supplier to forward to and the source file.
+Gmail drafts: created in the operator's mail account for 01–12, 15, 16 (2026-11-07/08) and for the controls-platform set 13, 14, 17, 18 and the generation-2 set 19, 20, 21 (2026-11-08); the old Olimex draft was deleted. All addressed to Ben@SchreiberAI.com, nothing sent; each draft names the supplier to forward to and the source file.
 
 Controls platform change 2026-11-08 (docs/CONTROLS_HARDWARE_DECISION.md): email 13 was replaced, 14 rewritten, 17 and 18 added. The Gmail draft for the old file 13 (hobby MCU boards) was deleted by the lead; new drafts for 13, 14, 17 and 18 are to be created by the lead from these files.
 
