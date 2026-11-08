@@ -77,7 +77,8 @@ def _refrigerant_note(lay):
     p = parts[0]
     gwp = p["gwp"]
     ok = "meets" if gwp < 700 else "DOES NOT MEET"
-    line1 = (f"Refrigerant: {p['refrigerant'].split(' — ')[0]} (catalog {', '.join(codes)}), GWP {gwp} — {ok} the AIM Act < 700 GWP limit for data-center cooling from 2027-01-01 (COMPLIANCE §0 finding 2).")
+    name = p['refrigerant'].split(' — ')[0].split(' (')[0].strip()
+    line1 = (f"Refrigerant: {name} (catalog {', '.join(codes)}), GWP {gwp} — {ok} the AIM Act < 700 GWP limit for data-center cooling from 2027-01-01 (COMPLIANCE §0 finding 2).")
     if lay.is_container:
         line2 = (f"A1 (non-flammable) refrigerant, so UL 60335-2-40 / ASHRAE 15 A2L charge limits do not apply; room volume {vol:.1f} m3; charge per unit nameplate, "
                  "record the charge per circuit on form Q-06 (CTP-M1 HOLD). No A2L unit may be substituted without a new charge-vs-volume check.")

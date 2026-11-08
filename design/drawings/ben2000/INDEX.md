@@ -25,7 +25,7 @@ Status: **ISSUED FOR REVIEW — not for construction until checked** — Rev B, 
 
 | Rev | Date | Description | Checked |
 |---|---|---|---|
-| A | 7 Nov 2026 | Generation-1 container set (BEN Micro/10/20/40, NEMA 3R); superseded, do not build from it. | — |
+| A | 7 Nov 2026 | Generation-1 container set (keys micro/ben10/ben20/ben40, Type 3R enclosures); superseded, do not build from it. | — |
 | B | 2026-11-08 | Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). | not checked |
 
 ## Interference checks for this tier

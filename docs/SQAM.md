@@ -469,5 +469,5 @@ Per-tier CTQ/CTP quick cards for the bay: `design/assembly/CTQ-CARD-ben5.md`, `d
 
 | Rev | Date | Change | By |
 |---|---|---|---|
-| A | 7 Nov 2026 | Generation-1 manual for the superseded drawing set: Generation-1 container set (BEN Micro/10/20/40, NEMA 3R); superseded, do not build from it. | BEN Engine generator |
+| A | 7 Nov 2026 | Generation-1 manual for the superseded drawing set: Generation-1 container set (keys micro/ben10/ben20/ben40, Type 3R enclosures); superseded, do not build from it. | BEN Engine generator |
 | B | 2026-11-08 | Generated from the ctq.py register matching the drawing set Rev B (2026-11-08, ISSUED FOR REVIEW) and ASSEMBLY-<tier>.md Issue B · 2026-11-08. Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). | BEN Engine generator; checked: ____ |

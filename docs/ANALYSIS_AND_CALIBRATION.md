@@ -20,7 +20,7 @@ All commands run from `software/` (or with `PYTHONPATH=software` from the repo r
 | Export | `export.py` | Telemetry ring buffer, flattened CSV, JSON lines |
 | Commissioning | `commissioning.py` | The ten-step site script, simulation or live, signed report with data hash |
 
-Tests: `PYTHONPATH=software pytest tests -q` (178 tests, about 16 s).
+Tests: `PYTHONPATH=software pytest tests -q` (185 tests, about 16 s).
 
 ---
 

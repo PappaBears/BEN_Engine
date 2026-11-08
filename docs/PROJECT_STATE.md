@@ -12,7 +12,7 @@ The full acceptance list in `docs/BRIEF.md` §5 (24 deliverables after the mid-s
 | Idea understood | Brief, acceptance list, gaps added | `docs/BRIEF.md` | done |
 | Design validated | Config model + twin run for 5 tiers (BEN 5/30/150/500 and the 2 MW BEN 2000) with faults; hardening H1–H3 in the config | `python -m ben_engine.config`, twin smoke run (see VALIDATION) | done |
 | First workflow | Config → twin → state → alarms | twin smoke run | done |
-| Full behaviour | CFD, calibration, sweeps, commissioning, dashboard, firmware, drawings, BOM, docs, web, VC, proposal generator, deal packages, SQAM, contracts, manufacturing strategy | pytest 178 passed; firmware 37 passed; generators run | done |
+| Full behaviour | CFD, calibration, sweeps, commissioning, dashboard, firmware, drawings, BOM, docs, web, VC, proposal generator, deal packages, SQAM, contracts, manufacturing strategy | pytest 185 passed; firmware 37 passed; generators run | done |
 | Quality confirmed | pytest + Playwright e2e + simulated end-to-end | `docs/VALIDATION.md` | done (hardware checks remain unverified) |
 | Handoff complete | README, VALIDATION, manifest, push | README.md, docs/launch-manifest.json, git log | done |
 | Generation-2 refactor (2026-11-08) | Power-based names (BEN 5/30/150/500), BEN 2000 prefabricated hall, NEMA 4X / IP66 baseline with H1/H2/H3 hardening, across config, docs, contracts, decks, product page | `docs/TIER_AND_ENCLOSURE_DECISION.md`, `python -m ben_engine.config --tier ben2000`, `docs/VALIDATION.md` | done: drawings (A-000 + per-module sheets), BOM-ben2000, twin/CFD/sweeps/commissioning run for the hall (VALIDATION §4a) |
@@ -21,7 +21,10 @@ The full acceptance list in `docs/BRIEF.md` §5 (24 deliverables after the mid-s
 No hardware here; EFR32 / Gecko SDK toolchain not available (network policy); vendor sites not reachable by curl, only through web search/fetch. No money spent; no emails sent (drafts only).
 
 ## Generation 2 (2026-11-08)
-Tiers renamed by IT power (BEN 5/30/150/500) with aliases; BEN 2000 prefabricated 2 MW center added as the capability example (positioning per D36: the all-in-one boxes BEN 5–500 are the core product and lead every document; BEN 2000 is kept fully engineered as the upsell path); enclosures IP66 with hardening H1–H3; controls on an industrial platform (BEN Controls Lite/Pro, BEN Pod on BEN Mesh). 178 Python tests, 25/25 browser checks, 21 RFQ drafts queued.
+Tiers renamed by IT power (BEN 5/30/150/500) with aliases; BEN 2000 prefabricated 2 MW center added as the capability example (positioning per D36: the all-in-one boxes BEN 5–500 are the core product and lead every document; BEN 2000 is kept fully engineered as the upsell path); enclosures IP66 with hardening H1–H3; controls on an industrial platform (BEN Controls Lite/Pro, BEN Pod on BEN Mesh). 185 Python tests, 25/25 browser checks, 21 RFQ drafts queued.
+
+## Audit (2026-11-08)
+Independent internal audit: 22 findings (4 major). All corrective actions worked; re-audit 17 PASS / 3 WARN / 0 FAIL. Open business items: name a drawing checker to re-issue Rev B as IFC; purchasing to confirm the BEN 5 cabinet AC refrigerant variant; counsel to align MSA 15.5 / licence 1.5 with the cybersecurity status table. Paperwork ready set in `docs/contracts/ready/`.
 
 ## Latest checkpoint
 `main` on github.com/PappaBears/BEN_Engine; see `git log`. Restore: clone the tag/commit and run the Quickstart commands in README.md.

@@ -1,0 +1,46 @@
+$ make -C firmware/ben-pod test
+# exit 0 · 2026-11-08T04:50:40+00:00
+make: Entering directory '/home/user/ben_engine/firmware/ben-pod'
+./.build-host/test_core
+test/test_core/test_main.cpp:559:test_calibration_apply_gain_offset:PASS
+test/test_core/test_main.cpp:560:test_calibration_rejects_bad_values:PASS
+test/test_core/test_main.cpp:561:test_calibration_digital_passthrough:PASS
+test/test_core/test_main.cpp:562:test_calibration_nvs_roundtrip:PASS
+test/test_core/test_main.cpp:563:test_cal_id_truncation:PASS
+test/test_core/test_main.cpp:564:test_tare_zeroes_dp:PASS
+test/test_core/test_main.cpp:565:test_tare_respects_gain_and_rejects_untareable:PASS
+test/test_core/test_main.cpp:566:test_telemetry_json_matches_protocol:PASS
+test/test_core/test_main.cpp:567:test_telemetry_json_calibrated_values_and_omits_missing:PASS
+test/test_core/test_main.cpp:568:test_telemetry_json_overflow_returns_zero:PASS
+test/test_core/test_main.cpp:569:test_telemetry_full_channel_set_fits_in_msg_cap:PASS
+test/test_core/test_main.cpp:570:test_status_json_matches_protocol:PASS
+test/test_core/test_main.cpp:571:test_topic_builder:PASS
+test/test_core/test_main.cpp:572:test_json_writer_escapes_and_trims:PASS
+test/test_core/test_main.cpp:573:test_parse_set_output:PASS
+test/test_core/test_main.cpp:574:test_parse_set_cal_and_tare_and_ota:PASS
+test/test_core/test_main.cpp:575:test_parse_malformed_inputs:PASS
+test/test_core/test_main.cpp:576:test_parse_tolerates_unknown_and_nested_fields:PASS
+test/test_core/test_main.cpp:577:test_parse_oversized_string_truncates_safely:PASS
+test/test_core/test_main.cpp:578:test_ack_set_output:PASS
+test/test_core/test_main.cpp:579:test_ack_error_shape:PASS
+test/test_core/test_main.cpp:580:test_ack_set_cal_persists_and_get_cal_reads_back:PASS
+test/test_core/test_main.cpp:581:test_ack_tare:PASS
+test/test_core/test_main.cpp:582:test_ack_identify_reboot_ota:PASS
+test/test_core/test_main.cpp:583:test_ring_record_size_and_pack_unpack:PASS
+test/test_core/test_main.cpp:584:test_ring_wraps_and_keeps_newest:PASS
+test/test_core/test_main.cpp:585:test_ring_capacity_is_one_hour:PASS
+test/test_core/test_main.cpp:586:test_failsafe_drops_only_failsafe_outputs_after_60s:PASS
+test/test_core/test_main.cpp:587:test_failsafe_on_link_down_and_wraparound:PASS
+test/test_core/test_main.cpp:588:test_failsafe_commands_during_loss_apply_on_restore:PASS
+test/test_core/test_main.cpp:589:test_alarm_thresholds_with_hold_time:PASS
+test/test_core/test_main.cpp:590:test_timesync_anchor_and_steps:PASS
+test/test_core/test_main.cpp:591:test_app_publishes_telemetry_at_1hz_with_sequence:PASS
+test/test_core/test_main.cpp:592:test_app_buffers_while_offline_and_replays_in_order:PASS
+test/test_core/test_main.cpp:593:test_app_handles_cmd_and_acks_and_resets_contact_timer:PASS
+test/test_core/test_main.cpp:594:test_app_dip_provisioning:PASS
+test/test_core/test_main.cpp:595:test_app_status_reports_errors_when_unsynced:PASS
+
+-----------------------
+37 Tests 0 Failures 0 Ignored
+OK
+make: Leaving directory '/home/user/ben_engine/firmware/ben-pod'

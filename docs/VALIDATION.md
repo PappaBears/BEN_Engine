@@ -8,7 +8,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 | Check | Command | Observed |
 | --- | --- | --- |
-| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **178 passed** in 16.6 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2) |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **185 passed** in 16.6 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2) |
 | Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
 | Build contract | `build_control.py run` (skill helper) | eight checks: python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500, sim-e2e-pytest, links, audit-mechanical. Commands carry their own `PYTHONPATH` so they run from a clean clone (audit F-01). Latest report stored at `docs/audit/evidence/build-report.json` |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |
@@ -38,9 +38,9 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 
 | Deliverable | Command | Observed |
 | --- | --- | --- |
-| Drawings | `python design/drawings/gen_drawings.py` | 5 tiers; BEN 2000 adds A-000 site plan and per-module A-001/A-002 sheets (42 sheets total, SVG+PNG), INDEX.md per tier, INTERFERENCE_CHECKS.md (BEN 2000 rows: no FAIL); red deviation notes: none after the configuration changes; remaining FAILs are informative (NEC 110.26 condition 2 not required, two-row layouts rejected by design) plus BEN 500 rack-top clearance 290 vs 300 mm (resolution printed on sheet) |
+| Drawings | `python design/drawings/gen_drawings.py` | Rev B 2026-11-08, status ISSUED FOR REVIEW until a checker is named in `design/REVISION.json`; 5 tiers; BEN 2000 adds A-000 site plan and per-module A-001/A-002 sheets (42 sheets total, SVG+PNG), INDEX.md per tier, INTERFERENCE_CHECKS.md (BEN 2000 rows: no FAIL); red deviation notes: none after the configuration changes; remaining FAILs are informative (NEC 110.26 condition 2 not required, two-row layouts rejected by design) plus BEN 500 rack-top clearance 290 vs 300 mm (resolution printed on sheet) |
 | Renders | `python design/renders/gen_renders.py` | 40 stage PNGs + 5 contact sheets (8 stages × 5 tiers); labelled concept renders |
-| Assembly | `python design/assembly/gen_assembly.py` | 5 STE documents (one per tier) with CTQ cards and QC forms; 0 instructions over 20 words; banned-word check passes; all item codes reconciled with the catalog |
+| Assembly | `python design/assembly/gen_assembly.py` | 5 STE documents (one per tier) with CTQ cards and QC forms; the generator's built-in check reports 0 banned-word hits and 0 step sentences over 20 words across 654 numbered steps and fails generation otherwise (audit F-10); all item codes reconciled with the catalog |
 | SQAM | `python design/gen_sqam.py` | 472 lines; CTQ/CTP register per tier (BEN 5 32, BEN 30 42, BEN 150 42, BEN 500 43, BEN 2000 44 items) |
 | BOM | `python -m ben_engine.bom --all` | BEN 5 65 lines $132 k (60 % confirmed); BEN 30 92 lines $666 k (80 %); BEN 150 104 lines $1.89 M (79 %); BEN 500 105 lines $4.45 M (83 %); BEN 2000 94 lines $40.4 M (73 %). "Confirmed" = distributor listing seen in search results on 2026-11-07/08, not a quote |
 | Proposals | `python -m ben_engine.proposal …` | 5 samples in `docs/proposals/` (one per tier); BEN 150 healthcare managed: $1.89 M capital, $27 k/yr, 34 weeks to in-service |
@@ -64,7 +64,7 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 - PLCnext project (interlocks, watchdog relay) on an AXC F 2152; UL 508A panel build; FCC Part 15 B test of the assembled Pod.
 - Modbus/SNMP adapters for third-party equipment (interfaces described, not coded).
 - Any physical behaviour: thermal time constants, ride-through, fan curves, pressure, acoustics.
-- Contract templates (counsel review), compliance edition years listed as unconfirmed in `docs/COMPLIANCE.md` §13; UL 752 / ASTM F3038 / MIL-STD-188-125-1 / ASHRAE 188 editions from memory.
+- Contract templates (counsel review), compliance edition years listed as unconfirmed in `docs/COMPLIANCE.md` §16; UL 752 / ASTM F3038 / MIL-STD-188-125-1 / ASHRAE 188 editions from memory.
 - BEN 2000 physical design values (module mass, slab, water use 2–8 m³/day per 1,000 kW, noise distances, utility lead time 26–52 weeks) are engineering estimates from public rules of thumb, not vendor data.
 
 ## 6. Blocked / deferred

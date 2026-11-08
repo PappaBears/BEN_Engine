@@ -17,7 +17,7 @@ Checks (see docs/audit/AUDIT_CHECKLIST.md for the criterion behind each one):
       price_source_note; every line has lead_time_weeks; WARN on marketplace/aggregator URLs
   A7  docs/contracts/fields.json covers every [FIELD] token used in the templates and vice versa
   A8  test count quoted in README.md / docs/VALIDATION.md / PROJECT_STATE.md == pytest --collect-only
-  A9  every drawing SVG title block carries "ISSUE FOR CONSTRUCTION" and "Rev A"
+  A9  every drawing SVG title block carries the status and revision from design/REVISION.json
   A10 every design/assembly/ASSEMBLY-*.md is free of the STE banned words (design/assembly/STE_STYLE.md
       rule 10); WARN for instruction sentences over 20 words
   A11 secrets scan (API keys, tokens, private keys, passwords) over tracked text files
@@ -122,7 +122,9 @@ def check_build_contract(run: bool) -> None:
                 problems.append(f"{c['id']}: timeout")
     # static: python -m ben_engine.* commands need the package importable without PYTHONPATH
     static_note = ""
-    needs_pkg = [c["id"] for c in bc["checks"] if "-m" in c["command"] and any(a.startswith("ben_engine") for a in c["command"])]
+    def _has_pythonpath(cmd):
+        return any(a.startswith("PYTHONPATH=") for a in cmd)
+    needs_pkg = [c["id"] for c in bc["checks"] if "-m" in c["command"] and any(a.startswith("ben_engine") for a in c["command"]) and not _has_pythonpath(c["command"])]
     if needs_pkg:
         probe = subprocess.run([sys.executable, "-c", "import ben_engine"], cwd=ROOT, capture_output=True, text=True)
         if probe.returncode != 0:
@@ -255,25 +257,30 @@ def check_test_count() -> None:
 
 # ----------------------------------------------------------------------------- A9 drawings
 def check_drawings() -> None:
+    import json as _json
+    rev = _json.loads((ROOT / "design/REVISION.json").read_text(encoding="utf-8"))
+    letter, date, checker = rev["drawing_rev"], rev["issue_date"], rev.get("checker", "")
+    status_title = "ISSUE FOR CONSTRUCTION" if checker else "ISSUED FOR REVIEW"
     svgs = sorted((ROOT / "design/drawings").glob("*/*.svg"))
     bad = []
     for s in svgs:
         t = s.read_text(encoding="utf-8", errors="replace")
-        if "ISSUE FOR CONSTRUCTION" not in t or not re.search(r"Rev A", t):
+        if status_title not in t or not re.search(rf"Rev {letter}\b", t):
             bad.append(rel(s))
-    record("A9", "PASS" if svgs and not bad else "FAIL", f"Drawing SVG title blocks carry 'ISSUE FOR CONSTRUCTION' and 'Rev A' ({len(svgs) - len(bad)}/{len(svgs)})", "; ".join(bad))
+    record("A9", "PASS" if svgs and not bad else "FAIL", f"Drawing SVG title blocks carry '{status_title}' and 'Rev {letter}' from design/REVISION.json ({len(svgs) - len(bad)}/{len(svgs)})", "; ".join(bad))
     # document control: checker blank
     idx = list((ROOT / "design/drawings").glob("*/INDEX.md"))
-    blank = [rel(i) for i in idx if "Checked: blank" in i.read_text(encoding="utf-8")]
-    record("A13a", "WARN" if blank else "PASS", f"Drawing INDEX 'Checked' field filled ({len(idx) - len(blank)}/{len(idx)})", "IFC status with no checker: " + "; ".join(blank) if blank else "")
-    # revision-date consistency between drawings, SQAM, QC forms and assembly
-    marks = {}
-    for f, pat in (("design/drawings/gen_drawings.py", r'DATE = "([0-9-]+)"'), ("docs/SQAM.md", r"IFC drawing set Rev A \(([0-9-]+)\)"),
-                   ("design/assembly/QC_FORMS.md", r"IFC Rev A ([0-9-]+)"), ("design/assembly/ASSEMBLY-ben150.md", r"Issue A · ([0-9-]+)")):
+    blank = [rel(i) for i in idx if not checker]
+    record("A13a", "WARN" if blank else "PASS", f"Drawing set has a named checker ({'yes' if checker else 'no'}; status {status_title})", "Set stays ISSUED FOR REVIEW until a checker is named in design/REVISION.json" if blank else "")
+    # revision-date consistency between drawings, SQAM, QC forms, assembly and the revision file
+    marks = {"design/REVISION.json": date}
+    for f, pat in (("docs/SQAM.md", rf"Rev {letter} \(([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"), ("design/assembly/QC_FORMS.md", rf"Rev {letter}[^0-9]*([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"),
+                   ("design/assembly/ASSEMBLY-ben150.md", rf"Issue {letter} · ([0-9-]+)"), ("design/drawings/ben150/INDEX.md", rf"Rev {letter}[^0-9]*([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})")):
         m = re.search(pat, (ROOT / f).read_text(encoding="utf-8"))
         marks[f] = m.group(1) if m else None
     dates = {v for v in marks.values() if v}
-    record("A13b", "PASS" if len(dates) <= 1 else "WARN", "Rev A issue dates agree across drawings, SQAM, QC forms, assembly", str(marks))
+    missing = [k for k, v in marks.items() if v is None]
+    record("A13b", "PASS" if len(dates) == 1 and not missing else "WARN", f"Rev {letter} issue dates agree across REVISION.json, SQAM, QC forms, assembly, INDEX", str(marks))
 
 
 # ----------------------------------------------------------------------------- A10 STE
