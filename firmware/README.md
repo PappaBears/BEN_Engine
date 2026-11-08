@@ -129,7 +129,7 @@ ordered replay with original timestamps, cmd routing/ack, DIP provisioning, unsy
 | DIP 0..3 | 5..8 | PA5..PA8 | 4-bit node id override (bench); unit id always from provisioning |
 | RTD ADC CS / DRDY | 40 / 41 | PA0 / PA4 | ADS124S08 on SPI (`spidrv_rtd`) |
 | I²C SDA/SCL | — | PC4 / PC5 | `i2cspm_sensor`: SHT45 0x44, SDP810 0x25 |
-| Pod E: LAN8742 nRST / RS-485 DE | 42 / 43 | PB2 / PB3 | Ethernet PHY over RMII (EFR32MG24 has no MAC: Pod E uses a W5500/KSZ SPI MAC+PHY — **open design item**), RS-485 on USART1 |
+| Pod E: LAN8742 nRST / RS-485 DE | 42 / 43 | PB2 / PB3 | W5500 SPI MAC+PHY (decided; EFR32MG24 has no MAC), RS-485 on USART1 |
 | SWD / secure debug | — | PF0/PF1 | locked after provisioning (Secure Vault debug lock, unlock via signed challenge) |
 
 ## Secure provisioning cell (how a Pod gets its certificate)
@@ -177,7 +177,7 @@ private key and the firmware signing key, air-gapped PC. Steps per Pod, scripted
 ## Pod E wired path: PoE and RS-485
 
 - **Power:** 802.3af PD (Si3402 class 0 controller, isolated flyback to 3.3 V/5 V) **or** 24 VDC terminal (reverse-protected, 1 A fuse). Either source; PoE preferred where the controls switch has PoE.
-- **Ethernet:** the EFR32MG24 has no Ethernet MAC; Pod E uses a **W5500 SPI MAC+PHY** (10/100, hardware TCP/IP offload) — the schematic note says "LAN8742 PHY", which only works with an external MAC; the layout review must pick W5500 (simplest) or KSZ8851 (MAC+PHY, SPI). Firmware path: MQTT/TLS over the W5500 socket instead of otTcp; `Efr32Net::path()` reports `"eth"`.
+- **Ethernet:** the EFR32MG24 has no Ethernet MAC; Pod E uses a **W5500 SPI MAC+PHY** (10/100, hardware TCP/IP offload) — decided 2026-11-08 over KSZ8851 for its hardware TCP/IP offload and wide industrial use; the decision doc and Pod spec now say W5500. Firmware path: MQTT/TLS over the W5500 socket instead of otTcp; `Efr32Net::path()` reports `"eth"`.
 - **RS-485 Modbus RTU** (USART1 + isolated transceiver, 120 Ω end termination jumper): the Pod is a Modbus **slave** to the PLC (Pro) or RevPi (Lite); registers 30001.. mirror the channel table (T_in ×100, RH ×10, dP ×10, leak, door, relays) so the PLC can use a Pod's readings in an interlock without the mesh. Thread stays the telemetry path to the edge; when Thread is down Pod E telemetry goes over Ethernet; when both are down the PLC still reads it over RS-485.
 - Isolation: Ethernet/PoE 1.5 kV magnetics, RS-485 2.5 kV, relays 4 kV coil-contact.
 

@@ -184,7 +184,7 @@ gantt
     Training and turnover (W20)             :e6, after e5, 1w
 ```
 
-Reading the chart: order to engineering release ≈ 14 weeks; permit ≈ 12 weeks; civil 20 weeks; set, join, hook-up and SAT ≈ 10 weeks. **Order to in service ≈ 52 weeks** when the utility delivers inside 40 weeks; a 52-week utility window pushes in-service to ≈ 60 weeks and the generators cannot be used to open early. The factory finishes months before the site needs the modules, so modules are stored at the manufacturer (storage fee in the proposal) rather than shipped early.
+Reading the chart: order to engineering release ≈ 14 weeks; permit ≈ 12 weeks; civil 20 weeks; set, join, hook-up and SAT ≈ 10 weeks. **Order to in service ≈ 52 weeks** when the utility delivers inside 40 weeks and transformers are ordered at engineering release; at today's catalog lead times (48–52 weeks for pad-mount transformers and 1,250 kW generators) the generated proposal schedule lands at **60–72 weeks**, and the generators cannot be used to open early. Shortening it means utility-supplied transformers or early deposits before the configuration is frozen. The factory finishes months before the site needs the modules, so modules are stored at the manufacturer (storage fee in the proposal) rather than shipped early.
 
 ## 4. Hold-point summary (the signatures that gate the money)
 

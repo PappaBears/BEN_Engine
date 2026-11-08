@@ -38,7 +38,7 @@ writes exactly three advisory registers.
 | `scripts/ben-backup.sh` | (run by timer) | The backup itself; skips loudly if the USB/NAS is not mounted |
 | `scripts/ben-vpn-support.sh` | `/usr/local/sbin/` | Customer-controlled `up`/`down` for the outbound-only WireGuard support tunnel (auto-off 48 h) |
 
-`ben_engine.plc_bridge` (the Python module the bridge service runs) is **not yet written**; the service file,
+`ben_engine.plc_bridge` is implemented (`software/ben_engine/plc_bridge.py`): dependency-free Modbus TCP client, register-map decoding from `firmware/ben-plc/modbus_map.csv`, BEN-protocol publishing (paho-mqtt when installed), watchdog/trim/test writes, and a `--sim` mode backed by `ben_engine.interlocks` with 6 tests in `tests/test_plc_bridge.py`. Verified against the simulated controller only; not yet against a PLCnext.
 the environment and the register map it will load (`/etc/ben/modbus_map.csv`) are in place.
 
 ## Install (Pro, Karbon 400)

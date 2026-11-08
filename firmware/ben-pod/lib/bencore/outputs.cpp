@@ -3,7 +3,7 @@
 
 namespace bencore {
 
-// Pin numbers match firmware/README.md and design/specs/wiring/02_node_wiring.svg.
+// Pin numbers match firmware/README.md and design/specs/wiring/02_controller_pod_wiring.svg.
 // relay1 (cooling enable) is failsafe: when the gateway is gone, cooling falls back to the
 // cooling unit's own local control, which is the safe direction. Lights/fan boost/spare hold.
 const RelayConfig RELAYS[N_RELAYS] = {

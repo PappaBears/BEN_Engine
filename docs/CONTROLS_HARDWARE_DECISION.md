@@ -43,7 +43,7 @@ Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`
 - Alternatives considered: Wi-SUN FAN (sub-GHz, utility-grade, longer range, heavier stack and modules, overkill inside a container; kept as the option for large campuses), LoRaWAN (not a mesh, too slow for 1 Hz telemetry), Zigbee (not IP), Wi-Fi mesh (power and interference), wired-only (rejected for the reasons above; a wired ring remains for the PLC I/O).
 
 **BEN Pod v1 (our PCB, built by the contract electronics manufacturer):**
-- MGM240P module; 24 VDC or PoE-powered variant (**Pod E**: LAN8742 Ethernet PHY + 802.3af PD, RS-485 Modbus RTU to the PLC as the wired path, Thread as backup) and battery/24 VDC variant (**Pod W**: Thread only, 2 × AA LiFeS2 or 24 VDC).
+- MGM240P module; 24 VDC or PoE-powered variant (**Pod E**: W5500 SPI MAC+PHY Ethernet (the EFR32MG24 has no Ethernet MAC; decided 2026-11-08) + 802.3af PD, RS-485 Modbus RTU to the PLC as the wired path, Thread as backup) and battery/24 VDC variant (**Pod W**: Thread only, 2 × AA LiFeS2 or 24 VDC).
 - Inputs: 4 × Pt1000 RTD (3-wire, 24-bit ADC), SHT45 temperature/humidity, SDP810 differential pressure, 2 × dry contact, 1 × leak-rope input, 2 × 4–20 mA (165 Ω, isolated), 2 × relay (10 A) on Pod E only.
 - Secure provisioning in our factory cell: per-device X.509 certificate from Schreiber AI's PKI written into Secure Vault; firmware signed with ECDSA P-256; attestation at network join; keys never leave the chip.
 - DIN-rail and rack-rail enclosure, IP40 indoor / IP65 outdoor variant, −40…70 °C.

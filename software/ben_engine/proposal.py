@@ -102,7 +102,7 @@ SCHEDULE_TIER = {
     "ben500": {"survey": 4, "release": 3, "short_lead": 3, "factory": 12, "cool_ctl": 4, "fat": 2, "ship": 2, "hookup": 1, "sat": 1, "permits": 10, "civil": 8, "ref_total": "32-36 weeks"},
     # BEN 2000: long-lead items (MV pad-mount transformers, 2 MW UPS strings, generators) typically 40 weeks from release;
     # site works (slab, MV service, yard) run 20 weeks in parallel; order-to-service about 52 weeks.
-    "ben2000": {"survey": 4, "release": 8, "short_lead": 12, "factory": 20, "cool_ctl": 4, "fat": 2, "ship": 3, "hookup": 4, "sat": 2, "permits": 12, "civil": 20, "long_lead_typical": 40, "ref_total": "about 52 weeks with 40-week long-lead items (MV transformers, 2 MW UPS); longer when generator or utility lead times run to 52 weeks"},
+    "ben2000": {"survey": 4, "release": 8, "short_lead": 12, "factory": 20, "cool_ctl": 4, "fat": 2, "ship": 3, "hookup": 4, "sat": 2, "permits": 12, "civil": 20, "long_lead_typical": 40, "ref_total": "52 weeks when the utility energises inside 40 weeks and transformers are ordered at engineering release; 60–72 weeks at today's catalog lead times (48–52 weeks for pad-mount transformers and 1,250 kW generators), which is what this schedule shows"},
 }
 
 COMMISSIONING_STEPS = [
