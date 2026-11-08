@@ -1,5 +1,5 @@
 {
-  "proposal_id": "SAI-BEN150-20261108-508EC188",
+  "proposal_id": "SAI-BEN150-20261108-C10DE35C",
   "date": "2026-11-08",
   "valid_until": "2027-01-07",
   "customer": "Acme Clinic",
@@ -24,11 +24,13 @@
     "brand": "Schreiber AI",
     "ups_minutes": 10,
     "generator": true,
-    "site_name": "Austin, TX"
+    "site_name": "Austin, TX",
+    "controls_tier": "auto",
+    "hardening": "H2"
   },
   "derived": {
     "tier_label": "BEN 150",
-    "enclosure": "20 ft high-cube ISO container",
+    "enclosure": "20 ft high-cube ISO-frame module, sealed to IP66",
     "per_rack_kw": 10.0,
     "cooling_label": "Rear-door heat exchanger + dry cooler",
     "cooling_units_n": 2,
@@ -45,37 +47,55 @@
     "ups_kva_each": 61,
     "battery_kwh": 9.3,
     "airflow_cfm": 2000,
-    "payload_kg": 5874,
-    "gross_kg": 8274,
+    "payload_kg": 6258,
+    "gross_kg": 8658,
     "envelope_gain_kw": 1.29,
     "pue_estimate": 1.185,
     "row_length_mm": 3500,
     "row_fits": true,
+    "rows": 1,
+    "racks_per_row": 5,
     "nfpa_855_scope": false,
-    "ashrae_class": "A1"
+    "mv_service": false,
+    "transformer_kva": 0,
+    "transformers_total": 0,
+    "generators_total": 1,
+    "generator_kw_each": 80,
+    "modules": 1,
+    "kind": "module",
+    "hardening": "H2",
+    "hardening_label": "H2 Severe environment",
+    "hardening_rating": "NEMA 4X / IP66 + flood plinth 600 mm",
+    "hardening_coating": "ISO 12944 C5-M",
+    "hardening_recommended": "H2",
+    "envelope_area_m2": 64.0,
+    "ashrae_class": "A1",
+    "controls_tier_resolved": "pro",
+    "controls_label": "BEN Controls Pro",
+    "pods": 12
   },
   "bom_totals": {
-    "total_usd": 1359627.04,
+    "total_usd": 1331205.2,
     "by_subsystem": {
       "compute": 772112.98,
-      "controls": 4327.78,
+      "controls": 19289.91,
       "cooling": 196180.0,
-      "env": 6504.85,
+      "env": 16666.85,
       "fs": 27604.34,
-      "power": 265642.22,
+      "power": 197156.25,
       "site": 24500.0,
-      "str": 26294.87,
-      "svc": 36460.0
+      "str": 40474.87,
+      "svc": 37220.0
     },
     "by_status": {
-      "confirmed": 969835.04,
-      "list": 12.0,
-      "estimate": 389780.0
+      "confirmed": 825524.2,
+      "list": 78.0,
+      "estimate": 505603.0
     },
-    "confirmed_pct": 71.3,
-    "items": 98,
+    "confirmed_pct": 62.0,
+    "items": 116,
     "max_lead_time_weeks": 20,
-    "confirmed_pct_ex_compute": 34.0
+    "confirmed_pct_ex_compute": 10.0
   },
   "prices": [
     {
@@ -86,17 +106,17 @@
         "cooling",
         "compute"
       ],
-      "hardware_cost_usd": 1355299.26,
-      "capital_price_usd": 1882360.08,
+      "hardware_cost_usd": 1311915.29,
+      "capital_price_usd": 1822104.57,
       "recurring_usd_per_year": 0.0,
       "recurring_label": "none (vendor warranties pass through; support on request)",
       "term_years": 1,
-      "total_term_usd": 1882360.08,
-      "price_per_kw_usd": 37647.2,
-      "confirmed_pct": 71.3,
+      "total_term_usd": 1822104.57,
+      "price_per_kw_usd": 36442.09,
+      "confirmed_pct": 62.2,
       "list_pct": 0.0,
-      "estimate_pct": 28.7,
-      "bom_lines": 75,
+      "estimate_pct": 37.8,
+      "bom_lines": 86,
       "headline": false
     },
     {
@@ -108,17 +128,17 @@
         "compute",
         "controls"
       ],
-      "hardware_cost_usd": 1359627.04,
-      "capital_price_usd": 1888370.89,
+      "hardware_cost_usd": 1331205.2,
+      "capital_price_usd": 1848896.11,
       "recurring_usd_per_year": 12000.0,
       "recurring_label": "BEN Controls licence (dashboard, twin, firmware updates, remote support hooks)",
       "term_years": 1,
-      "total_term_usd": 1900370.89,
-      "price_per_kw_usd": 37767.42,
-      "confirmed_pct": 71.3,
+      "total_term_usd": 1860896.11,
+      "price_per_kw_usd": 36977.92,
+      "confirmed_pct": 62.0,
       "list_pct": 0.0,
-      "estimate_pct": 28.7,
-      "bom_lines": 98,
+      "estimate_pct": 38.0,
+      "bom_lines": 116,
       "headline": false
     },
     {
@@ -130,17 +150,17 @@
         "compute",
         "controls"
       ],
-      "hardware_cost_usd": 1359627.04,
-      "capital_price_usd": 1888370.89,
+      "hardware_cost_usd": 1331205.2,
+      "capital_price_usd": 1848896.11,
       "recurring_usd_per_year": 15000,
       "recurring_label": "White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow)",
       "term_years": 1,
-      "total_term_usd": 1903370.89,
-      "price_per_kw_usd": 37767.42,
-      "confirmed_pct": 71.3,
+      "total_term_usd": 1863896.11,
+      "price_per_kw_usd": 36977.92,
+      "confirmed_pct": 62.0,
       "list_pct": 0.0,
-      "estimate_pct": 28.7,
-      "bom_lines": 98,
+      "estimate_pct": 38.0,
+      "bom_lines": 116,
       "headline": false
     },
     {
@@ -152,17 +172,17 @@
         "compute",
         "controls"
       ],
-      "hardware_cost_usd": 1359627.04,
-      "capital_price_usd": 1888370.89,
+      "hardware_cost_usd": 1331205.2,
+      "capital_price_usd": 1848896.11,
       "recurring_usd_per_year": 27000.0,
       "recurring_label": "Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule)",
       "term_years": 3,
-      "total_term_usd": 1969370.89,
-      "price_per_kw_usd": 37767.42,
-      "confirmed_pct": 71.3,
+      "total_term_usd": 1929896.11,
+      "price_per_kw_usd": 36977.92,
+      "confirmed_pct": 62.0,
       "list_pct": 0.0,
-      "estimate_pct": 28.7,
-      "bom_lines": 98,
+      "estimate_pct": 38.0,
+      "bom_lines": 116,
       "headline": true
     }
   ],
@@ -175,17 +195,17 @@
       "compute",
       "controls"
     ],
-    "hardware_cost_usd": 1359627.04,
-    "capital_price_usd": 1888370.89,
+    "hardware_cost_usd": 1331205.2,
+    "capital_price_usd": 1848896.11,
     "recurring_usd_per_year": 27000.0,
     "recurring_label": "Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule)",
     "term_years": 3,
-    "total_term_usd": 1969370.89,
-    "price_per_kw_usd": 37767.42,
-    "confirmed_pct": 71.3,
+    "total_term_usd": 1929896.11,
+    "price_per_kw_usd": 36977.92,
+    "confirmed_pct": 62.0,
     "list_pct": 0.0,
-    "estimate_pct": 28.7,
-    "bom_lines": 98,
+    "estimate_pct": 38.0,
+    "bom_lines": 116,
     "headline": true
   },
   "milestones": [
@@ -278,25 +298,25 @@
     {
       "milestone": "Engineering release (H4)",
       "share": 0.3,
-      "amount_usd": 566511.27,
+      "amount_usd": 554668.83,
       "week": 6
     },
     {
       "milestone": "Factory acceptance test (H13)",
       "share": 0.4,
-      "amount_usd": 755348.36,
+      "amount_usd": 739558.44,
       "week": 30
     },
     {
       "milestone": "Site acceptance test (H19)",
       "share": 0.25,
-      "amount_usd": 472092.72,
+      "amount_usd": 462224.03,
       "week": 33
     },
     {
       "milestone": "Turnover (W20)",
       "share": 0.05,
-      "amount_usd": 94418.54,
+      "amount_usd": 92444.81,
       "week": 34
     }
   ],
@@ -320,6 +340,15 @@
       "vendor": "Vertiv / CoolIT sales"
     },
     {
+      "code": "PWR-UPS-GVS150",
+      "name": "Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500)",
+      "lead_time_weeks": 14,
+      "qty": 1,
+      "unit": "ea",
+      "ext_price_usd": 68000.0,
+      "vendor": "AVENDOR"
+    },
+    {
       "code": "CLG-DRYCOOLER",
       "name": "Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol",
       "lead_time_weeks": 14,
@@ -336,15 +365,6 @@
       "unit": "ea",
       "ext_price_usd": 90000.0,
       "vendor": "nVent / Legrand distributor"
-    },
-    {
-      "code": "PWR-UPS-GVS100",
-      "name": "Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8",
-      "lead_time_weeks": 10,
-      "qty": 2,
-      "unit": "ea",
-      "ext_price_usd": 83207.98,
-      "vendor": "AVENDOR"
     }
   ],
   "sections": [
@@ -376,7 +396,7 @@
             ],
             [
               "Tier",
-              "BEN 150 \u2014 20 ft high-cube ISO container"
+              "BEN 150 \u2014 20 ft high-cube ISO-frame module, sealed to IP66"
             ],
             [
               "Mission profile",
@@ -400,7 +420,7 @@
             ],
             [
               "Proposal ID",
-              "SAI-BEN150-20261108-508EC188"
+              "SAI-BEN150-20261108-C10DE35C"
             ],
             [
               "Configuration",
@@ -410,7 +430,7 @@
         },
         {
           "kind": "p",
-          "text": "AI infrastructure that arrives finished. This proposal is generated from configuration version 5eec93f3; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.",
+          "text": "AI infrastructure that arrives finished. This proposal is generated from configuration version 121a414f; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.",
           "items": [],
           "headers": [],
           "rows": []
@@ -423,7 +443,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Austin, TX. We propose one BEN 150: a 20 ft high-cube ISO container fitted out as a complete data center with 5 rack(s), Rear-door heat exchanger + dry cooler with 2N redundancy, a 2 x 61 kVA UPS giving 10 minutes of ride-through, a standby generator, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
+          "text": "Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Austin, TX. We propose one BEN 150: a 20 ft high-cube ISO-frame module, sealed to IP66 fitted out as a complete data center with 5 rack(s), Rear-door heat exchanger + dry cooler with 2N redundancy, a 2 x 61 kVA UPS giving 10 minutes of ride-through, a standby generator, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
           "items": [],
           "headers": [],
           "rows": []
@@ -437,7 +457,7 @@
         },
         {
           "kind": "p",
-          "text": "Price for the managed service option: $1,888,371 capital ($37,767 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 71 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 29 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.",
+          "text": "Price for the managed service option: $1,848,896 capital ($36,978 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 62 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 38 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.",
           "items": [],
           "headers": [],
           "rows": []
@@ -516,7 +536,7 @@
           "rows": [
             [
               "Enclosure",
-              "20 ft high-cube ISO container",
+              "20 ft high-cube ISO-frame module, sealed to IP66",
               "External 6.058 x 2.438 x 2.896 m; interior 5.75 x 2.2 x 2.49 m"
             ],
             [
@@ -532,7 +552,7 @@
             [
               "Row fit",
               "fits",
-              "single row 3500 mm vs interior 5750 mm"
+              "1 row(s) of 5 racks, 3500 mm per row vs interior 5750 mm"
             ],
             [
               "Cooling electrical",
@@ -545,9 +565,24 @@
               "IT + cooling + 2 % house + 0.5 kW controls, pf 0.95"
             ],
             [
+              "Controls tier",
+              "BEN Controls Pro",
+              "PLCnext AXC F 2152 + Axioline I/O in a UL 508A BEN Controller panel, OnLogic Karbon 400 edge computer (TPM 2.0); 12 BEN Pods on the BEN Mesh (Thread, Secure Vault); selectable with controls_tier (docs/CONTROLS_HARDWARE_DECISION.md 2a)"
+            ],
+            [
               "Service",
               "480 V 3ph, 100 A breaker",
               "calculated 91 A at 80 % continuous, rounded to the next frame"
+            ],
+            [
+              "Generator",
+              "1 x 80 kW standby",
+              "total demand x 1.25, rounded to 10 kW"
+            ],
+            [
+              "Hardening",
+              "H2 Severe environment: NEMA 4X / IP66 + flood plinth 600 mm",
+              "coating ISO 12944 C5-M; recommended for this profile/climate: H2; envelope 64.0 m\u00b2"
             ],
             [
               "UPS",
@@ -576,7 +611,7 @@
             ],
             [
               "Mass",
-              "payload 5,874 kg; gross 8,274 kg",
+              "payload 6,258 kg; gross 8,658 kg",
               "tare 2,400 kg; crane and pad sized for the gross mass"
             ],
             [
@@ -606,8 +641,8 @@
             [
               "Power module",
               "included",
-              "17 lines",
-              "$368,948"
+              "16 lines",
+              "$273,828"
             ],
             [
               "Cooling module",
@@ -624,20 +659,20 @@
             [
               "Controls module",
               "included",
-              "23 lines",
-              "$6,011"
+              "30 lines",
+              "$26,792"
             ],
             [
               "Structure (container / cabinet)",
               "included",
-              "12 lines",
-              "$36,521"
+              "17 lines",
+              "$56,215"
             ],
             [
               "Envelope (insulation, liner, coatings)",
               "included",
-              "12 lines",
-              "$9,035"
+              "18 lines",
+              "$23,148"
             ],
             [
               "Fire detection and suppression",
@@ -654,14 +689,14 @@
             [
               "Build labour, FAT, logistics",
               "included",
-              "8 lines",
-              "$50,639"
+              "9 lines",
+              "$51,694"
             ]
           ]
         },
         {
           "kind": "p",
-          "text": "Top 15 lines of the 98-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):",
+          "text": "Top 15 lines of the 116-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):",
           "items": [],
           "headers": [],
           "rows": []
@@ -717,15 +752,6 @@
               "3"
             ],
             [
-              "PWR-UPS-GVS100",
-              "Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8",
-              "Schneider Electric GVSUPS100KGS",
-              "2 ea",
-              "$115,567",
-              "confirmed",
-              "10"
-            ],
-            [
               "PWR-GEN-150",
               "SD150 150 kW diesel standby generator, L2 enclosure, sub-base tank",
               "Generac Industrial SD0150",
@@ -735,13 +761,13 @@
               "20"
             ],
             [
-              "PWR-BATT-LI",
-              "Galaxy Lithium-ion battery cabinet UL, 16 x 2.04 kWh modules (32.6 kWh)",
-              "Schneider Electric LIBSESMG16UL",
+              "PWR-UPS-GVS150",
+              "Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500)",
+              "Schneider Electric GVSUPS150KHS (configure-to-order)",
               "1 ea",
-              "$76,692",
-              "confirmed",
-              "10"
+              "$94,444",
+              "estimate",
+              "14"
             ],
             [
               "CMP-SW100G",
@@ -771,6 +797,15 @@
               "8"
             ],
             [
+              "PWR-ATS-400",
+              "Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 4X",
+              "ASCO (Schneider) J03ATSB30400N5X",
+              "1 ea",
+              "$17,361",
+              "estimate",
+              "8"
+            ],
+            [
               "STR-RACK42",
               "NetShelter SX 42U 600x1070 mm enclosure with sides",
               "APC by Schneider Electric AR3100",
@@ -789,15 +824,6 @@
               "1"
             ],
             [
-              "PWR-ATS-400",
-              "Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 4X / IP66",
-              "ASCO (Schneider) J03ATSB30400N5X",
-              "1 ea",
-              "$15,361",
-              "confirmed",
-              "8"
-            ],
-            [
               "SVC-ELECTRICIAN",
               "Licensed electrician (commercial journeyman, billed)",
               "local electrical contractor ELEC-HR",
@@ -814,6 +840,15 @@
               "$11,667",
               "estimate",
               "6"
+            ],
+            [
+              "STR-FLOOD-PLINTH",
+              "Flood plinth 600 mm: hot-dip galvanised steel frame with cross-bracing, grating step and sealed service risers, per m of enclosure perimeter (H2 severe environment)",
+              "local steel fabricator PLINTH-600",
+              "18 m",
+              "$10,500",
+              "estimate",
+              "8"
             ]
           ]
         },
@@ -861,46 +896,46 @@
           "rows": [
             [
               "Hardware only",
-              "$1,882,360",
-              "$37,647",
+              "$1,822,105",
+              "$36,442",
               "-",
               "1 yr",
-              "$1,882,360",
-              "71 / 0 / 29 %",
-              "75",
+              "$1,822,105",
+              "62 / 0 / 38 %",
+              "86",
               "alternative"
             ],
             [
               "Hardware + BEN Controls",
-              "$1,888,371",
-              "$37,767",
+              "$1,848,896",
+              "$36,978",
               "$12,000",
               "1 yr",
-              "$1,900,371",
-              "71 / 0 / 29 %",
-              "98",
+              "$1,860,896",
+              "62 / 0 / 38 %",
+              "116",
               "alternative"
             ],
             [
               "White-label",
-              "$1,888,371",
-              "$37,767",
+              "$1,848,896",
+              "$36,978",
               "$15,000",
               "1 yr",
-              "$1,903,371",
-              "71 / 0 / 29 %",
-              "98",
+              "$1,863,896",
+              "62 / 0 / 38 %",
+              "116",
               "alternative"
             ],
             [
               "Managed service",
-              "$1,888,371",
-              "$37,767",
+              "$1,848,896",
+              "$36,978",
               "$27,000",
               "3 yr",
-              "$1,969,371",
-              "71 / 0 / 29 %",
-              "98",
+              "$1,929,896",
+              "62 / 0 / 38 %",
+              "116",
               "PROPOSED"
             ]
           ]
@@ -925,27 +960,27 @@
           "rows": [
             [
               "1 year",
-              "$1,888,371",
+              "$1,848,896",
               "$27,000",
-              "$1,915,371"
+              "$1,875,896"
             ],
             [
               "3 years",
-              "$1,888,371",
+              "$1,848,896",
               "$81,000",
-              "$1,969,371"
+              "$1,929,896"
             ],
             [
               "5 years",
-              "$1,888,371",
+              "$1,848,896",
               "$135,000",
-              "$2,023,371"
+              "$1,983,896"
             ]
           ]
         },
         {
           "kind": "p",
-          "text": "Payment milestones for the proposed option (Managed service, capital $1,888,371):",
+          "text": "Payment milestones for the proposed option (Managed service, capital $1,848,896):",
           "items": [],
           "headers": [],
           "rows": []
@@ -964,25 +999,25 @@
             [
               "Engineering release (H4)",
               "30 %",
-              "$566,511",
+              "$554,669",
               "6"
             ],
             [
               "Factory acceptance test (H13)",
               "40 %",
-              "$755,348",
+              "$739,558",
               "30"
             ],
             [
               "Site acceptance test (H19)",
               "25 %",
-              "$472,093",
+              "$462,224",
               "33"
             ],
             [
               "Turnover (W20)",
               "5 %",
-              "$94,419",
+              "$92,445",
               "34"
             ]
           ]
@@ -1139,6 +1174,13 @@
               "14"
             ],
             [
+              "PWR-UPS-GVS150",
+              "Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500)",
+              "AVENDOR",
+              "1 ea",
+              "14"
+            ],
+            [
               "CLG-DRYCOOLER",
               "Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol",
               "Guntner / Alfa Laval rep",
@@ -1151,13 +1193,6 @@
               "nVent / Legrand distributor",
               "5 ea",
               "12"
-            ],
-            [
-              "PWR-UPS-GVS100",
-              "Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8",
-              "AVENDOR",
-              "2 ea",
-              "10"
             ]
           ]
         }
@@ -1169,7 +1204,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Issue-for-construction drawing set for the BEN 150, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
+          "text": "Issue-for-construction drawing set for the BEN 150, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. Issue for construction set regenerated from the frozen configuration at engineering release (index not readable at proposal time)",
           "items": [],
           "headers": [],
           "rows": []
@@ -1186,44 +1221,44 @@
           "rows": [
             [
               "A-001",
-              "General arrangement (sheet 1/7)",
+              "General arrangement",
               "see sheet"
             ],
             [
               "A-002",
-              "Interior layout plan (sheet 2/7)",
+              "Interior layout plan",
               "see sheet"
             ],
             [
               "A-003",
-              "Envelope section (sheet 3/7)",
+              "Envelope section",
               "1:10 / 1:2"
             ],
             [
               "S-001",
-              "Floor framing and anchoring (sheet 4/7)",
+              "Floor framing and anchoring",
               "see sheet / 1:5"
             ],
             [
               "E-001",
-              "Power one-line (sheet 5/7)",
+              "Power one-line",
               "NTS"
             ],
             [
               "M-001",
-              "Cooling P&ID (sheet 6/7)",
+              "Cooling P&ID",
               "NTS"
             ],
             [
               "C-001",
-              "Controls layout (sheet 7/7)",
+              "Controls layout",
               "see sheet"
             ]
           ]
         },
         {
           "kind": "p",
-          "text": "Document set (indexed binder, encrypted USB in the controls cabinet, and the gateway share, per docs/TURNOVER.md):",
+          "text": "Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):",
           "items": [],
           "headers": [],
           "rows": []
@@ -1236,7 +1271,7 @@
             "At engineering release (H4): frozen configuration JSON with derived sizing, IFC drawing set with CTQ/CTP callouts, priced bill of materials with confirmation status, arc-flash and coordination study, PE anchorage calculation, compliance pack, FAT/SAT procedure",
             "At FAT (H13): signed commissioning report (JSON + PDF) with sweep CSVs, thermography, door-fan test, electrical and cooling test records",
             "At SAT (H19): site commissioning report, acoustic survey, final arc-flash labels, AHJ certificates",
-            "At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, gateway backup, password handover record, training sign-off, warranty certificates"
+            "At turnover (W20): as-built drawings, as-built BOM with serials, O&M manual, maintenance schedule with the first 12 months pre-populated, calibration certificates per channel, firmware hashes, Pod certificate register, edge computer backup, password handover record, training sign-off, warranty certificates"
           ],
           "headers": [],
           "rows": []
@@ -1346,8 +1381,8 @@
             ],
             [
               "UL 508A",
-              "Controls panel built in a UL 508A shop",
-              "Panel label and schedule"
+              "BEN Controller panel (PLCnext PLC, I/O, edge computer) built and labelled by a UL 508A shop",
+              "Panel label and schedule (CTQ-K6)"
             ],
             [
               "ASHRAE TC 9.9",
@@ -1422,6 +1457,22 @@
               "Early deposit and configuration freeze; no late changes."
             ],
             [
+              "R27",
+              "Medium-voltage utility service lead time (BEN 2000)",
+              "high",
+              "A new 12.47 kV service with primary metering and two pad-mount transformers is utility work on the utility's schedule, typically 26 to 52 weeks.",
+              "Interconnection application filed at order, utility window carried on the critical path, load letter and single-line ready at kick-off, temporary 480 V service for commissioning where allowed.",
+              "The utility contract and fees, land for utility equipment, easements."
+            ],
+            [
+              "R30",
+              "Construction permit for a building (BEN 2000)",
+              "high",
+              "The hall is a building (IBC Group B or F-1), not an equipment enclosure: plan review, state modular approval and inspections take 8 to 16 weeks before civil works can start.",
+              "Stamped permit set from the engineering release, state modular label on each module, pre-application meeting, civil package starts after permit, both occupancy classifications budgeted.",
+              "Zoning, land use, easements, neighbour notice, permit fees."
+            ],
+            [
               "R02",
               "Arc flash or electrical fault",
               "medium",
@@ -1442,7 +1493,7 @@
               "Lithium battery thermal runaway",
               "medium",
               "A battery cell failure can release flammable gas and start a fire that spreads if not contained.",
-              "LFP chemistry, UL 1973/9540 listed cabinets with UL 9540A data, BMS alarms, gas detection and venting above 20 kWh, capped battery size on smaller tiers.",
+              "LFP chemistry, UL 1973/9540 listed cabinets with UL 9540A data, BMS alarms, gas detection and venting above 20 kWh, capped battery size on smaller tiers; BEN 2000 battery rooms with 2-hour separation and gas detection.",
               "No unapproved batteries, keep BMS firmware updated, respond to BMS alarms."
             ],
             [
@@ -1470,6 +1521,22 @@
               "Utility fees, civil works, permits, taxes, and changes after freeze."
             ],
             [
+              "R28",
+              "Water availability for adiabatic cooling (BEN 2000)",
+              "medium",
+              "Hot-day make-up water is 2 to 8 cubic metres a day per 1,000 kW; drought rules or a weak supply can force the coolers to run dry and lose capacity on the hottest days.",
+              "Dry mode below 28 C, chilled-water option for hot climates, water quantity and drain confirmed at site survey, storage tank option, water management plan per ASHRAE 188.",
+              "Water supply contract, drought-rule compliance, sewer discharge permit for bleed water."
+            ],
+            [
+              "R29",
+              "Module joint leakage (BEN 2000)",
+              "medium",
+              "The three hall modules are sealed on site; the seams are the one part of the IP66 envelope not finished in the factory.",
+              "Factory compression gaskets and field EPDM cover strips with a drained cavity, joint seal hose test E15 at SAT and after any relocation, leak rope under each joint, semi-annual seal inspection.",
+              "Keep the roof clear of debris and snow beyond design, respond to alarms."
+            ],
+            [
               "R03",
               "Site fault current differs from assumption",
               "low",
@@ -1482,7 +1549,7 @@
               "Transport or lifting damage",
               "low",
               "A bad lift or rough transport can twist the frame or crack a weld.",
-              "Corner-casting lifts with spreader, PE-checked frame, shock loggers, set-down inspection, freight insurance.",
+              "Corner-casting lifts with spreader, PE-checked frame, shock loggers, set-down inspection, freight insurance; BEN 2000 modules lifted on engineered lugs with a 100 t crane and a certified lift plan.",
               "Crane access, competent rigger, route survey for the high-cube height."
             ],
             [
@@ -1516,6 +1583,22 @@
               "We design with TIA-942 Rated-2/3 concepts but do not hold a Tier certificate; an insurer or auditor may ask.",
               "Design-basis statement, FAT/SAT evidence, optional third-party audit at cost.",
               "Deciding if a certification is required and paying for it."
+            ],
+            [
+              "R31",
+              "Flood above the pad",
+              "low",
+              "A flood above the pad puts water in the enclosure and takes the unit out for a long time.",
+              "Pad 0.3 m above base flood elevation on every tier; hardening H2 and H3 add a 600 mm flood plinth with sealed penetrations, and the IP66 envelope holds against splash and standing water; flood alarm on the plinth.",
+              "Site selection outside the floodway, true flood zone data, choosing H2 where the map says so."
+            ],
+            [
+              "R32",
+              "Ballistic or forced-entry attack",
+              "low",
+              "Gunfire or a break-in can destroy IT, injure people or take data-bearing equipment.",
+              "H1: steel skin, keyed access, door contacts. H3: UL 752 ballistic panels (level 3 to 8), ASTM F3038 forced-entry doors, IK10, mantrap vestibule, two-factor access, tamper detection on the PLC and an audit trail in BEN Care.",
+              "Threat assessment and choice of level, guard force and response, perimeter."
             ]
           ]
         }
@@ -1552,7 +1635,7 @@
             ],
             [
               "Gross mass to set",
-              "8,274 kg (crane sized for this mass at the required radius)"
+              "8,658 kg (crane sized for this mass at the required radius)"
             ],
             [
               "Utility service",
@@ -1615,12 +1698,12 @@
           "rows": [
             [
               "Zoning / land use",
-              "Yes for 10/20/40 (accessory structure); often no for BEN 5",
+              "Yes for 30/150/500 (accessory structure); often no for BEN 5; BEN 2000: principal structure, site plan approval",
               "Customer"
             ],
             [
               "Building permit (structure, foundation, anchorage)",
-              "Yes for 10/20/40",
+              "Yes for 30/150/500; BEN 2000: full building permit (IBC Group B or F-1) plus state modular-building approval",
               "Customer's contractor or Schreiber AI as agent (we provide PE drawings)"
             ],
             [
@@ -1635,7 +1718,7 @@
             ],
             [
               "Fire alarm / suppression permit and plan review",
-              "Yes for 10/20/40",
+              "Yes for 30/150/500",
               "Licensed fire protection contractor"
             ],
             [
@@ -1647,6 +1730,21 @@
               "Utility interconnection (solar/export only)",
               "off_grid with PV paralleling",
               "Customer with our documents"
+            ],
+            [
+              "MV service application (BEN 2000)",
+              "Always",
+              "Customer, with our load letter and single-line"
+            ],
+            [
+              "Stormwater construction permit (NPDES CGP)",
+              "BEN 2000 (disturbance > 0.4 ha)",
+              "Customer civil"
+            ],
+            [
+              "Water supply and sewer discharge (BEN 2000)",
+              "Always",
+              "Customer"
             ],
             [
               "Stormwater / grading",
@@ -1685,8 +1783,8 @@
             ],
             [
               "2",
-              "Node discovery and firmware versions",
-              "All nodes answer; firmware versions and hashes match the release record"
+              "Pod discovery, attestation and firmware versions",
+              "All BEN Pods answer and attest; firmware versions and hashes match the release record"
             ],
             [
               "3",
@@ -1759,7 +1857,7 @@
             ],
             [
               "Controls software",
-              "Signed firmware and gateway updates for the licence term; security fixes for the life of the licence"
+              "Signed Pod firmware, PLC project and edge computer updates for the licence term; security fixes for the life of the licence"
             ],
             [
               "Support level in this option",
@@ -1802,17 +1900,17 @@
             [
               "Semi-annual",
               "Certified subcontractor (S) with record; remote (R) for controls",
-              "4"
+              "5"
             ],
             [
               "Annual",
               "Certified subcontractor (S) with record; remote (R) for controls",
-              "8"
+              "9"
             ],
             [
               "3-year",
               "Certified subcontractor (S) with record; remote (R) for controls",
-              "4"
+              "5"
             ],
             [
               "5-year",
@@ -1911,7 +2009,7 @@
           "text": "",
           "items": [
             "Configuration as on the cover: 50 kW IT, 5 rack(s), Rear-door heat exchanger + dry cooler, 2N, climate Hot / humid; any change is priced as a change order",
-            "Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 71 % confirmed, 0 % list, 29 % estimate for this option; the estimate share is re-priced at engineering release",
+            "Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 62 % confirmed, 0 % list, 38 % estimate for this option; the estimate share is re-priced at engineering release",
             "Gross margin 28% on hardware and build labour; controls licence $12,000/yr for this tier; white-label uplift x1.25; managed service $45/kW-month",
             "Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra",
             "Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order",
@@ -1931,7 +2029,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "By signing, the customer accepts this proposal (SAI-BEN150-20261108-508EC188) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
+          "text": "By signing, the customer accepts this proposal (SAI-BEN150-20261108-C10DE35C) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
           "items": [],
           "headers": [],
           "rows": []

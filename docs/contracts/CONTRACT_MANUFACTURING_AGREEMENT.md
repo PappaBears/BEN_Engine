@@ -109,7 +109,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **[SCHREIBER_
 | CTP-E2 termination torque | Every lug to device label value, recorded | Q-07 |
 | Insulation resistance | ≥ 100 MΩ at 1 kV | Q-07 |
 | CTQ-E2 bonding | Every bond ≤ 0.1 Ω | Q-07 |
-| CTQ-E1 working space | NEC 110.26 clearances; vestibule 1.1 m (BEN 150/40) | Q-07 |
+| CTQ-E1 working space | NEC 110.26 clearances; vestibule 1.1 m (BEN 150/500) | Q-07 |
 | CTQ-K3 sensor placement and calibration check | Within ±0.25 °C after correction; `cal_id` stored | Q-08 |
 | CTP-K1 life-safety isolation | Dry contacts only to node; releasing circuit independent | Q-09 |
 | CTP-F1 hold time | ≥ 10 min at design concentration; certificate | Q-09 |

@@ -48,7 +48,7 @@ plus its built-in position bias. ``apply_to_params(metrics, params)`` does this 
 
 CLI
 ---
-``python -m ben_engine.cfd --tier ben20 --png /tmp/x.png [--open] [--steps N]``
+``python -m ben_engine.cfd --tier ben150 --png /tmp/x.png [--open] [--steps N]``
 """
 from __future__ import annotations
 
@@ -60,7 +60,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from .config import Config, COOLING_LIBRARY
+from .config import Config, COOLING_LIBRARY, canonical_tier
 
 # ------------------------------------------------------------------ constants
 AIR_RHO = 1.18
@@ -127,24 +127,45 @@ def air_unit_count(cfg: Config) -> Tuple[int, int]:
     return d["cooling_units_total"], d["cooling_units_n"]
 
 
+def layout_unit_count(cfg: Config) -> Tuple[int, int]:
+    """(total, running) air units in the modelled row. Single-row tiers: all units. The BEN 2000 hall is
+    modelled one row-bay at a time (docs/TIER_AND_ENCLOSURE_DECISION.md: "CFD per module"), so the
+    units are shared evenly over ``rows``."""
+    n_u, n_run = air_unit_count(cfg)
+    rows = cfg.derived()["rows"]
+    if rows <= 1:
+        return n_u, n_run
+    return max(1, math.ceil(n_u / rows)), max(1, math.ceil(n_run / rows))
+
+
 def lattice_speed(tier: str) -> float:
-    """Max lattice speed per tier (Micro's tiny compressed layout needs a lower Mach number)."""
-    return 0.04 if tier == "micro" else U_LAT
+    """Max lattice speed per tier (the BEN 5 cabinet's tiny compressed layout needs a lower Mach number)."""
+    tier = canonical_tier(tier)
+    return 0.04 if tier == "ben5" else U_LAT
 
 
 def grid_dx(tier: str) -> float:
-    """Cell size per tier chosen so a default run finishes in well under a minute."""
-    return {"micro": 0.02, "ben10": 0.025, "ben20": 0.025, "ben40": 0.05}.get(tier, 0.025)
+    """Cell size per tier chosen so a default run finishes in well under a minute (hall: 100 mm cells per row bay)."""
+    tier = canonical_tier(tier)
+    return {"ben5": 0.02, "ben30": 0.025, "ben150": 0.025, "ben500": 0.05, "ben2000": 0.10}.get(tier, 0.025)
 
 
 def build_layout(cfg: Config, containment: bool = True, dx: Optional[float] = None) -> Layout:
-    g = cfg.derived()["geometry"]
+    d = cfg.derived()
+    g = d["geometry"]
     L, W = g["int_l_m"], g["int_w_m"]
     dx = dx or grid_dx(cfg.tier)
     notes: List[str] = []
-    if cfg.tier == "micro" and containment:
+    rows = d["rows"]
+    n_r = cfg.racks
+    if rows > 1:
+        # hall: one row bay (cold aisle + rack row + hot aisle) of the interior width; results are tiled over the rows
+        W = W / rows
+        n_r = d["racks_per_row"]
+        notes.append(f"{g['label']} hall modelled as one of {rows} row bays ({n_r} racks, {W:.2f} m wide); per-rack results tiled over the rows")
+    if d["kind"] == "cabinet" and containment:
         containment = False
-        notes.append("BEN Micro cabinet has no aisle containment; doors treated as open")
+        notes.append("BEN 5 cabinet has no aisle containment; doors treated as open")
     if COOLING_LIBRARY[cfg.cooling]["medium"] == "liquid":
         notes.append("DLC tier: CDUs move no room air; air side modelled with one in-row air unit per 2 racks + 1 standby "
                      "handling the 30 % residual air-side heat")
@@ -161,14 +182,13 @@ def build_layout(cfg: Config, containment: bool = True, dx: Optional[float] = No
     y_rack = (y_hot[0] - rack_d, y_hot[0])
     y_cold = (1, y_rack[0])
 
-    n_r = cfg.racks
-    n_u, n_u_run = air_unit_count(cfg)
+    n_u, n_u_run = layout_unit_count(cfg)
     rack_w = max(2, int(round(RACK_W_M / dx)))
     unit_w = max(1, int(round(UNIT_W_M / dx)))
     row_len = n_r * rack_w + n_u * unit_w
     inner_x = nx - 2
     if row_len > inner_x - 2:
-        # compress widths to fit (BEN Micro and odd configs)
+        # compress widths to fit (BEN 5 cabinet and odd configs)
         scale = (inner_x - 2) / row_len
         rack_w = max(2, int(rack_w * scale))
         unit_w = max(1, int(unit_w * scale))
@@ -272,7 +292,7 @@ class LBMSolver:
         n_units_all = len(layout.unit_cells)
         if active_units is None:
             # mirror the twin: N units run, the redundant ones stand by
-            n_run = min(n_units_all, air_unit_count(cfg)[1])
+            n_run = min(n_units_all, layout_unit_count(cfg)[1])
             active_units = [i < n_run for i in range(n_units_all)]
         self.active_units = list(active_units)
         unit_mask = np.zeros_like(layout.unit_mask)
@@ -288,10 +308,10 @@ class LBMSolver:
 
         # ---- physical flows
         it_kw = cfg.it_kw * load
-        flow_total = d["airflow_cfm"] * CFM_TO_M3S * max(0.2, load)      # m3/s through racks
+        n_r = len(layout.rack_cells)                                       # racks in the modelled row (hall: one row bay)
+        flow_total = d["airflow_cfm"] * CFM_TO_M3S * max(0.2, load) * n_r / cfg.racks   # m3/s through the modelled racks
         air_frac = 1.0 if cl["medium"] == "air" else 0.3                  # DLC: residual air-side heat
         rack_kw = it_kw / cfg.racks * air_frac
-        n_r = len(layout.rack_cells)
         n_u = max(1, sum(1 for a in self.active_units if a))
         rack_face_m = (layout.rack_cells[0][0].stop - layout.rack_cells[0][0].start) * dx
         unit_face_m = (layout.unit_cells[0][0].stop - layout.unit_cells[0][0].start) * dx if layout.unit_cells else rack_face_m
@@ -397,8 +417,13 @@ class LBMSolver:
         scale = AIR_RHO * (lay.dx / self.dt) ** 2
         dp_pa = float((self.rho[cold].mean() - self.rho[hot].mean()) / 3.0 * scale)
         umag = np.sqrt(self.ux ** 2 + self.uy ** 2)
+        # hall: the modelled row bay stands for every row; tile the per-rack results to cfg.racks
+        reps = max(1, math.ceil(self.cfg.racks / max(1, len(inlet_T))))
+        inlet_T = (inlet_T * reps)[: self.cfg.racks]
+        inlet_C = (inlet_C * reps)[: self.cfg.racks]
+        outlet_T = (outlet_T * reps)[: self.cfg.racks]
         return {
-            "tier": self.cfg.tier, "racks": self.cfg.racks, "containment": lay.containment,
+            "tier": self.cfg.tier, "racks": self.cfg.racks, "racks_modelled": len(lay.rack_cells), "rows": self.cfg.derived()["rows"], "containment": lay.containment,
             "active_units": list(self.active_units), "supply_ratio": self.supply_ratio,
             "grid": [lay.nx, lay.ny], "dx_m": lay.dx, "dt_s": self.dt, "steps": self.steps_done,
             "sim_time_s": self.steps_done * self.dt,
@@ -482,7 +507,8 @@ def steady_scalar(solver: "LBMSolver", source: float, dirichlet_value: float, di
 # ------------------------------------------------------------------ public API
 def default_steps(tier: str) -> int:
     """Upper bound on lattice steps for the flow field (stops earlier on convergence)."""
-    return {"micro": 3000, "ben10": 4000, "ben20": 5000, "ben40": 5000}.get(tier, 4000)
+    tier = canonical_tier(tier)
+    return {"ben5": 3000, "ben30": 4000, "ben150": 5000, "ben500": 5000, "ben2000": 3000}.get(tier, 4000)
 
 
 def run_cfd(cfg: Config, containment: bool = True, steps: Optional[int] = None, out_png: Optional[str] = None,
@@ -507,7 +533,7 @@ def run_cfd(cfg: Config, containment: bool = True, steps: Optional[int] = None, 
         n_all = len(lay.unit_cells)
         active = [False] * n_all
         healthy = [i for i in range(n_all) if i not in set(failed_units)]
-        for i in healthy[: air_unit_count(cfg)[1]]:
+        for i in healthy[: layout_unit_count(cfg)[1]]:
             active[i] = True
     s = LBMSolver(cfg, lay, load=load, supply_c=supply_c, supply_ratio=supply_ratio, active_units=active,
                   u_lat=lattice_speed(cfg.tier))
@@ -645,7 +671,7 @@ def plot_fields(metrics: Dict[str, Any], out_png: str, title: Optional[str] = No
 def main(argv=None):
     import argparse
     ap = argparse.ArgumentParser(description="BEN Engine 2-D thermal LBM airflow solver")
-    ap.add_argument("--tier", default="ben20")
+    ap.add_argument("--tier", default="ben150")
     ap.add_argument("--profile", default="ai_inference")
     ap.add_argument("--climate", default="temperate")
     ap.add_argument("--png", default=None, help="output PNG path")

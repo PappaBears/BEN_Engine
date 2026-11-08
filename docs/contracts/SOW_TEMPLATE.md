@@ -85,10 +85,14 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 
 | Scope item | Included / Excluded | Notes |
 | --- | --- | --- |
-| One-trip high-cube ISO container ([TIER]) or NEMA 4X / IP66 outdoor cabinet on skid (BEN 5), received and inspected (Q-01, W6) | [SCOPE_ENCLOSURE] | |
+| One-trip high-cube ISO-frame module ([TIER]) or NEMA 4X / IP66 outdoor cabinet on skid (BEN 5), received and inspected (Q-01, W6); BEN 2000: [MODULES_COUNT] factory-built wide-body hall modules plus one power module from the modular manufacturer, state modular label on each | [SCOPE_ENCLOSURE] | |
 | Structural modification by AWS D1.1 certified welder to IFC drawings; CWI inspection (H7, Q-02) | [SCOPE_STRUCTURAL] | Not applicable to BEN 5 |
-| Envelope: 100 mm PIR/spray-foam insulation, vapour barrier, non-combustible liner, personnel doors with panic hardware, coating system to ISO 9223 class [CORROSIVITY_CLASS], seals, drains (W8, Q-03) | [SCOPE_ENVELOPE] | |
-| Electrical vestibule 1.1 m (BEN 150/40); second egress door (BEN 500 at ≥ 1000 A) | [SCOPE_VESTIBULE] | |
+| Envelope: 100 mm PIR/spray-foam insulation, vapour barrier, non-combustible liner, personnel doors with compression gaskets, three-point latches and panic hardware, gasketed penetrations, drip edges, positive-pressure interior, coating system to ISO 12944 class per hardening level (C3 at H1; C5-M at H2/H3) for site corrosivity [CORROSIVITY_CLASS], seals, drains (W8, Q-03) | [SCOPE_ENVELOPE] | Every Unit is NEMA 4X / IP66 |
+| **Hardening level [HARDENING_LEVEL]** ([HARDENING_RATING]): H1 Standard; H2 Severe environment (600 mm flood plinth, ISO 16890 ePM1 filtration with weather hoods, hurricane-rated door hardware, roof snow guards, stainless fasteners, sacrificial anodes, intrusion detection and lighting); H3 Hardened / government (as H2 plus UL 752 ballistic panels at Level [BALLISTIC_LEVEL], ASTM F3038 forced-entry doors, IK10 doors, secure vestibule / mantrap, two-factor access, tamper detection, tamper-evident seals, CMMC / NIST 800-171 controls pack) | [SCOPE_HARDENING] | Certificates for ballistic, forced-entry and shielding items per `SUPPLIER_TERMS.md` Q1 are turnover item B9a |
+| HEMP / EMI shielding option (MIL-STD-188-125-1, 80 dB shielded enclosure with filtered penetrations and waveguide vents; IEEE 299 shielding effectiveness test at FAT) | [SCOPE_SHIELDING] | H3 only; TEMPEST-ready, not TEMPEST-certified |
+| **Envelope hose test E14** (UL 50E type 4X method, `docs/TEST_GUIDE.md`) after all penetrations, witnessed (H8, Q-03), pass = no water inside; repeated after relocation | [SCOPE_ENVELOPE_TEST] | Record dated [ENVELOPE_TEST_DATE] starts the envelope warranty (`WARRANTY_TERMS.md` 1.3) |
+| BEN 2000: module set with 100 t crane (3 days), hall join (structural bolting, EPDM cover strips, roof seams, busway and DLC couplings, fibre across joints), **module joint seal test E15** per joint (H17a) | [SCOPE_MODULE_JOIN] | BEN 2000 only |
+| Electrical vestibule 1.1 m (BEN 150/500); second egress door (BEN 500 at ≥ 1000 A) | [SCOPE_VESTIBULE] | |
 | Floor channels, anchor clips, torque record (Q-04) | [SCOPE_FLOOR] | |
 | Lighting, emergency lighting (90-minute self-contained), signage (arc-flash, NFPA 704, refrigerant, agent, entry procedure) | [SCOPE_LIGHTING_SIGNAGE] | |
 | Door access control (badge reader, camera on controls LAN) | [SCOPE_ACCESS_CONTROL] | |
@@ -101,7 +105,8 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | --- | --- | --- |
 | Main panelboard/switchboard rated [SERVICE_BREAKER_A] A, SCCR 65 kA, SPD | [SCOPE_PWR_MAIN] | |
 | UPS [UPS_MODULES] x [UPS_KVA_EACH] kVA, UL 1778, with lithium (LFP) battery [BATTERY_KWH] kWh, UL 1973 / UL 9540 | [SCOPE_PWR_UPS] | NFPA 855 package where ≥ 20 kWh: [NFPA855_PACKAGE] |
-| Step-down transformers 480→208Y/120 V (BEN 150/40) | [SCOPE_PWR_TRANSFORMERS] | |
+| Step-down transformers 480→208Y/120 V (BEN 150/500) | [SCOPE_PWR_TRANSFORMERS] | |
+| BEN 2000 medium-voltage and plant: [MV_SERVICE] service, [TRANSFORMERS_TOTAL] × 2,500 kVA pad-mount transformers (2N), 15 kV loop-feed switch, MV cable and duct bank from the utility point of delivery, UL 1558 main-tie-main switchgear 4,000 A, 2N UPS strings, NFPA 855 battery rooms, [GENERATORS_TOTAL] × 1,250 kW generators (N+1) with 48 h fuel, NETA acceptance tests, E16 transfer test | [SCOPE_PWR_MV_PLANT] | BEN 2000 only; utility works and fees are Customer's (Section 3.7); SPCC plan by PE |
 | Rack PDUs (A/B per rack, metered), whips, receptacles | [SCOPE_PWR_PDU] | |
 | Power meters per power path; E9 reconciliation | [SCOPE_PWR_METERS] | |
 | Grounding and bonding inside the Unit; two 2/0 AWG bonding lugs at diagonal corners | [SCOPE_PWR_BONDING] | Site electrode per Section 3.7 |
@@ -153,6 +158,7 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | VEWFD aspirating smoke detection plus spot detectors; UL 864 releasing panel; outdoor horn/strobe | [SCOPE_FS_DETECTION] | |
 | Clean agent system (FK-5-1-12 class) with 10-minute hold, pre-discharge delay, abort station, door fan test (Q-09) | [SCOPE_FS_SUPPRESSION] | BEN 30/150/500; BEN 5: aerosol unit, detection and extinguisher |
 | EPO at exit door; HVAC shutdown on second-stage alarm | [SCOPE_FS_EPO] | Hardwired, never on the controls bus |
+| BEN 2000: clean agent and VESDA per module, pre-action sprinkler option for the hall, NFPA 855 battery rooms with 2-hour separation, gas detection and deflagration venting | [SCOPE_FS_HALL] | BEN 2000 only; occupancy Group B / F-1 per AHJ |
 | Fire marshal plan review and permit by licensed fire protection contractor | [SCOPE_FS_PERMIT] | |
 | Connection to central station / Customer monitoring | [SCOPE_FS_MONITORING] | Site-dependent |
 

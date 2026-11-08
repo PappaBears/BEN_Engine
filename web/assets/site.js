@@ -1,4 +1,4 @@
-import { validate, derived, preset } from './selector.js';
+import { validate, derived, preset, canonicalTier, hardeningRecommended } from './selector.js';
 
 const $ = (s) => document.querySelector(s);
 const fmt = (n) => n.toLocaleString('en-US');
@@ -37,9 +37,13 @@ function buildTiers() {
   for (const [k, t] of Object.entries(CAT.tiers)) {
     const d = derived(preset(k, state.profile, state.climate, CAT), CAT);
     const el = document.createElement('article'); el.className = 'card';
-    el.innerHTML = `<h3>${t.label}<span class="kw">${t.it_kw_min}–${t.it_kw_max} kW</span></h3>
+    const service = d.mv_service ? `${t.voltage}; ${d.transformers_total} × ${fmt(d.transformer_kva)} kVA transformers at preset` : `${t.voltage}, ${d.service_breaker_a} A at preset`;
+    const racks = (t.rows ?? 1) > 1 ? `up to ${t.max_racks} × ${t.rack_u}U in ${t.rows} rows` : `up to ${t.max_racks} × ${t.rack_u}U`;
+    const footprint = (t.modules ?? 1) > 1 ? `${t.ext_l_m} × ${t.ext_w_m} × ${t.ext_h_m} m hall (${t.modules} modules) + power module + plant yard` : `${t.ext_l_m} × ${t.ext_w_m} × ${t.ext_h_m} m`;
+    el.dataset.tier = k;
+    el.innerHTML = `<h3>${t.label}<span class="kw">${fmt(t.it_kw_min)}–${fmt(t.it_kw_max)} kW</span></h3>
       <p class="muted">${t.enclosure}</p>
-      <dl><dt>Racks</dt><dd>up to ${t.max_racks} × ${t.rack_u}U</dd><dt>Cooling</dt><dd>${CAT.cooling[t.default_cooling].label}</dd><dt>Service</dt><dd>${t.voltage}, ${d.service_breaker_a} A at preset</dd><dt>Footprint</dt><dd>${t.ext_l_m} × ${t.ext_w_m} × ${t.ext_h_m} m</dd></dl>
+      <dl><dt>Racks</dt><dd>${racks}</dd><dt>Cooling</dt><dd>${CAT.cooling[t.default_cooling].label}</dd><dt>Service</dt><dd>${service}</dd><dt>Footprint</dt><dd>${footprint}</dd></dl>
       <button class="btn" data-tier="${k}" style="margin-top:12px">Configure ${t.label}</button>`;
     el.querySelector('button').onclick = () => { setPreset(k); location.hash = '#configure'; };
     g.appendChild(el);
@@ -52,12 +56,12 @@ function buildProfiles() {
     const b = document.createElement('button'); b.className = 'profile'; b.type = 'button'; b.setAttribute('role', 'listitem');
     b.setAttribute('aria-pressed', String(k === state.profile));
     b.innerHTML = `<span class="tag">${p.redundancy}</span><span class="tag" style="background:#66E3FF">ASHRAE ${p.ashrae}</span><h3>${p.label}</h3><p>${PROFILE_BLURB[k] || ''}</p>`;
-    b.onclick = () => { state.profile = k; buildProfiles(); buildRisks(); setPreset(state.cfg?.tier || 'ben20'); };
+    b.onclick = () => { state.profile = k; buildProfiles(); buildRisks(); setPreset(state.cfg?.tier || 'ben150'); };
     g.appendChild(b);
   }
   const cs = $('#climateSel'); cs.innerHTML = '';
   for (const [k, c] of Object.entries(CAT.climates)) { const o = document.createElement('option'); o.value = k; o.textContent = c.label; o.selected = k === state.climate; cs.appendChild(o); }
-  cs.onchange = () => { state.climate = cs.value; climateNote(); setPreset(state.cfg?.tier || 'ben20'); };
+  cs.onchange = () => { state.climate = cs.value; climateNote(); setPreset(state.cfg?.tier || 'ben150'); };
   climateNote();
 }
 function climateNote() { const c = CAT.climates[state.climate]; $('#climateNote').textContent = `Design day ${c.t_design_c} °C, low ${c.t_min_c} °C, corrosion class ${c.corrosion}, wind ${c.wind_ms} m/s. Cooling is derated and the envelope package is chosen from this.`; }
@@ -74,25 +78,39 @@ function buildRisks() {
 }
 
 function setPreset(tier) {
-  state.cfg = preset(tier, state.profile, state.climate, CAT);
+  state.cfg = preset(canonicalTier(tier, CAT), state.profile, state.climate, CAT);
   writeForm(); recompute();
 }
+function hardeningNote() {
+  const rec = hardeningRecommended(state.profile, state.climate);
+  const h = CAT.hardening?.[state.cfg.hardening];
+  const chosen = state.cfg.hardening;
+  $('#hardeningNote').textContent = `${h ? h.rating + '; coating ' + h.coating + '. ' : ''}Recommended for ${CAT.profiles[state.profile].label} in ${CAT.climates[state.climate].label}: ${rec}` + (rec !== chosen ? ` (you chose ${chosen})` : '');
+}
 function writeForm() {
-  const c = state.cfg, t = CAT.tiers[c.tier];
+  const c = state.cfg; c.tier = canonicalTier(c.tier, CAT); const t = CAT.tiers[c.tier];
+  if (!c.hardening) c.hardening = hardeningRecommended(c.profile || state.profile, c.climate || state.climate);
   $('#tier').value = c.tier;
   const it = $('#it_kw'); it.min = t.it_kw_min; it.max = t.it_kw_max; it.value = c.it_kw; $('#itOut').value = c.it_kw;
   $('#racks').max = t.max_racks; $('#racks').value = c.racks;
   const cs = $('#cooling'); cs.innerHTML = '';
-  for (const [k, v] of Object.entries(CAT.cooling)) { if ((c.tier === 'micro') !== (k === 'cabinet_dx')) continue; const o = document.createElement('option'); o.value = k; o.textContent = v.label; cs.appendChild(o); }
+  for (const [k, v] of Object.entries(CAT.cooling)) {
+    if ((c.tier === 'ben5') !== (k === 'cabinet_dx')) continue;
+    if (t.kind === 'hall' && k !== 'dlc_cdu') continue;
+    const o = document.createElement('option'); o.value = k; o.textContent = v.label; cs.appendChild(o);
+  }
   cs.value = c.cooling; $('#redundancy').value = c.redundancy; $('#ups_minutes').value = c.ups_minutes; $('#generator').checked = c.generator;
+  $('#hardening').value = c.hardening;
   document.querySelectorAll('.sub').forEach(x => x.checked = c.subsystems.includes(x.value));
   $('#white_label').checked = c.white_label; $('#brand').value = c.brand;
-  $('#heroImg').src = `assets/hero-${c.tier}.svg`;
+  const hero = $('#heroImg'); hero.src = `assets/hero-${c.tier}.svg`;
+  hero.alt = t.kind === 'hall' ? `Isometric illustration of the ${t.label} prefabricated data hall: three joined modules, a power module and a plant yard with dry coolers and generators` : `Isometric illustration of a ${t.label} ${t.kind === 'cabinet' ? 'outdoor cabinet' : 'container data center'} with the Schreiber AI mark on the side`;
 }
 function readForm() {
   const c = state.cfg;
   c.tier = $('#tier').value; c.it_kw = +$('#it_kw').value; c.racks = +$('#racks').value; c.cooling = $('#cooling').value;
   c.redundancy = $('#redundancy').value; c.ups_minutes = +$('#ups_minutes').value; c.generator = $('#generator').checked;
+  c.hardening = $('#hardening').value || c.hardening || 'H1';
   c.subsystems = [...document.querySelectorAll('.sub:checked')].map(x => x.value);
   c.white_label = $('#white_label').checked; c.brand = $('#brand').value || 'Schreiber AI';
   c.profile = state.profile; c.climate = state.climate;
@@ -103,7 +121,14 @@ function recompute() {
   const eb = $('#cfgErrors'); eb.hidden = errs.length === 0; eb.innerHTML = errs.map(e => `<div>⚠ ${e}</div>`).join('');
   if (errs.length) { $('#sizing').innerHTML = '<p class="muted">Fix the configuration to see sizing.</p>'; $('#price').innerHTML = ''; return; }
   const d = derived(state.cfg, CAT);
-  const rows = [['Enclosure', d.enclosure], ['IT load', `${state.cfg.it_kw} kW in ${state.cfg.racks} racks (${d.per_rack_kw} kW/rack)`], ['Cooling', `${d.cooling_units_total} × ${d.cooling_label} (${d.cooling_units_n} duty, ${state.cfg.redundancy})`], ['Cooling derate for climate', `${Math.round(d.cooling_derate * 100)} %`], ['Total electrical load', `${d.total_kw} kW / ${d.total_kva} kVA`], ['Service', `${d.voltage}, ${d.service_breaker_a} A main (calc ${d.service_amps_calc} A)`], ['UPS', `${d.ups_modules} × ${d.ups_kva_each} kVA, ${state.cfg.ups_minutes} min → ${d.battery_kwh} kWh LFP`], ['Airflow', `${fmt(d.airflow_cfm)} cfm`], ['Gross mass', `${fmt(d.gross_kg)} kg`], ['Estimated PUE', d.pue_estimate], ['Environmental class', `ASHRAE ${d.ashrae_class}`]];
+  hardeningNote();
+  const layout = d.rows > 1 ? `${state.cfg.racks} racks in ${d.rows} rows of ${d.racks_per_row} (${d.per_rack_kw} kW/rack)` : `${state.cfg.racks} racks (${d.per_rack_kw} kW/rack)`;
+  const rows = [['Enclosure', d.enclosure], ['IT load', `${fmt(state.cfg.it_kw)} kW in ${layout}`], ['Cooling', `${d.cooling_units_total} × ${d.cooling_label} (${d.cooling_units_n} duty, ${state.cfg.redundancy})`], ['Cooling derate for climate', `${Math.round(d.cooling_derate * 100)} %`], ['Total electrical load', `${fmt(d.total_kw)} kW / ${fmt(d.total_kva)} kVA`], ['Service', `${d.voltage}, ${fmt(d.service_breaker_a)} A main (calc ${fmt(d.service_amps_calc)} A)`]];
+  if (d.mv_service) rows.push(['Transformers', `${d.transformers_total} × ${fmt(d.transformer_kva)} kVA pad-mount (MV → 480 V, ${state.cfg.redundancy})`]);
+  rows.push(['UPS', `${d.ups_modules} × ${fmt(d.ups_kva_each)} kVA, ${state.cfg.ups_minutes} min → ${fmt(d.battery_kwh)} kWh LFP`]);
+  rows.push(['Generators', d.generators_total ? `${d.generators_total} × ${fmt(d.generator_kw_each)} kW standby${d.mv_service ? ' (N+1, 48 h fuel)' : ''}` : 'none (option)']);
+  rows.push(['Hardening', `${d.hardening_label}: ${d.hardening_rating}`]);
+  rows.push(['Airflow', `${fmt(d.airflow_cfm)} cfm`], ['Gross mass', `${fmt(d.gross_kg)} kg${d.modules > 1 ? ` (${d.modules} modules + power module)` : ''}`], ['Estimated PUE', d.pue_estimate], ['Environmental class', `ASHRAE ${d.ashrae_class}`]);
   $('#sizing').innerHTML = `<h3>Sizing</h3><table>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`;
   renderPrice(d);
   const q = encodeURIComponent(JSON.stringify(state.cfg));
@@ -139,12 +164,13 @@ async function main() {
   PRICING = await load('assets/pricing.json', null);
   buildTiers(); buildProfiles(); buildRisks();
   const ts = $('#tier'); for (const [k, t] of Object.entries(CAT.tiers)) { const o = document.createElement('option'); o.value = k; o.textContent = t.label; ts.appendChild(o); }
+  const hs = $('#hardening'); for (const [k, h] of Object.entries(CAT.hardening || {})) { const o = document.createElement('option'); o.value = k; o.textContent = `${h.label} — ${h.rating}`; hs.appendChild(o); }
   const urlCfg = new URLSearchParams(location.search).get('config');
-  if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset('ben20'); } }
-  else setPreset('ben20');
+  if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.cfg.tier = canonicalTier(state.cfg.tier, CAT); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset('ben150'); } }
+  else setPreset('ben150');
   ts.onchange = () => setPreset(ts.value);
   $('#it_kw').oninput = () => { $('#itOut').value = $('#it_kw').value; recompute(); };
-  for (const id of ['#racks', '#cooling', '#redundancy', '#ups_minutes', '#generator', '#white_label', '#brand']) $(id).onchange = recompute;
+  for (const id of ['#racks', '#cooling', '#redundancy', '#ups_minutes', '#generator', '#hardening', '#white_label', '#brand']) $(id).onchange = recompute;
   document.querySelectorAll('.sub').forEach(x => x.onchange = recompute);
   $('#dlCfg').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(state.cfg, null, 2)], { type: 'application/json' })); a.download = `ben-config-${state.cfg.tier}.json`; a.click(); };
 }

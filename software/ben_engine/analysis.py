@@ -419,7 +419,7 @@ def synthetic_load_step_record(cfg: Config, true_params: TwinParams, seed: int =
 def main(argv=None):
     import argparse, json
     ap = argparse.ArgumentParser(description="BEN Engine analysis: fit twin to telemetry and predict with intervals")
-    ap.add_argument("--tier", default="ben20")
+    ap.add_argument("--tier", default="ben150")
     ap.add_argument("--profile", default="ai_inference")
     ap.add_argument("--climate", default="temperate")
     ap.add_argument("--load", type=float, default=1.0)

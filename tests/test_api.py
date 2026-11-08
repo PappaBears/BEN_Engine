@@ -26,8 +26,8 @@ def client():
 
 @pytest.fixture(autouse=True)
 def _reset_config(client):
-    """Every test starts from the BEN 20 preset at 1x speed."""
-    client.post("/api/config", json=Config.preset("ben20").to_dict())
+    """Every test starts from the BEN 150 preset at 1x speed."""
+    client.post("/api/config", json=Config.preset("ben150").to_dict())
     client.post("/api/sim/speed", json={"x": 1})
     client.delete("/api/faults")
     yield
@@ -71,21 +71,21 @@ def test_catalog_shape(client):
 
 def test_config_get_has_config_derived_sensors(client):
     r = client.get("/api/config").json()
-    assert r["config"]["tier"] == "ben20"
-    assert r["derived"]["tier_label"] == "BEN 20"
+    assert r["config"]["tier"] == "ben150"
+    assert r["derived"]["tier_label"] == "BEN 150"
     assert r["errors"] == []
-    assert len(r["sensors"]) == len(Twin(Config.preset("ben20")).sensors())
+    assert len(r["sensors"]) == len(Twin(Config.preset("ben150")).sensors())
     assert {"id", "kind", "location_m", "unit", "u95", "node"} <= set(r["sensors"][0])
 
 
 def test_config_post_valid_rebuilds_twin(client):
-    r = client.post("/api/config", json={"tier": "ben40", "it_kw": 300, "racks": 8, "cooling": "dlc_cdu", "redundancy": "N+1"})
+    r = client.post("/api/config", json={"tier": "ben500", "it_kw": 300, "racks": 8, "cooling": "dlc_cdu", "redundancy": "N+1"})
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["config"]["tier"] == "ben40" and body["config"]["racks"] == 8
-    assert body["derived"]["tier_label"] == "BEN 40"
+    assert body["config"]["tier"] == "ben500" and body["config"]["racks"] == 8
+    assert body["derived"]["tier_label"] == "BEN 500"
     st = client.get("/api/state").json()
-    assert st["tier"] == "ben40" and len(st["rack_inlet_c"]) == 8
+    assert st["tier"] == "ben500" and len(st["rack_inlet_c"]) == 8
     assert len(client.get("/api/sensors").json()) == len(body["sensors"])
 
 
@@ -95,9 +95,9 @@ def test_config_post_invalid_returns_400_with_errors(client):
     errs = r.json()["errors"]
     assert errs and any("kW" in e for e in errs)
     # the running twin is untouched
-    assert client.get("/api/state").json()["tier"] == "ben20"
-    r = client.post("/api/config", json={"tier": "micro", "cooling": "inrow_dx", "it_kw": 4, "racks": 1})
-    assert r.status_code == 400 and any("Micro" in e for e in r.json()["errors"])
+    assert client.get("/api/state").json()["tier"] == "ben150"
+    r = client.post("/api/config", json={"tier": "ben5", "cooling": "inrow_dx", "it_kw": 4, "racks": 1})
+    assert r.status_code == 400 and any("BEN 5" in e for e in r.json()["errors"])
 
 
 def test_config_validate_endpoint_does_not_apply(client):
@@ -122,7 +122,7 @@ def test_state_shape(client):
 def test_websocket_pushes_config_then_state(client):
     with client.websocket_connect("/ws/state") as ws:
         m1 = ws.receive_json()
-        assert m1["type"] == "config" and m1["config"]["tier"] == "ben20"
+        assert m1["type"] == "config" and m1["config"]["tier"] == "ben150"
         m2 = ws.receive_json()
         assert m2["type"] == "state" and "rack_inlet_c" in m2["state"]
 
@@ -206,7 +206,7 @@ def test_export_range_filters_and_json(client):
     r = client.get("/api/export.json?last=600")
     assert r.status_code == 200 and r.headers["content-type"].startswith("application/json")
     body = r.json()
-    assert body["config"]["tier"] == "ben20" and isinstance(body["rows"], list) and body["rows"]
+    assert body["config"]["tier"] == "ben150" and isinstance(body["rows"], list) and body["rows"]
     assert client.get("/api/export.csv?from=not-a-time").status_code == 400
     rng = client.get("/api/export/range").json()
     assert rng["rows"] > 0 and rng["from"] <= rng["to"]

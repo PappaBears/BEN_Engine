@@ -56,6 +56,11 @@ const BASE = `http://127.0.0.1:${port}`;
 let browser;
 try {
   const health = await waitHttp(`${BASE}/api/health`);
+  // the default configuration comes from /api/config (BEN 150 preset), never hard-coded here
+  const cfg0 = await waitHttp(`${BASE}/api/config`);
+  const presets = await waitHttp(`${BASE}/api/presets`);
+  const DEF = { tier: cfg0.config.tier, racks: cfg0.config.racks, label: cfg0.derived.tier_label };
+  const L = (t) => presets[t].derived.tier_label;
   check('server up', health.twin_running === true, `port ${port}, modules ${Object.entries(health.modules).filter(([, v]) => v).map(([k]) => k).join(',')}`);
 
   browser = await chromium.launch({ headless: HEADLESS, args: ['--no-sandbox', '--disable-dev-shm-usage', '--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
@@ -84,36 +89,44 @@ try {
     if (!dot.includes('ok')) throw new Error('status dot not ok: ' + dot);
     return 'status strip shows live';
   });
-  await step('3D scene built for BEN 20 (5 racks)', async () => {
+  await step(`3D scene built for ${DEF.label} (${DEF.racks} racks)`, async () => {
     const n = await page.evaluate(() => window.__ben.scene.rackCount());
     const sensors = await page.evaluate(() => window.__ben.scene.sensorCount());
-    if (n !== 5) throw new Error(`expected 5 racks, got ${n}`);
+    if (n !== DEF.racks) throw new Error(`expected ${DEF.racks} racks, got ${n}`);
     if (sensors < 10) throw new Error(`expected sensors, got ${sensors}`);
     return `${n} racks, ${sensors} sensors`;
   });
   await page.waitForTimeout(1500);
   await shot(page, `${SCREENS}/desktop-exterior-iso.png`);
 
-  // ---------------------------------------------------------------------------------------------- selector -> BEN 40
-  await step('selector: switch to BEN 40 rebuilds twin + scene', async () => {
+  // ---------------------------------------------------------------------------------------------- selector -> BEN 500
+  await step('selector: five tier presets and a hardening select', async () => {
     await page.click('#tabs button[data-id="selector"]');
     await page.waitForSelector('#btn-apply-config');
-    await page.click('.panel-body[data-panel="selector"] .row button:has-text("BEN 40")');
-    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben40');
+    const labels = await page.$$eval('.panel-body[data-panel="selector"] .row button', bs => bs.map(b => b.textContent.trim()));
+    const want = Object.keys(presets).map(L);
+    for (const w of want) if (!labels.includes(w)) throw new Error(`preset button ${w} missing: ${labels.join(', ')}`);
+    const hz = await page.$$eval('select[name=hardening] option', os => os.map(o => o.value));
+    if (hz.join(',') !== 'H1,H2,H3') throw new Error('hardening options ' + hz.join(','));
+    return `${labels.join(' · ')} · hardening ${hz.join('/')}`;
+  });
+  await step(`selector: switch to ${L('ben500')} rebuilds twin + scene`, async () => {
+    await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben500')}")`);
+    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben500');
     await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
     await page.click('#btn-apply-config');
-    await page.waitForFunction(() => window.__ben.store.config && window.__ben.store.config.tier === 'ben40' && window.__ben.scene.rackCount() === window.__ben.store.config.racks, null, { timeout: 15000, polling: 200 });
+    await page.waitForFunction(() => window.__ben.store.config && window.__ben.store.config.tier === 'ben500' && window.__ben.scene.rackCount() === window.__ben.store.config.racks, null, { timeout: 15000, polling: 200 });
     const racks = await page.evaluate(() => [window.__ben.scene.rackCount(), window.__ben.store.config.racks, window.__ben.store.derived.tier_label]);
     if (racks[0] !== racks[1]) throw new Error(`scene racks ${racks[0]} != config ${racks[1]}`);
-    if (racks[2] !== 'BEN 40') throw new Error('pill not BEN 40');
+    if (racks[2] !== L('ben500')) throw new Error(`pill not ${L('ben500')}`);
     return `${racks[0]} racks in scene`;
   });
   await page.waitForTimeout(1200);
-  await shot(page, `${SCREENS}/selector-ben40.png`);
+  await shot(page, `${SCREENS}/selector-ben500.png`);
 
   await step('selector: invalid configuration shows inline errors', async () => {
     await page.evaluate(() => { const s = document.querySelector('select[name=cooling]'); s.value = 'cabinet_dx'; s.dispatchEvent(new Event('change')); });
-    await page.waitForFunction(() => { const e = document.querySelector('.errors'); return e && !e.hidden && /Micro only/.test(e.textContent); }, null, { timeout: 5000, polling: 200 });
+    await page.waitForFunction(() => { const e = document.querySelector('.errors'); return e && !e.hidden && /BEN 5 only/.test(e.textContent); }, null, { timeout: 5000, polling: 200 });
     const disabled = await page.evaluate(() => document.querySelector('#btn-apply-config').disabled);
     if (!disabled) throw new Error('apply should be disabled on invalid config');
     await page.evaluate(() => { const s = document.querySelector('select[name=cooling]'); s.value = 'dlc_cdu'; s.dispatchEvent(new Event('change')); });
@@ -121,26 +134,49 @@ try {
     return 'cabinet_dx-on-container error shown, apply disabled, then cleared';
   });
 
-  // ---------------------------------------------------------------------------------------------- micro
-  await step('selector: BEN Micro renders a single cabinet', async () => {
-    await page.click('.panel-body[data-panel="selector"] .row button:has-text("BEN Micro")');
-    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'micro');
+  // ---------------------------------------------------------------------------------------------- BEN 5 cabinet
+  await step(`selector: ${L('ben5')} renders a single cabinet`, async () => {
+    await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben5')}")`);
+    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben5');
     await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
     await page.click('#btn-apply-config');
-    await page.waitForFunction(() => window.__ben.store.config.tier === 'micro' && window.__ben.scene.rackCount() === 1, null, { timeout: 15000, polling: 200 });
+    await page.waitForFunction(() => window.__ben.store.config.tier === 'ben5' && window.__ben.scene.rackCount() === 1, null, { timeout: 15000, polling: 200 });
     await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true));
     await page.waitForTimeout(1200);
-    await shot(page, `${SCREENS}/selector-micro.png`);
+    await shot(page, `${SCREENS}/selector-ben5.png`);
     return 'rackCount 1';
   });
 
-  // back to BEN 20 for the rest
+  // ---------------------------------------------------------------------------------------------- BEN 2000 hall
+  await step(`selector: ${L('ben2000')} builds the hall (rows, power module, yard, hardening)`, async () => {
+    await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben2000')}")`);
+    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben2000');
+    await page.evaluate(() => { const s = document.querySelector('select[name=hardening]'); s.value = 'H3'; s.dispatchEvent(new Event('change')); });
+    await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
+    await page.click('#btn-apply-config');
+    await page.waitForFunction(() => window.__ben.store.config.tier === 'ben2000' && window.__ben.scene.rackCount() === window.__ben.store.config.racks, null, { timeout: 30000, polling: 200 });
+    const info = await page.evaluate(() => ({ racks: window.__ben.scene.rackCount(), cfgRacks: window.__ben.store.config.racks, rows: window.__ben.scene.rowCount(), dry: window.__ben.scene.dryCoolerCount(), d: window.__ben.store.derived, hall: window.__ben.scene.hallObjects(), hz: window.__ben.store.config.hardening }));
+    if (info.racks !== info.cfgRacks) throw new Error(`scene racks ${info.racks} != config ${info.cfgRacks}`);
+    if (info.rows !== info.d.rows) throw new Error(`rows ${info.rows} != derived ${info.d.rows}`);
+    if (!info.d.mv_service || info.d.transformers_total < 2) throw new Error('derived MV service / transformers missing');
+    if (!info.hall.powermodule || info.hall.transformers !== info.d.transformers_total || info.hall.generators !== info.d.generators_total) throw new Error('hall objects ' + JSON.stringify(info.hall));
+    if (info.dry !== info.d.cooling_units_total) throw new Error(`dry coolers ${info.dry} != ${info.d.cooling_units_total}`);
+    if (info.hz !== 'H3' || !info.hall.vestibule || !info.hall.plinth) throw new Error('H3 hardening visuals missing ' + JSON.stringify(info.hall));
+    const derivedTxt = await page.textContent('.panel-body[data-panel="selector"]');
+    if (!/Transformers/.test(derivedTxt) || !/Generators/.test(derivedTxt) || !/Hardening/.test(derivedTxt)) throw new Error('derived table lacks MV/generator/hardening rows');
+    await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true));
+    await page.waitForTimeout(1500);
+    await shot(page, `${SCREENS}/selector-ben2000.png`);
+    return `${info.racks} racks in ${info.rows} rows, ${info.hall.transformers} transformers, ${info.hall.generators} generators, ${info.dry} dry coolers, ${info.hall.fanwalls} fan walls`;
+  });
+
+  // back to the default tier for the rest
   if (!ONLY) {
-  await page.click('.panel-body[data-panel="selector"] .row button:has-text("BEN 20")');
-  await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben20');
+  await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${DEF.label}")`);
+  await page.waitForFunction((t) => document.querySelector('select[name=tier]').value === t, DEF.tier);
   await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
   await page.click('#btn-apply-config');
-  await page.waitForFunction(() => window.__ben.store.config.tier === 'ben20' && window.__ben.scene.rackCount() === 5, null, { timeout: 15000, polling: 200 });
+  await page.waitForFunction(([t, n]) => window.__ben.store.config.tier === t && window.__ben.scene.rackCount() === n, [DEF.tier, DEF.racks], { timeout: 15000, polling: 200 });
   }
 
   // ---------------------------------------------------------------------------------------------- hover tooltip

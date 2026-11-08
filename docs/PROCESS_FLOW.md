@@ -1,6 +1,6 @@
 # BEN Engine — Manufacturing Process Flow (design to in service)
 
-**Owner:** Schreiber AI operations. **Applies to:** BEN 5, BEN 30, BEN 150, BEN 500. **Manufacturing model (operator decision, 2026-11-08):** **third parties first.** The build stages are performed by a **qualified contract manufacturer / integrator (CM)** — a container modification shop or modular electrical skid builder with licensed trades and, ideally, its own UL 508A panel shop — working from Schreiber AI's engineering release, with Schreiber AI's **controls kit**, QC forms and commissioning script, and with Schreiber AI engineers present at witness points and at FAT. A Schreiber AI greenfield factory is a later phase (see `docs/MANUFACTURING_STRATEGY.md`). **Rule:** every stage has an owner, inputs, outputs, hold points and records. A **hold point (H)** stops the work until a named person signs. A **witness point (W)** is an invitation: Schreiber AI quality, the customer or an inspector may attend; work continues if they decline in writing.
+**Owner:** Schreiber AI operations. **Applies to:** BEN 5, BEN 30, BEN 150, BEN 500 (stages 1–22) and BEN 2000 (stages 1–22 plus the hall path in §5). **Manufacturing model (operator decision, 2026-11-08):** **third parties first.** The build stages are performed by a **qualified contract manufacturer / integrator (CM)** — a container modification shop or modular electrical skid builder with licensed trades and, ideally, its own UL 508A panel shop — working from Schreiber AI's engineering release, with Schreiber AI's **controls kit**, QC forms and commissioning script, and with Schreiber AI engineers present at witness points and at FAT. A Schreiber AI greenfield factory is a later phase (see `docs/MANUFACTURING_STRATEGY.md`). **Rule:** every stage has an owner, inputs, outputs, hold points and records. A **hold point (H)** stops the work until a named person signs. A **witness point (W)** is an invitation: Schreiber AI quality, the customer or an inspector may attend; work continues if they decline in writing.
 
 Owners: **ENG** Schreiber AI engineering (design authority) · **SAI-Q** Schreiber AI quality (witness, FAT, records) · **CM** contract manufacturer / integrator (build, its own QC, its licensed trades and certified welders, its UL 508A panel shop or a sub) · **SUB** certified subcontractor to the CM or to Schreiber AI (fire suppression contractor, EPA 608 refrigeration tech, PE, CWI, NRTL field evaluation) · **LOG** logistics · **SITE** site contractor (civil, crane, utility) · **CUST** customer · **AHJ** inspector / fire marshal / utility.
 
@@ -60,7 +60,7 @@ Amber = contains a hold point. Cyan = contains a witness point.
 | 5a | **Controls kit build and test** | ENG (Schreiber AI's own small shop or its UL 508A panel partner) | Controls panel drawings, nodes, gateway, switch, sensors, cables cut to length, labels | **Controls kit**: UL 508A-labelled controls panel, pre-addressed and calibrated nodes with `cal_id`, gateway imaged for this unit, sensor strings, labelled cable set, dP tubing, installation sheet; bench-tested end to end (every channel) before it ships | **W5a** kit bench test (CM may attend remotely) | ENG builds and tests; SAI-Q signs the kit test record | Kit test record (I/O 100 %), firmware hashes, calibration certificates, packing list; consignment note | 1–2 weeks (in parallel with 6–9) | Kit passes bench test; consigned to CM with serial numbers |
 | 6 | **Container receiving & inspection** | CM | New one-trip high-cube container (CSC plated) or new cabinet (BEN 5) | Accepted container; baseline dimensions and squareness; CSC plate photographed | **W6** SAI-Q or customer may witness (remote photo review acceptable) | SAI-Q reviews Q-01 remotely within 24 h | Q-01 receiving report, photos, plate record, flatness/squareness (CTQ-S1) | 1 day | No dents > 20 mm, doors seal, floor sound, plate legible |
 | 7 | **Structural modification** | CM (AWS D1.1 certified welders) under ENG drawing | IFC structural drawings, PE calc | Framed openings (doors, louvres, penetrations), reinforcing, floor stiffeners under UPS/battery, anchor clips | **H7** weld inspection (visual 100 %, MT 10 %) by CWI before closing in | SAI-Q witnesses the CWI inspection on first article and on every BEN 500; otherwise reviews the CWI report | Q-02 weld map, welder certs, CWI report, PE letter | 1–2 weeks | All welds accepted; squareness within CTQ-S1 after welding |
-| 8 | **Envelope** | CM | Modified shell | Insulation (100 mm PIR / spray foam, R 3.5 m²K/W), vapour barrier, non-combustible liner, personnel doors with panic hardware, roof treatment, coating system per ISO 9223 class, door seals, drains | **W8** insulation and vapour barrier before liner (hidden work) | SAI-Q present or photo-witness before liner closes; approves coating DFT record | Q-03 envelope (coating DFT, insulation photos, door swing, blower-door) | 1–2 weeks | Liner closed only after W8 photos filed; leak test ≤ target (CTQ-E2) |
+| 8 | **Envelope** | CM | Modified shell | Insulation (100 mm PIR / spray foam, R 3.5 m²K/W), vapour barrier, non-combustible liner, personnel doors with compression gaskets, three-point latches and panic hardware, gasketed and hose-tested penetrations, drip edges, roof treatment, coating system per hardening level (ISO 12944 C3 at H1, C5-M at H2/H3), door seals, drains; H2 flood plinth and weather hoods; H3 ballistic panels, forced-entry doors and shielding liner before the thermal liner | **W8** insulation and vapour barrier before liner (hidden work); **H8** envelope hose test E14 (UL 50E type 4X) after all penetrations are in | SAI-Q present or photo-witness before liner closes; approves coating DFT record; witnesses E14 | Q-03 envelope (coating DFT, insulation photos, door swing, blower-door, **E14 hose test record**; H3: panel certificates, IEEE 299 shielding test) | 1–2 weeks (H3: +2 weeks) | Liner closed only after W8 photos filed; E14 passed with no water inside; leak test ≤ target (CTQ-E2) |
 | 9 | **Mechanical fit-out** | CM | Racks, containment, cable tray, lighting, leak rope (from kit) | Racks anchored, hot-aisle containment, trays, lights, emergency lights, signage, drip trays | — | SAI-Q reviews Q-04 remotely | Q-04 rack anchor torque, layout check vs drawing | 1 week | Rack positions within ±5 mm; containment seals; aisle width ≥ drawing |
 | 10 | **Electrical** | CM (licensed electrical contractor / its own licensed electricians) | Electrical IFC, BOM, wire sizing table (`BUILD_AND_WIRING.md`) | Main panel, UPS, PDUs, transformers, feeders, whips, grounding/bonding, SPDs, labels, arc-flash labels (provisional) | **H10a** rough-in inspection before covers; **H10b** torque and megger before energisation; **W10** customer or AHJ-of-record may witness | SAI-Q present for H10b (first article: both H10a and H10b); ENG available for RFIs within 4 h | Q-05 torque log, Q-06 insulation resistance / bonding continuity / phase rotation, circuit directory, label photos | 2–3 weeks | Energised from shop supply; phase rotation checked; no open items |
 | 11 | **Cooling** | CM's licensed HVAC trade or SUB (EPA 608 technicians) | Mechanical IFC, refrigerant charge vs volume calc, **A1 refrigerant spec (R-513A/R-515B)** | In-row/cabinet DX or RDHx/CDU + dry cooler piping, condensate, refrigerant detector, glycol fill, pressure test | **H11** pressure test (nitrogen, 1.1× design, 24 h) and evacuation (≤ 500 µm hold) witnessed before charging | SAI-Q witnesses H11 on first article and spot-checks thereafter; reviews Q-07 | Q-07 pressure/evacuation chart, charge weight per circuit, glycol % and pH, refrigerant nameplate record | 1–2 weeks | Units run, superheat/subcool in range, no leaks at 24 h sniff |
@@ -82,7 +82,7 @@ Amber = contains a hold point. Cyan = contains a witness point.
 | --- | --- | --- |
 | Q-01 | 6 | Container receiving: dimensions, squareness, dents, floor, doors, CSC plate photo |
 | Q-02 | 7 | Weld map, welder IDs and certs, CWI visual/MT results, squareness after welding |
-| Q-03 | 8 | Insulation thickness and photos before liner, vapour barrier continuity, coating DFT grid, door swing/seal, leak test |
+| Q-03 | 8 | Insulation thickness and photos before liner, vapour barrier continuity, coating DFT grid, door swing/seal, leak test, E14 hose test record (hardening level, nozzle, duration, result) |
 | Q-04 | 9 | Rack positions vs drawing, anchor torque, containment seal check, lighting lux |
 | Q-05 | 10 | Torque log, 100 % of terminations, torque-seal marks |
 | Q-06 | 10 | Insulation resistance per circuit, bonding continuity, phase rotation, label photos, circuit directory |
@@ -133,7 +133,58 @@ gantt
     Training and turnover (W20)        :e6, after e5, 2d
 ```
 
-Reading the chart: order to engineering release ≈ 8 weeks; release to FAT complete ≈ 16 weeks (set by the 12-week long-lead items, not by the CM); shipping, set-down, hook-up, SAT and turnover ≈ 3 weeks. **Order to in service ≈ 27 weeks for a BEN 150 at a qualified CM.** Add **one full build cycle (≈ 16 weeks) plus a 2–4 week audit** the first time a tier is built at a new CM (stage 4a first article). BEN 5: ≈ 10–12 weeks. BEN 30: ≈ 20 weeks. BEN 500: ≈ 32–36 weeks.
+Reading the chart: order to engineering release ≈ 8 weeks; release to FAT complete ≈ 16 weeks (set by the 12-week long-lead items, not by the CM); shipping, set-down, hook-up, SAT and turnover ≈ 3 weeks. **Order to in service ≈ 27 weeks for a BEN 150 at a qualified CM.** Add **one full build cycle (≈ 16 weeks) plus a 2–4 week audit** the first time a tier is built at a new CM (stage 4a first article). BEN 5: ≈ 10–12 weeks. BEN 30: ≈ 20 weeks. BEN 500: ≈ 32–36 weeks. BEN 2000: ≈ 52 weeks, set by the utility (§5). Hardening H3 adds 2–4 weeks for ballistic/shielding vendor lead time and the shielding test.
+
+## 5. BEN 2000 path (the hall)
+
+BEN 2000 is built by a **modular-building manufacturer** (`MANUFACTURING_STRATEGY.md` §2) in three wide-body modules plus a power module, and the site is a construction project with a building permit. Stages 1–5 and 19–22 are the same; stages 6–18 change as below. The **critical path is the utility**, not the factory: a new 12.47 kV service with primary metering and two pad-mount transformers takes 26–52 weeks from a signed interconnection agreement, so the application is filed at order and the factory schedule is fitted to the utility's date.
+
+| # | Stage | Owner | What is different for the hall | Hold / witness | Records | Typical duration |
+| --- | --- | --- | --- | --- | --- | --- |
+| 3 | Site survey | ENG + CUST + utility | Load letter and single-line to the utility; MV route and pad location; water supply and drain for adiabatic coolers; generator pad and fuel delivery route; geotechnical report; noise study for 3 generators; stormwater; pre-application meeting on occupancy (Group B / F-1) | **H3** + interconnection application filed | Utility application, geotech, noise model | 4–6 weeks |
+| 4 | Engineering release | ENG + PE team | Stamped permit set (structural, electrical, mechanical, fire, civil); state modular-building submission for the factory-built portion; coordination study with utility fault data; SPCC plan draft | **H4**; permit submission | Permit set, modular approval | 6–8 weeks |
+| — | Building permit | AHJ | Plan review and comments; state modular approval runs in parallel | Permit issued | Permit | 8–16 weeks |
+| 5 | Procurement | Schreiber AI | MV switch 20–30 wk, pad-mount transformers 30–52 wk (ordered on the utility's spec), UL 1558 switchgear 30–40 wk, 2 MW UPS strings 20–30 wk, generators 30–45 wk, CDUs and adiabatic coolers 16–24 wk, racks and busway 12–16 wk | — | Long-lead tracker | Longest 52 wk, in step with the utility |
+| 6–8 | Module fabrication | Modular manufacturer | 3 wide-body steel modules (12.2 × 3.66 × 4.2 m) and the power module built in parallel bays: frame, floor, walls, roof, IP66 envelope, joint gaskets fitted in the factory; state modular label | **H7** weld inspection per module; **W8** before liner; **H8** E14 hose test per module (joints excluded, tested at site) | Q-01..Q-03 per module | 10–14 weeks for the set |
+| 9–12 | Fit-out in the factory | Modular manufacturer + ENG | Racks, busway, DLC manifolds, CDU pair, fan wall, VESDA and clean agent per module; power module: switchgear, UPS strings, battery rooms; 4 PLCs, 2 edge computers, 3 border routers installed and loop-checked module by module | **H10**, **H11**, **W12** per module | Q-04..Q-08 per module | 8–10 weeks, overlapping fabrication |
+| 13 | Factory acceptance | ENG leads | FAT per module (E1, E2, E4, E9, E12) and power-module FAT (switchgear NETA tests, UPS string test); the joined-hall tests wait for site | **H13** per module | Q-09 per module | 2 weeks |
+| 14–15 | Transport | LOG | Four over-width loads (3.66 m) with permits and escorts; 100 t crane booked for a 3-day set | — | Permits, lift plan | 1–2 weeks |
+| 16 | Site civil | SITE | Slab 40 × 14 m with grade beams, MV pad with oil containment, generator pad with containment, fuel tanks, duct banks, water and drain, fence, stormwater | **H16** | Survey, concrete, ground test | **20 weeks** after permit |
+| 16a | MV service | Utility + SITE | Primary line extension, metering, transformer set and energisation by the utility; customer-side MV switch and cable VLF test | Utility energisation | Utility acceptance | Utility lead time 26–52 weeks from agreement (parallel with everything above) |
+| 17 | **Module set** | LOG + crane | Three hall modules and the power module set on the slab with a 100 t crane; alignment to ±5 mm at the joints | **W17** lift plan | Q-11 per module | **3 days** |
+| 17a | **Hall join and seal** | Modular manufacturer field crew | Structural bolting at the joints, field EPDM cover strips over factory gaskets, roof seams, interior finish at joints, busway and DLC manifold couplings across joints, fibre across joints | **H17a** E15 module joint seal test (hose test on every joint); joint bolt torque | E15 record, torque log | 2 weeks |
+| 18 | Hook-up | Electrical + mechanical + SITE | 480 V from transformers to switchgear, generators cabled and fuelled, adiabatic cooler loops filled and balanced, water treatment skid, make-up and bleed connections | **H18** | Hook-up checklist, AHJ | 3–4 weeks |
+| 19 | SAT | ENG leads; AHJ | E1–E6, E9, E10 (with generator run), E12, **E16 transformer / UPS string transfer test**, NFPA 110 acceptance test, battery room gas detection, pre-action trip test if fitted, final occupancy inspection | **H19**; certificate of occupancy | Q-12, CO | 2–3 weeks |
+
+```mermaid
+gantt
+    title BEN 2000 typical schedule (weeks from order) — utility on the critical path
+    dateFormat  YYYY-MM-DD
+    axisFormat  W%W
+    section Commercial and permits
+    Inquiry and selector                    :a1, 2026-01-05, 2w
+    Site survey, utility application (H3)   :a2, after a1, 5w
+    Engineering release, permit set (H4)    :b1, after a2, 7w
+    Building permit review                  :b2, after b1, 12w
+    section Utility
+    MV service by utility (26–52 wk)        :crit, u1, after a2, 40w
+    section Procurement
+    Transformers, switchgear, generators    :c1, after b1, 36w
+    UPS strings, CDUs, coolers              :c2, after b1, 26w
+    section Modular manufacturer
+    Module fabrication (H7, W8, H8)         :d1, after b1, 12w
+    Fit-out per module (H10, H11, W12)      :d2, after d1, 8w
+    FAT per module (H13)                    :d3, after d2, 2w
+    section Site
+    Site civil 20 weeks (H16)               :e1, after b2, 20w
+    Module set, 3 days (W17)                :crit, e2, after e1, 3d
+    Hall join and E15 seal test (H17a)      :crit, e3, after e2, 2w
+    Hook-up (H18)                           :crit, e4, after e3, 4w
+    SAT incl. E16, NFPA 110 (H19)           :crit, e5, after e4, 3w
+    Training and turnover (W20)             :e6, after e5, 1w
+```
+
+Reading the chart: order to engineering release ≈ 14 weeks; permit ≈ 12 weeks; civil 20 weeks; set, join, hook-up and SAT ≈ 10 weeks. **Order to in service ≈ 52 weeks** when the utility delivers inside 40 weeks; a 52-week utility window pushes in-service to ≈ 60 weeks and the generators cannot be used to open early. The factory finishes months before the site needs the modules, so modules are stored at the manufacturer (storage fee in the proposal) rather than shipped early.
 
 ## 4. Hold-point summary (the signatures that gate the money)
 
@@ -143,10 +194,12 @@ Reading the chart: order to engineering release ≈ 8 weeks; release to FAT comp
 | H4a | CM qualification / first article | Schreiber AI quality + ENG + CM | "This shop, with these certificates and this first unit, can build this tier to our package." |
 | H4 | Engineering release | ENG lead, compliance, SAI-Q; CM acknowledges | "Configuration is frozen; drawings, BOM, QC forms and calcs are complete; the CM has them." |
 | H7 | Structural welds | CWI + ENG | "Modified container is structurally sound per PE calc." |
+| H8 | Envelope hose test (E14) | SAI-Q + CM | "The envelope is watertight at NEMA 4X / IP66 with every penetration in." |
 | H10a/b | Electrical rough-in / pre-energise | CM's licensed electrician + SAI-Q | "Wiring matches drawings; insulation and bonding tests pass." |
 | H11 | Refrigerant / fluid pressure test | SAI-Q + HVAC trade | "No leaks; evacuated; correct charge and fluid." |
 | H13 | FAT | ENG + SAI-Q + CM + customer | "The unit does what the commissioning script says, in the CM's shop." |
 | H16 | Pad and utilities | Site contractor + ENG | "Pad, anchors, ground and utility are ready for this exact unit." |
+| H17a | Hall join and seal (BEN 2000) | Modular manufacturer + SAI-Q | "The three modules are one sealed envelope; every joint passed E15." |
 | H18 | Pre-energisation at site | Licensed electrician + AHJ | "Safe to energise." |
 | H19 | SAT | ENG + customer + fire marshal | "The unit does what the commissioning script says, on this site, and the fire systems are accepted." |
 | H22 | Decommission | ENG + customer | "Data destroyed, hazards removed, safe to move." |

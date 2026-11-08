@@ -61,6 +61,7 @@ Roles in one line each: **Schreiber AI** owns what the unit *is* and proves that
 | **Container modification companies** | Volume cutting/framing, insulation, liner, doors, paint; many have electricians and climate-control experience; fast and cheap on the shell | Data-center-grade electrical (480 V switchgear, UPS), refrigeration, controls, test | BEN 30 / BEN 150 shell and fit-out; BEN 5 skid assembly |
 | **Modular electrical skid / e-house / PDC builders** | UL 508A panel shops, 480 V switchgear integration, licensed electricians, testing culture, steel fabrication, often ISO 9001 | Container-specific envelope work, HVAC/refrigeration | BEN 150 / BEN 500 power module and controls panel; can be the primary CM if they take the shell too |
 | **Data-center / containerized DC integrators and metal-intensive contract manufacturers** | Have built containerized data centers; understand cooling, hot-aisle containment, commissioning; some offer field installation | Cost (higher margin), may compete with us, IP exposure | BEN 500 first articles; overflow capacity; export units |
+| **Prefabricated modular-building and modular data center manufacturers** (BEN 2000) | Factory-built wide-body steel modules (12 × 3.7 × 4.2 m class) under a state modular-building programme, PE-stamped module structures, multi-trade fit-out bays, experience with site joining and sealing of multi-module halls, crane set and field crews, some with data-center references | The IP66 envelope detail and joint system to our drawings, MV/switchgear integration (often sub to an e-house builder), our controls, FAT by us | **BEN 2000** hall modules and power module; also an alternate for BEN 500 where a container shop is at capacity |
 
 ### 3.1 Named US candidates found by web search (2026-11-08)
 
@@ -79,6 +80,20 @@ Capabilities below are **as listed on their own sites or in search snippets**; n
 | 9 | **Columbia Tech (Coghlin Companies)** | Contract manufacturer / containerized systems | Massachusetts | States it manufactured one of the largest containerized modular data center projects ever produced; design, DFM, contract manufacturing, transport, installation and field support | https://www.coghlincompanies.com/?p=615 |
 | 10 | **Prince Manufacturing** | Metal-intensive contract manufacturer for data-center OEMs | USA / Mexico footprint | Fabrication, coating and assembly under one roof; positions itself as a contract manufacturing partner for data center OEMs | https://princemanufacturing.com/data-centers/ |
 | 11 | **MCF International (MCFI)** | Containerized / modular data center provider | US | Turnkey modular and containerized data centers; ISO containers modified for IT equipment (potential partner **or** competitor — approach for overflow only) | https://mcfintl.com/services/containerized-data-center-solutions/ |
+
+### 3.2 Named US prefabricated modular data center / modular-building makers for BEN 2000 (web search 2026-11-08)
+
+Same caveat: capabilities **as listed on their own sites, in press releases or trade press**; nothing verified by audit. These are candidates for a BEN 2000 RFI, not approved suppliers. A hall manufacturer is qualified with the same scorecard (§4) plus three gates: a state modular-building programme approval, a joined multi-module reference, and a bay that can hold a 12.2 × 3.66 × 4.2 m module.
+
+| # | Company | Type | Location (as listed) | Capabilities as listed | Source |
+| --- | --- | --- | --- | --- | --- |
+| 1 | **BMarko Structures** | Prefabricated modular data centers, steel-frame and containerized modules | Georgia (Atlanta area) | Offsite-built containerized and steel-frame modular data centers; states its steel-frame modules give more design flexibility and load capacity for larger builds | https://bmarkostructures.com/?p=12503 |
+| 2 | **CEI (Modular division)** | Modular data center manufacturer | Edgerton, Wisconsin | Builds and tests independent parts of the data center in a controlled factory environment; states 1,530 data center modules deployed totalling 1.3 GW | https://www.cei.com/core-markets/modular |
+| 3 | **Northstar Enterprise + Defense** (Northstar Technologies Group) | Prefabricated modular data centers (FRP composite modules) | Bonita Springs / Fort Myers, Florida (153,000 sq ft campus announced) | Prefabricated modular data centers deployable on rooftops or unprepared sites; stated 90-day deployment; defence and telecom focus (relevant to H3) | https://www.blackridgeresearch.com/news-releases/northstar-expands-us-modular-data-center-manufacturing-with-153000-square-foot-florida-campus ; https://businessobserverfl.com/news/2026/oct/21/modular-data-center-manufacturer-fort-myers/ |
+| 4 | **GrayWolf Modular** | Modular digital infrastructure builder (engineering, fabrication, assembly in-house) | US (construction group, 15+ years; plant locations not listed in results) | Factory-built data center modules with multi-trade fabrication under one roof; design through factory assembly and installation support; data center, edge and colocation references (e.g. CyrusOne) | https://graywolf.com/ ; https://www.modular.org/2024/10/30/graywolf-building-the-future-of-modular-data-centers/ |
+| 5 | **PCX Corporation** (Hubbell) | Prefabricated modular power and data center modules (electrical skids, enclosures) | Clayton and Knightdale, North Carolina (159,600 sq ft facility) | Prefabricated electrical power distribution systems for modular data centers; large electrical and mechanical skids, IT systems and enclosures; candidate for the BEN 2000 **power module** specifically | https://ciodive.com/press-release/20211102-pcx-announces-grand-opening-of-knightdale-manufacturing-facility |
+
+Also seen: Vertiv (MegaMod, steel-framed modules assembled at regional facilities), Schneider Electric (Red Oak, Texas integration facility) and Flex sell complete prefabricated data centers and are OEM suppliers or competitors rather than CMs for us; general modular-building manufacturers under the Modular Building Institute (https://www.modular.org/) are the fallback for the steel shell if the data-center specialists decline a 2 MW order.
 
 Not found / not confirmed in this search: current details for BMarko Structures and Giant Containers (names appear only in market reports); Vertiv and other OEMs sell complete prefabricated data centers and are suppliers of equipment, not CMs for us.
 
@@ -161,7 +176,8 @@ Non-conformances are raised on the CM's NCR form or ours; disposition (use-as-is
 
 | Phase | Units/year | CMs | Notes |
 | --- | --- | --- | --- |
-| Pilot (first 12 months) | 3–6 | 1 primary (BEN 30/20), 1 panel-shop partner for the controls kit if the primary has no UL 508A file | First article + pilots; Schreiber AI presence high |
+| Pilot (first 12 months) | 3–6 | 1 primary (BEN 30/150), 1 panel-shop partner for the controls kit if the primary has no UL 508A file | First article + pilots; Schreiber AI presence high |
+| BEN 2000 (from month 12) | 1 hall per year, then 2–3 | 1 modular-building / modular data center manufacturer (§3.2) + an e-house builder for the power module; MV and generators bought by Schreiber AI | Engineering release first; first hall is a lighthouse with a regional enterprise, hospital or university |
 | Ramp (year 2) | 10–25 | 2 CMs (second qualified before unit 10), one capable of BEN 500 | Regional split by pilot-site geography; frame agreements with reserved bay-weeks |
 | Scale (year 3+) | 25–60 | 2–3 CMs; decision point for greenfield (§10) | |
 
@@ -176,6 +192,8 @@ Non-conformances are raised on the CM's NCR form or ours; disposition (use-as-is
 | **Listing/licence lapses** (UL 508A file, electrical licence) | L | Certificates verified at audit and annually; UL file number on every panel label checked at FAT |
 | **Schedule dependence on long-lead equipment** (not CM) | H | Schreiber AI buys long-lead at engineering release; approved alternates; small stock of controls hardware |
 | **Field-evaluation demand by AHJ** on a non-listed assembled unit | M | Component listings + UL 508A panel + optional NRTL field evaluation budgeted (`COMPLIANCE.md` §3) |
+| **A hall manufacturer treats BEN 2000 as its own product** (BEN 2000) | M | Same IP terms; the envelope detail, joint system, controls and BEN Care stay ours; we buy modules to our drawings, not their catalogue product; two qualified makers before the second hall |
+| **H3 vendor certificates missing or wrong edition** | M | Certificates required with the shipment (`SUPPLIER_TERMS.md` Q1 ENV Hardening rows); no panel installed without its lot certificate; shielding test at FAT by an independent lab |
 | **Cost creep** in CM quotes once they see the volume is small | M | Open-book pricing; labour hours tracked per unit; benchmark against a second CM |
 
 ## 10. Transition criteria to a greenfield factory

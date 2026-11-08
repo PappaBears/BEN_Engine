@@ -144,6 +144,7 @@ class SimNode:
         return {"fw": FW_VERSION, "uptime_s": round(self.uptime_s, 1), "rssi": -55 - int(self.rng.random() * 3),
                 "ip": self.ip, "heap": 180_000 - 16 * self.seq % 4000, "errors": list(self.errors),
                 "node_id": self.node_id, "kind": self.kind, "racks": [i + 1 for i in self.rack_indices],
+                "module": getattr(self, "module", 1), "pods": getattr(self, "pods", 2 * len(self.rack_indices) or 2),
                 "device": "pod", "attested": True, "mesh": {"role": "router" if self.kind == "room" else "end_device", "lqi": 3, "parent": None if self.kind == "room" else "node1"}}
 
     # ---------------------------------------------------------------- commands
@@ -218,19 +219,41 @@ class SimNode:
 
 
 class NodeFleet:
-    """All virtual nodes for one unit: node1 (room) + one node per two racks."""
+    """All virtual nodes for one unit: node1 (room) + one node per two racks, plus one more room node per extra
+    module on the BEN 2000 hall. Every node reports the BEN Pods it stands for (``pods`` in its status): two per rack
+    (cold and hot face), room + outdoor per module, three on the BEN 5 cabinet; ``pod_count()`` equals
+    ``Config.derived()["pods"]``."""
+
+    @staticmethod
+    def expected_nodes(cfg) -> int:
+        d = cfg.derived()
+        return d["modules"] + (cfg.racks + 1) // 2
 
     def __init__(self, cfg, unit: str = UNIT_DEFAULT, seed: int = 0, on_output=None):
         self.cfg = cfg
         self.unit = unit
         d = cfg.derived()
+        self.modules = d["modules"]
         fs = max(10.0, d["total_kw"] * 1.25)
         self.nodes: List[SimNode] = [SimNode("node1", "room", (), unit, seed, on_output, fs)]
+        self.nodes[0].module = 1
+        self.nodes[0].pods = 3 if d["kind"] == "cabinet" else 2
         racks = list(range(cfg.racks))
         for k in range(0, len(racks), 2):
             nid = f"node{2 + k // 2}"
-            self.nodes.append(SimNode(nid, "rack", tuple(racks[k:k + 2]), unit, seed, on_output, fs))
+            n = SimNode(nid, "rack", tuple(racks[k:k + 2]), unit, seed, on_output, fs)
+            n.module = 1 + (k // 2) * self.modules // max(1, (cfg.racks + 1) // 2)
+            n.pods = 0 if d["kind"] == "cabinet" else 2 * len(n.rack_indices)
+            self.nodes.append(n)
+        for m in range(2, self.modules + 1):
+            n = SimNode(f"node{len(self.nodes) + 1}", "room", (), unit, seed, on_output, fs)
+            n.module = m
+            n.pods = 2
+            self.nodes.append(n)
         self.by_id: Dict[str, SimNode] = {n.node_id: n for n in self.nodes}
+
+    def pod_count(self) -> int:
+        return sum(getattr(n, "pods", 0) for n in self.nodes)
 
     def poll_all(self, state: Dict[str, Any]) -> List[Tuple[str, Dict[str, Any]]]:
         """(topic, payload) for every node's telemetry message."""

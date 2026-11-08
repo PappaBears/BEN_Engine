@@ -37,7 +37,7 @@ from fastapi import FastAPI, HTTPException, Query, Request, WebSocket, WebSocket
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from .config import (CLIMATE_DESIGN, COOLING_LIBRARY, PROFILE_DEFAULTS, TIER_GEOMETRY, Config)
+from .config import (CLIMATE_DESIGN, COOLING_LIBRARY, PROFILE_DEFAULTS, TIER_GEOMETRY, TIER_ALIASES, HARDENING, CONTROLS_TIERS, Config, canonical_tier)
 from .twin import Twin, TwinParams
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -370,7 +370,7 @@ class Runtime:
     """Everything mutable the API serves: twin, buffer, jobs, WS clients."""
 
     def __init__(self):
-        self.cfg: Config = Config.preset("ben20")
+        self.cfg: Config = Config.preset("ben150")
         self.twin: Twin = Twin(self.cfg, seed=1)
         self.twin.set_it_load(0.75)
         self.buffer = TelemetryBuffer()
@@ -681,7 +681,8 @@ async def presets():
 
 @app.get("/api/catalog")
 async def catalog():
-    return {"tiers": TIER_GEOMETRY, "profiles": PROFILE_DEFAULTS, "cooling": COOLING_LIBRARY, "climates": CLIMATE_DESIGN,
+    return {"tiers": TIER_GEOMETRY, "tier_aliases": TIER_ALIASES, "hardening": HARDENING, "controls_tiers": CONTROLS_TIERS,
+            "profiles": PROFILE_DEFAULTS, "cooling": COOLING_LIBRARY, "climates": CLIMATE_DESIGN,
             "redundancy": ["N", "N+1", "2N"], "subsystems": ["power", "cooling", "compute", "controls"], "faults": list(Twin.FAULTS)}
 
 
@@ -1014,7 +1015,7 @@ def _cfd_run(tier: str, job: Dict[str, Any]):
 @app.post("/api/cfd/run")
 async def cfd_run(tier: Optional[str] = None):
     _require("cfd")
-    tier = tier or RT.cfg.tier
+    tier = canonical_tier(tier or RT.cfg.tier)
     if tier not in TIER_GEOMETRY:
         raise HTTPException(status_code=400, detail="unknown tier")
     job = {"tier": tier, "status": "running", "started": time.time(), "finished": None, "png": None, "metrics": None, "error": None}
@@ -1026,7 +1027,7 @@ async def cfd_run(tier: Optional[str] = None):
 @app.get("/api/cfd/metrics")
 async def cfd_metrics(tier: Optional[str] = None):
     _require("cfd")
-    tier = tier or RT.cfg.tier
+    tier = canonical_tier(tier or RT.cfg.tier)
     job = RT.cfd_jobs.get(tier)
     if job is None:
         return {"tier": tier, "status": "idle", "metrics": None}
@@ -1036,7 +1037,7 @@ async def cfd_metrics(tier: Optional[str] = None):
 @app.get("/api/cfd")
 async def cfd_png(tier: Optional[str] = None):
     _require("cfd")
-    tier = tier or RT.cfg.tier
+    tier = canonical_tier(tier or RT.cfg.tier)
     job = RT.cfd_jobs.get(tier)
     if job is None or job["status"] != "done" or not job.get("png"):
         raise HTTPException(status_code=404, detail="no CFD result for that tier yet; POST /api/cfd/run")
@@ -1046,7 +1047,7 @@ async def cfd_png(tier: Optional[str] = None):
 @app.post("/api/cfd/apply")
 async def cfd_apply(tier: Optional[str] = None):
     """Copy the CFD per-rack recirculation profile into the running twin's parameters."""
-    tier = tier or RT.cfg.tier
+    tier = canonical_tier(tier or RT.cfg.tier)
     job = RT.cfd_jobs.get(tier)
     if job is None or job["status"] != "done":
         raise HTTPException(status_code=409, detail="run CFD first")

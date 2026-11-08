@@ -7,7 +7,7 @@ from ben_engine import analysis as an
 
 
 def test_schedule_from_states_detects_steps_and_faults():
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     sched = [an.Event(0.0, it_fraction=0.4), an.Event(60.0, it_fraction=0.9), an.Event(120.0, inject="door_open"), an.Event(150.0, clear="door_open")]
     states = an.simulate(cfg, TwinParams(), sched, 200.0, dt=5.0)
     ev, dt, dur = an.schedule_from_states(states)
@@ -18,7 +18,7 @@ def test_schedule_from_states_detects_steps_and_faults():
 
 
 def test_fit_recovers_recirculation_and_bypass():
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     true = TwinParams(recirculation=0.15, bypass=0.18)
     rec = an.synthetic_load_step_record(cfg, true, seed=4, dt=2.0, levels=(0.4, 1.0), hold_s=400.0)
     fit = an.fit_params(cfg, rec, fit=("recirculation", "bypass"), sample_every_s=10.0, warmup_s=600.0)
@@ -31,7 +31,7 @@ def test_fit_recovers_recirculation_and_bypass():
 
 
 def test_predict_intervals_contain_nominal_and_widen_with_cov():
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     p = TwinParams(recirculation=0.1)
     sched = [an.Event(0.0, it_fraction=1.0, outdoor_c=35.0)]
     tight = an.predict(cfg, p, sched, 300.0, cov=None, dt=10.0, warmup_s=300.0, warmup_load=1.0)
@@ -46,7 +46,7 @@ def test_predict_intervals_contain_nominal_and_widen_with_cov():
 
 
 def test_pue_thermal_margin_ups_curve():
-    cfg = Config.preset("ben20")
+    cfg = Config.preset("ben150")
     st = an.simulate(cfg, TwinParams(), [an.Event(0, it_fraction=1.0)], 60.0, dt=10.0, warmup_s=600.0, warmup_load=1.0)[-1]
     pb = an.pue_breakdown(st, cfg)
     assert pb["pue"] is not None and 1.0 < pb["pue"] < 2.0
@@ -58,7 +58,7 @@ def test_pue_thermal_margin_ups_curve():
 
 
 def test_plain_summary_text(capsys):
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     s = an.plain_summary(cfg, TwinParams(), None, load=1.0, outdoor_c=35.0, horizon_s=300.0, n_mc=0)
     assert "inlet will be" in s["text"] and "ride" not in s["text"].lower() or "minutes" in s["text"]
     assert s["worst_rack"] in (1, 2)

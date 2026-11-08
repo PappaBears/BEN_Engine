@@ -196,7 +196,7 @@ def cooling_unit_failover(twin: Twin, load: float = 1.0, fail_s: float = 900.0, 
 def utility_loss_ride_through(twin: Twin, load: float = 1.0, max_s: float = 3600.0, record_every_s: float = 5.0,
                               clock: Optional[str] = None) -> SweepResult:
     """Drop utility; measure time to ASHRAE max inlet and UPS depletion. Cooling is off on battery
-    (mechanical load is not on the UPS except BEN Micro) unless a generator starts."""
+    (mechanical load is not on the UPS except the BEN 5 cabinet) unless a generator starts."""
     res = SweepResult("utility_loss_ride_through", _now(clock))
     cls = twin.d["ashrae_class"]
     a_max = ASHRAE_MAX[cls]
@@ -411,7 +411,7 @@ def report_markdown(results: List[SweepResult]) -> str:
 def main(argv=None):
     import argparse, json
     ap = argparse.ArgumentParser(description="BEN Engine automated sweeps on the digital twin")
-    ap.add_argument("--tier", default="ben20")
+    ap.add_argument("--tier", default="ben150")
     ap.add_argument("--profile", default="ai_inference")
     ap.add_argument("--climate", default="temperate")
     ap.add_argument("--sweep", default="all", choices=["all"] + list(SWEEPS))

@@ -141,6 +141,14 @@ class Twin:
         # fan modulation: target return temp = supply + 12 K
         err = self.return_c - (self.p.supply_setpoint_c + 12.0)
         target_fan = max(30.0, min(100.0, 60.0 + 8.0 * err))
+        # capacity shortfall: every running unit at full fan and the return still 2 K over target starts a standby unit
+        # (clogged filters, derated units); the sequencer stops it again once the error is gone
+        if running and err > 2.0 and all(u["fan_pct"] >= 98.0 for u in running):
+            for u in self.cooling_units:
+                if u["ok"] and not u["on"]:
+                    u["on"] = True
+                    u["fan_pct"] = 60.0
+                    break
         for u in self.cooling_units:
             if u["on"] and u["ok"]:
                 u["fan_pct"] += (target_fan - u["fan_pct"]) * min(1.0, dt / self.p.cooling_time_constant_s)
@@ -181,8 +189,8 @@ class Twin:
                 rack_kw = 0.0
         else:
             self.ups_soc = min(100.0, self.ups_soc + h / 3600.0 / 4.0 * 100.0)  # 4 h recharge
-        # cooling loses power on battery unless generator (mechanical load is not on UPS, except Micro)
-        cooling_powered = self.utility_ok or self.generator_on or (cfg.tier == "micro")
+        # cooling loses power on battery unless generator (mechanical load is not on UPS, except the BEN 5 cabinet)
+        cooling_powered = self.utility_ok or self.generator_on or (d["kind"] == "cabinet")
 
         # ---- cooling capacity and electrical
         cool_kw_total = 0.0
@@ -191,9 +199,9 @@ class Twin:
         for u in self.cooling_units:
             if u["on"] and u["ok"] and cooling_powered:
                 cap = cl["unit_kw"] * derate * (u["fan_pct"] / 100.0) ** 0.8
-                # clog reduces airflow → capacity
+                # clog reduces airflow → capacity; on liquid cooling only the 30 % air-side residual path has filters
                 if "filter_clog" in self.faults:
-                    cap *= 0.75
+                    cap *= 0.75 if cl["medium"] != "liquid" else (1.0 - 0.25 * 0.3)
                 u["kw"] = cap
                 cool_kw_total += cap
                 cool_elec += cap / cl["cop"] * (0.6 + 0.4 * (u["fan_pct"] / 100.0) ** p.fan_law_exp)
@@ -233,8 +241,10 @@ class Twin:
                 pos_bias = 0.0
             else:
                 recirc = recirc_scalar
-                # per-rack position effect: racks far from cooling see +0.3 K per position (CFD overrides via recirculation profile)
-                pos_bias = 0.3 * i / max(1, cfg.racks - 1)
+                # per-rack position effect: racks far from cooling see +0.3 K per position along the row
+                # (CFD overrides via recirculation profile); multi-row halls bias per row position
+                rpr = d["racks_per_row"]
+                pos_bias = 0.3 * (i % rpr) / max(1, rpr - 1)
             inlet_target = (1 - recirc) * self.supply_c + recirc * self.rack_outlet_c[i] + pos_bias
             tau = p.rack_mass_kg * AIR_CP_J_KGK / max(per_rack_flow, 1.0)
             self.rack_inlet_c[i] += (inlet_target - self.rack_inlet_c[i]) * min(1.0, h / max(tau, 5.0))
@@ -320,21 +330,39 @@ class Twin:
             "door_open": "door_open" in self.faults, "leak": "leak" in self.faults,
         }
 
+    def rack_positions(self) -> List[tuple]:
+        """(x, y) floor position of every rack, origin at the door-end floor centreline. Single-row modules put the
+        row on the centreline; the BEN 2000 hall places ``rows`` rows across the interior width (hot/cold aisles between)."""
+        g = self.d["geometry"]
+        rows = self.d["rows"]
+        rpr = self.d["racks_per_row"]
+        pitch = g["int_l_m"] / (rpr + 1)
+        out = []
+        for i in range(self.cfg.racks):
+            r, k = divmod(i, rpr)
+            x = pitch * (k + 1)
+            y = 0.0 if rows == 1 else -g["int_w_m"] / 2 + g["int_w_m"] * (r + 1) / (rows + 1)
+            out.append((x, y))
+        return out
+
     def sensors(self) -> List[SensorSpec]:
         g = self.d["geometry"]
         out: List[SensorSpec] = []
-        pitch = g["int_l_m"] / (self.cfg.racks + 1)
-        for i in range(self.cfg.racks):
-            x = pitch * (i + 1)
+        for i, (x, y) in enumerate(self.rack_positions()):
             node = f"node{i // 2 + 1}"
             for z in (0.4, 1.2, 1.8):
-                out.append(SensorSpec(f"T_in_r{i+1}_{z}", "temperature", (x, -0.55, z), "C", 0.25, node))
-            out.append(SensorSpec(f"T_out_r{i+1}", "temperature", (x, 0.55, 1.2), "C", 0.25, node))
+                out.append(SensorSpec(f"T_in_r{i+1}_{z}", "temperature", (round(x, 3), round(y - 0.55, 3), z), "C", 0.25, node))
+            out.append(SensorSpec(f"T_out_r{i+1}", "temperature", (round(x, 3), round(y + 0.55, 3), 1.2), "C", 0.25, node))
         out.append(SensorSpec("T_supply", "temperature", (0.3, -0.6, 0.3), "C", 0.25, "node1"))
         out.append(SensorSpec("T_return", "temperature", (0.3, 0.6, 2.2), "C", 0.25, "node1"))
-        out.append(SensorSpec("RH_room", "humidity", (g["int_l_m"] / 2, 0.0, 1.5), "%RH", 1.5, "node1"))
-        out.append(SensorSpec("dP_aisle", "pressure", (g["int_l_m"] / 2, 0.0, 1.5), "Pa", 0.4, "node1"))
-        out.append(SensorSpec("leak_floor", "leak", (g["int_l_m"] / 2, 0.0, 0.02), "bool", 0, "node1"))
+        modules = self.d["modules"]
+        for m in range(modules):
+            # room sensors per module (one set for single-module tiers)
+            sfx = "" if modules == 1 else f"_m{m+1}"
+            xm = g["int_l_m"] * (m + 0.5) / modules
+            out.append(SensorSpec(f"RH_room{sfx}", "humidity", (round(xm, 3), 0.0, 1.5), "%RH", 1.5, "node1"))
+            out.append(SensorSpec(f"dP_aisle{sfx}", "pressure", (round(xm, 3), 0.0, 1.5), "Pa", 0.4, "node1"))
+            out.append(SensorSpec(f"leak_floor{sfx}", "leak", (round(xm, 3), 0.0, 0.02), "bool", 0, "node1"))
         out.append(SensorSpec("door_main", "contact", (0.05, 0.0, 1.0), "bool", 0, "node1"))
         out.append(SensorSpec("P_utility", "power", (0.2, 0.9, 1.5), "kW", 0.005 * self.d["total_kw"], "meter1"))
         return out

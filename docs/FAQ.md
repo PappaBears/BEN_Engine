@@ -1,6 +1,12 @@
 # FAQ
 
-**What is BEN Engine?** A family of modular data centers (BEN 5, 10, 20, 40) built in off-the-shelf outdoor cabinets and ISO high-cube containers, with Schreiber AI's controls layer: a BEN Controller (PLC + industrial edge computer, or a Revolution Pi on the Lite tier), BEN Pods on the BEN Mesh, dashboard, digital twin, calibration, a commissioning script and the BEN Care digital care layer. One configuration model drives the drawings, bill of materials, compliance pack, assembly instructions, proposal and the twin.
+**What is BEN Engine?** A family of modular data centers named by IT power (BEN 5, BEN 30, BEN 150, BEN 500 and the 2 MW BEN 2000) built in off-the-shelf outdoor cabinets, sealed ISO-frame high-cube modules and, for BEN 2000, a prefabricated modular hall, with Schreiber AI's controls layer: a BEN Controller (PLC + industrial edge computer, or a Revolution Pi on the Lite tier), BEN Pods on the BEN Mesh, dashboard, digital twin, calibration, a commissioning script and the BEN Care digital care layer. One configuration model drives the drawings, bill of materials, compliance pack, assembly instructions, proposal and the twin.
+
+**Why did the names change from BEN 10/20/40 to BEN 30/150/500?** The old number was the container length in feet; the new number is the nominal maximum IT kW, which is what a buyer sizes against. BEN Micro became BEN 5. The old keys (`micro`, `ben10`, `ben20`, `ben40`) still load through an alias map in `config.py` (D33 in `docs/PROJECT_NOTES.md`).
+
+**What is BEN 2000?** The single 2 MW center: not a container but a prefabricated, relocatable data hall of three factory-built wide-body steel modules (12.2 × 3.66 × 4.2 m each) joined on site into one sealed envelope, plus a separate power module and a plant yard. 800–2,000 kW IT in up to 48 liquid-cooled racks; 12.47 kV medium-voltage service to two 2,500 kVA pad-mount transformers (2N), 2N UPS strings with NFPA 855 battery rooms, three 1,250 kW generators (N+1) with 48 h fuel, adiabatic dry coolers. It is a building to the AHJ (IBC Group B or F-1) and the utility service is the critical path: about 52 weeks from order to in service (`docs/PROCESS_FLOW.md` §5). `python -m ben_engine.config --tier ben2000` prints the sizing.
+
+**Is it weatherproof? What are H1, H2 and H3?** Every tier is element-proof by default: NEMA 4X / IP66 envelope, hose-tested per UL 50E type 4X (test E14), corrosion class C3. **H2 Severe environment** adds a 600 mm flood plinth, C5-M marine coating, sand/dust filtration, 67 m/s wind hardware and anodes for coastal, desert, arctic and hurricane sites. **H3 Hardened / government** adds UL 752 ballistic panels, ASTM F3038 forced-entry doors, IK10, a mantrap, two-factor access, tamper detection and an optional HEMP shield (MIL-STD-188-125-1) with TEMPEST-ready separation. The old rain-only 3R rating is no longer used anywhere. The configurator has a Hardening select; the config recommends H2 for severe climates and offers H3 for public-sector profiles.
 
 **Can I try it without hardware?** Yes. `bash scripts/run_dashboard.sh` starts the dashboard in simulation mode with the twin, virtual Pods for I/O tests, sweeps, CFD, calibration and CSV export. Everything shown is labelled simulation.
 
@@ -24,11 +30,11 @@
 
 **Why not R-410A or R-454B?** The AIM Act 700-GWP limit for new IT-room cooling applies from 2027-01-01, and A2L refrigerant charge limits inside a 32 m³ container are below what a 20–30 kW DX unit holds. In-row DX is specified with R-513A or R-515B (A1, GWP under 700).
 
-**What about lithium batteries?** UL 9540 listed cabinets; BEN 5/30/150 presets stay under the 20 kWh NFPA 855 threshold by default; BEN 500 carries the full NFPA 855 package.
+**What about lithium batteries?** UL 9540 listed cabinets; BEN 5/30/150 presets stay under the 20 kWh NFPA 855 threshold by default; BEN 500 carries the full NFPA 855 package; BEN 2000 has dedicated battery rooms with 2-hour separation, gas detection and deflagration venting.
 
 **Can a customer run the commissioning themselves?** Yes. `python -m ben_engine.commissioning --sim` rehearses it; `--live --url` targets a unit's edge computer. The report carries the SHA-256 of the exported data and a signature block.
 
-**Who builds the units?** Third-party contract manufacturers to Schreiber AI's drawings and Simplified Technical English instructions, with hold points, QC forms and our witness at FAT. See `docs/MANUFACTURING_STRATEGY.md`. A greenfield factory is a later study.
+**Who builds the units?** Third-party contract manufacturers to Schreiber AI's drawings and Simplified Technical English instructions, with hold points, QC forms and our witness at FAT. BEN 2000 modules come from prefabricated modular-building / modular data center manufacturers (named candidates in `docs/MANUFACTURING_STRATEGY.md` §3.2). A greenfield factory is a later study.
 
 **What paperwork exists?** Customer side: MSA, SOW, change order, acceptance certificates, software licence, SLA, warranty, NDA. Partner side: integrator agreement, contract manufacturing agreement, supplier PO terms with delay liquidated damages. All in `docs/contracts/`, all templates for counsel review, all fillable from the proposal generator.
 

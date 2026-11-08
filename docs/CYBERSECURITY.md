@@ -91,9 +91,23 @@ Anything else found open is a defect.
 | Source escrow | Hardware-only and white-label customers get source escrow for the controls layer, released on defined triggers (insolvency, end of support) so the "no cloud dependency" promise survives Schreiber AI |
 | Compliance packs | HIPAA, PCI, CMMC mappings are delivered as templates; the partner is responsible for their own attestation |
 
+## 7a. Hardening level H3: TEMPEST separation and the air-gapped variant
+
+H3 (`Config.hardening = "H3"`, `docs/TIER_AND_ENCLOSURE_DECISION.md` §3) adds physical and electromagnetic controls to the zones above. Nothing in the software changes; the conduits get narrower and the box gets quieter.
+
+| Topic | H3 rule |
+| --- | --- |
+| **TEMPEST-ready separation** | Red (customer IT, Z3) and black (controls, Z1, and any external link) cabling run in separate, labelled, metallic raceways with ≥ 50 mm separation and no shared penetration; fibre only between red and black spaces; controls panel, edge computer and border routers sit in the black space; the shielded enclosure option (80 dB, MIL-STD-188-125-1) gives a single filtered power entry and waveguide-below-cutoff vents so the hall or module is itself the shielded volume. **We deliver TEMPEST-ready, not TEMPEST-certified**: the customer's certified TEMPEST authority (CTTA) assesses and certifies; we provide the drawings, the shielding test (IEEE 299) and the penetration schedule they ask for. |
+| **Air-gapped variant** | Z4 removed entirely: no WireGuard endpoint, no modem, remote-support key switch deleted from the panel, the edge computer's external interface disabled in firmware and the port blanked; GPS or a local rubidium/PTP grandmaster for time (SNTP off); updates by signed offline bundle on a customer-controlled medium through a kiosk procedure (hash verified against a printed manifest, dual-person rule); fleet learning off, Care Managed delivered as **on-site visits** with an export of the signed monthly proof-of-redundancy report carried out by the customer; vulnerability notices by letter/secure email to the customer's ISSO. |
+| **Physical access and tamper** | Mantrap vestibule with two-factor (badge + PIN or biometric) on the inner door; tamper switches on the controls panel, conduit bodies and the shielded door frame wired to PLC digital inputs (Z1a) so a tamper is an interlock event, not a log line; tamper-evident seal register audited quarterly (`MAINTENANCE.md` §5a); audit trail of every door, login, setpoint change and firmware event in BEN Care with hash chaining, exportable for the SSP. |
+| **Controls pack** | NIST SP 800-171 Rev. 3 / CMMC Level 2 physical (PE), audit (AU), configuration management (CM) and media protection (MP) control statements pre-written for the unit; FIPS 140-3 validated crypto modules on the edge computer (option) and the PLC's certified development process cited; the controls zone has no route to the internet in any variant, and in the air-gapped variant no route to anything outside the hall. |
+| **Border routers and Pods** | Thread radio stays inside the shielded volume (the shield also keeps the mesh in); the Pod radio power is limited to the minimum for the mesh; in a TEMPEST assessment the mesh is treated as a black-side emitter and the CTTA may require the wired RS-485 path (Pod E) only — the design supports both. |
+| **BEN 2000 at H3** | Each module is its own shielded volume with a shielded joint (conductive gasket across the module seam, tested in E15 with a shield continuity check); the power module is outside the shield and feeds through filtered penetrations; the plant yard equipment is unshielded and treated as black-side. |
+
 ## 8. What we do not claim
 
 - No system certification to IEC 62443 yet; the architecture is designed to SL 2 and can be assessed on request. The PLCnext controller's 62443-4-1 process certification and the MGM240P's PSA Level 3 certification are the vendors' certificates, not ours, and the attestation flow has not yet run on hardware.
 - No FIPS 140-3 validation of the crypto modules by default; available as an option for public-sector units.
 - No guarantee against a compromised customer network reaching Z3 services we expose on request (read-only API); the firewall rules we ship are the minimum, and customer changes to them are the customer's responsibility.
 - The controls layer does not protect the customer's IT workloads; it protects the room they run in.
+- No TEMPEST certification: H3 is TEMPEST-*ready*. HEMP protection to MIL-STD-188-125-1 is an option built with a shielding vendor's certified enclosure and verified by test; it is a vendor certificate plus our annual IEEE 299 test, not a government accreditation.

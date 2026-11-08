@@ -1,6 +1,6 @@
 # BEN Engine — Maintenance Schedule (outdoor units)
 
-**Owner:** Schreiber AI operations. **Applies to:** BEN 5, BEN 30, BEN 150, BEN 500 in all climates. **Principle:** the box lives outdoors for 15 years; the equipment inside lives 10. Most failures start at the envelope (water, corrosion, seals) or in consumables (filters, batteries, capacitors). Remote checks catch trends; hands-on visits fix them.
+**Owner:** Schreiber AI operations. **Applies to:** BEN 5, BEN 30, BEN 150, BEN 500 in all climates, plus the hall and plant items for BEN 2000 (section 4a) and the hardening add-ons for H2/H3 units (section 5a). **Principle:** the box lives outdoors for 15 years; the equipment inside lives 10. Most failures start at the envelope (water, corrosion, seals) or in consumables (filters, batteries, capacitors). Remote checks catch trends; hands-on visits fix them.
 
 Who does what — **R** remote by Schreiber AI operations (dashboard, analysis tools); **L** local technician (customer's or Schreiber AI field tech, trained to `TURNOVER.md` T3/T5); **S** certified subcontractor (licensed electrician, EPA 608 HVAC tech, fire suppression contractor, generator vendor, battery vendor); **C** customer IT. Where "S" appears a record from the sub is mandatory.
 
@@ -48,6 +48,7 @@ Intervals are the default for `temperate`. Climate add-ons (section 5) shorten s
 
 | Interval | Subsystem | Task | Who | Record |
 | --- | --- | --- | --- | --- |
+| **Semi-annual** | Envelope | **Gasket and seal inspection (every tier, every hardening level)**: door compression gaskets (no set > 30 %, no cracks), penetration gaskets and glands, drip edges, roof seams; positive-pressure fan ΔP within band; repair and re-test locally with a hose on any repaired seam | L | Semi-annual envelope form; photos |
 | **Semi-annual** | Fire | **NFPA 2001 Ch. 8 semi-annual inspection**: agent quantity/pressure, cylinder and actuator condition, nozzles unobstructed, hoses, enclosure integrity changes (new penetrations?), detection functional test | S (licensed fire contractor) | Contractor report |
 | Semi-annual | Cooling | Refrigerant leak check (electronic detector at all joints and the ITE space detector calibration/bump); verify charge by superheat/subcool; AIM Act leak-rate record for appliances ≥ 15 lb | S (EPA 608) | Leak check form with technician cert number |
 | Semi-annual | Power | Thermography of all panels, UPS, PDU and transformer terminations at ≥ 40 % load; capacitor bank visual (bulging/leak) | S (electrician with IR camera) | IR report |
@@ -61,6 +62,7 @@ Intervals are the default for `temperate`. Climate add-ons (section 5) shorten s
 | Annual | Structure | Anchor bolt torque check; twist-lock condition; level check at corners (±6 mm); corner casting cracks | L | A1 |
 | Annual | Cooling | Full performance check at load (repeat E3 reduced or compare to commissioning sweep); fan motor current; EC fan bearings; condensate pump test; dry cooler pad/adiabatic system descaling | S | Report |
 | Annual | Compliance | Review compliance pack against code changes (AIM Act, NFPA 855, local adoption); update arc-flash labels if the utility changed anything; SPCC plan review | Compliance (R) | Review note |
+| **3-year** | Envelope | **Hose test E14 repeat** (UL 50E type 4X method, `TEST_GUIDE.md`): whole envelope every 3 years and after any relocation or new penetration; pass = no water inside | L + SAI-Q witness | E14 record; warranty evidence (`WARRANTY_TERMS.md`) |
 | **3-year** | Power | Full UPS service: fans, DC capacitors inspection (replace per vendor, typically 5–7 yr), firmware; ATS contact inspection; generator battery replacement; coordination study review if site changed | S | Report |
 | 3-year | Cooling | Replace EC fan units showing bearing noise; refrigerant filter-driers on service; glycol replacement or re-inhibit per lab; CDU pump seals | S | Report |
 | 3-year | Controls | **Pod W battery replacement** (2 × AA LiFeS2; 3–5 yr depending on report rate and temperature; the dashboard predicts the date from the measured drain); replace Pt1000 strings showing drift > 0.3 °C after calibration; replace dP tubing; PLC backup battery; spare Pod rotation | R + L | Record |
@@ -71,6 +73,40 @@ Intervals are the default for `temperate`. Climate add-ons (section 5) shorten s
 | 5-year | Cooling | Dry cooler coil replacement assessment (C5 coastal), DX compressor condition (run hours, oil analysis for larger units) | S | Report |
 | 5-year | Fire | Clean agent cylinder hydrostatic test / requalification; full discharge test is **not** performed (door fan test substitutes) | S | Report |
 | 5-year | Controls / IT | Edge computer refresh assessment (industrial PC: 7–10 yr, OnLogic longevity programme) with TPM re-enrolment and database migration; Pod W second battery change; Pod certificate re-issue (5-year validity); PLC I/O module assessment | R + L | Record |
+
+## 4a. BEN 2000 hall and plant items (in addition to sections 1–4, applied per module)
+
+| Interval | Subsystem | Task | Who | Record |
+| --- | --- | --- | --- | --- |
+| Weekly (R) | Plant | Adiabatic cooler mode history (dry/wet hours), make-up water volume vs model, bleed conductivity, water treatment chemical level; generator fuel level and polishing status; transformer temperature and oil level alarms; UPS string load balance (2N: each string < 50 %); battery room gas detection normal; edge computer A/B replication healthy | R | Weekly plant report |
+| Monthly (L) | Cooling plant | **Adiabatic cooler water treatment**: biocide dosing check, conductivity controller calibration, pad condition, sump cleanliness, drift eliminators, drain-down valve test (dry mode); make-up strainer | L + water treatment S | Water log (part of the ASHRAE 188 water management plan) |
+| Monthly (L) | Generators | Exercise each of the 3 × 1,250 kW sets 30 min at ≥ 30 % load with a transfer (NFPA 110 8.4.2); fuel level, leaks, charger, block heater; fuel tank interstitial monitor | L | Generator log per set |
+| Monthly (L) | Envelope | **Module joint seal inspection** from inside and roof: cover strips, sealant, drained cavity outlets clear, leak rope under joints dry, humidity Pods either side within 5 %RH of each other | L | M1 hall supplement with photos |
+| Quarterly | Cooling plant | **Legionella control per ASHRAE 188 / Guideline 12**: Legionella culture sampling at the cooler sumps and make-up (action level ≥ 100 CFU/mL per CDC toolkit, disinfect and re-sample), heterotrophic plate count, water treatment vendor report; adjust programme | S (water treatment) | Sampling certificates in the water management plan |
+| Quarterly | Power | Battery room: gas detection sensor bump test, ventilation interlock test, deflagration vent inspection, BMS export per cabinet, thermal imaging of string connections | L + S | Q1 power module |
+| Semi-annual | Power | UPS string transfer: shift load to one string and back (maintenance bypass procedure, E16 reduced); switchgear tie-breaker exercise; ATS logic test with a simulated utility loss (generators start, no load transfer) | S (electrical) + R | E16 record |
+| Annual | Generators | **Load bank test**: each set 2 h at 100 % rated (NFPA 110 8.4.2.3 where monthly runs did not reach 30 %; we do it regardless), plus one full-system test: utility open, all three sets start, N+1 proven with one set inhibited | S (generator vendor) | Load bank report; fuel consumed |
+| Annual | Plant | Adiabatic cooler: descale and disinfect pads or replace (typically 2–3 yr life), coil cleaning, EC fan bearings, controls calibration of wet-bulb sensors; water management plan review and sign-off | S | Report |
+| Annual | Envelope | Joint seal hose test (E15) on 1 of 3 joints by rotation (so every joint is tested every 3 years) and after any seismic event or module movement alarm | L + SAI-Q | E15 record |
+| Annual | Power | MV: visual and thermography of pad-mount transformers and switch at load; transformer oil sample (DGA, moisture, dielectric) | S (NETA) | Report |
+| **3-year** | Power | **MV gear maintenance** (NETA MTS): de-energise one transformer at a time (2N allows it), switch contact inspection and lubrication, cable terminations and elbows, insulation resistance, relay calibration, transformer TTR and power factor; switchgear breaker drawout and secondary injection test | S (NETA-accredited) | NETA report |
+| 3-year | Envelope | Full E15 on all joints and E14 on each module; re-seal cover strips | L + SAI-Q | Records |
+| 5-year | Power | UPS string capacitor/fan replacement by string (2N allows it live); battery SOH review per room | S | Report |
+| 5-year | Plant | Generator major service (injectors, coolant system, exhaust bellows); fuel tank interior inspection (STI SP001) | S | Report |
+
+## 5a. Hardening add-ons (H2 and H3 units)
+
+| Level | Interval | Task | Who | Record |
+| --- | --- | --- | --- | --- |
+| H1–H3 | Semi-annual | **Gasket inspection** (section 4, first row) — mandatory for the envelope warranty | L | Form |
+| H1–H3 | 3-year and after relocation | **Hose test E14** — mandatory for the envelope warranty | L + SAI-Q | E14 record |
+| H2, H3 | Annual | **Sacrificial anode inspection**; **replace at 50 % consumed** (typically 2–4 years coastal, 5+ inland) on skids, plinth steel and any buried steel; check bonding of anodes | L | A1 supplement |
+| H2, H3 | Semi-annual | C5-M coating survey (ISO 4628) with touch-up; stainless fastener crevice check; weather hood and sand-trap louvre cleaning; ePM1 filter change on ΔP | L | A1 |
+| H2, H3 | Annual | Flood plinth: sealed penetrations, drain valve, flood sensor test; hurricane door hardware operation; snow guard anchorage | L | A1 |
+| H3 | Semi-annual | **Ballistic panel inspection**: no impacts, delamination, water staining or corrosion at panel edges; fasteners present; vision panel clarity; any panel struck is replaced, never repaired; lot certificate retained | L | H3 form with photos |
+| H3 | Annual | Forced-entry door assemblies: hinge pins, multi-point locks, strike wear, closer force; IK10 door skins for dents; mantrap interlock and two-factor reader test; tamper switches and PLC tamper alarm test; audit trail export from BEN Care | L + R | H3 form |
+| H3 (shielded option) | Annual | **Shield integrity test**: shielding effectiveness per IEEE 299 at 3 frequencies (10 kHz H-field, 100 MHz, 1 GHz plane wave) at every door, vent and penetration group; pass ≥ 80 dB (or the value on the FAT certificate); door finger-stock contact check, waveguide vent inspection, filter insulation resistance | S (shielding vendor or EMC lab) | Shield test certificate |
+| H3 | Quarterly | Tamper-evident seal audit on panels, conduit bodies and the controls cabinet against the seal register | L | Seal register |
 
 ## 5. Climate add-ons
 
@@ -91,13 +127,13 @@ Intervals are the default for `temperate`. Climate add-ons (section 5) shorten s
 
 ## 7. Spare parts list (on-site kit per unit)
 
-| Item | Qty M / 10 / 20 / 40 | Why on site |
+| Item | Qty BEN 5 / 30 / 150 / 500 (BEN 2000: per module as BEN 500, plus plant spares below) | Why on site |
 | --- | --- | --- |
 | BEN Pod W, provisioned and calibrated as "spare, unassigned" (joins the mesh with its own certificate) | 1 / 1 / 2 / 3 | Pod failure = blind rack face; swap is 5 minutes, no wiring |
 | BEN Pod E (room / outdoor variant) | 0 / 1 / 1 / 1 | Wired RS-485 path and Thread router |
 | Pod W battery set (2 × AA LiFeS2) | 1 per Pod W | Replace at the predicted date |
 | Edge computer (OnLogic Karbon 400, imaged, TPM enrolled) — Pro; RevPi Connect 4 imaged — Lite | 0 / 1 / 1 / 1 | Single point of monitoring; PLC keeps the interlocks meanwhile |
-| MGM240P border router RCP (xG24 Explorer Kit) | 1 / 1 / 1 / 1 | Second radio already fitted on BEN 150/40 |
+| MGM240P border router RCP (xG24 Explorer Kit) | 1 / 1 / 1 / 1 | Second radio already fitted on BEN 150/500 |
 | Axioline F I/O module of each type (Pro) / RevPi DIO (Lite) | 1 each | PLC I/O failure |
 | Pt1000 probe string, SDP810 sensor, Setra 264 (Pro), rope leak sensor 5 m, door reed | 1 each | Consumable sensors |
 | QUINT4 24 VDC supply, interface relays, Class 2 fuses, panel fuses | 1 set | |
@@ -114,6 +150,8 @@ Intervals are the default for `temperate`. Climate add-ons (section 5) shorten s
 | Emergency light batteries, exit sign lamps | 1 set | |
 | Smoke detector heads (spot and VEWFD filter) | 0 / 1 / 2 / 2 | |
 | Laminated procedures, log forms, cable labels | 1 set | |
+| BEN 2000 plant spares: cooler EC fan 2, adiabatic pad set 1, water treatment pump and probes 1 set, generator starting battery set 1, fuel filter kits 3, switchgear trip unit 1, MV fuses 1 set, UPS power module 1 per string, battery-room gas sensor 1, joint cover strip 12 m and sealant, edge computer 1 (third unit) | — | Plant items with lead times of weeks |
+| H2/H3 spares: sacrificial anodes 1 set, ePM1 filters 2 sets, door gasket (hardened door profile) 10 m, finger-stock 5 m and shielded door gasket (H3 shielded), tamper seals 100, ballistic vision panel 1 | — | Hardening items are long lead |
 
 ## 8. Record forms
 

@@ -147,8 +147,9 @@ function renderInspector() {
   const sel = store.selection, st = store.state, cfg = store.config, d = store.derived;
   if (!st || !cfg) { inspBody.replaceChildren(h('p', { class: 'muted' }, 'Waiting for the twin…')); return; }
   const alarmsFor = (pred) => st.alarms.filter(pred);
-  let title = 'Container', tag = 'enclosure', body = [];
+  let title = 'Enclosure', tag = 'enclosure', body = [];
   const p = st.power;
+  const hall = d.kind === 'hall', cabinet = d.kind === 'cabinet';
   switch (sel.type) {
     case 'rack': {
       const i = sel.index; title = `Rack ${i + 1}`; tag = 'compute';
@@ -170,13 +171,34 @@ function renderInspector() {
       ]), evidence(['T_supply', 'T_return', 'dP_aisle'], st)];
       break;
     }
-    case 'drycooler': title = `Dry cooler ${(sel.index || 0) + 1}`; tag = 'heat rejection';
+    case 'transformer': title = `Transformer ${(sel.index || 0) + 1}`; tag = 'power';
+      body = [kv([['Rating', `${d.transformer_kva} kVA pad-mount`], ['Installed', `${d.transformers_total} (${cfg.redundancy})`], ['Primary', d.voltage], ['Utility', p.utility_ok ? 'OK' : 'LOST'], ['Demand', `${d.total_kva} kVA`]]), evidence(['P_utility'], st)];
+      break;
+    case 'switchgear': title = '480 V switchgear'; tag = 'power';
+      body = [kv([['Main frame', `${d.service_breaker_a} A`], ['Calculated', `${d.service_amps_calc} A`], ['Transformers', d.transformers_total], ['Generators', d.generators_total], ['Import', `${fmt.num(p.utility_kw)} kW`]])];
+      break;
+    case 'powermodule': title = 'Power module'; tag = 'power';
+      body = [kv([['UPS strings', `${d.ups_modules} × ${d.ups_kva_each} kVA`], ['Battery room', `${d.battery_kwh} kWh LFP (NFPA 855)`], ['Switchgear', `${d.service_breaker_a} A`], ['UPS state', p.ups_on_battery ? 'ON BATTERY' : 'online'], ['SoC', `${fmt.num(p.ups_soc_pct)} %`]])];
+      break;
+    case 'fanwall': title = `Fan-wall unit ${(sel.index || 0) + 1}`; tag = 'cooling';
+      body = [kv([['Role', 'air-side residual (~30 %) of DLC racks'], ['Supply', `${fmt.num(st.supply_c)} °C`], ['Return', `${fmt.num(st.return_c)} °C`], ['Aisle ΔP', `${fmt.num(st.aisle_dp_pa)} Pa`]]), evidence(['T_supply', 'T_return'], st)];
+      break;
+    case 'plinth': title = 'Flood plinth'; tag = 'hardening';
+      body = [kv([['Level', d.hardening_label], ['Rating', d.hardening_rating], ['Coating', d.hardening_coating], ['Recommended here', d.hardening_recommended]])];
+      break;
+    case 'armour': title = 'Ballistic wall panels'; tag = 'hardening';
+      body = [kv([['Level', d.hardening_label], ['Rating', d.hardening_rating], ['Coating', d.hardening_coating], ['Envelope', `${d.envelope_area_m2} m²`]])];
+      break;
+    case 'vestibule': title = 'Secure vestibule / mantrap'; tag = 'hardening';
+      body = [kv([['Level', d.hardening_label], ['Access', 'two-factor, interlocked doors'], ['Door', st.door_open ? 'OPEN' : 'closed']]), evidence(['door_main'], st)];
+      break;
+    case 'drycooler': title = hall ? `Adiabatic dry cooler ${(sel.index || 0) + 1}` : `Dry cooler ${(sel.index || 0) + 1}`; tag = 'heat rejection';
       body = [kv([['Outdoor', `${fmt.num(st.outdoor_c)} °C`], ['Heat rejected', `${fmt.num(st.cooling_units.reduce((s, u) => s + u.kw, 0))} kW`], ['Design day', `${d.climate.t_design_c} °C`], ['Medium', 'glycol/water']])];
       break;
-    case 'cdu': title = 'CDU'; tag = 'liquid cooling';
+    case 'cdu': title = hall ? `CDU ${(sel.index || 0) + 1}` : 'CDU'; tag = 'liquid cooling';
       body = [kv([['Liquid share of heat', '70 %'], ['Units', `${d.cooling_units_total} (${cfg.redundancy})`], ['Supply air (residual)', `${fmt.num(st.supply_c)} °C`], ['Leak', st.leak ? 'DETECTED' : 'clear']]), evidence(['leak_floor'], st)];
       break;
-    case 'ups': title = 'UPS'; tag = 'power';
+    case 'ups': title = hall ? `UPS string ${(sel.index || 0) + 1}` : 'UPS'; tag = 'power';
       body = [kv([['State', p.ups_on_battery ? 'ON BATTERY' : 'online'], ['Load', `${fmt.num(p.ups_kw)} kW`], ['SoC', `${fmt.num(p.ups_soc_pct)} %`], ['Runtime', `${fmt.num(p.ups_runtime_min)} min`], ['Modules', `${d.ups_modules} × ${d.ups_kva_each} kVA`], ['Battery', `${d.battery_kwh} kWh (${cfg.ups_minutes} min design)`]])];
       break;
     case 'battery': title = 'Battery cabinet'; tag = 'power';
@@ -191,8 +213,8 @@ function renderInspector() {
     case 'utility': title = 'Utility service'; tag = 'power';
       body = [kv([['Utility', p.utility_ok ? 'OK' : 'LOST'], ['Import', `${fmt.num(p.utility_kw)} kW`], ['Service', `${d.voltage}, ${d.service_breaker_a} A`], ['PUE now', fmt.num(st.pue, 3)]]), evidence(['P_utility'], st)];
       break;
-    case 'generator': title = 'Generator'; tag = 'power';
-      body = [kv([['State', p.generator_on ? 'RUNNING' : 'standby'], ['Utility', p.utility_ok ? 'OK' : 'LOST'], ['Start delay', '12 s'], ['Fitted', cfg.generator ? 'yes' : 'no']])];
+    case 'generator': title = hall ? `Generator ${(sel.index || 0) + 1}` : 'Generator'; tag = 'power';
+      body = [kv([['State', p.generator_on ? 'RUNNING' : 'standby'], ['Utility', p.utility_ok ? 'OK' : 'LOST'], ['Start delay', '12 s'], ['Fitted', cfg.generator ? (d.generators_total > 1 ? `${d.generators_total} × ${d.generator_kw_each} kW (N+1)` : 'yes') : 'no']])];
       break;
     case 'containment': title = `Containment door ${(sel.index || 0) + 1}`; tag = 'cooling';
       body = [kv([['Aisle ΔP', `${fmt.num(st.aisle_dp_pa)} Pa`], ['Return', `${fmt.num(st.return_c)} °C`]]), evidence(['dP_aisle', 'T_return'], st)];
@@ -201,7 +223,7 @@ function renderInspector() {
       body = [kv([['Leak', st.leak ? 'DETECTED' : 'clear']]), evidence(['leak_floor'], st)];
       break;
     case 'gateway': case 'controller': title = 'BEN Controller'; tag = 'controls';
-      body = [kv([['Controller', cfg.tier === 'micro' ? 'RevPi · ben_engine' : 'PLC + edge computer · ben_engine'], ['BEN Pods', `${new Set(store.sensors.map(s => s.node)).size} virtual`], ['Transport', 'BEN Mesh (MQTT, isolated LAN)'], ['Mode', st.mode], ['Seq', st.seq]])];
+      body = [kv([['Controller', cabinet ? 'RevPi · ben_engine' : 'PLC + edge computer · ben_engine'], ['BEN Pods', `${new Set(store.sensors.map(s => s.node)).size} virtual`], ['Transport', 'BEN Mesh (MQTT, isolated LAN)'], ['Mode', st.mode], ['Seq', st.seq]])];
       break;
     case 'doors': title = 'Doors'; tag = 'envelope';
       body = [kv([['State', st.door_open ? 'OPEN' : 'closed'], ['Humidity', `${fmt.num(st.rh_pct)} %RH`], ['Outdoor', `${fmt.num(st.outdoor_c)} °C`]]), evidence(['door_main', 'RH_room'], st)];
@@ -217,7 +239,8 @@ function renderInspector() {
       break;
     }
     default: title = `${d.tier_label}`; tag = cfg.white_label ? cfg.brand : 'Schreiber AI';
-      body = [kv([['Enclosure', d.enclosure], ['Profile', cfg.profile], ['IT', `${fmt.num(st.it_kw)} / ${cfg.it_kw} kW`], ['Racks', cfg.racks], ['Cooling', d.cooling_label], ['Redundancy', cfg.redundancy],
+      body = [kv([['Enclosure', d.enclosure], ['Hardening', `${d.hardening_label}`], ['Profile', cfg.profile], ['IT', `${fmt.num(st.it_kw)} / ${cfg.it_kw} kW`], ['Racks', hall ? `${cfg.racks} in ${d.rows} rows` : cfg.racks], ['Cooling', d.cooling_label], ['Redundancy', cfg.redundancy],
+        hall ? ['Service', `${d.transformers_total} × ${d.transformer_kva} kVA, ${d.generators_total} generators`] : null,
         ['PUE now', fmt.num(st.pue, 3)], ['Outdoor', `${fmt.num(st.outdoor_c)} °C`], ['Room', `${fmt.num(st.room_c)} °C`], ['Alarms', st.alarms.length]])];
   }
   inspTitle.replaceChildren(title, h('span', { class: 'tag' }, tag));

@@ -15,3 +15,6 @@
 | Managed-service SOC 2 program | Enterprise and healthcare sales | Ops team |
 | Paperclip agent tree per unit (monitor, draft maintenance tickets) | Zero relay work for the operator | Paperclip endpoint |
 | Atlas memory of fitted parameters across the fleet | Fleet learning: each commissioning improves the next twin | Atlas endpoint |
+| BEN 2000 engineering release: stamped permit set for a reference site, utility pre-application, modular manufacturer RFI and first-article plan, per-module drawings and site plan A-000 generated and inspected, CFD per module, BOM confirmed from quotes | The 2 MW center becomes quotable and permittable; first hall lighthouse with a regional enterprise, hospital or university | Funding; a reference site with a utility willing to quote MV service; catalog lines confirmed (`docs/BOM-ben2000.md`) |
+| Hardening vendor qualification: UL 752 panel, ASTM F3038 door and HEMP shielding vendors under `SUPPLIER_TERMS.md` Q1; first H2 unit at a coastal site; first H3 envelope with an IEEE 299 test at FAT | H2/H3 become deliverable, not described | Vendor certificates; a public-sector pilot |
+| Envelope hose test E14 run on the first lighthouse unit and written into the warranty record | NEMA 4X / IP66 claim is measured, not designed | Lighthouse build |

@@ -20,7 +20,7 @@ def test_flatten_state_rules():
 
 
 def test_load_step_passes_and_is_deterministic():
-    cfg = Config.preset("ben20")
+    cfg = Config.preset("ben150")
     r1 = sw.load_step(Twin(cfg, seed=1), hold_s=300.0, clock="2026-01-01T00:00:00+00:00")
     r2 = sw.load_step(Twin(cfg, seed=1), hold_s=300.0, clock="2026-01-01T00:00:00+00:00")
     assert r1.to_dict() == r2.to_dict()
@@ -30,7 +30,7 @@ def test_load_step_passes_and_is_deterministic():
 
 
 def test_failover_and_ride_through():
-    cfg = Config.preset("ben20")
+    cfg = Config.preset("ben150")
     f = sw.cooling_unit_failover(Twin(cfg, seed=0), fail_s=200.0, recover_s=100.0)
     assert f.passed and len(f.extra["units"]) == cfg.derived()["cooling_units_total"]
     r = sw.utility_loss_ride_through(Twin(cfg, seed=0))
@@ -40,7 +40,7 @@ def test_failover_and_ride_through():
 
 
 def test_door_outdoor_filter():
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     d = sw.door_open(Twin(cfg, seed=0), open_s=300.0)
     assert any(c.name == "door_alarm_raised" and c.passed for c in d.criteria)
     o = sw.outdoor_temperature_sweep(Twin(cfg, seed=0), hold_s=200.0, step_k=10.0)
@@ -50,7 +50,7 @@ def test_door_outdoor_filter():
 
 
 def test_run_sweep_and_csv(tmp_path):
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     r = sw.run_sweep("door_open", cfg, open_s=120.0)
     p = tmp_path / "door.csv"
     sw.to_csv(r, str(p))

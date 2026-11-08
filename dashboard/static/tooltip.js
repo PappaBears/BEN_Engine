@@ -31,6 +31,16 @@ const CODES = {
   sensor_power: ['PWR-METER', 'PWR-CT'],
   sensor_leak: ['CTL-LEAK'],
   sensor_contact: ['CTL-DOOR'],
+  // BEN 2000 hall and hardening items (docs/TIER_AND_ENCLOSURE_DECISION.md)
+  hall: ['STR-MODULE-WB', 'STR-HALL', 'STR-MODULE', 'STR-CONT40'],
+  powermodule: ['STR-POWERMOD', 'STR-MODULE-WB', 'PWR-SWGR'],
+  transformer: ['PWR-XFMR-2500', 'PWR-XFMR', 'PWR-MV'],
+  switchgear: ['PWR-SWGR', 'PWR-MV-SWGR', 'PWR-PANEL-ILINE', 'PWR-MAIN-BKR'],
+  fanwall: ['CLG-FANWALL', 'CLG-AHU', 'CLG-INROW'],
+  drycooler_adiabatic: ['CLG-DRYCOOLER-ADIA', 'CLG-DRYCOOLER', 'CLG-'],
+  plinth: ['HRD-PLINTH', 'HRD-H2', 'STR-PLINTH'],
+  armour: ['HRD-BALLISTIC', 'HRD-H3', 'STR-ARMOUR'],
+  vestibule: ['HRD-VESTIBULE', 'HRD-MANTRAP', 'HRD-H3', 'STR-VESTIBULE'],
 };
 
 function findPart(prefs) {
@@ -56,6 +66,7 @@ function describe(hv) {
   const p = st.power;
   const aMax = { A1: 27, A2: 35, A3: 40, A4: 45 }[d.ashrae_class] || 35;
   const cool = cfg.cooling, liquid = cool === 'dlc_cdu', water = cool === 'rdhx_drycooler';
+  const kind = d.kind || (cfg.tier === 'ben5' ? 'cabinet' : 'module'), cabinet = kind === 'cabinet', hall = kind === 'hall';
   const live = [];
   const L = (k, v, cls) => live.push([k, v, cls]);
   let name = hv.type, tag = '', codes = [], desc = '';
@@ -77,41 +88,70 @@ function describe(hv) {
     }
     case 'drycooler': {
       const u = st.cooling_units[hv.index] || {};
-      name = `Dry cooler ${(hv.index || 0) + 1}`; tag = 'heat rejection'; codes = CODES.drycooler;
-      desc = `Roof dry cooler: rejects the glycol loop heat to outdoor air with EC fans; sized for the ${d.climate.t_design_c} °C design day.`;
+      name = hall ? `Adiabatic dry cooler ${(hv.index || 0) + 1}` : `Dry cooler ${(hv.index || 0) + 1}`; tag = 'heat rejection'; codes = hall ? CODES.drycooler_adiabatic : CODES.drycooler;
+      desc = hall ? `Adiabatic dry cooler in the plant yard: EC fans with wetted pre-cooling pads for the ${d.climate.t_design_c} °C design day; water-free mode below ~30 °C.` : `Roof dry cooler: rejects the glycol loop heat to outdoor air with EC fans; sized for the ${d.climate.t_design_c} °C design day.`;
       L('status', !u.ok ? 'FAILED' : u.on ? 'running' : 'standby', !u.ok ? 'bad' : u.on ? 'ok' : ''); L('heat rejected', `${fmt.num(u.kw)} kW`); L('fan', `${fmt.num(u.fan_pct, 0)} %`); L('outdoor', `${fmt.num(st.outdoor_c)} °C`);
       break;
     }
-    case 'cdu': name = 'CDU'; tag = 'liquid cooling'; codes = CODES.cdu;
+    case 'cdu': name = hall ? `CDU ${(hv.index || 0) + 1}` : 'CDU'; tag = 'liquid cooling'; codes = CODES.cdu;
+      if (hall) { const u = st.cooling_units[hv.index] || {}; L('status', !u.ok ? 'FAILED' : u.on ? 'running' : 'standby', !u.ok ? 'bad' : u.on ? 'ok' : ''); L('to liquid', `${fmt.num(u.kw)} kW`); }
       desc = liquid ? 'Coolant distribution unit: pumps and isolates the rack coolant loop from the facility glycol loop; ~70 % of IT heat goes to liquid.' : 'Coolant distribution unit for the rear-door heat exchangers: pumps, heat exchanger and leak-safe isolation from the dry-cooler loop.';
       L('loop heat', `${fmt.num(st.cooling_units.reduce((s, u) => s + u.kw, 0))} kW`); L('residual air supply', `${fmt.num(st.supply_c)} °C`); L('leak', st.leak ? 'DETECTED' : 'clear', st.leak ? 'bad' : 'ok');
       break;
-    case 'ups': name = 'UPS'; tag = 'power'; codes = CODES.ups;
-      desc = `Double-conversion UPS, ${d.ups_modules} × ${d.ups_kva_each} kVA (${cfg.redundancy}): carries the IT load through utility events until the generator or utility returns.`;
+    case 'ups': name = hall ? `UPS string ${(hv.index || 0) + 1}` : 'UPS'; tag = 'power'; codes = CODES.ups;
+      desc = hall ? `Modular UPS string, ${d.ups_modules} × ${d.ups_kva_each.toLocaleString()} kVA (2N): each string alone carries the IT load; frames are hot-swappable.` : `Double-conversion UPS, ${d.ups_modules} × ${d.ups_kva_each} kVA (${cfg.redundancy}): carries the IT load through utility events until the generator or utility returns.`;
       L('state', p.ups_on_battery ? 'ON BATTERY' : 'online', p.ups_on_battery ? 'warn' : 'ok'); L('SoC', `${fmt.num(p.ups_soc_pct, 0)} %`, p.ups_soc_pct < 30 ? 'bad' : ''); L('runtime', `${fmt.num(p.ups_runtime_min, 0)} min`);
       break;
-    case 'battery': name = 'Battery cabinet'; tag = 'power'; codes = CODES.battery;
-      desc = `LFP battery cabinet, ${d.battery_kwh} kWh at 90 % depth of discharge: ${cfg.ups_minutes} min of IT load for the UPS.`;
+    case 'battery': name = hall ? 'Battery room cabinet' : 'Battery cabinet'; tag = 'power'; codes = CODES.battery;
+      desc = hall ? `Lithium battery room per NFPA 855 (2-hour separation, gas detection, UL 9540A data): ${d.battery_kwh.toLocaleString()} kWh for ${cfg.ups_minutes} min of IT load.` : `LFP battery cabinet, ${d.battery_kwh} kWh at 90 % depth of discharge: ${cfg.ups_minutes} min of IT load for the UPS.`;
       L('SoC', `${fmt.num(p.ups_soc_pct, 0)} %`, p.ups_soc_pct < 30 ? 'bad' : ''); L('energy', `${d.battery_kwh} kWh`); L('runtime', `${fmt.num(p.ups_runtime_min, 0)} min`);
       break;
-    case 'ats': name = 'ATS / main breaker'; tag = 'power'; codes = CODES.ats;
-      desc = `Automatic transfer switch and ${d.service_breaker_a} A main: selects utility or generator and protects the ${d.voltage} service.`;
+    case 'ats': name = hall ? 'Transfer / paralleling section' : 'ATS / main breaker'; tag = 'power'; codes = CODES.ats;
+      desc = hall ? `Paralleling and transfer section of the 480 V switchgear: selects the utility transformers or the ${d.generators_total} generators; ${d.service_breaker_a} A main.` : `Automatic transfer switch and ${d.service_breaker_a} A main: selects utility or generator and protects the ${d.voltage} service.`;
       L('utility', p.utility_ok ? 'OK' : 'LOST', p.utility_ok ? 'ok' : 'bad'); L('generator', cfg.generator ? (p.generator_on ? 'running' : 'standby') : 'not fitted'); L('import', `${fmt.num(p.utility_kw)} kW`);
       break;
     case 'panel': name = 'Distribution panel'; tag = 'power'; codes = CODES.panel;
       desc = `Distribution panelboard: one branch breaker per rack PDU plus cooling and controls circuits; ${d.service_breaker_a} A frame.`;
       L('IT now', `${fmt.num(st.it_kw)} kW`); L('circuits', `${cfg.racks} PDU + aux`); L('calc demand', `${d.service_amps_calc} A`);
       break;
-    case 'utility': name = 'Utility service'; tag = 'power'; codes = CODES.utility;
-      desc = `Service entrance and revenue meter: ${d.voltage}, ${d.service_breaker_a} A; the meter is the reference for PUE.`;
+    case 'utility': name = hall ? 'MV utility service' : 'Utility service'; tag = 'power'; codes = CODES.utility;
+      desc = hall ? `Medium-voltage service entrance and revenue meter (${d.voltage}) feeding the pad-mount transformers; the meter is the reference for PUE.` : `Service entrance and revenue meter: ${d.voltage}, ${d.service_breaker_a} A; the meter is the reference for PUE.`;
       L('utility', p.utility_ok ? 'OK' : 'LOST', p.utility_ok ? 'ok' : 'bad'); L('import', `${fmt.num(p.utility_kw)} kW`); L('PUE', fmt.num(st.pue, 3));
       break;
-    case 'generator': name = 'Generator'; tag = 'power'; codes = CODES.generator;
-      desc = 'Standby generator on its own skid: starts within ~12 s of utility loss and takes over through the ATS so cooling returns before the UPS battery empties.';
+    case 'generator': name = hall ? `Generator ${(hv.index || 0) + 1} of ${d.generators_total}` : 'Generator'; tag = 'power'; codes = CODES.generator;
+      desc = hall ? `${d.generator_kw_each.toLocaleString()} kW diesel generator (N+1 set) with a 48 h belly tank and SPCC containment: starts within ~12 s of utility loss and parallels onto the switchgear.` : 'Standby generator on its own skid: starts within ~12 s of utility loss and takes over through the ATS so cooling returns before the UPS battery empties.';
       L('state', p.generator_on ? 'RUNNING' : 'standby', p.generator_on ? 'ok' : ''); L('utility', p.utility_ok ? 'OK' : 'LOST', p.utility_ok ? 'ok' : 'bad');
       break;
+    case 'transformer': name = `Transformer ${(hv.index || 0) + 1} of ${d.transformers_total}`; tag = 'power'; codes = CODES.transformer;
+      desc = `${(d.transformer_kva || 2500).toLocaleString()} kVA pad-mount transformer, ${d.voltage.split('→')[0].trim()} to 480 V (${cfg.redundancy === 'N' ? 'N' : '2N pair'}); oil-filled, loop-feed, in the fenced MV yard.`;
+      L('utility', p.utility_ok ? 'OK' : 'LOST', p.utility_ok ? 'ok' : 'bad'); L('load', `${fmt.num(p.utility_kw / Math.max(1, d.transformers_total))} kW each`); L('demand', `${d.total_kva.toLocaleString()} kVA`);
+      break;
+    case 'switchgear': name = '480 V switchgear'; tag = 'power'; codes = CODES.switchgear;
+      desc = `Low-voltage switchgear lineup in the power module: transformer mains, tie, generator paralleling and UPS feeders; ${d.service_breaker_a} A frame.`;
+      L('utility', p.utility_ok ? 'OK' : 'LOST', p.utility_ok ? 'ok' : 'bad'); L('import', `${fmt.num(p.utility_kw)} kW`); L('calc demand', `${d.service_amps_calc.toLocaleString()} A`);
+      break;
+    case 'powermodule': name = 'Power module'; tag = 'power'; codes = CODES.powermodule;
+      desc = `Separate wide-body module beside the hall: switchgear, ${d.ups_modules} UPS strings and the battery room, so no energy storage sits in the IT hall.`;
+      L('UPS', p.ups_on_battery ? 'ON BATTERY' : 'online', p.ups_on_battery ? 'warn' : 'ok'); L('SoC', `${fmt.num(p.ups_soc_pct, 0)} %`); L('import', `${fmt.num(p.utility_kw)} kW`);
+      break;
+    case 'fanwall': name = `Fan-wall unit ${(hv.index || 0) + 1}`; tag = 'cooling'; codes = CODES.fanwall;
+      desc = 'Fan-wall air handler along the long wall: handles the ~30 % air-side residual heat of the liquid-cooled racks and holds the hall at the supply set-point.';
+      L('supply', `${fmt.num(st.supply_c)} °C`); L('return', `${fmt.num(st.return_c)} °C`); L('fans', `${fmt.num(Math.max(...st.cooling_units.map(u => u.fan_pct), 0), 0)} %`);
+      break;
+    case 'plinth': name = 'Flood plinth'; tag = 'hardening'; codes = CODES.plinth;
+      desc = `${d.hardening_label || cfg.hardening}: 600 mm flood plinth with sealed penetrations above the flood line; stainless fasteners and ${d.hardening_coating || 'C5-M'} coating.`;
+      L('level', cfg.hardening); L('rating', d.hardening_rating || 'IP66');
+      break;
+    case 'armour': name = 'Ballistic wall panel'; tag = 'hardening'; codes = CODES.armour;
+      desc = 'H3 hardened envelope: UL 752 ballistic panels (level selectable), IK10 impact doors, forced-entry rating per ASTM F3038; HEMP shielding option (MIL-STD-188-125-1).';
+      L('level', cfg.hardening); L('rating', d.hardening_rating || '');
+      break;
+    case 'vestibule': name = 'Secure vestibule / mantrap'; tag = 'hardening'; codes = CODES.vestibule;
+      desc = 'Two-door interlocked vestibule with two-factor access, tamper detection on the PLC and an audit trail in BEN Care (H3 package).';
+      L('door', st.door_open ? 'OPEN' : 'closed', st.door_open ? 'warn' : 'ok'); L('access', 'two-factor');
+      break;
     case 'controller': name = 'BEN Controller'; tag = 'controls'; codes = CODES.controller;
-      desc = cfg.tier === 'micro' ? 'BEN Controller (RevPi): PLC logic plus the ben_engine twin and API; talks to the BEN Pods over BEN Mesh and to the UPS/AC over Modbus.' : 'BEN Controller: PLC + edge computer running ben_engine; collects BEN Pods over BEN Mesh, polls UPS/cooling/meters over Modbus, serves this dashboard locally.';
+      desc = cabinet ? 'BEN Controller (RevPi): PLC logic plus the ben_engine twin and API; talks to the BEN Pods over BEN Mesh and to the UPS/AC over Modbus.' : 'BEN Controller: PLC + edge computer running ben_engine; collects BEN Pods over BEN Mesh, polls UPS/cooling/meters over Modbus, serves this dashboard locally.';
       L('pods', `${new Set(store.sensors.map(s => s.node)).size}`); L('mode', st.mode); L('seq', st.seq);
       break;
     case 'tray': name = 'Cable tray'; tag = 'power'; codes = CODES.tray;
@@ -141,8 +181,8 @@ function describe(hv) {
     }
     case 'aisle_cold': name = 'Cold aisle'; tag = 'cooling'; codes = CODES.containment; desc = 'Supply-air aisle in front of the rack inlets.'; L('supply', `${fmt.num(st.supply_c)} °C`); L('ΔP', `${fmt.num(st.aisle_dp_pa)} Pa`); break;
     case 'aisle_hot': name = 'Hot aisle'; tag = 'cooling'; codes = CODES.containment; desc = 'Contained exhaust aisle behind the racks.'; L('return', `${fmt.num(st.return_c)} °C`); break;
-    default: name = d.tier_label; tag = 'enclosure'; codes = CODES.container;
-      desc = `${d.enclosure}: ISO corner castings, 100 mm PIR insulation, corrosion class ${d.climate.corrosion}; ${d.gross_kg.toLocaleString()} kg gross.`;
+    default: name = d.tier_label; tag = 'enclosure'; codes = hall ? CODES.hall : CODES.container;
+      desc = hall ? `${d.enclosure}: ${d.modules} wide-body modules on a slab, ${d.hardening_label || 'H1'} (${d.hardening_rating || 'IP66'}); ${d.gross_kg.toLocaleString()} kg gross.` : `${d.enclosure}: ${cabinet ? 'NEMA 4X / IP66 cabinet' : 'ISO corner castings, 100 mm PIR insulation'}, ${d.hardening_label || 'H1'}, corrosion class ${d.climate.corrosion}; ${d.gross_kg.toLocaleString()} kg gross.`;
       L('room', `${fmt.num(st.room_c)} °C`); L('PUE', fmt.num(st.pue, 3)); L('alarms', st.alarms.length, st.alarms.length ? 'warn' : 'ok');
   }
   return { name, tag, part: findPart(codes), desc, live };

@@ -14,21 +14,23 @@ Tick every line. "N/A" must be justified in the notes column (e.g. "no generator
 | A3 | Single-line diagram (as built) with breaker settings and ATS sequence | ENG | PDF | All | | |
 | A4 | Controls wiring and one-line diagrams; network diagram with IP plan | ENG | PDF | All | | |
 | A5 | Bill of materials as built (serials of UPS, cooling units, CDU, batteries, panel) | CM (verified by Schreiber AI quality) | CSV + PDF | All | | |
-| A6 | PE-stamped anchorage/foundation drawing and calc; structural modification calc and weld inspection report | PE / CWI | PDF | 10/20/40 | | |
-| A7 | Arc-flash and coordination study, final (with utility data) and label schedule | PE | PDF | 10/20/40 | | |
-| A8 | Refrigerant charge vs. room volume calc; refrigerant and GWP declaration per circuit | ENG / HVAC sub | PDF | M/10/20 | | |
+| A6 | PE-stamped anchorage/foundation drawing and calc; structural modification calc and weld inspection report (BEN 2000: stamped structural, civil, MV and site plan sets; utility interconnection agreement and single-line as accepted by the utility) | PE / CWI | PDF | 30/150/500/2000 | | |
+| A7 | Arc-flash and coordination study, final (with utility data) and label schedule | PE | PDF | 30/150/500/2000 | | |
+| A8 | Refrigerant charge vs. room volume calc; refrigerant and GWP declaration per circuit | ENG / HVAC sub | PDF | 5/30/150 | | |
 | A9 | Compliance pack for the profile (subset of `COMPLIANCE.md`) and code summary sheet | Compliance | PDF | All | | |
 | **B. Test and inspection reports** | | | | | | |
 | B1 | FAT commissioning report (signed JSON + PDF) with all experiment data and CSVs | ENG | PDF + CSV | All | | |
 | B2 | SAT commissioning report (signed) | ENG | PDF + CSV | All | | |
 | B3 | Electrical tests: torque log, insulation resistance, bonding continuity, ground electrode resistance, phase rotation, thermography images | CM licensed electrician (witnessed by Schreiber AI quality) | PDF | All | | |
 | B4 | Cooling tests: pressure test chart, evacuation log, charge weights, superheat/subcool, glycol concentration and pH, flow and dP readings | HVAC sub | PDF | All | | |
-| B5 | Fire alarm record of completion (NFPA 72), suppression acceptance test, door fan (enclosure integrity) test report, agent concentration calc | Fire contractor | PDF | 10/20/40 | | |
+| B5 | Fire alarm record of completion (NFPA 72), suppression acceptance test, door fan (enclosure integrity) test report, agent concentration calc | Fire contractor | PDF | 30/150/500/2000 | | |
 | B6 | Battery: UL 9540A report (≥ 20 kWh), BMS commissioning report, capacity/runtime test | Battery vendor / ENG | PDF | All | | |
 | B7 | Generator: NFPA 110 installation acceptance test, load bank report, fuel system test | Generator vendor | PDF | option | | |
 | B8 | Acoustic survey at property line (E10) | ENG | PDF | All | | |
-| B9 | Envelope: coating DFT record, insulation photos, blower-door/leak test, water spray test | CM (countersigned by Schreiber AI quality) | PDF | All | | |
-| B10 | Transport record: shock logger data, weigh ticket, set-down inspection | LOG | PDF | 10/20/40 | | |
+| B9 | Envelope: coating DFT record, insulation photos, blower-door/leak test, **E14 hose test record (UL 50E type 4X method) with hardening level, witness and date** — the envelope warranty starts from this record | CM (countersigned by Schreiber AI quality) | PDF | All | | |
+| B9a | Hardening evidence (H2/H3): coating system certificate (ISO 12944 C5-M), anode schedule, plinth drawing; H3: UL 752 panel lot certificates, ASTM F3038 door test reports, IK10 certificates, IEEE 299 shielding effectiveness test (shielded option), tamper-seal register, mantrap interlock test | Vendors / ENG | PDF | H2/H3 units | | |
+| B11 | BEN 2000 hall: E15 module joint seal test per joint, module alignment survey, bolt torque log, state modular labels, E16 transfer test with NETA switchgear and transformer test reports, MV cable VLF test, transformer oil sample, relay settings as left, NFPA 110 acceptance test, battery room gas detection calibration, SPCC plan, water management plan (ASHRAE 188) with baseline sampling, certificate of occupancy | ENG / NETA / vendors / AHJ | PDF | 2000 | | |
+| B10 | Transport record: shock logger data, weigh ticket, set-down inspection | LOG | PDF | 30/150/500/2000 | | |
 | **C. Calibration** | | | | | | |
 | C1 | Calibration certificates for every sensor channel (gain/offset, `cal_id`, reference instrument and its traceability, uncertainty budget per GUM) | ENG (`calibration.py`) | PDF + JSON | All | | |
 | C2 | Reference instrument certificates (traceable to NIST or national lab) | Cal lab | PDF | All | | |
@@ -58,7 +60,7 @@ Tick every line. "N/A" must be justified in the notes column (e.g. "no generator
 | H1 | Training attendance and competency sign-off per module (§4) | ENG + CUST | PDF, signed | All | | |
 | H2 | Open items list (punch list) with owner and date for each item | ENG + CUST | PDF | All | | |
 | H3 | Certificate of substantial completion / acceptance | CUST | PDF, signed | All | | |
-| H4 | AHJ certificates (electrical final, mechanical final, fire final, certificate of occupancy or equivalent) | AHJ via sub | PDF | 10/20/40 | | |
+| H4 | AHJ certificates (electrical final, mechanical final, fire final, certificate of occupancy or equivalent) | AHJ via sub | PDF | 30/150/500/2000 | | |
 
 ## 2. Turnover meeting agenda (half day on site, after SAT)
 

@@ -5,7 +5,7 @@ from ben_engine.sim_nodes import NodeFleet, SimNode, RELAYS, MqttPublisher
 
 
 def _fleet():
-    cfg = Config.preset("ben20")
+    cfg = Config.preset("ben150")
     tw = Twin(cfg, seed=1)
     for _ in range(30):
         tw.step(1.0)
@@ -89,3 +89,18 @@ def test_mqtt_publisher_optional():
     assert pub.available in (True, False)
     assert pub.publish("x", {}) in (True, False)
     pub.close()
+
+
+def test_pod_count_follows_derived_pods_for_every_tier():
+    from ben_engine.config import TIER_GEOMETRY
+    for tier in TIER_GEOMETRY:
+        cfg = Config.preset(tier)
+        fl = NodeFleet(cfg, seed=1)
+        assert fl.pod_count() == cfg.derived()["pods"], tier
+        assert len(fl.nodes) == NodeFleet.expected_nodes(cfg)
+        st = fl.discover()
+        assert all("pods" in n and "module" in n for n in st)
+    cfg = Config.preset("ben2000")
+    fl = NodeFleet(cfg)
+    rooms = [n for n in fl.nodes if n.kind == "room"]
+    assert len(rooms) == 3 and sorted(n.module for n in rooms) == [1, 2, 3]

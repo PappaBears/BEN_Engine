@@ -8,8 +8,9 @@ The original wording is preserved at the bottom so later sessions can check for 
 ## 1. One sentence
 
 Schreiber AI designs, builds, commissions and operates **BEN Engine** (Business Edge Node): a family of
-modular data centers built from off-the-shelf ISO containers and outdoor cabinets, sized from a single
-rack for a small business up to a 40 ft liquid-cooled AI pod, with Schreiber AI's control layer
+modular data centers built from sealed ISO-frame modules, outdoor cabinets and a prefabricated modular hall,
+sized from a single rack for a small business (BEN 5) through a 40 ft liquid-cooled AI pod (BEN 500) to a single
+2 MW center (BEN 2000), element-proof by default (NEMA 4X / IP66) and hardened on request, with Schreiber AI's control layer
 (firmware, digital twin, dashboard, calibration and commissioning tooling) that customers can run
 white-label, with their own software, or as a full managed solution.
 
@@ -31,12 +32,17 @@ else (bill of materials, drawings, digital twin, dashboard 3D scene, commissioni
 compliance matrix) is generated from that configuration. Changing a value in the selector changes
 every downstream deliverable consistently.
 
-| Tier | Enclosure (off the shelf) | IT load | Racks | Cooling | Power | Controls (default) |
+Names follow the nominal maximum IT kW (`docs/TIER_AND_ENCLOSURE_DECISION.md`); the enclosure is described by its size. Generation-1 keys (`micro`, `ben10`, `ben20`, `ben40`) still load through the alias map in `config.py`.
+
+| Tier | Enclosure (off the shelf, sealed to NEMA 4X / IP66) | IT load | Racks | Cooling | Power | Controls (default) |
 | --- | --- | --- | --- | --- | --- | --- |
-| **BEN 5** | NEMA 4X / IP66 / IP55 outdoor 24U cabinet with integral air conditioner, on a skid | 3–8 kW | 1 | Cabinet DX air conditioner | 208/240 V 1φ, 30–50 A; 3–6 kVA UPS | BEN Controls Lite: Revolution Pi RevPi Connect 4 + 3 BEN Pods |
-| **BEN 30** | 10 ft high-cube ISO container | 10–30 kW | 1–2 | In-row DX, hot-aisle containment, economizer | 208 V 3φ 100 A; 20–30 kVA UPS | Lite (Pro selectable; Pro default for healthcare, public sector, AI training) |
-| **BEN 150** | 20 ft high-cube ISO container | 50–150 kW | 4–6 | In-row DX or rear-door heat exchangers + dry cooler; DLC option | 480 V 3φ 400 A; 150 kVA modular UPS | BEN Controls Pro: PLCnext AXC F 2152 + Axioline I/O in a UL 508A panel, OnLogic Karbon 400 edge computer, 2 Pods per rack + 2 |
-| **BEN 500** | 40 ft high-cube ISO container | 150–500 kW | 8–12 | Direct liquid cooling with CDU + external dry cooler; RDHx | 480 V 3φ 800–1200 A; modular UPS, generator ready | BEN Controls Pro |
+| **BEN 5** | NEMA 4X / IP66 outdoor 24U cabinet with integral air conditioner, on a skid | 2–5 kW | 1 | Cabinet DX air conditioner | 208/240 V 1φ, 30–50 A; 3–6 kVA UPS | BEN Controls Lite: Revolution Pi RevPi Connect 4 + 3 BEN Pods |
+| **BEN 30** | 10 ft high-cube ISO-frame module | 10–30 kW | 1–2 | In-row DX, hot-aisle containment, economizer | 208 V 3φ 100 A; 20–30 kVA UPS | Lite (Pro selectable; Pro default for healthcare, public sector, AI training) |
+| **BEN 150** | 20 ft high-cube ISO-frame module | 50–150 kW | 4–6 | In-row DX or rear-door heat exchangers + dry cooler; DLC option | 480 V 3φ 400 A; 150 kVA modular UPS | BEN Controls Pro: PLCnext AXC F 2152 + Axioline I/O in a UL 508A panel, OnLogic Karbon 400 edge computer, 2 Pods per rack + 2 |
+| **BEN 500** | 40 ft high-cube ISO-frame module | 150–500 kW | 8–12 | Direct liquid cooling with CDU + external dry cooler; RDHx | 480 V 3φ 800–1200 A; modular UPS, generator ready | BEN Controls Pro |
+| **BEN 2000** | Prefabricated wide-body modular hall: 3 site-joined 12.2 × 3.66 × 4.2 m steel modules (36.6 × 11.0 m hall) + power module + plant yard | 800–2,000 kW | up to 48 (4 rows of 12) | Direct liquid cooling, N+1 CDU row, fan-wall residual air; adiabatic dry coolers in the plant yard (dry mode available) | 12.47 / 13.8 kV MV service → 2 × 2,500 kVA pad-mount transformers (2N) → 480 V UL 1558 switchgear; 2N UPS (2 × 2,000 kW strings), NFPA 855 battery rooms; N+1 generators 3 × 1,250 kW, 48 h fuel | BEN Controls Pro: redundant edge computers, one PLC per module + plant PLC, BEN Mesh with multiple border routers |
+
+Every tier ships at hardening level **H1** (watertight, corrosion class C3). **H2 Severe environment** (flood plinth, C5-M, 67 m/s wind, dust filtration) and **H3 Hardened / government** (UL 752 ballistic panels, ASTM F3038 forced-entry doors, IK10, HEMP shielding option, TEMPEST-ready separation, mantrap) are selectable per unit.
 
 Controls hardware is the industrial platform in `docs/CONTROLS_HARDWARE_DECISION.md`: both tiers run the same software, the same BEN Pods on the BEN Mesh (Thread, Silicon Labs MGM240P with Secure Vault High) and the same protocol; life safety is hardwired in both.
 
@@ -54,7 +60,7 @@ list that must be disclosed on the product page before purchase.
 
 | # | Deliverable | Where | Done when |
 | --- | --- | --- | --- |
-| 1 | Issue-for-construction drawing set per tier with CTQ/CTP callouts | `design/drawings/` | Drawings generated from the config; every CTQ has a check method and tolerance |
+| 1 | Issue-for-construction drawing set per tier with CTQ/CTP callouts | `design/drawings/` | Drawings generated from the config; every CTQ has a check method and tolerance; BEN 2000 adds a site plan (A-000) and per-module sheets |
 | 2 | Assembly renders + Simplified Technical English assembly instructions | `design/renders/`, `design/assembly/` | A worker with no data-center experience can follow numbered steps with one action per step |
 | 3 | Manufacturing process flow, design to field deployed | `docs/PROCESS_FLOW.md` | Every stage has an owner, inputs, outputs, hold points and records |
 | 4 | Firmware for the BEN Pods (MGM240P / OpenThread) and the BEN Controller (edge image, PLC project), with spec sheets and one-line wiring diagrams | `firmware/`, `design/specs/` | Compiles; unit tests pass on host; protocol documented; EFR32 build and attestation status stated honestly |
@@ -76,6 +82,8 @@ list that must be disclosed on the product page before purchase.
 | 20 | Paperwork set, two-sided | `docs/contracts/` | Customer: MSA, SOW, change order, acceptance certificates, software licence, SLA, warranty, NDA. Partner/supply: integrator agreement, contract manufacturing agreement, supplier PO terms with delivery liquidated damages flowing back-to-back; customer scope-change and delay clauses |
 | 21 | Manufacturing strategy: third-party first | `docs/MANUFACTURING_STRATEGY.md`, revised `docs/PROCESS_FLOW.md` | Contract manufacturers and integrators build; Schreiber AI is design authority, controls, commissioning and operations; greenfield factory is a later study |
 | 22 | Deal package assembler | `software/ben_engine/package.py` | One command assembles the customer deal package and the partner onboarding package for a configuration |
+| 23 | BEN 2000 single 2 MW center | `config.py` (`ben2000`), `docs/COMPLIANCE.md` §14, `PROCESS_FLOW.md`, `SITE_REQUIREMENTS.md`, `MAINTENANCE.md`, `BUILD_AND_WIRING.md` | Sizing (MV service, transformers, UPS strings, generators, CDUs per module) generated from the config; building-permit, MV-service, NFPA 855 battery-room, NFPA 110 Level 1, SPCC and ASHRAE 188 rows in the compliance pack; ~52-week order-to-service plan with the utility lead time on the critical path |
+| 24 | Enclosure hardening H1/H2/H3 | `config.py` (`hardening`), `COMPLIANCE.md` §15, `TEST_GUIDE.md` E14, contracts | Every unit IP66 and hose-tested; H2/H3 packages priced from catalog lines, their tests (UL 752, ASTM F3038, IEEE 299 shielding) in the compliance pack, maintenance add-ons and warranty terms tied to the hose test |
 
 ## 6. Constraints the operator set
 
@@ -101,6 +109,7 @@ list that must be disclosed on the product page before purchase.
 10. **An investor-grade proposition** (added at the operator's request mid-session).
 11. **Proposal-level output from the selector** and the **two-sided paperwork** (customer deals; integrator, contract-manufacturer and supplier agreements) with liquidated damages and scope-change rules that flow back-to-back (added mid-session).
 12. **Third-party manufacturing first**, greenfield factory later (added mid-session).
+13. **Power-based names, a 2 MW center and element-proof enclosures** (operator steering 2026-11-08, `docs/TIER_AND_ENCLOSURE_DECISION.md`): the number in the name is the IT kW, not the container length; BEN 2000 is a prefabricated modular hall rather than a container; NEMA 3R is gone and every unit is NEMA 4X / IP66 with optional H2/H3 hardening.
 
 ## 8. Original request (verbatim, preserved)
 

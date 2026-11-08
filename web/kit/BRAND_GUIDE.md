@@ -2,12 +2,13 @@
 
 **Positioning.** Schreiber AI builds AI infrastructure for businesses that cannot and should not become data-center operators. BEN Engine is the hardware expression of that: a finished, measured, documented box.
 
-**Voice.** Plain, specific, measured. We say what we verified and what we did not. We show risks before prices. We never say "cutting-edge", "seamless", "revolutionary". We say "20 ft high-cube, 96 kW IT, N+1, 225 A main, PUE 1.37 estimated".
+**Voice.** Plain, specific, measured. We say what we verified and what we did not. We show risks before prices. We never say "cutting-edge", "seamless", "revolutionary". We say "BEN 150, 20 ft high-cube module, 96 kW IT, N+1, 225 A main, IP66 H1, PUE 1.18 estimated".
 
 ## Names
 - Company: **Schreiber AI** (two words, capital S, capital AI). Monogram: **SAI**.
 - Product: **BEN Engine** (BEN capitalised, Engine title case). Expansion: *Business Edge Node*.
-- Tiers: **BEN 5, BEN 30, BEN 150, BEN 500**. Modules: Power, Cooling, Compute, Controls.
+- Tiers: **BEN 5, BEN 30, BEN 150, BEN 500, BEN 2000**. The number is the nominal maximum IT kW, never the container length; the enclosure is described separately ("20 ft high-cube module", "prefabricated hall"). The retired generation-1 length-based names are not used in new material. Modules: Power, Cooling, Compute, Controls.
+- Hardening levels: **H1 Standard**, **H2 Severe environment**, **H3 Hardened / government**; the baseline rating is written **NEMA 4X / IP66** (never the rain-only 3R rating).
 - Software: **BEN Controls** (gateway + nodes + dashboard + twin).
 
 ## Colour (from `brand.json`)

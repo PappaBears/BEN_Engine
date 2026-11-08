@@ -23,7 +23,7 @@ try {
   await page.screenshot({ path: 'docs/media/screens/web-risks.png' });
   // interaction: pick healthcare + ben40 + hot_arid and check validation path
   await page.click('.profile:nth-child(6)');
-  await page.selectOption('#tier', 'ben40');
+  await page.selectOption('#tier', 'ben500');
   await page.selectOption('#climateSel', 'hot_arid');
   const txt = await page.textContent('#sizing');
   await page.fill('#racks', '1');
@@ -35,5 +35,5 @@ try {
   await narrow.waitForSelector('#sizing table');
   await narrow.screenshot({ path: 'docs/media/screens/web-narrow.png', fullPage: true });
   const overflow = await narrow.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
-  console.log(JSON.stringify({ sizingHasBen40: txt.includes('40 ft'), validationError: err.trim().slice(0, 120), narrowHorizontalOverflow: overflow, errors }, null, 1));
+  console.log(JSON.stringify({ sizingHasBen500: txt.includes('40 ft'), validationError: err.trim().slice(0, 120), narrowHorizontalOverflow: overflow, errors }, null, 1));
 } finally { await browser.close(); srv.kill(); }

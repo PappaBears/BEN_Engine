@@ -23,6 +23,9 @@ Summary:
 | E11 | 48-hour burn-in | FAT (24 h minimum) / SAT (48 h) | yes | Infant mortality caught; stability |
 | E12 | Cyber: port scan, Pod attestation, rogue-join rejection and failsafe on controller loss | twin, FAT, SAT | yes | No open attack surface; only attested Pods join; loss of the edge computer or PLC is safe |
 | E13 | Mesh resilience: pull a router Pod, measure heal time | twin (model), FAT, SAT | partly | BEN Mesh heals around a lost router without data loss |
+| E14 | Envelope hose test (UL 50E type 4X) | FAT (H8), SAT after relocation, every 3 years | no | The envelope is watertight at every hardening level; the basis of the envelope warranty |
+| E15 | Module joint seal test (BEN 2000) | SAT (H17a), after relocation, by rotation annually | no | Three factory modules are one sealed envelope on site |
+| E16 | MV transformer / UPS string transfer test (BEN 2000) | FAT (power module, reduced), SAT | partly | 2N power path: either transformer and either UPS string carries the hall; generators start and carry it on utility loss |
 
 Common "what to do if it fails": stop, record, do not adjust more than one thing, re-run on the twin with the suspected fault injected to see whether the twin reproduces the real data — if it does not, the model is wrong and `analysis.py` must be refit; if it does, fix the hardware cause and repeat.
 
@@ -203,14 +206,62 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 | | |
 | --- | --- |
 | **Purpose** | Prove BEN Mesh (Thread) heals around a lost router Pod and a lost border router radio without losing telemetry, so a single Pod failure or battery change never blinds a rack. |
-| **Hypothesis** | With the placement rules in `BUILD_AND_WIRING.md` §6 (every battery Pod within range of ≥ 2 router-eligible Pods, two RCPs on BEN 150/40), removing any one router Pod causes its children to re-attach to another parent within 60 s (Thread parent search; target < 30 s) with no telemetry gap longer than the ring-buffer catch-up, and removing one RCP causes no gap at all on BEN 150/40 (second border router) or a ≤ 2 min gap with full buffer catch-up on single-RCP units. |
+| **Hypothesis** | With the placement rules in `BUILD_AND_WIRING.md` §6 (every battery Pod within range of ≥ 2 router-eligible Pods, two RCPs on BEN 150/500), removing any one router Pod causes its children to re-attach to another parent within 60 s (Thread parent search; target < 30 s) with no telemetry gap longer than the ring-buffer catch-up, and removing one RCP causes no gap at all on BEN 150/500 (second border router) or a ≤ 2 min gap with full buffer catch-up on single-RCP units. |
 | **Setup** | Fully commissioned mesh (E12 step 5 passed); dashboard mesh health panel open (topology, parent, link quality per Pod); a stopwatch; the unit at idle or low load. |
 | **Instrumentation** | Pod `status` at 10 s (parent, link quality, role); OTBR topology dump every 10 s; broker message log per Pod; alarm log. |
-| **Procedure** | 1. Record the topology: which Pods are routers, which are children of which parent. 2. Identify the router Pod with the most children (usually the room Pod E or a 24 VDC Pod W). Remove its power (or pull it off the rail and open the battery door). Start the stopwatch. 3. Record, per orphaned child, the time until it reports a new parent and the time until its telemetry resumes at the broker. 4. Leave it out for 15 min; confirm no sensor-loss alarm escalates beyond "Pod offline" for the removed Pod itself, and that the twin keeps running on neighbouring sensors. 5. Restore the Pod; confirm it re-attests and rejoins as a router within 2 min. 6. Repeat for a second router Pod at the far end of the row. 7. Unplug RCP 1 from the edge computer for 10 min; record any gap; restore; on BEN 150/40 repeat with RCP 2. 8. Export the CSV for the whole window. |
+| **Procedure** | 1. Record the topology: which Pods are routers, which are children of which parent. 2. Identify the router Pod with the most children (usually the room Pod E or a 24 VDC Pod W). Remove its power (or pull it off the rail and open the battery door). Start the stopwatch. 3. Record, per orphaned child, the time until it reports a new parent and the time until its telemetry resumes at the broker. 4. Leave it out for 15 min; confirm no sensor-loss alarm escalates beyond "Pod offline" for the removed Pod itself, and that the twin keeps running on neighbouring sensors. 5. Restore the Pod; confirm it re-attests and rejoins as a router within 2 min. 6. Repeat for a second router Pod at the far end of the row. 7. Unplug RCP 1 from the edge computer for 10 min; record any gap; restore; on BEN 150/500 repeat with RCP 2. 8. Export the CSV for the whole window. |
 | **Data to record** | Topology before/after each step; per-Pod re-attach time and telemetry resume time; gap analysis per channel from the CSV (`seq` continuity); alarm log; RCP events. |
 | **Analysis** | Heal time = max over children of (new parent time − removal time); data completeness per channel over the window; any child that failed to re-attach = placement defect (shadowed by racks, only one parent in range). |
-| **Pass** | Every orphaned child re-attached ≤ 60 s (record the value; target ≤ 30 s); telemetry completeness ≥ 99.5 % per channel over the window after buffer catch-up; no false alarm other than the removed Pod's own offline event; removed Pod re-attests on return; RCP loss on BEN 150/40 produced no gap; on single-RCP units the gap was ≤ 2 min and fully back-filled. |
+| **Pass** | Every orphaned child re-attached ≤ 60 s (record the value; target ≤ 30 s); telemetry completeness ≥ 99.5 % per channel over the window after buffer catch-up; no false alarm other than the removed Pod's own offline event; removed Pod re-attests on return; RCP loss on BEN 150/500 produced no gap; on single-RCP units the gap was ≤ 2 min and fully back-filled. |
 | **If it fails** | A child with no second parent: add a 24 VDC-powered Pod W as a router above the rack line or move the Pod per the spacing rule; a child with link quality 1 to its only parent: re-site away from the metal rack top; heal time > 60 s on every child: check the Thread network's router count (target ≥ 3 inside a 20 ft unit) and the RCP placement; after any change repeat E13 from step 1. |
+
+---
+
+## E14 — Envelope hose test (UL 50E type 4X method)
+
+| | |
+| --- | --- |
+| **Purpose** | Prove the enclosure is watertight and every penetration is sealed before the liner closes and again after the unit has travelled. This is the test behind the NEMA 4X / IP66 claim at every hardening level (`COMPLIANCE.md` §15) and the condition of the envelope warranty (`contracts/WARRANTY_TERMS.md`). |
+| **Hypothesis** | With gasketed doors and penetrations built to the envelope drawings, a hose-down per UL 50E type 4X leaves no water inside the enclosure and no water in the drained cavities of the joints or plinth. |
+| **Setup** | Unit or module with all exterior penetrations installed (louvres with weather hoods, cable glands, refrigerant/glycol sleeves, roof penetrations, door hardware); doors closed and latched; positive-pressure fan OFF (the test is passive); interior lined with white absorbent paper at every penetration, door threshold and seam; H2: plinth fitted; H3: shielded doors closed with finger-stock engaged. Water supply ≥ 240 L/min at the nozzle. |
+| **Instrumentation** | 25 mm (1 in.) hose nozzle, flow meter or bucket-timed calibration (≥ 240 L/min = 65 US gal/min), tape measure for the 3.0–3.5 m stand-off, stopwatch, humidity Pods inside logging at 1 Hz, camera. |
+| **Procedure** | 1. Calibrate the flow (fill a 200 L drum: ≤ 50 s). 2. Mark the seam and penetration map on the envelope drawing; compute the test time: 5 min per linear metre of seam and gasket for a module (not less than 5 min per face). 3. From 3.0–3.5 m, direct the stream at every seam, gasket, hinge, latch, penetration and roof edge, moving along at the computed rate; include the underside of hoods and the plinth junction. 4. After each face, open the door and inspect the paper; photograph. 5. Repeat for roof and all faces. 6. H3 shielded units: after the hose test, check door finger-stock for retained water and the filter box drains. |
+| **Data to record** | Flow calibration, stand-off, per-face start/stop times, humidity trend inside, paper inspection result per location, photos, the hardening level, ambient temperature. |
+| **Analysis** | Any damp paper, droplet or run mark inside = fail at that location. Interior RH rise > 10 %RH during the test with dry paper = a vapour path (likely a gland or a hood): investigate and re-test. |
+| **Pass** | **No water inside the enclosure at any location after the full procedure; no standing water in drained cavities more than 10 min after the hose stops.** Record "E14 PASS (UL 50E type 4X method), date, level, witness" in Q-03 and the turnover package. |
+| **If it fails** | Re-seal the failed location (gasket, gland, sealant); never rely on sealant alone where a gasket is specified; re-test the face; two failures at the same location = design review of that detail. |
+
+---
+
+## E15 — Module joint seal test (BEN 2000)
+
+| | |
+| --- | --- |
+| **Purpose** | The three hall modules are joined on site; their joints are the only part of the IP66 envelope not finished in the factory. E15 proves each joint before hook-up (H17a) and after any relocation or seismic event. |
+| **Hypothesis** | With factory compression gaskets engaged, field EPDM cover strips applied and the drained cavity open, a hose-down of each joint (wall both sides and roof) per the E14 method produces no water inside and the drained cavity discharges at its outlets only. |
+| **Setup** | Modules set, aligned to ±5 mm, structural bolts torqued (record), cover strips and roof seam complete, interior finish at the joints still open for inspection (do not close the interior joint trim until E15 passes). Leak rope under each joint live on the PLC. Absorbent paper along the joint inside, floor to ceiling. |
+| **Instrumentation** | As E14; plus a dye tablet in the roof seam cavity and a clear jar at each cavity outlet. |
+| **Procedure** | 1. Joint 1–2: hose the roof seam for 10 min walking the full width, then each wall joint 5 min per 3 m of height from both exterior sides. 2. Inspect inside: paper, leak rope event log, cavity outlets (dye water at outlets = cavity drains correctly; dye inside = fail). 3. Repeat for joint 2–3 and at the power module coupling (busway and DLC manifold sleeves). 4. Stop; wait 30 min; re-inspect for delayed seepage. |
+| **Data to record** | Bolt torque log, alignment survey, per-joint times, leak rope events, photos inside and at outlets, dye observations. |
+| **Analysis** | Any water or dye inside = fail; cavity outlet not flowing while the seam is wetted = blocked drain (fail until cleared and re-tested). |
+| **Pass** | **No water inside at any joint after 30 min, leak rope log clean, every cavity outlet flowed during the test.** Interior joint trim may then be closed; result recorded in Q-11 supplement and the turnover package. |
+| **If it fails** | Open the cover strip at the failed location, inspect the gasket for crush or displacement, re-seat or replace, re-apply the strip, re-test the joint from step 1. |
+
+---
+
+## E16 — MV transformer and UPS string transfer test (BEN 2000)
+
+| | |
+| --- | --- |
+| **Purpose** | Prove the 2N power path: either pad-mount transformer, either 480 V main and either UPS string carries the whole hall, the tie closes as designed, and on utility loss the N+1 generators start and carry the load within the NFPA 110 Level 1 time. |
+| **Hypothesis** | With load banks (FAT) or the live IT load (SAT, at ≤ 50 % of design so one string can carry it), opening transformer A's main causes no IT interruption (UPS rides through, tie closes within the trip-unit settings), shifting the UPS load from string A to string B and back causes no output deviation beyond the UPS spec, and opening the utility causes all three generators to start and accept load within 10 s (NFPA 110 Type 10) with one generator inhibited to prove N+1. |
+| **Setup** | Switchgear in automatic; both transformers energised; both UPS strings online and sharing; generators ready with fuel ≥ 50 %; battery rooms normal; load banks on the busway (FAT) or IT at ≤ 50 %; coordination study and trip settings on hand; NETA test company present; all alarms cleared; plant PLC event log at 10 ms resolution. |
+| **Instrumentation** | Power quality recorder on each UPS output (voltage, frequency, transients), switchgear event recorder, UPS logs, generator controller logs, twin running in `utility_loss_ride_through` and plant mode, stopwatch. |
+| **Procedure** | 1. Baseline 15 min. 2. Open main A: record tie closing time, UPS A input loss and ride-through, bus voltages; hold 15 min; restore main A; repeat for main B. 3. UPS string transfer: through the maintenance bypass procedure shift the load to string B only, hold 15 min, return to shared, then to string A only, return. 4. Utility loss: open the utility switch; record generator start, synchronise and load acceptance times for each set; hold 30 min; inhibit one set and confirm the other two carry the load (N+1); restore utility; record retransfer and cool-down. 5. Battery room: during step 4 confirm gas detection and ventilation stay normal. |
+| **Data to record** | All timestamps (open, trip, tie, start, sync, load, retransfer), UPS output recorder files, bus voltages, generator loads, alarms, fuel consumed, twin prediction vs measured for the ride-through. |
+| **Analysis** | Compare switching times to the coordination study; UPS output within ITIC curve throughout; generator start-to-load ≤ 10 s each; retransfer timed; no unintended trips. |
+| **Pass** | **No IT interruption during any step; UPS output within specification; tie and transfers within study times; all three generators started and the hall ran on two with the third inhibited; NFPA 110 acceptance witnessed.** Result in Q-12; the FAT version (power module alone on load banks) is recorded as E16-F. |
+| **If it fails** | A trip outside the study: stop, review settings with the PE before any retry; a generator not accepting load in 10 s: vendor adjustment and repeat step 4 for that set only; UPS transfer deviation: vendor service and repeat step 3. |
 
 ---
 
@@ -227,4 +278,4 @@ python -m ben_engine.commissioning --mode factory --config unit.json --experimen
 python -m ben_engine.commissioning --mode site --config unit.json --experiments E1,E2,E3r,E4,E5,E6,E9,E12,E13 --burnin-hours 48
 ```
 
-The report is signed JSON (hash of the data files plus the engineer's key) and a PDF. E8 and E10 are attached as separate reports with their own data files. The twin run is kept beside the real run so every plot in the report shows "predicted" and "measured".
+The report is signed JSON (hash of the data files plus the engineer's key) and a PDF. E8, E10, E14 and E15 are attached as separate reports with their own data files; E16 is scripted for the switching sequence log and the twin prediction only (the switching itself is done by the NETA test company). For BEN 2000 the twin and scripted experiments run per module (`--module 1..3`) plus one plant run. The twin run is kept beside the real run so every plot in the report shows "predicted" and "measured".

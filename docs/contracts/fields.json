@@ -50,7 +50,8 @@
    "CM_STORAGE_FEE_PER_DAY",
    "CM_FREE_STORAGE_DAYS"
   ],
-  "rule": "SUPPLIER_LD_GRACE_DAYS <= CM_LD_GRACE_DAYS <= LD_GRACE_DAYS so upstream LDs accrue before downstream LDs"
+  "rule": "SUPPLIER_LD_GRACE_DAYS <= CM_LD_GRACE_DAYS <= LD_GRACE_DAYS so upstream LDs accrue before downstream LDs",
+  "hardening_and_ben2000": "Fields HARDENING_LEVEL, HARDENING_RATING, BALLISTIC_LEVEL, ENVELOPE_TEST_DATE, MODULES_COUNT, TRANSFORMERS_TOTAL, GENERATORS_TOTAL, MV_SERVICE added 2026-11-08 (docs/TIER_AND_ENCLOSURE_DECISION.md); the proposal generator fills them from Config.derived()."
  },
  "fields": [
   {
@@ -260,6 +261,16 @@
    "source": "sow",
    "documents": [
     "MANAGED_SERVICES_SLA.md",
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
+   "name": "BALLISTIC_LEVEL",
+   "description": "UL 752 level selected for H3 ballistic panels (3 to 8); blank below H3",
+   "type": "integer",
+   "default": null,
+   "source": "sow",
+   "documents": [
     "SOW_TEMPLATE.md"
    ]
   },
@@ -821,8 +832,8 @@
    ]
   },
   {
-   "name": "CM_PRICE_BEN30",
-   "description": "CM build price per BEN 30",
+   "name": "CM_PRICE_BEN150",
+   "description": "CM build price per BEN 150",
    "type": "money",
    "default": null,
    "source": "cm_quote",
@@ -831,8 +842,8 @@
    ]
   },
   {
-   "name": "CM_PRICE_BEN150",
-   "description": "CM build price per BEN 150",
+   "name": "CM_PRICE_BEN30",
+   "description": "CM build price per BEN 30",
    "type": "money",
    "default": null,
    "source": "cm_quote",
@@ -1145,6 +1156,16 @@
    "source": "pricing",
    "documents": [
     "INTEGRATOR_AGREEMENT.md"
+   ]
+  },
+  {
+   "name": "CONTROLS_TIER_LABEL",
+   "description": "Resolved controls tier label: BEN Controls Lite (Revolution Pi + Pods) or BEN Controls Pro (PLCnext + UL 508A panel + edge computer + Pods)",
+   "type": "string",
+   "default": null,
+   "source": "derived",
+   "documents": [
+    "SOW_TEMPLATE.md"
    ]
   },
   {
@@ -2842,6 +2863,18 @@
    ]
   },
   {
+   "name": "ENVELOPE_TEST_DATE",
+   "description": "Date of the passed envelope hose test E14 (UL 50E type 4X method) recorded in Q-03 / turnover item B9; starts the envelope warranty",
+   "type": "date",
+   "default": null,
+   "source": "qc_form",
+   "documents": [
+    "SOW_TEMPLATE.md",
+    "WARRANTY_TERMS.md",
+    "ACCEPTANCE_CERTIFICATES.md"
+   ]
+  },
+  {
    "name": "ENVELOPE_WARRANTY_MONTHS",
    "description": "Envelope weather-tightness and coating warranty months",
    "type": "integer",
@@ -3748,6 +3781,17 @@
    ]
   },
   {
+   "name": "GENERATORS_TOTAL",
+   "description": "Generator sets from derived()['generators_total'] (0 or 1 for BEN 30/150/500 with the generator option; 3 at N+1 for BEN 2000)",
+   "type": "integer",
+   "default": 0,
+   "source": "derived",
+   "documents": [
+    "SOW_TEMPLATE.md",
+    "MANAGED_SERVICES_SLA.md"
+   ]
+  },
+  {
    "name": "GENERATOR_ACCEPTANCE_ID",
    "description": "Generator acceptance id",
    "type": "id",
@@ -3819,6 +3863,34 @@
    "source": "manual",
    "documents": [
     "ACCEPTANCE_CERTIFICATES.md"
+   ]
+  },
+  {
+   "name": "HARDENING_LEVEL",
+   "description": "Enclosure hardening level from config.json `hardening`: H1 Standard, H2 Severe environment, H3 Hardened / government (docs/TIER_AND_ENCLOSURE_DECISION.md section 3)",
+   "type": "enum",
+   "enum": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "default": "H1",
+   "source": "config",
+   "documents": [
+    "SOW_TEMPLATE.md",
+    "WARRANTY_TERMS.md",
+    "CONTRACT_MANUFACTURING_AGREEMENT.md"
+   ]
+  },
+  {
+   "name": "HARDENING_RATING",
+   "description": "Printed enclosure rating for the level, from derived()['hardening_rating'] (e.g. 'NEMA 4X / IP66', 'NEMA 4X / IP66 + flood plinth 600 mm', 'NEMA 4X / IP66 + ballistic (UL 752) + forced-entry (ASTM F3038) + HEMP shielding option (MIL-STD-188-125-1)')",
+   "type": "string",
+   "default": "NEMA 4X / IP66",
+   "source": "derived",
+   "documents": [
+    "SOW_TEMPLATE.md",
+    "WARRANTY_TERMS.md"
    ]
   },
   {
@@ -4593,6 +4665,17 @@
    ]
   },
   {
+   "name": "MODULES_COUNT",
+   "description": "Number of factory-built enclosure modules from TIER_GEOMETRY['modules'] (1 for BEN 5/30/150/500; 3 hall modules for BEN 2000, power module listed separately)",
+   "type": "integer",
+   "default": 1,
+   "source": "derived",
+   "documents": [
+    "SOW_TEMPLATE.md",
+    "CONTRACT_MANUFACTURING_AGREEMENT.md"
+   ]
+  },
+  {
    "name": "MONITORING_HOURS",
    "description": "Monitoring hours description",
    "type": "text",
@@ -4614,6 +4697,16 @@
     "MANAGED_SERVICES_SLA.md",
     "MSA.md",
     "SOFTWARE_LICENSE_BEN_CONTROLS.md",
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
+   "name": "MV_SERVICE",
+   "description": "Medium-voltage service description from derived()['voltage'] for BEN 2000 (e.g. '12.47 kV MV service → 480 V 3ph'); blank for low-voltage tiers",
+   "type": "string",
+   "default": null,
+   "source": "derived",
+   "documents": [
     "SOW_TEMPLATE.md"
    ]
   },
@@ -4896,6 +4989,26 @@
    ]
   },
   {
+   "name": "OEM_WARRANTY_HARDENING_ID",
+   "description": "Vendor warranty document reference for hardening items",
+   "type": "string",
+   "default": null,
+   "source": "purchasing",
+   "documents": [
+    "WARRANTY_TERMS.md"
+   ]
+  },
+  {
+   "name": "OEM_WARRANTY_HARDENING_TERM",
+   "description": "Pass-through warranty term of the ballistic / forced-entry / shielding vendors (H3)",
+   "type": "string",
+   "default": null,
+   "source": "purchasing",
+   "documents": [
+    "WARRANTY_TERMS.md"
+   ]
+  },
+  {
    "name": "OEM_WARRANTY_PDU_ID",
    "description": "OEM warranty registration confirmation number: pdu",
    "type": "id",
@@ -4909,6 +5022,26 @@
    "name": "OEM_WARRANTY_PDU_TERM",
    "description": "OEM warranty term: pdu",
    "type": "text",
+   "default": null,
+   "source": "purchasing",
+   "documents": [
+    "WARRANTY_TERMS.md"
+   ]
+  },
+  {
+   "name": "OEM_WARRANTY_PLANT_ID",
+   "description": "Vendor warranty document references for BEN 2000 plant items",
+   "type": "string",
+   "default": null,
+   "source": "purchasing",
+   "documents": [
+    "WARRANTY_TERMS.md"
+   ]
+  },
+  {
+   "name": "OEM_WARRANTY_PLANT_TERM",
+   "description": "Pass-through warranty terms of BEN 2000 plant OEMs (transformers, switchgear, generators, coolers)",
+   "type": "string",
    "default": null,
    "source": "purchasing",
    "documents": [
@@ -5231,6 +5364,18 @@
    "source": "pricing",
    "documents": [
     "INTEGRATOR_AGREEMENT.md"
+   ]
+  },
+  {
+   "name": "POD_COUNT",
+   "description": "BEN Pod count = racks*2 + 2 (cold face, hot face per rack + room + outdoor); BEN 5 3",
+   "type": "integer",
+   "default": null,
+   "source": "derived",
+   "documents": [
+    "ACCEPTANCE_CERTIFICATES.md",
+    "CONTRACT_MANUFACTURING_AGREEMENT.md",
+    "SOW_TEMPLATE.md"
    ]
   },
   {
@@ -7207,6 +7352,19 @@
    ]
   },
   {
+   "name": "SCOPE_ENVELOPE_TEST",
+   "description": "Included: envelope hose test E14 (always included)",
+   "type": "enum",
+   "enum": [
+    "Included"
+   ],
+   "default": "Included",
+   "source": "sow",
+   "documents": [
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
    "name": "SCOPE_FIELD_EVAL",
    "description": "Scope row 'field_eval' in SOW Section 3: Included / Excluded",
    "type": "enum",
@@ -7247,6 +7405,20 @@
    ]
   },
   {
+   "name": "SCOPE_FS_HALL",
+   "description": "Included / Not applicable: BEN 2000 hall fire protection and battery rooms",
+   "type": "enum",
+   "enum": [
+    "Included",
+    "Not applicable"
+   ],
+   "default": "Not applicable",
+   "source": "sow",
+   "documents": [
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
    "name": "SCOPE_FS_MONITORING",
    "description": "Scope row 'fs_monitoring' in SOW Section 3: Included / Excluded",
    "type": "enum",
@@ -7277,11 +7449,40 @@
    ]
   },
   {
+   "name": "SCOPE_HARDENING",
+   "description": "Included / Excluded: hardening package at HARDENING_LEVEL",
+   "type": "enum",
+   "enum": [
+    "Included",
+    "Excluded"
+   ],
+   "default": "Included",
+   "source": "sow",
+   "documents": [
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
    "name": "SCOPE_LIGHTING_SIGNAGE",
    "description": "Scope row 'lighting_signage' in SOW Section 3: Included / Excluded",
    "type": "enum",
    "default": null,
    "source": "proposal",
+   "documents": [
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
+   "name": "SCOPE_MODULE_JOIN",
+   "description": "Included / Excluded / Not applicable: BEN 2000 module set, hall join and E15",
+   "type": "enum",
+   "enum": [
+    "Included",
+    "Excluded",
+    "Not applicable"
+   ],
+   "default": "Not applicable",
+   "source": "sow",
    "documents": [
     "SOW_TEMPLATE.md"
    ]
@@ -7367,6 +7568,20 @@
    ]
   },
   {
+   "name": "SCOPE_PWR_MV_PLANT",
+   "description": "Included / Not applicable: BEN 2000 MV service, transformers, switchgear, UPS strings, generators",
+   "type": "enum",
+   "enum": [
+    "Included",
+    "Not applicable"
+   ],
+   "default": "Not applicable",
+   "source": "sow",
+   "documents": [
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
    "name": "SCOPE_PWR_PDU",
    "description": "Scope row 'pwr_pdu' in SOW Section 3: Included / Excluded",
    "type": "enum",
@@ -7392,6 +7607,20 @@
    "type": "enum",
    "default": null,
    "source": "proposal",
+   "documents": [
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
+   "name": "SCOPE_SHIELDING",
+   "description": "Included / Excluded: HEMP / EMI shielding option (H3)",
+   "type": "enum",
+   "enum": [
+    "Included",
+    "Excluded"
+   ],
+   "default": "Excluded",
+   "source": "sow",
    "documents": [
     "SOW_TEMPLATE.md"
    ]
@@ -8460,7 +8689,7 @@
   },
   {
    "name": "TIER",
-   "description": "Tier from config.json: ben5, ben30, ben150, ben500 (printed as BEN 5 / BEN 30 / BEN 150 / BEN 500)",
+   "description": "Tier from config.json: ben5, ben30, ben150, ben500, ben2000 (printed as BEN 5 / BEN 30 / BEN 150 / BEN 500 / BEN 2000). Generation-1 keys micro/ben10/ben20/ben40 are normalised by config.canonical_tier().",
    "type": "enum",
    "default": null,
    "source": "config",
@@ -8471,6 +8700,13 @@
     "MANAGED_SERVICES_SLA.md",
     "SOW_TEMPLATE.md",
     "WARRANTY_TERMS.md"
+   ],
+   "enum": [
+    "ben5",
+    "ben30",
+    "ben150",
+    "ben500",
+    "ben2000"
    ]
   },
   {
@@ -8925,6 +9161,16 @@
    ]
   },
   {
+   "name": "TRANSFORMERS_TOTAL",
+   "description": "Pad-mount transformers from derived()['transformers_total'] (0 below BEN 2000; 2 at 2N for BEN 2000)",
+   "type": "integer",
+   "default": 0,
+   "source": "derived",
+   "documents": [
+    "SOW_TEMPLATE.md"
+   ]
+  },
+  {
    "name": "TRANSITION_DAYS",
    "description": "Days of transition assistance after termination",
    "type": "integer",
@@ -9241,28 +9487,6 @@
    "source": "manual",
    "documents": [
     "INTEGRATOR_AGREEMENT.md"
-   ]
-  },
-  {
-   "name": "POD_COUNT",
-   "description": "BEN Pod count = racks*2 + 2 (cold face, hot face per rack + room + outdoor); BEN 5 3",
-   "type": "integer",
-   "default": null,
-   "source": "derived",
-   "documents": [
-    "ACCEPTANCE_CERTIFICATES.md",
-    "CONTRACT_MANUFACTURING_AGREEMENT.md",
-    "SOW_TEMPLATE.md"
-   ]
-  },
-  {
-   "name": "CONTROLS_TIER_LABEL",
-   "description": "Resolved controls tier label: BEN Controls Lite (Revolution Pi + Pods) or BEN Controls Pro (PLCnext + UL 508A panel + edge computer + Pods)",
-   "type": "string",
-   "default": null,
-   "source": "derived",
-   "documents": [
-    "SOW_TEMPLATE.md"
    ]
   }
  ]

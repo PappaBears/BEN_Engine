@@ -6,7 +6,7 @@ live run would. In ``--live`` mode it connects to the unit's gateway API (see
 spec/INTERFACES.md); the live adapter is a placeholder that checks the gateway answers and then
 stops, because the live I/O and load-bank steps need a person on site.
 
-    python -m ben_engine.commissioning --sim --tier ben20 --out /path/report.md [--yes] [--csv /path/data.csv]
+    python -m ben_engine.commissioning --sim --tier ben150 --out /path/report.md [--yes] [--csv /path/data.csv]
     python -m ben_engine.commissioning --live --url http://ben-gateway.local:8000 --out /path/report.md
 
 Steps (each records values and PASS/FAIL):
@@ -149,7 +149,7 @@ class Commissioning:
     def step2_discovery(self, sr: StepResult):
         self._run(5.0)
         nodes = self.fleet.discover()
-        expected = 1 + (self.cfg.racks + 1) // 2
+        expected = NodeFleet.expected_nodes(self.cfg)
         sr.values["nodes"] = [{"node_id": n["node_id"], "fw": n["fw"], "ip": n["ip"], "kind": n["kind"], "racks": n["racks"]} for n in nodes]
         sr.values["expected_nodes"] = expected
         fws = {n["fw"] for n in nodes}
@@ -545,7 +545,7 @@ def main(argv=None):
     mode.add_argument("--sim", action="store_true", help="run against the digital twin and virtual nodes")
     mode.add_argument("--live", action="store_true", help="connect to a gateway (placeholder: connectivity + report)")
     ap.add_argument("--url", default="http://localhost:8000", help="gateway API base URL for --live")
-    ap.add_argument("--tier", default="ben20")
+    ap.add_argument("--tier", default="ben150")
     ap.add_argument("--profile", default="ai_inference")
     ap.add_argument("--climate", default="temperate")
     ap.add_argument("--site", default="Demo site")

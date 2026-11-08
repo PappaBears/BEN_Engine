@@ -5,7 +5,7 @@
 
 ## 1. The one-paragraph case
 
-Small and mid-size businesses are adopting AI faster than their infrastructure can follow. Their choices today are a cloud bill that scales with success, a colocation contract priced for hyperscalers (about USD 196 per kW-month wholesale in 2025), or a server closet nobody commissioned. BEN Engine is a family of modular data centers, from a 6 kW outdoor cabinet to a 500 kW liquid-cooled 40 ft container, built from off-the-shelf enclosures and listed equipment, and sold with a controls layer that makes the box observable, testable and brandable. Schreiber AI's edge is not the steel: it is the **configuration-driven engineering system** that turns a mission profile into drawings, bill of materials, compliance pack, assembly instructions, digital twin and commissioning report, in the same afternoon, with the same numbers. That system is working software in this repository, not a roadmap item.
+Small and mid-size businesses are adopting AI faster than their infrastructure can follow. Their choices today are a cloud bill that scales with success, a colocation contract priced for hyperscalers (about USD 196 per kW-month wholesale in 2025), or a server closet nobody commissioned. BEN Engine is a family of modular data centers named by IT power, from a 5 kW outdoor cabinet (BEN 5) through a 500 kW liquid-cooled 40 ft module (BEN 500) to a single 2 MW prefabricated center (BEN 2000), built from off-the-shelf enclosures and listed equipment, element-proof (NEMA 4X / IP66) by default and hardened on request, and sold with a controls layer that makes the box observable, testable and brandable. Schreiber AI's edge is not the steel: it is the **configuration-driven engineering system** that turns a mission profile into drawings, bill of materials, compliance pack, assembly instructions, digital twin and commissioning report, in the same afternoon, with the same numbers. That system is working software in this repository, not a roadmap item.
 
 ## 2. Problem
 
@@ -18,10 +18,15 @@ Small and mid-size businesses are adopting AI faster than their infrastructure c
 
 | Tier | Enclosure | IT load | Who buys it |
 | --- | --- | --- | --- |
-| BEN 5 | NEMA 4X / IP66 outdoor 24U cabinet | 2–6 kW | Clinics, retailers, farms, branch offices, "AI for everyone" |
-| BEN 30 | 10 ft high-cube ISO container | 10–30 kW | SMB private cloud + inference |
-| BEN 150 | 20 ft high-cube | 50–150 kW | Mid-market, industrial sites, regional AI |
-| BEN 500 | 40 ft high-cube, direct liquid cooling | 150–500 kW | Training pods, white-label partners, public sector |
+| BEN 5 | NEMA 4X / IP66 outdoor 24U cabinet | 2–5 kW | Clinics, retailers, farms, branch offices, "AI for everyone" |
+| BEN 30 | 10 ft high-cube ISO-frame module, IP66 | 10–30 kW | SMB private cloud + inference |
+| BEN 150 | 20 ft high-cube module, IP66 | 50–150 kW | Mid-market, industrial sites, regional AI |
+| BEN 500 | 40 ft high-cube module, direct liquid cooling | 150–500 kW | Training pods, white-label partners, public sector |
+| BEN 2000 | Prefabricated modular hall (3 joined wide-body modules) + power module + plant yard; MV service, 2N power, N+1 generators | 800–2,000 kW | Regional enterprises, hospital systems, universities, municipalities, colocation-edge operators, defence |
+
+**BEN 2000: who buys a single 2 MW center.** Below the hyperscale campus and above the container there is a buyer nobody serves well: the regional enterprise consolidating its server rooms, the hospital system that must keep imaging and records on campus, the university research cluster, the municipality or utility building a resilient operations center, the colocation-edge operator planting a 2 MW node in a secondary market, and defence or public-sector programmes that need a hardened, relocatable facility. Their alternative is a traditional build at USD 10–13 M per MW over 18–30 months, with a design team hired per project. BEN 2000 is the same configuration-driven system scaled to a hall: three factory-finished modules, a power module and a plant yard, about 52 weeks from order to in service with the utility on the critical path, and the same twin, commissioning script and BEN Care on top. The BOM-based price per MW comes from `docs/BOM-ben2000.md` once the catalog is complete (**see BOM**).
+
+**Hardening as a margin lever.** Every tier is NEMA 4X / IP66 (H1) at the base price. **H2 Severe environment** (flood plinth, C5-M coating, dust filtration, hurricane hardware) and **H3 Hardened / government** (UL 752 ballistic panels, ASTM F3038 doors, mantrap, HEMP shielding option, CMMC controls pack) are priced from catalog lines with `applies_to_hardening` and sold to buyers whose alternative is a bespoke engineering project; they carry hardware margin above the 28 % base because the value is the certified, tested envelope and the compliance pack, not the steel. H2 is recommended automatically for coastal, desert, arctic and high-altitude climates, which is a large share of the sites that cannot use a conventional building.
 
 Four ways to buy: **hardware only**, **hardware + BEN Controls**, **white-label** (partner's brand on the box and dashboard), **managed** (Schreiber AI watches and maintains). Modules (power, cooling, compute, controls) can be bought separately.
 
@@ -53,7 +58,7 @@ Ranges, not point estimates (sources in `MARKET_SOURCES.md`):
 - Edge data centers: USD 13–16 B in 2025 by most firms; US alone about USD 5.7 B.
 - SMB AI adoption: between 28 % and 65 % of US small businesses report using or piloting AI in 2025 depending on survey; 68 % among 10–100 employee firms in one survey.
 
-Our serviceable segment is the sub-500 kW, owner-operated deployment: SMBs, regional healthcare, industrial sites, municipalities, and integrators who want a white-label platform. We do not compete for hyperscale campuses.
+Our serviceable segment is the owner-operated deployment from 5 kW to 2 MW: SMBs, regional healthcare, industrial sites, municipalities, and integrators who want a white-label platform (BEN 5–500), plus the **mid-market / regional 2 MW segment** (BEN 2000): enterprises, hospital systems, universities, municipalities, colocation-edge operators and defence buyers whose only alternative is a traditional build at USD 10–13 M per MW and 18–30 months. We do not compete for hyperscale campuses.
 
 ## 6. Business model and unit economics
 
@@ -62,10 +67,11 @@ Unit economics are derived from the bill of materials in `docs/BOM.md`. The tabl
 <!-- UNIT_ECONOMICS_TABLE -->
 | Tier (preset) | IT kW | BOM cost (all modules) | Sell price (28 % GM) | Infrastructure-only sell price (no compute) | Gross profit | Confirmed / list / estimate share of cost | Controls licence /yr | Managed service /yr | Price per kW IT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| BEN 5 | 5 | $135,082 | $187,614 | $135,811 | $52,532 | 69 % / 0 % / 31 % | $1,200 | $2,700 | $37,523 |
-| BEN 30 | 30 | $659,524 | $916,006 | $278,290 | $256,482 | 81 % / 0 % / 19 % | $4,800 | $16,200 | $30,534 |
-| BEN 150 | 96 | $1,872,923 | $2,601,282 | $614,136 | $728,359 | 79 % / 0 % / 21 % | $12,000 | $51,840 | $27,097 |
-| BEN 500 | 192 | $4,428,311 | $6,150,432 | $1,277,687 | $1,722,121 | 83 % / 0 % / 17 % | $30,000 | $103,680 | $32,033 |
+| BEN 5 | 5 | $132,118 | $183,497 | $131,695 | $51,379 | 60 % / 1 % / 39 % | $1,200 | $2,700 | $36,699 |
+| BEN 30 | 30 | $666,095 | $925,132 | $287,415 | $259,037 | 80 % / 0 % / 20 % | $4,800 | $16,200 | $30,838 |
+| BEN 150 | 96 | $1,890,335 | $2,625,466 | $638,320 | $735,130 | 79 % / 0 % / 21 % | $12,000 | $51,840 | $27,349 |
+| BEN 500 | 192 | $4,446,283 | $6,175,394 | $1,302,649 | $1,729,110 | 83 % / 0 % / 17 % | $30,000 | $103,680 | $32,164 |
+| BEN 2000 | 1600 | $40,414,106 | $56,130,703 | $16,389,803 | $15,716,597 | 73 % / 0 % / 27 % | $90,000 | $864,000 | $35,082 |
 
 Assumptions: hardware gross margin 28%; managed service $45/kW-month; controls licence per tier as shown. BOM cost excludes site civil and utility service (SITE- lines are shown separately in `docs/BOM.md`). Compute is the reference GPU/CPU node set from the catalog and dominates the all-modules price (one 8-GPU server is ~$82–236 k); most SMB customers will size their own compute or start with the infrastructure-only price and grow.
 
@@ -94,6 +100,7 @@ Units are built by qualified third-party contract manufacturers (container modif
 | Controls hardware | BEN Pod PCBA production run (MGM240P), secure provisioning cell (PKI, Secure Vault certificate injection), first PLCnext panels and edge computers, RevPi Lite kits |
 | Team | Controls engineer, field commissioning lead, sourcing/quality lead |
 | Working capital | Long-lead equipment deposits (UPS, cooling, GPUs) |
+| **First BEN 2000 engineering release** | Stamped permit set for a reference site, utility pre-application and MV single-line, modular manufacturer qualification and first-article plan, per-module drawings and site plan, hardening vendor qualification (UL 752, ASTM F3038, shielding); makes the 2 MW center quotable and permittable before the first hall is sold |
 
 The exact ask and allocation are set with the lead investor; this document fixes the *shape* of the plan so the numbers can be audited against the build.
 

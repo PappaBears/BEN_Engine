@@ -6,7 +6,7 @@ from ben_engine import commissioning as cm
 
 
 def test_sim_commissioning_passes_and_signs(tmp_path):
-    cfg = Config.preset("ben20")
+    cfg = Config.preset("ben150")
     cfg.site_name = "Test site"
     c = cm.Commissioning(cfg, sim=True, yes=True, seed=0, operator="QA", log=lambda m: None, fast=True,
                          clock="2026-01-01T00:00:00+00:00")
@@ -25,7 +25,7 @@ def test_sim_commissioning_passes_and_signs(tmp_path):
 
 
 def test_checklist_can_fail_step1(tmp_path):
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     answers = iter(["y"] * 3 + ["n"] + ["y"] * 10)
     c = cm.Commissioning(cfg, sim=True, yes=False, ask=lambda q: next(answers), log=lambda m: None, fast=True)
     rep = c.run(str(tmp_path / "r.md"))
@@ -34,8 +34,8 @@ def test_checklist_can_fail_step1(tmp_path):
 
 
 def test_cli_and_live_placeholder(tmp_path):
-    rc = cm.main(["--sim", "--tier", "ben10", "--yes", "--fast", "--out", str(tmp_path / "cli.md")])
+    rc = cm.main(["--sim", "--tier", "ben30", "--yes", "--fast", "--out", str(tmp_path / "cli.md")])
     assert rc == 0 and (tmp_path / "cli.md").exists()
-    rep = cm.run_live("http://127.0.0.1:9", Config.preset("ben10"), str(tmp_path / "live.md"), log=lambda m: None)
+    rep = cm.run_live("http://127.0.0.1:9", Config.preset("ben30"), str(tmp_path / "live.md"), log=lambda m: None)
     assert rep.mode == "live" and rep.steps[0].passed is False
     assert "not reachable" in rep.steps[0].notes[0]

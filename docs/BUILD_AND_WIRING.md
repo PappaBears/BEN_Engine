@@ -41,6 +41,13 @@ Conductors: copper, 90 °C insulation (THHN/THWN-2 or XHHW-2), **ampacity taken 
 | BEN 500 dry cooler fan bank, 480 V 3φ | per vendor MCA | — | per MCA/MOCP | — | — | — | — |
 | **BEN 500 max** (500 kW) service feeder | 581 kVA | 874 | 1000 | 3 × 400 kcmil per phase, parallel | 1005 | 2/0 AWG (per raceway if parallel: 2/0 in each) | 3 × 400 kcmil |
 | BEN 500 max UPS input | 605 kVA | 728 → 910 | 1000 | 3 × 400 kcmil | 1005 | 2/0 | 3 × 400 kcmil |
+| **BEN 2000** transformer secondary to switchgear main, 480Y/277 V (each of 2) | 2,500 kVA | 3,007 | 3,000 (main, 4,000 A bus) | 3,000 A bus duct or 8 × 500 kcmil per phase | 8 × 380 = 3,040 | 400 kcmil | bus duct neutral full |
+| BEN 2000 UPS string input, 480 V (each of 2) | 2,000 kW / 0.97 → 2,062 kVA | 2,480 → 3,100 | 3,000 (UPS input breaker, string sized at 80 %) | bus duct 3,000 A | — | 400 kcmil | — |
+| BEN 2000 UPS output to row busway (4 rows × 2 paths, 800 A each) | 500 kW per row | 601 → 752 | 800 | busway 800 A per path | — | per busway listing | full |
+| BEN 2000 rack tap-off, 415Y/240 V 3φ | 40 kW | 56 → 70 | 80 | busway plug-in unit | — | — | — |
+| BEN 2000 CDU row (7 units), 480 V 3φ | 16 kW elec. each | 19 → 24 | 30 | 10 AWG | 35 | 10 AWG | — |
+| BEN 2000 adiabatic dry cooler bank, 480 V 3φ | per vendor MCA (≈ 120 kW total) | — | per MCA/MOCP | — | — | — | — |
+| BEN 2000 generator feeder (each of 3 × 1,250 kW, 480 V) | 1,563 kVA | 1,880 | 2,000 | 6 × 500 kcmil per phase | 2,280 | 250 kcmil | 6 × 500 kcmil |
 
 Notes: (1) Neutral is full-size on all IT circuits because IT loads are non-linear (NEC 310.15(E), neutral counts as a current-carrying conductor). (2) Parallel sets per 310.10(G): same length, material, size, insulation, termination; each raceway carries one of each phase + neutral + EGC. (3) Voltage drop: keep feeders ≤ 3 %; at these lengths (< 15 m inside the container) it is never limiting. (4) Cooling unit circuits are sized from the nameplate **MCA/MOCP**, not from the config COP estimate; the config number is the budget check. (5) Where the AHJ's edition differs, re-check 310.16 — the table has not changed in substance since 2017.
 
@@ -156,9 +163,28 @@ Every torqued termination is marked with torque-seal paint after tightening and 
 | **Mesh placement rules**: Pod spacing ≤ 8 m line of sight inside the container (Thread at 2.4 GHz through racks: plan 4–6 m); at least two **router-eligible Pods** (Pod E, and any 24 VDC-powered Pod W) within range of every battery Pod; both border router RCPs on USB extensions ≥ 1 m apart and ≥ 0.5 m from the steel panel door; keep a Pod ≥ 0.3 m from a metal rack top or wall (antenna detuning) and never between two closed metal doors | **Metal rack shadowing**: a 48U steel rack attenuates 2.4 GHz by 15–25 dB; a Pod behind two racks from its parent loses its link margin. Routers above the rack line and a spacing rule keep every Pod with two parents so the mesh heals around a lost router (E13) |
 | **Pod W battery vs 24 VDC**: Pods on racks run on 2 × AA LiFeS2 (sleepy end device, 1 Hz telemetry with batched reports); where a 24 VDC drop is available (end-zone racks, BEN 5) power the Pod and make it a router | Battery Pods cannot route; wired Pods add mesh depth for free |
 
+## 6a. BEN 2000: medium-voltage section, switchgear working space and module joining
+
+**Medium voltage (12.47 or 13.8 kV).** The utility owns the primary to the point of delivery and the primary metering; we own the 15 kV class loop-feed pad-mount switch, 2 × 2,500 kVA pad-mount transformers (2N, 480Y/277 V secondary, FR3 ester fluid, 5.75 % Z) and the MV cable between them. Rules:
+
+- MV cable 15 kV 133 % insulation EPR, 1/0 Cu or 4/0 Al, in 125 mm PVC conduit concrete-encased 750 mm below grade with red dye and warning tape; separate duct bank from LV and fibre; pulling tension and bend radius per the cable sheet; terminations by a certified MV splicer with 200 A or 600 A dead-break elbows per the utility standard.
+- Transformer pads: 100 mm clear around the cabinet, 3 m working clearance in front of the doors, oil containment per the SPCC plan, bollards on any traffic side, grounding grid tied to the site electrode ring; neutral grounded at the transformer and the switchgear ground bus bonded with 500 kcmil.
+- Working on the MV side is **NEC Art. 490 / NFPA 70E Table 130.7(C)(15)(b)** work: only the utility or a qualified MV contractor; the switch is padlocked; Schreiber AI staff never open MV compartments.
+- Acceptance: VLF withstand and tan-delta on each cable, TTR, insulation resistance, winding resistance and oil sample on each transformer, protective relay settings per the coordination study (NETA ATS), all before the utility energises.
+
+**480 V switchgear in the power module.** Main-tie-main UL 1558 drawout switchgear, 4,000 A bus, 2 × 3,000 A mains, 3,000 A tie, 100 kA SCCR, LSIG trip units with zone-selective interlocking and an arc-flash reduction maintenance switch per main; generator paralleling switchgear (3 × 2,000 A) feeding the tie through two generator mains. Working space (**NEC 110.26 Condition 2**, 480 V, grounded parts opposite): **1.2 m (4 ft) clear in front**, a **0.9 m rear access aisle** for drawout and bus inspection, 2.0 m headroom, two exits from the working space (110.26(C)(3)) with panic hardware opening outward, dedicated electrical space above the gear to the ceiling; the power module layout (12.2 × 3.66 m) places the gear along one long wall, UPS strings along the other, with the 1.2 m aisle between and the battery rooms at one end behind the 2-hour wall. Floor marked "no storage"; rubber matting rated 17 kV in front of the gear (ASTM D178 Class 2).
+
+**Module joining (hall).** Electrical and mechanical services cross the two hall joints and the hall-to-power-module coupling:
+
+- Power: UPS output to each row runs as 800 A busway along the row; the busway crosses a joint through a **flanged expansion joint section** rated for ±25 mm movement and the joint's 100 mm seal cavity; no cable crosses a joint in free air.
+- Controls: fibre only across joints (OM4, 12-strand, armoured, in a sealed 50 mm sleeve); the ring of managed switches is one switch per module so a joint carries only fibre. Copper controls wiring never crosses a joint.
+- DLC: the CDU supply/return manifolds (DN100) cross joints with **grooved couplings and a flexible connector** inside a drip tray with a leak rope; isolation valves on both sides of every joint so a module can be isolated.
+- Grounding: each module has its own bonding bar bonded to the site ring; modules are bonded to each other across each joint with two 2/0 AWG jumpers (one at each end) **after** alignment and bolting, before any power is energised.
+- Sequence: set and align modules (±5 mm) → structural bolts torqued → bonding jumpers → E15 seal test → busway expansion sections and DLC couplings installed → fibre spliced and tested (OTDR) → interior trim closed.
+
 ## 7. Grounding and bonding of the container
 
-1. Main bonding bar (copper, 6 × 50 mm) in the electrical vestibule, bonded to the MDP ground bus with 2/0 AWG (BEN 30/20) or 250 kcmil (BEN 500).
+1. Main bonding bar (copper, 6 × 50 mm) in the electrical vestibule, bonded to the MDP ground bus with 2/0 AWG (BEN 30/150) or 250 kcmil (BEN 500); BEN 2000: one bar per module and in the power module, 500 kcmil to the switchgear ground bus.
 2. Container shell bonded to the bar at **two diagonally opposite corner castings** with 2/0 AWG and listed lugs on cleaned, welded bonding pads (paint removed to bright metal, anti-oxidant, pad painted after).
 3. Every rack bonded to a rack grounding busbar (telecom "TGB" style, 2 AWG), racks bonded with 6 AWG jumpers; cable trays bonded every 10 m and at every splice.
 4. PDU transformer secondaries are separately derived systems: system bonding jumper per 250.30, grounding electrode conductor to the main bonding bar.
@@ -181,5 +207,8 @@ Every torqued termination is marked with torque-seal paint after tightening and 
 | Failsafe test: stop the PLC / RevPi → watchdog relay drops within 5 s, cooling enable stays ON; stop the edge computer → Pods keep publishing to buffer; restore → buffer drains (CTP-K2) | Test record |
 | Provisioning check: `commissioning --stage provisioning-check` shows every Pod attested; an unprovisioned Pod is rejected at join (CTQ-K5) | Mesh report |
 | Fire contractor's dry contacts verified at the PLC DI (and room Pod) with the fire panel in test mode | Joint record |
+| Envelope: E14 hose test record (every tier, every hardening level) and, for BEN 2000, E15 per joint | Q-03 / Q-11 supplement |
+| BEN 2000: NETA acceptance test reports (switchgear, transformers, MV cable), relay settings as left, bus duct insulation resistance, busway expansion sections torqued, inter-module bonding ≤ 0.1 Ω | NETA report; table |
+| H3: shield continuity across every door and penetration (≤ 2.5 mΩ door-to-frame), filter box insulation resistance, IEEE 299 shielding test certificate | Shielding vendor record |
 
 The commissioning engineer does not start `commissioning.py` until this hand-off is complete. The script then takes over (`docs/TEST_GUIDE.md`).

@@ -66,7 +66,51 @@ flowchart TB
   EDGE -. outbound-only support tunnel (optional) .-> SAI[Schreiber AI ops]
 ```
 
-Two controls tiers run this architecture (`docs/CONTROLS_HARDWARE_DECISION.md` §2a, `Config.controls_tier`): **BEN Controls Pro** (BEN 150/40, selectable on BEN 30) is the diagram above. **BEN Controls Lite** (BEN 5, default on BEN 30) replaces the PLC + edge computer pair with one DIN-rail **Revolution Pi RevPi Connect 4** with RevPi DIO/AIO modules: it runs `ben_engine`, the broker, the border router and the interlock logic in software behind a hardware watchdog relay. Same Pods, same mesh, same protocol, same dashboard; life safety is hardwired in both.
+Two controls tiers run this architecture (`docs/CONTROLS_HARDWARE_DECISION.md` §2a, `Config.controls_tier`): **BEN Controls Pro** (BEN 150/500, selectable on BEN 30) is the diagram above. **BEN Controls Lite** (BEN 5, default on BEN 30) replaces the PLC + edge computer pair with one DIN-rail **Revolution Pi RevPi Connect 4** with RevPi DIO/AIO modules: it runs `ben_engine`, the broker, the border router and the interlock logic in software behind a hardware watchdog relay. Same Pods, same mesh, same protocol, same dashboard; life safety is hardwired in both.
+
+## BEN 2000: the same architecture, multiplied by module
+BEN 2000 (`TIER_GEOMETRY["ben2000"]`, `kind: "hall"`, `modules: 3`) is a prefabricated hall of three site-joined wide-body modules, a separate power module and a plant yard (`docs/TIER_AND_ENCLOSURE_DECISION.md` §2). Nothing in the controls architecture changes shape; it is instanced per module and given redundancy at the top.
+
+```mermaid
+flowchart TB
+  subgraph Hall (3 joined modules, IP66 envelope)
+    M1[Module 1 · PLC 1 + Axioline I/O<br/>16 racks, CDU pair, fan wall, VESDA, clean agent]
+    M2[Module 2 · PLC 2 + Axioline I/O]
+    M3[Module 3 · PLC 3 + Axioline I/O]
+    BR1[Border router A · 2 RCPs]
+    BR2[Border router B · 2 RCPs]
+    BR3[Border router C · 2 RCPs]
+    M1 --- BR1
+    M2 --- BR2
+    M3 --- BR3
+  end
+  subgraph Power module (separate fire area)
+    PPLC[Plant PLC · switchgear, ATS logic supervision,<br/>generator and transformer status, battery-room gas detection, fuel level]
+    EA[Edge computer A · OnLogic Karbon 400]
+    EB[Edge computer B · OnLogic Karbon 400<br/>active standby, replicated SQLite + broker bridge]
+    SWA[Managed switch A] --- SWB[Managed switch B]
+  end
+  subgraph Plant yard
+    MV[MV switch · 2 × 2,500 kVA transformers]
+    GEN[3 × 1,250 kW generators · 48 h fuel]
+    ADC[Adiabatic dry coolers · water treatment skid]
+  end
+  M1 & M2 & M3 -->|Modbus TCP / OPC UA, ring| SWA
+  PPLC --> SWA
+  SWA & SWB --> EA & EB
+  BR1 & BR2 & BR3 -->|IPv6| SWA
+  MV & GEN & ADC -.hardwired I/O + Modbus.-> PPLC
+```
+
+| Rule | BEN 2000 value | Why |
+| --- | --- | --- |
+| One PLC per module plus a plant PLC | 4 PLCnext AXC F 2152 | A module's interlocks (CDU isolation, leak valves, cooling failover, door/EPO) must not depend on a cable that crosses a module joint; the plant PLC supervises MV, generators, ATS logic in the switchgear, battery-room gas detection and fuel |
+| Redundant edge computers | 2 × OnLogic Karbon 400, active/standby, replicated history, VRRP address for the dashboard and API | The hall is NOC-less under BEN Care Managed; the twin, sweeps and the care layer must survive one computer failing or being patched |
+| Multiple border routers | 3 border routers (one per module, 2 RCPs each) forming one Thread network with 102 Pods (`derived()["pods"]`) | Thread partitions heal, but the 36.6 m hall and the steel module walls make a single border router a reach and a single-point problem |
+| Controls network | Ring of managed switches (MRP/RSTP) between modules and the power module, fibre across module joints | Copper across a joint is a maintenance seam; fibre also helps the H3 shielding and TEMPEST separation |
+| Life safety | Per module: VESDA + spot detection + clean agent release panel; hall pre-action option; EPO per module and whole-hall | Same rule as every tier: hardwired, PLC only observes dry contacts |
+| Twin and CFD | Twin per module with a shared plant model; CFD per module (`cfd.py` runs the 2-D solver on each module's rack rows) | Keeps the solver small and the fit per module where the sensors are |
+| Drawings | Site plan A-000 plus per-module sheets | A hall needs a site plan for the AHJ; a module needs the same sheets a BEN 500 has |
 
 ## Components and contracts
 | Component | Owns | Interface | Persistence |
@@ -101,3 +145,7 @@ Two controls tiers run this architecture (`docs/CONTROLS_HARDWARE_DECISION.md` �
 | Utility loss | UPS carries IT; cooling rides through only with the mechanical-UPS option; twin predicts minutes to ASHRAE limit |
 | Cooling unit fail | Standby unit starts (N+1/2N); alarm; sweep `cooling_unit_failover` is the acceptance test |
 | Leak | Critical alarm; CDU isolates (liquid tiers); procedure in maintenance docs |
+| One edge computer down (BEN 2000) | Standby edge computer takes the VRRP address within seconds; history replicated; PLCs unaffected |
+| Border router down (BEN 2000) | Pods re-parent to a neighbouring module's border router through router-eligible Pod E units at the joints; alarm "border router loss" |
+| Module joint seal failure (BEN 2000) | Leak-rope under each joint and humidity Pods either side raise the alarm; E15 seal test at SAT and after any relocation; procedure in `MAINTENANCE.md` |
+| MV transformer or UPS string loss (BEN 2000) | 2N: the other transformer and string carry the full load; generators start on utility loss; E16 transfer test is the acceptance test |

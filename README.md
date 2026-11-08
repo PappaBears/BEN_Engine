@@ -4,7 +4,7 @@
 
 **For** small and mid-size businesses, integrators and public-sector sites that want AI and IT on their own pad.
 **The problem:** cloud bills that scale with success, colocation priced for hyperscalers, server closets nobody commissioned.
-**The outcome:** a family of modular data centers (BEN 5 2–5 kW cabinet to BEN 500 500 kW liquid-cooled container) built from off-the-shelf enclosures, with Schreiber AI's controls layer, digital twin, commissioning script and a complete, generated deal package. Every drawing, part, price, alarm threshold and proposal comes from one configuration model.
+**The outcome:** a family of modular data centers (BEN 5 2–5 kW cabinet, BEN 30/150/500 sealed ISO-frame modules to 500 kW, and the 2 MW BEN 2000 prefabricated hall; every unit NEMA 4X / IP66 with H1/H2/H3 hardening) built from off-the-shelf enclosures, with Schreiber AI's controls layer, digital twin, commissioning script and a complete, generated deal package. Every drawing, part, price, alarm threshold and proposal comes from one configuration model.
 
 ![BEN Engine dashboard guided tour: the 3-D twin of a BEN 150 with cutaway, racks, rear-door heat exchangers and roof dry coolers](docs/media/demo.gif)
 
@@ -14,7 +14,7 @@
 
 | Capability | Where | Status |
 | --- | --- | --- |
-| Configuration model: tiers, profiles, climates, sizing, validation (rows that do not fit are rejected) | `software/ben_engine/config.py`, `spec/` | verified (tests, 4 tiers × 8 profiles × climates) |
+| Configuration model: tiers, profiles, climates, sizing, validation (rows that do not fit are rejected) | `software/ben_engine/config.py`, `spec/` | verified (tests, 5 tiers × 8 profiles × climates × 3 hardening levels; BEN 2000 downstream generators pending, see VALIDATION §4a) |
 | Digital twin: thermal + power chain, 7 faults, ASHRAE-class alarms | `software/ben_engine/twin.py` | verified in simulation |
 | 2-D thermal lattice-Boltzmann CFD per tier, recirculation profile into the twin | `software/ben_engine/cfd.py` | verified (runs, converges); relative tool only |
 | Calibration (GUM budgets, tares, placement effects) and analysis (parameter fit, 95 % prediction intervals, ride-through) | `calibration.py`, `analysis.py` | verified on synthetic data |
@@ -51,6 +51,8 @@ More commands:
 
 ```bash
 PYTHONPATH=software python -m ben_engine.config --tier ben150 --profile healthcare --climate hot_humid
+PYTHONPATH=software python -m ben_engine.config --tier ben2000
+PYTHONPATH=software python -m ben_engine.config --tier ben150 --hardening H3
 PYTHONPATH=software python -m ben_engine.sweeps --tier ben500
 PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben150 --yes --out /tmp/report.md
 PYTHONPATH=software python -m ben_engine.cfd --tier ben150 --png /tmp/cfd.png
@@ -65,9 +67,12 @@ cd firmware/ben-pod && make test
 | Tier | Enclosure | IT load | Cooling (preset) | Power |
 | --- | --- | --- | --- | --- |
 | BEN 5 | NEMA 4X / IP66 24U outdoor cabinet on a skid | 2–5 kW | 2 × 5.8 kW cabinet DX (N+1) | 208/240 V 1φ |
-| BEN 30 | 10 ft high-cube ISO container | 10–30 kW | 300 mm in-row DX, R-513A | 208 V 3φ |
-| BEN 150 | 20 ft high-cube | 50–150 kW | Rear-door heat exchangers + dry cooler | 480 V 3φ |
-| BEN 500 | 40 ft high-cube | 150–500 kW | Direct liquid cooling, CDU + dry cooler | 480 V 3φ |
+| BEN 30 | 10 ft high-cube ISO-frame module, IP66 | 10–30 kW | 300 mm in-row DX, R-513A | 208 V 3φ |
+| BEN 150 | 20 ft high-cube module, IP66 | 50–150 kW | Rear-door heat exchangers + dry cooler | 480 V 3φ |
+| BEN 500 | 40 ft high-cube module, IP66 | 150–500 kW | Direct liquid cooling, CDU + dry cooler | 480 V 3φ |
+| BEN 2000 | Prefabricated wide-body modular hall (3 joined 12.2 m modules) + power module + plant yard | 800–2,000 kW | Direct liquid cooling, N+1 CDU row, adiabatic dry coolers | 12.47 kV MV → 2 × 2,500 kVA (2N), 2N UPS, 3 × 1,250 kW generators |
+
+Names are the nominal maximum IT kW (`docs/TIER_AND_ENCLOSURE_DECISION.md`); old keys `micro/ben10/ben20/ben40` still load. Every enclosure is NEMA 4X / IP66 (hardening **H1**); **H2** severe-environment and **H3** hardened/government packages are selectable (`--hardening H2|H3`).
 
 Mission profiles: AI inference, AI training, private cloud, disaster recovery, industrial OT, healthcare, public sector, off-grid. Modules (power, cooling, compute, controls) can be bought separately; white-label and managed options exist.
 

@@ -6,30 +6,30 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 ## 1. Unit summary (filled from the configuration)
 
-| Item | BEN 5 | BEN 30 | BEN 150 | BEN 500 |
-| --- | --- | --- | --- | --- |
-| Enclosure | Outdoor 24U NEMA 4X / IP66 cabinet on skid | 10 ft high-cube ISO | 20 ft high-cube ISO | 40 ft high-cube ISO |
-| External L × W × H (m) | 1.20 × 1.00 × 1.80 | 2.991 × 2.438 × 2.896 | 6.058 × 2.438 × 2.896 | 12.192 × 2.438 × 2.896 |
-| Gross shipped mass, default preset *(config)* | 2.2 t | 4.6 t | 9.0 t | 14.7 t |
-| Gross mass, maximum configuration *(config)* | 2.2 t | 4.6 t | 10.5 t | 17.3 t |
-| Service voltage *(config)* | 208/240 V 1φ | 208 V 3φ (208Y/120) | 480 V 3φ (480Y/277) | 480 V 3φ (480Y/277) |
-| Customer disconnect / feeder breaker, default preset *(config)* | 50 A | 150 A | 225 A | 400 A |
-| Feeder breaker, maximum configuration *(config)* | 50 A | 150 A | 400 A | 1000 A |
-| Total electrical demand, default preset *(config)* | 9.4 kVA | 42.6 kVA | 135 kVA | 224 kVA |
-| Heat rejected outdoors (≈ total kW) | 9 kW | 41 kW | 128 kW | 212 kW |
-| Outdoor noise sources | Cabinet AC condenser | In-row condensers (2–3) | In-row condensers (3–6) or dry cooler | Dry cooler bank, CDU pumps, generator |
+| Item | BEN 5 | BEN 30 | BEN 150 | BEN 500 | BEN 2000 |
+| --- | --- | --- | --- | --- | --- |
+| Enclosure (all NEMA 4X / IP66 at hardening H1) | Outdoor 24U cabinet on skid | 10 ft high-cube ISO-frame module | 20 ft high-cube ISO-frame module | 40 ft high-cube ISO-frame module | Prefabricated hall: 3 joined wide-body modules + power module + plant yard |
+| External L × W × H (m) | 1.20 × 1.00 × 1.80 | 2.991 × 2.438 × 2.896 | 6.058 × 2.438 × 2.896 | 12.192 × 2.438 × 2.896 | Hall 36.6 × 11.0 × 4.2; each module 12.2 × 3.66 × 4.2; power module 12.2 × 3.66 × 4.2 |
+| Gross shipped mass, default preset *(config)* | 2.2 t | 4.6 t | 9.0 t | 14.7 t | 109 t total (≈ 25–30 t per module as shipped) |
+| Gross mass, maximum configuration *(config)* | 2.2 t | 4.6 t | 10.5 t | 17.3 t | ≈ 125 t total |
+| Service voltage *(config)* | 208/240 V 1φ | 208 V 3φ (208Y/120) | 480 V 3φ (480Y/277) | 480 V 3φ (480Y/277) | **12.47 kV (or 13.8 kV) MV service** → 2 × 2,500 kVA pad-mount transformers (2N) → 480Y/277 V |
+| Customer disconnect / feeder breaker, default preset *(config)* | 50 A | 150 A | 225 A | 400 A | Utility primary metering; MV loop-feed switch; 3,000 A per 480 V main (4,000 A bus) |
+| Feeder breaker, maximum configuration *(config)* | 50 A | 150 A | 400 A | 1000 A | 2 × 3,000 A mains (2N) |
+| Total electrical demand, default preset *(config)* | 9.4 kVA | 42.6 kVA | 135 kVA | 224 kVA | 1,766 kW at 1,600 kW IT (≈ 1,960 kVA); 2,250 kVA at 2,000 kW IT |
+| Heat rejected outdoors (≈ total kW) | 9 kW | 41 kW | 128 kW | 212 kW | 1,770–2,200 kW via adiabatic dry coolers |
+| Outdoor noise sources | Cabinet AC condenser | In-row condensers (2–3) | In-row condensers (3–6) or dry cooler | Dry cooler bank, CDU pumps, generator | Adiabatic dry cooler bank (8–12 fans), 3 × 1,250 kW generators (test runs), transformers (hum) |
 
 ## 2. Pad and foundation
 
-| Requirement | BEN 5 | BEN 30 | BEN 150 | BEN 500 | Who provides |
-| --- | --- | --- | --- | --- | --- |
-| Pad plan size (unit + 1.0 m apron all round, + equipment yard) | 2.5 × 2.5 m | 5.0 × 4.5 m + condenser yard 3 × 3 m | 8.0 × 4.5 m + condenser/dry cooler yard 6 × 3 m | 14.5 × 4.5 m + dry cooler yard 12 × 4 m + generator pad per vendor | Customer civil (or Schreiber AI turnkey) |
-| Pad type and thickness | 150 mm reinforced slab, or 4 precast piers | 200 mm reinforced slab on 150 mm compacted base, **or** 4 reinforced concrete piers 600 × 600 mm at corner castings to frost depth | 200 mm slab or 4 piers (6 piers if mid-anchors required by wind calc) | 250 mm slab or 6–8 piers; check bearing: corner loads up to 45 kN each | PE-stamped drawing supplied by Schreiber AI per site soil (allowable bearing ≥ 100 kPa assumed; geotech if unknown) |
-| Level tolerance | ±6 mm across pad | ±6 mm between corner castings (containers twist; doors will not seal if out of level) | ±6 mm | ±6 mm | Surveyed at H16 |
-| Anchor points | 4 × M16 chemical anchors into slab | 4 × cast-in twist-lock bases or weld plates at corner castings (ISO 1161 pattern) | 4 (+2 mid) twist-lock bases / weld plates | 6–8 twist-lock bases / weld plates | Embeds supplied by Schreiber AI; set by civil contractor to ±10 mm |
-| Elevation | Pad top ≥ 150 mm above grade; ≥ 300 mm above base flood elevation | same | same | same | Customer |
-| Drainage | Grade away 2 %; condensate/CDU drain to a trapped drain or dry well | same | same + glycol drip tray drain | same | Customer |
-| Frost | Piers to local frost depth in `cold` climate | same | same | same | Customer |
+| Requirement | BEN 5 | BEN 30 | BEN 150 | BEN 500 | BEN 2000 | Who provides |
+| --- | --- | --- | --- | --- | --- | --- |
+| Pad plan size (unit + 1.0 m apron all round, + equipment yard) | 2.5 × 2.5 m | 5.0 × 4.5 m + condenser yard 3 × 3 m | 8.0 × 4.5 m + condenser/dry cooler yard 6 × 3 m | 14.5 × 4.5 m + dry cooler yard 12 × 4 m + generator pad per vendor | **Hall slab 40 × 14 m**; power module slab 14 × 6 m; MV pad 8 × 6 m with oil containment; generator pad 20 × 8 m with containment and fuel tanks; plant yard 30 × 10 m for adiabatic coolers and water treatment; total fenced site ≈ 70 × 45 m | Customer civil (or Schreiber AI turnkey) |
+| Pad type and thickness | 150 mm reinforced slab, or 4 precast piers | 200 mm reinforced slab on 150 mm compacted base, **or** 4 reinforced concrete piers 600 × 600 mm at corner castings to frost depth | 200 mm slab or 4 piers (6 piers if mid-anchors required by wind calc) | 250 mm slab or 6–8 piers; check bearing: corner loads up to 45 kN each | 250–300 mm slab-on-grade with grade beams under module rails (line load ≈ 25 kN/m), designed from the geotechnical report; frost-protected shallow foundation in `cold` | PE-stamped drawing supplied by Schreiber AI per site soil (allowable bearing ≥ 100 kPa assumed; geotech required for BEN 2000) |
+| Level tolerance | ±6 mm across pad | ±6 mm between corner castings (containers twist; doors will not seal if out of level) | ±6 mm | ±6 mm | ±5 mm along module rails (joints will not seal if out of level) | Surveyed at H16 |
+| Anchor points | 4 × M16 chemical anchors into slab | 4 × cast-in twist-lock bases or weld plates at corner castings (ISO 1161 pattern) | 4 (+2 mid) twist-lock bases / weld plates | 6–8 twist-lock bases / weld plates | Cast-in embed plates at 3 m centres under each module rail; welded hold-downs per seismic category | Embeds supplied by Schreiber AI; set by civil contractor to ±10 mm |
+| Elevation | Pad top ≥ 150 mm above grade; ≥ 300 mm above base flood elevation | same | same | same | same; H2/H3 adds a 600 mm plinth on every tier | Customer |
+| Drainage | Grade away 2 %; condensate/CDU drain to a trapped drain or dry well | same | same + glycol drip tray drain | same | Hall floor drains to trapped sumps with leak detection; cooler bleed to sanitary sewer (not storm); transformer and generator containment per SPCC | Customer |
+| Frost | Piers to local frost depth in `cold` climate | same | same | same | Grade beams to frost depth or insulated slab edge | Customer |
 
 ## 3. Setbacks and clearances
 
@@ -37,7 +37,8 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 | --- | --- | --- |
 | Door side | 2.5 m clear for door swing, egress and equipment movement | OSHA egress, rack delivery |
 | Condenser / dry cooler side | ≥ 1.5 m from container wall and ≥ 2.0 m from any wall or fence; no recirculation from another unit's discharge; nothing above the fan discharge | Capacity: recirculated hot air is the most common cause of lost capacity |
-| Property line | Distance such that predicted sound level meets the local ordinance (see section 9); typical ≥ 15 m residential, ≥ 5 m industrial | Noise |
+| Property line | Distance such that predicted sound level meets the local ordinance (see section 9); typical ≥ 15 m residential, ≥ 5 m industrial; BEN 2000 ≥ 50 m residential (≥ 25 m with barrier) | Noise |
+| BEN 2000 hall | Fire separation ≥ 10 m to other buildings or 2-hour rated wall; 6 m fire lane on two sides; MV pad ≥ 3 m from the hall with utility clearances (typically 3 m front, 1 m sides); generators ≥ 6 m from hall air intakes; fuel tanks per NFPA 30 Table 22.4.1.1 | Fire code, utility rules, exhaust |
 | Buildings / combustibles | ≥ 3 m to other structures or per local fire code; ≥ 6 m to fire apparatus lane on one long side | Fire code, access |
 | Generator | Per manufacturer: typically ≥ 1.5 m from the container, ≥ 1.5 m from openings, exhaust away from doors and air intakes; fuel tank per NFPA 30/37 and local code | Exhaust, fire |
 | Overhead | No power lines within 3 m horizontally of crane path; nothing above the unit (snow slide, roof drip) | Crane safety, roof |
@@ -46,21 +47,22 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 | Item | Requirement |
 | --- | --- |
-| Delivery vehicle | Flatbed or step-deck; high-cube overall height on a standard trailer ≈ 4.4 m — the route must clear 4.5 m. Customer confirms gate width ≥ 3.5 m, turning radius for a 16 m (BEN 30/20) or 21 m (BEN 500) tractor-trailer, surface for 40 t axle loads |
+| Delivery vehicle | Flatbed or step-deck; high-cube overall height on a standard trailer ≈ 4.4 m — the route must clear 4.5 m. Customer confirms gate width ≥ 3.5 m, turning radius for a 16 m (BEN 30/150) or 21 m (BEN 500) tractor-trailer, surface for 40 t axle loads. **BEN 2000:** four over-width loads (3.66 m wide, 4.2 m high on a lowboy ≈ 4.9 m overall), escorts and state permits; gate ≥ 5 m; yard for a 100 t crane to set all modules from one or two positions |
 | Crane | Mobile crane sized for the gross mass at the required radius (BEN 150 at 9 t and 12 m radius ≈ 60–80 t crane; BEN 500 at 15–17 t ≈ 100–130 t crane). Firm, level outrigger ground; outrigger mats. Lift by all four top corner castings with spreader bar only |
 | Alternative | BEN 5 and BEN 30 can be set with a telehandler/forklift of adequate capacity using the forklift pockets (BEN 30) or skid (BEN 5) |
+| BEN 2000 crane | **100 t all-terrain crane** (module ≈ 30 t at up to 15 m radius), engineered lifting lugs and a four-leg spreader frame supplied with the modules; 3-day set for three hall modules and the power module; crane pad bearing ≥ 200 kPa on mats |
 | Who | Customer provides access and permission; Schreiber AI logistics books the crane unless the customer prefers their own rigger (then the lift plan is still reviewed by us, W17) |
 
 ## 5. Utility service
 
-| Item | BEN 5 | BEN 30 | BEN 150 | BEN 500 |
-| --- | --- | --- | --- | --- |
-| Voltage / phases | 208 or 240 V, 1φ, 3-wire + ground | 208Y/120 V, 3φ, 4-wire + ground | 480Y/277 V, 3φ, 4-wire + ground | 480Y/277 V, 3φ, 4-wire + ground |
-| Customer-provided disconnect within sight of the unit, rated *(config `service_breaker_a`)* | 50 A | 150 A | 225 A (default) to 400 A (max) | 400 A (default) to 1000 A (max) |
-| Feeder conductors (customer side, NEC 310.16 75 °C Cu) | 8 AWG | 1/0 AWG | 4/0 AWG (225 A) / 600 kcmil or 2 × 3/0 (400 A) | 600 kcmil (400 A) / 3 × 400 kcmil (1000 A) |
+| Item | BEN 5 | BEN 30 | BEN 150 | BEN 500 | BEN 2000 |
+| --- | --- | --- | --- | --- | --- |
+| Voltage / phases | 208 or 240 V, 1φ, 3-wire + ground | 208Y/120 V, 3φ, 4-wire + ground | 480Y/277 V, 3φ, 4-wire + ground | 480Y/277 V, 3φ, 4-wire + ground | **Medium voltage 12.47 kV (or 13.8 kV) 3φ** from the utility with primary metering; customer-owned 15 kV class loop-feed pad-mount switch, 2 × 2,500 kVA pad-mount transformers (2N) to 480Y/277 V |
+| Customer-provided disconnect within sight of the unit, rated *(config `service_breaker_a`)* | 50 A | 150 A | 225 A (default) to 400 A (max) | 400 A (default) to 1000 A (max) | MV switch with fused ways; 480 V mains 2 × 3,000 A in the power module (we supply) |
+| Feeder conductors (customer side, NEC 310.16 75 °C Cu) | 8 AWG | 1/0 AWG | 4/0 AWG (225 A) / 600 kcmil or 2 × 3/0 (400 A) | 600 kcmil (400 A) / 3 × 400 kcmil (1000 A) | MV: 15 kV 1/0 Al or Cu EPR cable in concrete-encased duct bank (utility spec); LV: bus duct 3,000 A per transformer to switchgear, ≤ 15 m |
 | Available fault current at the disconnect | Required from utility before shipping; our SCCR is 65 kA at 480 V, 65 kA at 208/240 V; higher values need current-limiting fuses — tell us early |  |  |  |
 | Metering | Utility meter at customer switchgear (normal) or at the unit (tell us; changes to NEC Art. 230 service rules) |  |  |  |
-| Generator (if selected) | n/a | n/a | 150–250 kW diesel/natural gas, customer gas service or diesel tank | 250–750 kW, sub-base tank; SPCC applies ≥ 1,320 gal |
+| Generator (if selected) | n/a | n/a | 150–250 kW diesel/natural gas, customer gas service or diesel tank | 250–750 kW, sub-base tank; SPCC applies ≥ 1,320 gal | Standard: **3 × 1,250 kW N+1, 48 h fuel** (≈ 10,500 US gal diesel in UL 142 double-wall sub-base or bulk tank); PE-certified SPCC plan; fuel delivery access for a 30 t tanker |
 | Power quality | Voltage within ±10 %, frequency ±1 Hz; harmonics per IEEE 519 at PCC (we provide active-front-end UPS; report THD at SAT) |  |  |  |
 | Who | Customer's electrical contractor installs the disconnect and feeder; Schreiber AI's licensed sub terminates at the unit |  |  |  |
 
@@ -90,8 +92,9 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 | --- | --- |
 | Condensate (DX units) | Gravity to a trapped drain or dry well; ≥ 25 mm line; heat-traced in `cold` climate. Volume at design humidity: up to 20 L/day (BEN 150, hot_humid) |
 | Make-up water (dry cooler with adiabatic pad, option) | Potable or softened water, 15–20 L/min at 2 bar during peak; backflow preventer per local plumbing code |
+| **BEN 2000 adiabatic coolers** | Make-up water **2–8 m³/day per 1,000 kW on hot days, zero in dry mode** (below ≈ 28 °C dry bulb); peak flow 60–100 L/min at 2–3 bar; water quality: hardness < 200 mg/L CaCO₃ or softener supplied; 3-day storage tank option where supply is uncertain; bleed/blow-down 20–30 % of make-up to **sanitary** sewer; backflow preventer; water treatment skid and ASHRAE 188 water management plan (`MAINTENANCE.md`) |
 | Glycol loop fill | Closed loop filled by Schreiber AI (propylene glycol 30–50 % by climate); no site water connection needed; drain containment 200 L drip tray |
-| Drain | Floor drain or dry well sized for a full-loop dump (BEN 500 CDU loop ≈ 400–600 L) |
+| Drain | Floor drain or dry well sized for a full-loop dump (BEN 500 CDU loop ≈ 400–600 L; BEN 2000 CDU and cooler loops ≈ 6,000–8,000 L, drained to a holding tank) |
 | Who | Customer plumbing contractor |
 
 ## 9. Noise
@@ -99,20 +102,23 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 | Item | Requirement |
 | --- | --- |
 | Customer provides | The local ordinance limits (day/night, dBA at property line) and the distance from the equipment yard to the nearest property line and nearest dwelling |
-| Schreiber AI provides | A predicted level at the property line from the selected equipment's sound power, with the barrier/low-noise options if the prediction is within 3 dB of the limit |
+| Schreiber AI provides | A predicted level at the property line from the selected equipment's sound power, with the barrier/low-noise options if the prediction is within 3 dB of the limit. BEN 2000: generators in Level 2 (≤ 75 dBA at 7 m) enclosures, adiabatic coolers with EC fans ≈ 65 dBA at 10 m per bank, night set-back; expect ≥ 50 m to a residential property line without a barrier wall, ≥ 25 m with one |
 | Verified by | Acoustic survey at SAT (E10) |
 
 ## 10. Permits and who pulls them
 
 | Permit | Typical need | Who pulls | Notes |
 | --- | --- | --- | --- |
-| Zoning / land use | Yes for 30/150/500 (accessory structure); often no for BEN 5 | Customer | Setbacks, height, screening |
-| Building permit (structure, foundation, anchorage) | Yes for 30/150/500 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) | AHJ decides Group U vs other occupancy; see `COMPLIANCE.md` §6 |
+| Zoning / land use | Yes for 30/150/500 (accessory structure); often no for BEN 5; **BEN 2000: principal structure, site plan approval** | Customer | Setbacks, height, screening |
+| Building permit (structure, foundation, anchorage) | Yes for 30/150/500; **BEN 2000: full building permit (IBC Group B or F-1) plus state modular-building approval** | Customer's contractor or Schreiber AI as agent (we provide PE drawings) | AHJ decides Group U vs other occupancy; see `COMPLIANCE.md` §6 and §14; BEN 2000 plan review 8–16 weeks |
 | Electrical permit | Yes | Licensed electrical sub (ours for the unit, customer's for the feeder) | Two permits are common: one for the site feeder, one for the unit hook-up |
 | Mechanical / refrigeration permit | Yes where DX or glycol piping is installed on site | Licensed HVAC sub | Refrigerant quantity declared |
 | Fire alarm / suppression permit and plan review | Yes for 30/150/500 | Licensed fire protection contractor | Fire marshal plan review 4–8 weeks |
 | Generator: air permit / registration, fuel tank permit | If generator selected | Customer (we provide engine certification and tank data) | Emergency-engine rules; SPCC ≥ 1,320 gal |
 | Utility interconnection (solar/export only) | off_grid with PV paralleling | Customer with our documents | Art. 705 |
+| **MV service application** (BEN 2000) | Always | Customer, with our load letter and single-line | Filed at order; 26–52 weeks utility lead time; easement for utility equipment |
+| Stormwater construction permit (NPDES CGP) | BEN 2000 (disturbance > 0.4 ha) | Customer civil | SWPPP before mobilisation |
+| Water supply and sewer discharge (BEN 2000) | Always | Customer | Make-up water tap size, bleed discharge permit |
 | Stormwater / grading | Site dependent | Customer civil | |
 
 ## 11. Security fencing and lighting
@@ -136,6 +142,8 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 | Site altitude | m above sea level | Fan and generator derate (high_altitude) |
 | Wildfire interface | yes/no | Ember-resistant louvres, defensible space |
 | Corrosivity confirmation | distance to salt water, industrial emissions | ISO 9223 class (C2–C5) coating system |
+| Hardening level | H1 standard / H2 severe environment / H3 hardened (`Config.hardening`); the config recommends H2 for coastal, hot_arid, hot_humid, cold and high_altitude and offers H3 for public_sector | Envelope package, flood plinth, ballistic/forced-entry/shielding options; the hose test E14 is run at every level |
+| Water availability (BEN 2000) | supply capacity L/min, hardness, drought restrictions, sewer discharge rules | Adiabatic vs dry vs chilled-water selection |
 
 ## 13. Delivery route
 

@@ -15,7 +15,7 @@
   "availability_note": "10 ft HC is rare; new/one-trip only. Dealer stock varies by yard.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10"
+   "ben30"
   ],
   "qty_rule": "1"
  },
@@ -35,7 +35,7 @@
   "availability_note": "Common stock item at most US depots; delivery quoted per ZIP.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20"
+   "ben150"
   ],
   "qty_rule": "1"
  },
@@ -55,33 +55,33 @@
   "availability_note": "Backordered at ContainerOne on 2026-11-07; alternates Cascade ($4,950), Dry Box (~$4,800), eBay Oakland ($4,700).",
   "moq": 1,
   "applies_to_tiers": [
-   "ben40"
+   "ben500"
   ],
   "qty_rule": "1"
  },
  {
   "code": "STR-CAB24U",
-  "name": "Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN Micro)",
-  "manufacturer": "Great Lakes Data Racks",
-  "mpn": "GL24-NEMA4-AC2200",
-  "vendor": "CDW",
-  "vendor_url": "https://www.cdw.com/product/great-lakes-single-bay-cabinet/9008440",
+  "name": "Outdoor NEMA 4X / IP66 24U cabinet, aluminium (UL 50E Type 4X), 300 mm plinth, two side cut-outs for cabinet coolers, compression-gasket door with 3-point latch (shell for BEN 5)",
+  "manufacturer": "DDB Unlimited (alt: Great Lakes NEMA 4X, Purcell)",
+  "mpn": "OD-series 4X, 24U configured (OD-50DXC class)",
+  "vendor": "DDB Unlimited / Radiogagas (reseller)",
+  "vendor_url": "https://radiogagas.com/product/50hx25d-outdoor-encl-4",
   "unit": "ea",
-  "unit_price_usd": 13212.99,
-  "price_status": "confirmed",
-  "price_source_note": "CDW $13,212.99 seen 2026-11-07. Integral 2200 BTU AC is far too small for 6 kW IT; BEN Micro adds CLG-CABAC units (see notes). DDB Unlimited / Purcell are quote-only.",
-  "price_checked": "2026-11-07",
-  "lead_time_weeks": 6,
-  "availability_note": "Built to order; 4-8 wk typical for NEMA cabinets.",
+  "unit_price_usd": 7500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $7,500. Radiogagas lists the DDB OD-50DXC (50 in, 1 bay, Type 4) at $4,065.60 (seen 2026-11-08); the 4X finish, plinth, cooler cut-outs and 24U rails are configure-to-order (DDB quote, email 02). Great Lakes GL24-NEMA4-AC2200 at CDW $13,212.99 (2026-11-07) includes an undersized 2,200 BTU AC and is Type 4, not 4X. Purcell quote-only.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "Configure-to-order; 6-10 wk. OD-16DXC showed backorder at Solid Signal 2026-11-08.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
  {
   "code": "STR-SKID",
-  "name": "Steel skid base for Micro cabinet (C6 channel frame, forklift pockets, 4 lifting eyes)",
+  "name": "Steel skid base for BEN 5 cabinet (C6 channel frame, forklift pockets, 4 lifting eyes)",
   "manufacturer": "Schreiber AI (fabricated)",
   "mpn": "BEN-SKID-01",
   "vendor": "local steel fab",
@@ -95,7 +95,7 @@
   "availability_note": "Make item; any local fab shop.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -115,8 +115,8 @@
   "availability_note": "Stock item at CDW/SHI; ships same/next business day.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20"
+   "ben30",
+   "ben150"
   ],
   "qty_rule": "racks"
  },
@@ -130,13 +130,14 @@
   "unit": "ea",
   "unit_price_usd": 4000.0,
   "price_status": "estimate",
-  "price_source_note": "AR3307 (1200 deep) was $4,000 confirmed at CDW on 2026-11-07; AR3107 (1070 deep) assumed same price band, to be quoted (email 04).",
+  "price_source_note": "AR3307 (1200 deep) was $4,000 confirmed at CDW on 2026-11-07; AR3107 (1070 deep) assumed same price band, to be quoted (email 04). BEN 2000: 48 racks in 4 rows of 12 (derived rows / racks_per_row).",
   "price_checked": null,
   "lead_time_weeks": 2,
   "availability_note": "Stock item; 1200 mm depth needed for GPU servers + manifolds.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben40"
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks"
  },
@@ -156,9 +157,10 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks"
  },
@@ -178,9 +180,9 @@
   "availability_note": "Many resellers show out of stock; Zoro and Camcor ($1,044.99) listed available.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "2"
  },
@@ -200,9 +202,9 @@
   "availability_note": "Requires SRCTMTFRM frame end kit.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -222,9 +224,9 @@
   "availability_note": "Make item.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "racks"
  },
@@ -244,9 +246,9 @@
   "availability_note": "Stock at container dealers.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m/7)"
  },
@@ -266,9 +268,9 @@
   "availability_note": "Stock at container parts suppliers.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -288,10 +290,10 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m)"
  },
@@ -311,15 +313,15 @@
   "availability_note": "Big-box / insulation distributor stock; pallet quantities.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil((2*(tier_len_m+2.44)*2.9+tier_len_m*2.44)/2.97*2*1.1)"
  },
  {
   "code": "ENV-PIR-MICRO",
-  "name": "Polyiso board 1 in x 4 ft x 8 ft, R-6 (Micro cabinet interior lining)",
+  "name": "Polyiso board 1 in x 4 ft x 8 ft, R-6 (BEN 5 cabinet interior lining)",
   "manufacturer": "Johns Manville",
   "mpn": "AP Foil 1in",
   "vendor": "Lowe's",
@@ -333,7 +335,7 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "4"
  },
@@ -353,9 +355,9 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil((2*(tier_len_m+2.2)*2.55+tier_len_m*2.2)/2.23*1.1)"
  },
@@ -375,9 +377,9 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m*4)"
  },
@@ -397,10 +399,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "ceil(tier_len_m*2)+2"
  },
@@ -420,10 +423,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "max(1, ceil(tier_len_m/1.5))"
  },
@@ -443,9 +447,9 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m*2.2*10.76)"
  },
@@ -465,9 +469,9 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m*1.2)"
  },
@@ -487,7 +491,7 @@
   "availability_note": "Stock at major IT resellers.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "ups_modules"
  },
@@ -507,7 +511,7 @@
   "availability_note": "Stock item normally.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "ups_modules"
  },
@@ -524,7 +528,7 @@
   "price_source_note": "AVENDOR sale $58,272.99 (reg $86,419) seen 2026-11-07; 480 V frame-only variant $51,788.99 showed 0 stock; SHI MSRP $87-93k",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 8,
-  "availability_note": "Configured-to-order; several AVENDOR SKUs at 0 stock. Quote required (see email queue). ALTERNATE ONLY: two 93PM 50 kW towers (495 mm each) do not fit the 10 ft row (interference check I-C21); BEN 10 preset uses PWR-UPS-RM20 rack-mount modules in R1. Kept in catalog for sites that place the UPS in an exterior electrical enclosure.",
+  "availability_note": "Configured-to-order; several AVENDOR SKUs at 0 stock. Quote required (see email queue). ALTERNATE ONLY: two 93PM 50 kW towers (495 mm each) do not fit the 10 ft row (interference check I-C21); BEN 30 preset uses PWR-UPS-RM20 rack-mount modules in R1. Kept in catalog for sites that place the UPS in an exterior electrical enclosure.",
   "moq": 1,
   "applies_to_tiers": [],
   "qty_rule": "ups_modules"
@@ -549,7 +553,7 @@
  },
  {
   "code": "PWR-UPS-GVS150",
-  "name": "Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40)",
+  "name": "Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500)",
   "manufacturer": "Schneider Electric",
   "mpn": "GVSUPS150KHS (configure-to-order)",
   "vendor": "AVENDOR",
@@ -563,8 +567,8 @@
   "availability_note": "Single frame per N string; redundancy inside the frame (N+1 power modules). 2N customers take a second frame via the proposal option.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "max(1, ceil(ups_kva_each/150))"
  },
@@ -581,17 +585,17 @@
   "price_source_note": "AVENDOR sale $55,217.99 (reg $69,740) seen 2026-11-07; 17-module UL variant $62,215.99",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 10,
-  "availability_note": "Factory order; UL9540A documentation needed for AHJ. Lead time tracks cell supply. Qty rule: one shared cabinet string sized to battery_kwh (shared bus between frames per vendor confirmation requested in email 09); 2N adds a second string via the proposal option. Under 20 kWh (BEN 20 default, NFPA 855 threshold) the batteries are internal to the UPS frame and no cabinet is used.",
+  "availability_note": "Factory order; UL9540A documentation needed for AHJ. Lead time tracks cell supply. Qty rule: one shared cabinet string sized to battery_kwh (shared bus between frames per vendor confirmation requested in email 09); 2N adds a second string via the proposal option. Under 20 kWh (BEN 150 default, NFPA 855 threshold) the batteries are internal to the UPS frame and no cabinet is used.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "0 if battery_kwh <= 20 else max(1, ceil(battery_kwh/32.6))"
  },
  {
   "code": "PWR-XFMR",
-  "name": "Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben20) / 300 kVA (ben40), for rack PDUs",
+  "name": "Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben150) / 300 kVA (ben500), for rack PDUs",
   "manufacturer": "Square D / Eaton",
   "mpn": "EX150T3H / EX300T3H",
   "vendor": "electrical distributor",
@@ -605,7 +609,7 @@
   "availability_note": "Distributor stock for 150 kVA common; 300 kVA often 6-10 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20"
+   "ben150"
   ],
   "qty_rule": "ups_modules"
  },
@@ -625,7 +629,7 @@
   "availability_note": "6-10 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben40"
+   "ben500"
   ],
   "qty_rule": "ups_modules"
  },
@@ -645,8 +649,8 @@
   "availability_note": "Distributor stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -666,8 +670,8 @@
   "availability_note": "Distributor stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -687,14 +691,14 @@
   "availability_note": "Distributor stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
  {
   "code": "PWR-PANEL-NQ",
-  "name": "NQ panelboard 225 A MLO 208Y/120 V, 42 circuit, with 150 A main breaker (ben10)",
+  "name": "NQ panelboard 225 A MLO 208Y/120 V, 42 circuit, with 150 A main breaker (ben30)",
   "manufacturer": "Square D (Schneider)",
   "mpn": "NQ442L2C + QGL32150",
   "vendor": "electrical distributor",
@@ -708,27 +712,27 @@
   "availability_note": "Distributor stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10"
+   "ben30"
   ],
   "qty_rule": "1"
  },
  {
   "code": "PWR-LOADCTR",
-  "name": "QO 100 A 20-space outdoor (NEMA 3R) load center with 50 A 2P main for Micro",
+  "name": "QO 100 A 20-space outdoor (NEMA 4X) load center with 50 A 2P main for BEN 5",
   "manufacturer": "Square D (Schneider)",
   "mpn": "QO120M100RB + QO250",
   "vendor": "Home Depot",
   "vendor_url": "",
   "unit": "set",
-  "unit_price_usd": 220.0,
+  "unit_price_usd": 320.0,
   "price_status": "estimate",
-  "price_source_note": "Engineering estimate from big-box pricing $180-260",
+  "price_source_note": "Engineering estimate from big-box pricing $180-260. Rating changed from NEMA 3R to NEMA 4X (docs/TIER_AND_ENCLOSURE_DECISION.md §3); estimate carries the 4X uplift.",
   "price_checked": null,
   "lead_time_weeks": 1,
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -748,52 +752,53 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1"
  },
  {
   "code": "PWR-ATS-400",
-  "name": "Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 3R",
+  "name": "Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 4X",
   "manufacturer": "ASCO (Schneider)",
   "mpn": "J03ATSB30400N5X",
   "vendor": "Norwall PowerSystems",
   "vendor_url": "https://norwall.com/products/asco-400-amp-ats-3p-sed-nema-3r-asco400a300se",
   "unit": "ea",
-  "unit_price_usd": 11060.0,
-  "price_status": "confirmed",
-  "price_source_note": "Norwall $11,060 seen 2026-11-07; non-SE NEMA 1 units from ~$2,400 (Winco/GeneratorJoe)",
-  "price_checked": "2026-11-07",
+  "unit_price_usd": 12500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $12,500: Norwall listed the Series 300 400 A SE-rated NEMA 3R at $11,060 on 2026-11-07; the NEMA 4X enclosure option is quote-only (~+10-15 %). NEMA 3R dropped per docs/TIER_AND_ENCLOSURE_DECISION.md §3.",
+  "price_checked": null,
   "lead_time_weeks": 8,
   "availability_note": "Factory order 6-10 wk; only when generator option selected.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "generator"
  },
  {
   "code": "PWR-ATS-200",
-  "name": "Series 300 ATS 200 A 3P 208 V, NEMA 3R",
+  "name": "Series 300 ATS 200 A 3P 208 V, NEMA 4X",
   "manufacturer": "ASCO (Schneider)",
   "mpn": "J03ATSA30200N5X",
   "vendor": "Winco / GeneratorJoe",
   "vendor_url": "https://www.wincogen.com/?p=10208",
   "unit": "ea",
-  "unit_price_usd": 4500.0,
+  "unit_price_usd": 5200.0,
   "price_status": "estimate",
-  "price_source_note": "Estimate: Series 300 'from $2,440' (Winco) for small frames; 3-pole 200 A NEMA 3R ~$4,000-5,000",
+  "price_source_note": "Estimate: Series 300 'from $2,440' (Winco) for small frames; 3-pole 200 A NEMA 3R ~$4,000-5,000. Rating changed from NEMA 3R to NEMA 4X (docs/TIER_AND_ENCLOSURE_DECISION.md §3); estimate carries the 4X uplift.",
   "price_checked": null,
   "lead_time_weeks": 8,
   "availability_note": "Only when generator option selected.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10"
+   "ben5",
+   "ben30"
   ],
   "qty_rule": "generator"
  },
@@ -813,7 +818,7 @@
   "availability_note": "16-26 wk typical for industrial gensets.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20"
+   "ben150"
   ],
   "qty_rule": "generator"
  },
@@ -833,13 +838,13 @@
   "availability_note": "16-26 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben40"
+   "ben500"
   ],
   "qty_rule": "generator"
  },
  {
   "code": "PWR-GEN-SMALL",
-  "name": "30/60 kW diesel standby generator for Micro/BEN10 (Protector series)",
+  "name": "30/60 kW diesel standby generator for BEN 5 / BEN 30 (Protector series)",
   "manufacturer": "Generac",
   "mpn": "RD030 / RD060",
   "vendor": "Generac dealer",
@@ -847,14 +852,14 @@
   "unit": "ea",
   "unit_price_usd": 22000.0,
   "price_status": "estimate",
-  "price_source_note": "Estimate: 30 kW diesel ~$18-24k; 60 kW ~$30-38k (use $22k Micro, scale for ben10 via quote)",
+  "price_source_note": "Estimate: 30 kW diesel ~$18-24k; 60 kW ~$30-38k (use $22k BEN 5, scale for ben30 via quote)",
   "price_checked": null,
   "lead_time_weeks": 12,
   "availability_note": "Dealer stock for small frames.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10"
+   "ben5",
+   "ben30"
   ],
   "qty_rule": "generator"
  },
@@ -874,10 +879,10 @@
   "availability_note": "Stock. A/B feed per rack.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "racks*2"
  },
@@ -897,12 +902,13 @@
   "availability_note": "Ships from China; 3-4 wk. Modbus map public.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "ups_modules+1"
+  "qty_rule": "ups_modules + 1 + transformers_total"
  },
  {
   "code": "PWR-CT",
@@ -920,12 +926,13 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "ups_modules+1"
+  "qty_rule": "ups_modules + 1 + transformers_total"
  },
  {
   "code": "PWR-FEEDER",
@@ -943,10 +950,11 @@
   "availability_note": "Stock; copper volatility.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "service_breaker_a"
  },
@@ -966,10 +974,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1"
  },
@@ -989,9 +998,10 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1"
  },
@@ -1005,13 +1015,13 @@
   "unit": "ea",
   "unit_price_usd": 9222.32,
   "price_status": "confirmed",
-  "price_source_note": "DigiKey listing $9,222.32 with 1 in stock seen 2026-11-07; Electrika trade GBP 5,869.14 (~$7,600). Micro N+1 per config => 3 units; physical fit on a 24U cabinet is a known risk (see notes).",
+  "price_source_note": "DigiKey listing $9,222.32 with 1 in stock seen 2026-11-07; Electrika trade GBP 5,869.14 (~$7,600). BEN 5 N+1 per config => 3 units; physical fit on a 24U cabinet is a known risk (see notes).",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 8,
   "availability_note": "Low distributor stock (1-2 pcs); 6-10 wk factory. Quote Pfannenberg DTS 6x2E as alternate.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "cooling_units_total",
   "applies_to_cooling": [
@@ -1034,8 +1044,8 @@
   "availability_note": "Factory order 8-12 wk; needs outdoor condensing unit (CLG-COND).",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20"
+   "ben30",
+   "ben150"
   ],
   "qty_rule": "cooling_units_total",
   "applies_to_cooling": [
@@ -1059,8 +1069,8 @@
   "availability_note": "Ships with in-row order.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20"
+   "ben30",
+   "ben150"
   ],
   "qty_rule": "cooling_units_total",
   "applies_to_cooling": [
@@ -1084,8 +1094,8 @@
   "availability_note": "Stock. Changed from R-410A: AIM Act 700-GWP limit for new IT-room cooling from 2027-01-01 and A2L charge limits (UL 60335-2-40 / ASHRAE 15) make R-454B/R-32 unusable inside a container; specify R-513A or R-515B factory charge from the DX vendor.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20"
+   "ben30",
+   "ben150"
   ],
   "qty_rule": "cooling_units_total",
   "applies_to_cooling": [
@@ -1110,8 +1120,8 @@
   "availability_note": "10-16 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "racks",
   "applies_to_cooling": [
@@ -1134,8 +1144,8 @@
   "availability_note": "12-20 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "2",
   "applies_to_cooling": [
@@ -1152,13 +1162,14 @@
   "unit": "ea",
   "unit_price_usd": 150000.0,
   "price_status": "estimate",
-  "price_source_note": "Quote-only (no public price for XDU450 or CHx750 as of 2026-11-07). Estimate $150k at ~$330/kW; N+1 per config => 2 units.",
+  "price_source_note": "Quote-only (no public price for XDU450 or CHx750 as of 2026-11-07). Estimate $150k at ~$330/kW; N+1 per config => 2 units. BEN 2000: CDU rows at the row ends, qty = cooling_units_total (N+1 on 300 kW class units).",
   "price_checked": null,
   "lead_time_weeks": 16,
   "availability_note": "16-24 wk; AI demand has extended CDU lead times.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben40"
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "cooling_units_total",
   "applies_to_cooling": [
@@ -1175,13 +1186,14 @@
   "unit": "per rack",
   "unit_price_usd": 4500.0,
   "price_status": "estimate",
-  "price_source_note": "Engineering estimate: manifolds $2.5-3k + 16 QD hose pairs",
+  "price_source_note": "Engineering estimate: manifolds $2.5-3k + 16 QD hose pairs BEN 2000: one manifold pair per rack.",
   "price_checked": null,
   "lead_time_weeks": 12,
   "availability_note": "10-14 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben40"
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks",
   "applies_to_cooling": [
@@ -1204,8 +1216,8 @@
   "availability_note": "12-18 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(it_kw*1.15)",
   "applies_to_cooling": [
@@ -1229,8 +1241,8 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m)",
   "applies_to_cooling": [
@@ -1254,8 +1266,9 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "ceil(it_kw*0.8)",
   "applies_to_cooling": [
@@ -1279,8 +1292,8 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20"
+   "ben30",
+   "ben150"
   ],
   "qty_rule": "cooling_units_total",
   "applies_to_cooling": [
@@ -1304,7 +1317,8 @@
   "availability_note": "Allocation-dependent; 8-16 wk. Configure via reseller quote.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben40"
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "floor(it_kw*0.75/10.2)"
  },
@@ -1324,8 +1338,8 @@
   "availability_note": "Build-to-order 3-6 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20"
+   "ben30",
+   "ben150"
   ],
   "qty_rule": "floor(it_kw*0.7/4)"
  },
@@ -1345,10 +1359,11 @@
   "availability_note": "Build-to-order 2-4 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "max(2, racks)"
  },
@@ -1368,15 +1383,16 @@
   "availability_note": "Secondary-market stock; new via reseller quote.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "min(2, ceil(racks/3))"
+  "qty_rule": "min(2, ceil(racks/3)) if racks <= 12 else ceil(racks/4)"
  },
  {
   "code": "CMP-SW10G",
-  "name": "Top-of-rack 10 GbE aggregation switch (Micro)",
+  "name": "Top-of-rack 10 GbE aggregation switch (BEN 5)",
   "manufacturer": "Ubiquiti",
   "mpn": "USW-Pro-Aggregation",
   "vendor": "Ubiquiti store",
@@ -1390,7 +1406,7 @@
   "availability_note": "Stock usually.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -1410,9 +1426,10 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks*4"
  },
@@ -1476,10 +1493,11 @@
   "availability_note": "First article 8 wk after Gerbers; production 4 wk. 1,000 pcs module RFQ queued (email 13).",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "lite",
@@ -1525,10 +1543,11 @@
   "availability_note": "ICS50 bases ship in ~5 wk from Phoenix; Hammond in stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "lite",
@@ -1552,10 +1571,11 @@
   "availability_note": "OEM string 6 wk; Omega singles in stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "lite",
@@ -1565,7 +1585,7 @@
  },
  {
   "code": "CTL-RCP",
-  "name": "xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 20/40",
+  "name": "xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 150/40",
   "manufacturer": "Silicon Labs",
   "mpn": "XG24-EK2703A",
   "vendor": "Silicon Labs / DigiKey",
@@ -1579,16 +1599,17 @@
   "availability_note": "Stock. Production RCP is the same MGM240P on a USB stick PCB from the Pod CM (later).",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "lite",
    "pro"
   ],
-  "qty_rule": "2 if racks >= 3 else 1"
+  "qty_rule": "modules + 1 if modules > 1 else (2 if racks >= 3 else 1)"
  },
  {
   "code": "CTL-RS485",
@@ -1606,10 +1627,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "lite",
@@ -1633,10 +1655,11 @@
   "availability_note": "Stock (5,671 pcs at Buerklin).",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "lite",
@@ -1660,10 +1683,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "lite",
@@ -1684,17 +1708,18 @@
   "price_source_note": "TTI Americas $1,034.59 (1), $1,086.32, 5 in stock seen 2026-11-08 via FindChips; RS UK GBP 851.13; Buerklin EUR 928.90 (0 stock); Elektromax24 EUR 611.10 net",
   "price_checked": "2026-11-08",
   "lead_time_weeks": 3,
-  "availability_note": "Constrained; order with the 10-unit panel run (email 17). Alternates Beckhoff CX9240, WAGO PFC200.",
+  "availability_note": "Constrained; order with the 10-unit panel run (email 17). Alternates Beckhoff CX9240, WAGO PFC200. BEN 2000: one PLC per module plus the plant PLC in the BEN Controls Pro panel.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1 if modules <= 1 else modules + 1"
  },
  {
   "code": "CTL-IO-DIO",
@@ -1712,14 +1737,15 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1 if racks <= 2 else 2"
+  "qty_rule": "1 if racks <= 2 else max(2, ceil(racks/12))"
  },
  {
   "code": "CTL-IO-RTD",
@@ -1737,14 +1763,15 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1 if modules <= 1 else modules"
  },
  {
   "code": "CTL-IO-AI",
@@ -1762,14 +1789,15 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1 if racks <= 6 else 2"
+  "qty_rule": "1 if racks <= 6 else ceil(racks/6)"
  },
  {
   "code": "CTL-PSU-ORING",
@@ -1787,9 +1815,10 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
@@ -1812,9 +1841,10 @@
   "availability_note": "Stock; FM (remote contact) variant 2838199 +~10 %.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
@@ -1837,9 +1867,10 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
@@ -1862,14 +1893,15 @@
   "availability_note": "Built to order 3-4 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "2 if modules > 1 else 1"
  },
  {
   "code": "CTL-PANEL",
@@ -1887,9 +1919,10 @@
   "availability_note": "Stock. Includes back panel.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
@@ -1912,9 +1945,10 @@
   "availability_note": "Partner selection via email 17.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
@@ -1937,14 +1971,15 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "max(1, rows) if modules > 1 else 1"
  },
  {
   "code": "CTL-DWYER-MS2",
@@ -1983,14 +2018,15 @@
   "availability_note": "Configure to order.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "max(1, modules)"
  },
  {
   "code": "CTL-LEAK-CTRL",
@@ -2008,14 +2044,15 @@
   "availability_note": "Available to order. Needs isolated 24 VDC (from CTL-PSU-QUINT).",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "max(1, modules)"
  },
  {
   "code": "CTL-REVPI",
@@ -2033,8 +2070,8 @@
   "availability_note": "Stock at RS. RevPi Connect 5 is the successor if lead times slip.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10"
+   "ben5",
+   "ben30"
   ],
   "applies_to_controls": [
    "lite"
@@ -2057,8 +2094,8 @@
   "availability_note": "Stock at distributors.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10"
+   "ben5",
+   "ben30"
   ],
   "applies_to_controls": [
    "lite"
@@ -2081,8 +2118,8 @@
   "availability_note": "Spotty stock; order early.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10"
+   "ben5",
+   "ben30"
   ],
   "applies_to_controls": [
    "lite"
@@ -2105,8 +2142,8 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10"
+   "ben5",
+   "ben30"
   ],
   "applies_to_controls": [
    "lite"
@@ -2151,10 +2188,11 @@
   "availability_note": "Stock 310 pcs.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "2",
   "applies_to_controls": [
@@ -2222,12 +2260,13 @@
   "availability_note": "Stock.",
   "moq": 10,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "10 if racks <= 6 else 20",
+  "qty_rule": "10 if racks <= 6 else (20 if racks <= 12 else 40)",
   "applies_to_controls": [
    "lite",
    "pro"
@@ -2249,12 +2288,13 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "max(1, ceil(tier_len_m*2/15.24))",
+  "qty_rule": "max(1, ceil(tier_len_m*2*rows/15.24))",
   "applies_to_controls": [
    "lite",
    "pro"
@@ -2276,10 +2316,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1",
   "applies_to_controls": [
@@ -2303,10 +2344,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks+2",
   "applies_to_controls": [
@@ -2330,8 +2372,8 @@
   "availability_note": "Low stock; alternates Hammond 1554/Polycase.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10"
+   "ben5",
+   "ben30"
   ],
   "qty_rule": "1",
   "applies_to_controls": [
@@ -2354,12 +2396,13 @@
   "availability_note": "Stock.",
   "moq": 50,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "100 if racks <= 2 else 200",
+  "qty_rule": "100 if racks <= 2 else (200 if racks <= 12 else 600)",
   "applies_to_controls": [
    "lite",
    "pro"
@@ -2447,10 +2490,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks*4+6",
   "applies_to_controls": [
@@ -2474,10 +2518,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "ceil(racks/8)",
   "applies_to_controls": [
@@ -2501,10 +2546,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1",
   "applies_to_controls": [
@@ -2528,15 +2574,15 @@
   "availability_note": "6-10 wk after design approval.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m*2.2*2.55)"
  },
  {
   "code": "FS-AEROSOL",
-  "name": "Condensed aerosol fire suppression unit for Micro cabinet (no piping)",
+  "name": "Condensed aerosol fire suppression unit for BEN 5 cabinet (no piping)",
   "manufacturer": "Fireaway Stat-X / FirePro",
   "mpn": "Stat-X 250E",
   "vendor": "fire distributor",
@@ -2544,13 +2590,13 @@
   "unit": "ea",
   "unit_price_usd": 900.0,
   "price_status": "estimate",
-  "price_source_note": "Not priced this session; typical $600-1,100 per 250 g unit. Micro uses aerosol instead of clean-agent pipework (decision in notes).",
+  "price_source_note": "Not priced this session; typical $600-1,100 per 250 g unit. BEN 5 uses aerosol instead of clean-agent pipework (decision in notes).",
   "price_checked": null,
   "lead_time_weeks": 3,
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -2570,10 +2616,11 @@
   "availability_note": "Stock. Pre-engineered FS systems may supply their own detectors; reconcile at quote.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "2+ceil(tier_len_m/6)"
  },
@@ -2593,8 +2640,8 @@
   "availability_note": "Stock at distributors.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben20",
-   "ben40"
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -2614,15 +2661,16 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "1"
+  "qty_rule": "max(1, modules)"
  },
  {
   "code": "FS-EPO-MICRO",
-  "name": "Mushroom-head E-stop station, NEMA 4X, with lift cover (Micro EPO)",
+  "name": "Mushroom-head E-stop station, NEMA 4X, with lift cover (BEN 5 EPO)",
   "manufacturer": "Schneider / IDEC",
   "mpn": "XALK178E",
   "vendor": "Grainger",
@@ -2636,7 +2684,7 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -2656,10 +2704,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1+ceil(tier_len_m/7)"
  },
@@ -2679,10 +2728,11 @@
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1"
  },
@@ -2702,10 +2752,10 @@
   "availability_note": "Regional; +/-40% by market.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil((tier_len_m+1.2)*3.64*10.76)"
  },
@@ -2725,15 +2775,15 @@
   "availability_note": "Book 1-2 wk ahead.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
  {
   "code": "SITE-FORKLIFT",
-  "name": "Forklift / tilt-bed delivery and set for Micro skid",
+  "name": "Forklift / tilt-bed delivery and set for BEN 5 skid",
   "manufacturer": "local",
   "mpn": "FORK-5T",
   "vendor": "local",
@@ -2747,7 +2797,7 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -2767,15 +2817,15 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
  {
   "code": "SITE-FREIGHT-MICRO",
-  "name": "LTL/flatbed freight of Micro unit",
+  "name": "LTL/flatbed freight of BEN 5 unit",
   "manufacturer": "regional carrier",
   "mpn": "LTL-SKID",
   "vendor": "local",
@@ -2789,7 +2839,7 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -2809,10 +2859,10 @@
   "availability_note": "Utility lead time 6-20 wk is the critical path.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "service_breaker_a"
  },
@@ -2832,10 +2882,11 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1"
  },
@@ -2855,10 +2906,11 @@
   "availability_note": "Carrier dependent.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1"
  },
@@ -2878,10 +2930,10 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -2901,10 +2953,10 @@
   "availability_note": "Only when generator option selected.",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "generator"
  },
@@ -2924,10 +2976,10 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m*4)+4"
  },
@@ -2947,9 +2999,9 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "3+cooling_units_total"
  },
@@ -2969,10 +3021,11 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "ceil(40+racks*8+service_breaker_a/10)"
  },
@@ -2992,10 +3045,11 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "ceil(cooling_units_total*8+it_kw/10)"
  },
@@ -3015,9 +3069,9 @@
   "availability_note": "Needed if unit will move by sea/rail after fit-out.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -3037,10 +3091,11 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks+cooling_units_total+ups_modules"
  },
@@ -3060,12 +3115,13 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
-  "qty_rule": "16+racks*4"
+  "qty_rule": "16 + racks*4 + 40*(modules-1)"
  },
  {
   "code": "SVC-PE",
@@ -3083,10 +3139,10 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -3106,9 +3162,9 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m*2/3)"
  },
@@ -3128,9 +3184,9 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m/3)*2"
  },
@@ -3150,9 +3206,10 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks*2"
  },
@@ -3172,9 +3229,9 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "2"
  },
@@ -3194,9 +3251,9 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "ceil(tier_len_m*2.2)"
  },
@@ -3216,9 +3273,9 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "cooling_units_total+2"
  },
@@ -3238,10 +3295,11 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "1"
  },
@@ -3261,15 +3319,15 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
  {
   "code": "ENV-MICRO-HEATER",
-  "name": "Anti-condensation heater 100 W with thermostat + replacement IP55 door gasket (Micro cabinet)",
+  "name": "Anti-condensation heater 100 W with thermostat + replacement IP55 door gasket (BEN 5 cabinet)",
   "manufacturer": "Stego/various",
   "mpn": "STEGO-100W",
   "vendor": "TBD",
@@ -3283,7 +3341,7 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro"
+   "ben5"
   ],
   "qty_rule": "1"
  },
@@ -3303,16 +3361,17 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
   ],
   "qty_rule": "racks*4"
  },
  {
   "code": "PWR-UPS-RM20",
-  "name": "Rack/tower online UPS 20 kVA 208 V, 10U, parallel-capable (BEN 10 R1, 3 x in parallel for N+1; 93PM tower does not fit the row)",
+  "name": "Rack/tower online UPS 20 kVA 208 V, 10U, parallel-capable (BEN 30 R1, 3 x in parallel for N+1; 93PM tower does not fit the row)",
   "manufacturer": "Vertiv",
   "mpn": "GXT5-20KMVRT11UXLN",
   "vendor": "TBD",
@@ -3320,13 +3379,13 @@
   "unit": "ea",
   "unit_price_usd": 9500.0,
   "price_status": "estimate",
-  "price_source_note": "Engineering estimate from list-price range $8-11k; see design/drawings/ben10/INDEX.md I-C21",
+  "price_source_note": "Engineering estimate from list-price range $8-11k; see design/drawings/ben30/INDEX.md I-C21",
   "price_checked": null,
   "lead_time_weeks": 6,
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10"
+   "ben30"
   ],
   "qty_rule": "ceil(ups_kva_each/20)+1"
  },
@@ -3346,29 +3405,29 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10"
+   "ben30"
   ],
   "qty_rule": "max(1, ceil(battery_kwh/6))"
  },
  {
   "code": "PWR-SVC-ENCL",
-  "name": "NEMA 3R service-section enclosure, wall-mount on blind end, houses main breaker + SPD + ATS, with EPO station",
+  "name": "NEMA 4X service-section enclosure, wall-mount on blind end, houses main breaker + SPD + ATS, with EPO station",
   "manufacturer": "Hoffman/various",
   "mpn": "A72H6024SSLP3PT",
   "vendor": "TBD",
   "vendor_url": "",
   "unit": "ea",
-  "unit_price_usd": 1800.0,
+  "unit_price_usd": 2300.0,
   "price_status": "estimate",
-  "price_source_note": "Engineering estimate: NEMA 3R enclosure 72x60x24 in + back panel",
+  "price_source_note": "Engineering estimate: NEMA 3R enclosure 72x60x24 in + back panel. Rating changed from NEMA 3R to NEMA 4X (docs/TIER_AND_ENCLOSURE_DECISION.md §3); estimate carries the 4X uplift.",
   "price_checked": null,
   "lead_time_weeks": 4,
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -3388,10 +3447,10 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "racks*2"
  },
@@ -3411,10 +3470,10 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500"
   ],
   "qty_rule": "1"
  },
@@ -3434,10 +3493,1227 @@
   "availability_note": "",
   "moq": 1,
   "applies_to_tiers": [
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "max(1, modules)"
+ },
+ {
+  "code": "ENV-SEAL-KIT",
+  "name": "Gasketed cable/pipe penetration frame IP66/IP67, UL 50E Type 4X (Roxtec CF 32 / ComSeal 4X class) with compression modules, per penetration",
+  "manufacturer": "Roxtec",
+  "mpn": "CF 32/32 4X / ComSeal",
+  "vendor": "Rexel / Roxtec distributor",
+  "vendor_url": "https://www.rexelusa.com/p/29902/roxtec/cf32-32-130x/ckt3200000032",
+  "unit": "ea",
+  "unit_price_usd": 350.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $350 per frame incl. modules. Rexel hides the CF 32 price behind sign-in (2026-11-08); RS lists the EzEntry 16/16 polyamide frame at GBP 141.22 (~$185) and the ComSeal IP55 at EUR 308. 4X stainless frames quote-only.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Stock at Rexel/Graybar for CF series; ComSeal 4X 2-4 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "2 if tier_len_m < 2 else 3 + cooling_units_total + modules"
+ },
+ {
+  "code": "ENV-DOORGASKET-4X",
+  "name": "Compression door gasket kit: EPDM sponge D-profile 20 mm on the frame, 3-point compression latch with padlock hasp, drip edge, per door (UL 50E Type 4X)",
+  "manufacturer": "Southco / Trelleborg (gasket), EMKA (latch)",
+  "mpn": "E3 / 1000-series compression latch",
+  "vendor": "Southco distributor",
+  "vendor_url": "https://www.southco.com",
+  "unit": "ea",
+  "unit_price_usd": 180.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $180 per door: compression latch $60-90 (Southco E3 class), 6 m EPDM sponge D-seal $35, drip edge and hardware $40.",
+  "price_checked": null,
+  "lead_time_weeks": 3,
+  "availability_note": "Stock items.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "1 if tier_len_m < 2 else modules + 1 + ceil(tier_len_m/7)"
+ },
+ {
+  "code": "SVC-HOSE-TEST",
+  "name": "Hose test per UL 50E Type 4X / IEC 60529 IPX6 on every penetration and door (12.5 mm nozzle, 100 L/min, 3 m, 3 min per m2) — witnessed, recorded on Q-03",
+  "manufacturer": "Schreiber AI",
+  "mpn": "HOSE-HR",
+  "vendor": "internal",
+  "vendor_url": "",
+  "unit": "h",
+  "unit_price_usd": 95.0,
+  "price_status": "estimate",
+  "price_source_note": "Internal loaded rate; 0.5 h per penetration + 4 h setup and record per unit.",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(4 + 0.5*(2 if tier_len_m < 2 else 3 + cooling_units_total + modules))"
+ },
+ {
+  "code": "ENV-PRESSURE-FAN",
+  "name": "Positive-pressure make-up fan 150 m3/h with ePM10 filter, IP66 weather hood and backdraught damper, per module (keeps the envelope at +10 Pa)",
+  "manufacturer": "Systemair / Rittal",
+  "mpn": "SF-150 class + hood",
+  "vendor": "HVAC distributor",
+  "vendor_url": "https://www.systemair.com",
+  "unit": "ea",
+  "unit_price_usd": 650.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $650: EC fan $280, ePM10 filter box $190, 4X hood + damper $180.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "modules"
+ },
+ {
+  "code": "STR-MODULE-WB",
+  "name": "Wide-body prefabricated data-hall module (one 12.2 m bay = three road sections 12.2 x 3.66 x 4.2 m, site-joined to 12.2 x 11.0 m), factory-finished steel frame, 100 mm PIR sandwich walls/roof, IP66 envelope, 3.6 m clear interior, C3 coating",
+  "manufacturer": "modular building manufacturer (PCX / Whitley / Compass Datacenters-class, RFQ email 19)",
+  "mpn": "WB-12.2-DH",
+  "vendor": "modular building manufacturer",
+  "vendor_url": "https://www.amcompute.com/blog/modular-data-center-cost-per-mw",
+  "unit": "ea",
+  "unit_price_usd": 420000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $420k per bay (3 road sections of 44.7 m2 each, 134 m2 per bay). Basis: factory-built data-center modules trade at $4.4-6.5M per MW all-in (amcompute 2026, inflect, DCD 2025); the shell + envelope + interior finish share is ~12-18 % of a ~$9M 2 MW build => $1.1-1.6M for 3 bays. Heavy steel relocatable modular buildings run $350-600/ft2 factory-finished => 1,440 ft2 per bay = $500-860k list, volume-discounted. Quote-only; RFQ in email 19.",
+  "price_checked": null,
+  "lead_time_weeks": 26,
+  "availability_note": "20-30 wk factory; 3 modules in one production slot.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "modules"
+ },
+ {
+  "code": "STR-MODULE-PWR",
+  "name": "Power module 12.2 x 11.0 x 4.2 m (three road sections), factory-fitted: 480 V switchgear room with 1.5 m working space, UPS room, two lithium battery rooms with 2-hour fire separation (NFPA 855), HVAC, IP66 envelope",
+  "manufacturer": "modular building manufacturer (RFQ email 19)",
+  "mpn": "WB-12.2-PWR",
+  "vendor": "modular building manufacturer",
+  "vendor_url": "https://www.amcompute.com/blog/modular-data-center-cost-per-mw",
+  "unit": "ea",
+  "unit_price_usd": 460000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $460k: wide-body bay as STR-MODULE-WB ($420k) + 2-hour rated partitions, battery-room ventilation/deflagration venting and equipment pads (~$40k). Depth check I-H8 needed three sections (switchgear + 1.5 m working space + UPS row + battery rooms = 9.4 m). Quote-only (email 19).",
+  "price_checked": null,
+  "lead_time_weeks": 26,
+  "availability_note": "20-30 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
   ],
   "qty_rule": "1"
+ },
+ {
+  "code": "STR-MODULE-JOINT",
+  "name": "Module-to-module joint kit: bolted splice plates, two-stage EPDM + butyl gasket, cover flashing, interior liner trim, bonding jumpers (per joint)",
+  "manufacturer": "module manufacturer",
+  "mpn": "WB-JOINT",
+  "vendor": "modular building manufacturer",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 6500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $6,500 per joint (2 x 4.2 m walls + 11 m roof seam): manufacturer-supplied kit, typical for site-joined modular buildings. Qty: 2 longitudinal joints per hall bay + joints between bays + 2 in the power module.",
+  "price_checked": null,
+  "lead_time_weeks": 26,
+  "availability_note": "Ships with the modules.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "modules*2 + (modules - 1) + 2"
+ },
+ {
+  "code": "STR-PLANTYARD",
+  "name": "Plant-yard steel: equipment skids for CDUs/pump skid, pipe rack 30 m, generator and dry-cooler support steel, bollards, galvanised (lot)",
+  "manufacturer": "local steel fabricator",
+  "mpn": "PY-LOT",
+  "vendor": "steel fabricator",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 85000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $85k: ~18 t galvanised structural steel at $4,200/t installed + bollards and grating.",
+  "price_checked": null,
+  "lead_time_weeks": 10,
+  "availability_note": "8-12 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "PWR-BUSWAY",
+  "name": "Overhead track busway 800 A 480 V, 36 m run with end-feed, 12 plug-in tap-off boxes 60 A 3P (one A or B run per row)",
+  "manufacturer": "Starline (Legrand) / Eaton Pow-R-Way",
+  "mpn": "T5 800 A",
+  "vendor": "Starline / electrical distributor",
+  "vendor_url": "https://www.starlinepower.com",
+  "unit": "ea",
+  "unit_price_usd": 42000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $42k per run: 800 A track ~$650/m x 36 m + end feed $6k + 12 tap-offs at $950. Quote-only (email 20).",
+  "price_checked": null,
+  "lead_time_weeks": 12,
+  "availability_note": "10-14 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "rows*2"
+ },
+ {
+  "code": "PWR-PDU-HD",
+  "name": "Rack PDU 0U 3-phase 415 V 60 A (34.6 kW), metered by outlet, 42 x C13/C19, Modbus/SNMP (A and B per rack, BEN 2000 high-density rows)",
+  "manufacturer": "Schneider APC / Vertiv Geist",
+  "mpn": "APDU10350ME class",
+  "vendor": "CDW / electrical distributor",
+  "vendor_url": "https://www.cdw.com",
+  "unit": "ea",
+  "unit_price_usd": 2400.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $2,400: 415 V 60 A metered-by-outlet PDUs list $2,100-2,900 (APC NetShelter 9000 / Geist). Not priced this session.",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "4-8 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "racks*2"
+ },
+ {
+  "code": "PWR-XFMR-ROW",
+  "name": "Dry-type transformer 480 D - 415Y/240 V, 300 kVA, K-13, Cu, for the row busways (one per busway run)",
+  "manufacturer": "Eaton / Schneider / Hammond",
+  "mpn": "V48M28T300",
+  "vendor": "electrical distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 19000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $19k: 300 kVA K-13 Cu dry-type list $17-22k (2026 copper).",
+  "price_checked": null,
+  "lead_time_weeks": 12,
+  "availability_note": "10-14 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "rows*2"
+ },
+ {
+  "code": "PWR-MV-SWGR",
+  "name": "Pad-mounted 15 kV class switchgear, 600 A, 4-way (2 source ways + 2 fault-interrupter transformer ways), SF6-free, dead-front (S&C Vista / Eaton VFI class)",
+  "manufacturer": "S&C Electric / Eaton Cooper Power",
+  "mpn": "Vista 15 kV 4-way (or VFI)",
+  "vendor": "S&C / Eaton distributor (RFQ email 20)",
+  "vendor_url": "https://www.sandc.com/vista-guide21",
+  "unit": "ea",
+  "unit_price_usd": 185000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $185k installed on pad. No public price (S&C, Eaton quote-only, 2026-11-08); campus-distribution guides rank Vista/PMH-class gear 'high cost'; utility bid tabs for 4-way 15 kV fault-interrupter gear fall in $120-220k.",
+  "price_checked": null,
+  "lead_time_weeks": 40,
+  "availability_note": "32-52 wk (2026 MV gear lead times).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "PWR-MV-XFMR-2500",
+  "name": "Pad-mount transformer 2,500 kVA, 12.47 kV delta (or 13.8 kV) - 480Y/277 V, FR3 natural ester, dead-front loop feed, bayonet fuses, taps (2N pair)",
+  "manufacturer": "Prolec GE / Eaton Cooper / ABB-Hitachi",
+  "mpn": "PM-2500-12.47-480Y",
+  "vendor": "transformer distributor (RFQ email 20)",
+  "vendor_url": "https://surplusrecord.com/listing/2500-kva-prolec-ge-pad-mount-transformer-26-4-kv-480y-277v-2024-new-surplus-1159068/",
+  "unit": "ea",
+  "unit_price_usd": 98000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $98k new. Surplus Record shows a 2024 new-surplus Prolec GE 2,500 kVA (26.4 kV primary, 480Y) asking $89,500 (seen 2026-11-08); 12.47 kV units from Core Transformers / Maddox / High To Low Voltage are quote-only. New factory units ~$85-110k; qty = transformers_total (2N).",
+  "price_checked": null,
+  "lead_time_weeks": 48,
+  "availability_note": "40-60 wk new (2026); surplus/reconditioned 2-8 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "transformers_total"
+ },
+ {
+  "code": "PWR-LV-SWGR-4000",
+  "name": "480 V low-voltage switchgear 4,000 A UL 1558, drawout power circuit breakers, main-tie-main ready, 6 feeder breakers, arc-resistant option, one lineup per transformer (A / B)",
+  "manufacturer": "Eaton Magnum / Schneider MasterPact / Vertiv Powerboard",
+  "mpn": "Magnum DS 4000 A",
+  "vendor": "switchgear manufacturer (RFQ email 20)",
+  "vendor_url": "https://vertiv.com/49ffbc/globalassets/products/critical-power/switchgear/vertiv-ei-powerboard-1558/vertiv-ul1558-switchgear-brochure-sl-70900.pdf",
+  "unit": "ea",
+  "unit_price_usd": 310000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $310k per lineup. No public price (2026-11-08); an Eaton cost-of-ownership paper priced a 3,000 A breaker lineup at $47.5k (dated); current UL 1558 4,000 A drawout lineups with 6 feeders quote $250-380k. Working space NEC 110.26 cond. 3: 1.2 m min, 1.5 m drawn, two exits.",
+  "price_checked": null,
+  "lead_time_weeks": 44,
+  "availability_note": "36-52 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "max(1, transformers_total)"
+ },
+ {
+  "code": "PWR-UPS-GVL500",
+  "name": "Galaxy VL UPS 500 kVA/kW 480 V frame, N+1 internal power modules, parallel-capable (4 frames per 2,000 kW string; 2 strings for 2N)",
+  "manufacturer": "Schneider Electric",
+  "mpn": "GVL500KDS",
+  "vendor": "CDW",
+  "vendor_url": "https://www.cdw.com/product/apc-by-schneider-electric-galaxy-vl-500kva-modular-ups/8228997",
+  "unit": "ea",
+  "unit_price_usd": 88073.99,
+  "price_status": "confirmed",
+  "price_source_note": "CDW $88,073.99 (incl. 5x8 start-up) seen 2026-11-08. Alternatives Vertiv Liebert EXL S1 1,200 kW and Eaton Power Xpert 9395 1,100 kW are quote-only (email 20). Qty = ups_modules x ceil(ups_kva_each/500).",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 20,
+  "availability_note": "Configured-to-order; 16-24 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "ups_modules * ceil(ups_kva_each/500)"
+ },
+ {
+  "code": "PWR-UPS-PARALLEL",
+  "name": "UPS parallel system cabinet with system bypass and output switchgear for one 2,000 kW string (4 x 500 kW frames)",
+  "manufacturer": "Schneider Electric",
+  "mpn": "Galaxy VL parallel/MBP cabinet",
+  "vendor": "Schneider / CDW",
+  "vendor_url": "https://www.cdw.com",
+  "unit": "ea",
+  "unit_price_usd": 65000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $65k per string: parallel cabinet + maintenance bypass for 4 frames (quote-only, email 20).",
+  "price_checked": null,
+  "lead_time_weeks": 20,
+  "availability_note": "With the UPS order.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "ups_modules"
+ },
+ {
+  "code": "PWR-BATT-ROOM",
+  "name": "Lithium (LFP) UPS battery cabinets for the 2,000 kW strings, UL 9540 / UL 9540A, in two battery rooms with 2-hour separation (NFPA 855), per kWh installed",
+  "manufacturer": "Schneider Galaxy Li-Ion / Vertiv EnergyCore / Samsung SDI",
+  "mpn": "Li-ion cabinet string",
+  "vendor": "UPS manufacturer (RFQ email 20)",
+  "vendor_url": "https://www.vertiv.com/en-us/products-catalog/critical-power/uninterruptible-power-supplies-ups/vertiv-energycore-lithium-ion-battery-cabinet",
+  "unit": "kWh",
+  "unit_price_usd": 900.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $900/kWh installed for UPS-grade LFP cabinets with BMS and UL 9540A file (small cabinet PWR-BATT-LI is $1,694/kWh; LFP cells $50-70/kWh ex-works 2025 per Fastmarkets; large strings $700-1,100/kWh). Qty = battery_kwh per string x ups_modules (2N). NFPA 855: each room <= 600 kWh per group or UL 9540A large-scale fire test; 2-hour separation between rooms.",
+  "price_checked": null,
+  "lead_time_weeks": 24,
+  "availability_note": "20-30 wk; cell supply dependent.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "ceil(battery_kwh) * ups_modules"
+ },
+ {
+  "code": "PWR-GEN-1250",
+  "name": "Diesel standby generator 1,250 kW / 1,562 kVA 480 V, EPA Tier 2 stationary emergency, Level 2 sound-attenuated enclosure, 24 h sub-base tank, paralleling-ready controls (N+1 set)",
+  "manufacturer": "Caterpillar / Cummins / Kohler",
+  "mpn": "CAT D1250 GC / Cummins QSK50-DQGAA",
+  "vendor": "Cat / Cummins dealer (RFQ email 20)",
+  "vendor_url": "https://www.cat.com/en_ID/products/new/power-systems/electric-power/diesel-generator-sets/114082.html",
+  "unit": "ea",
+  "unit_price_usd": 620000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $620k (~$495/kW) with enclosure and tank. Dealer-quote only (Cat 'request a price' 2026-11-08); a 1991 Cat XQ1250 used asked $445k on Surplus Record. New 1,250 kW sets quote $520-700k in 2025-26. Qty = generators_total (N+1).",
+  "price_checked": null,
+  "lead_time_weeks": 52,
+  "availability_note": "40-60 wk (2026 genset backlog).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "generators_total"
+ },
+ {
+  "code": "PWR-GEN-PARALLEL",
+  "name": "Generator paralleling switchgear 480 V 4,000 A with load-share controls, utility-paralleling (closed transition) and load-shed, outdoor walk-in or in the power module",
+  "manufacturer": "ASCO / Eaton / Russelectric",
+  "mpn": "ASCO 7000 series paralleling",
+  "vendor": "ASCO dealer (RFQ email 20)",
+  "vendor_url": "https://www.ascopower.com",
+  "unit": "ea",
+  "unit_price_usd": 280000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $280k: 3-generator paralleling lineup with master controls, 2025-26 quotes $220-350k.",
+  "price_checked": null,
+  "lead_time_weeks": 44,
+  "availability_note": "36-52 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1 if generators_total > 0 else 0"
+ },
+ {
+  "code": "PWR-FUEL-48H",
+  "name": "Bulk diesel storage 10,000 gal (38 m3) UL 2085 protected above-ground tank, fuel polishing, day-tank transfer pumps, SPCC plan (48 h at N load)",
+  "manufacturer": "ConVault / Containment Solutions",
+  "mpn": "UL 2085 10,000 gal",
+  "vendor": "fuel system contractor",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 145000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $145k: 10,000 gal UL 2085 tank $85-100k + pumps, polishing, piping and SPCC $45-60k. Fuel burn: 2 x 1,250 kW at 75 % ~ 170 gal/h => 8,200 gal / 48 h.",
+  "price_checked": null,
+  "lead_time_weeks": 16,
+  "availability_note": "12-20 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1 if generators_total > 0 else 0"
+ },
+ {
+  "code": "CLG-FANWALL",
+  "name": "Fan-wall air handler 200 kW class on the hall long wall, chilled/glycol coil, EC fan array N+1, ePM1 filters, for residual air-side heat (one per module + 1)",
+  "manufacturer": "Vertiv CoolLoop Thermal Wall / Mitsubishi CVWALL / Carrier",
+  "mpn": "Thermal Wall 200 kW",
+  "vendor": "Vertiv / Mitsubishi (RFQ email 05/07)",
+  "vendor_url": "https://www.vertiv.com/en-us/products-catalog/thermal-management/room-cooling/vertiv-coolloop-thermal-wall-from-350-to-500-kw/",
+  "unit": "ea",
+  "unit_price_usd": 95000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $95k (~$475/kW of air-side capacity). Vendors state 'low cost per kW' but publish no price (2026-11-08); chilled-water fan walls quote $400-600/kW.",
+  "price_checked": null,
+  "lead_time_weeks": 20,
+  "availability_note": "16-24 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "modules + 1"
+ },
+ {
+  "code": "CLG-ADIABATIC",
+  "name": "Adiabatic dry cooler bank, V-type, EC fans, glycol, wetted pre-cooling pads with water-free mode, outdoor plant yard, per kW of heat rejection at design ambient",
+  "manufacturer": "Guntner / Alfa Laval / EVAPCO / BAC",
+  "mpn": "Guntner ADC V-shape",
+  "vendor": "Guntner / Alfa Laval (RFQ email 07)",
+  "vendor_url": "https://guntner.com/en-us/our-impact/blog/planning-for-adiabatic-cooling-in-data-centers",
+  "unit": "kW",
+  "unit_price_usd": 140.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $140/kW: plain dry coolers $100-150k per MW (secondary source 2026-11-08); adiabatic pads, water treatment and controls add ~25-40 %. Qty = ceil(total_kw x 1.1).",
+  "price_checked": null,
+  "lead_time_weeks": 20,
+  "availability_note": "16-24 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "ceil(total_kw*1.1)"
+ },
+ {
+  "code": "CLG-PIPING-HALL",
+  "name": "Plant piping: primary glycol loop DN200 to the dry coolers, secondary DN150 headers to the CDU rows, N+1 pump skid with VFDs, expansion, air separation, chemical treatment, insulation and heat trace (lot)",
+  "manufacturer": "mechanical contractor",
+  "mpn": "PIPE-LOT",
+  "vendor": "mechanical contractor",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 420000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $420k: ~180 m DN150/200 welded steel insulated at $900/m + pump skid 2 x 75 kW $140k + accessories $60k + labour.",
+  "price_checked": null,
+  "lead_time_weeks": 14,
+  "availability_note": "12-16 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "FS-CLEAN-AGENT-HALL",
+  "name": "Pre-engineered FK-5-1-12 clean agent per module zone + power module: cylinders, nozzles, releasing panels, cross-zoned detection, design and AHJ submittal, installed, per m3 protected",
+  "manufacturer": "Fike / Kidde (via licensed fire contractor)",
+  "mpn": "ECS-500 / Fike CA",
+  "vendor": "licensed fire contractor (RFQ email 11)",
+  "vendor_url": "https://kidde.com/fire-suppression/en/uk/media/ECS-Novec-1230-Clean-Agent-Fire-Extinguishing-System_tcm1137-190027.pdf",
+  "unit": "m3 protected",
+  "unit_price_usd": 420.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $420/m3 installed at hall volume (vs $550/m3 for small rooms): agent 40.8 lb per 1,000 ft3 at 4.5 %, agent $12-20/lb, cylinder hardware shared per zone. Volume = int_volume_m3 of the hall + 160 m3 power module.",
+  "price_checked": null,
+  "lead_time_weeks": 10,
+  "availability_note": "8-12 wk after design approval.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "ceil(int_volume_m3 + 160)"
+ },
+ {
+  "code": "FS-VESDA-HALL",
+  "name": "VESDA-E VEU aspirating smoke detector, UL, one per module zone + power module",
+  "manufacturer": "Xtralis (Honeywell)",
+  "mpn": "VEU-A00",
+  "vendor": "fire distributor",
+  "vendor_url": "https://www.firesupplydepot.com/xtralis-veu-a00",
+  "unit": "ea",
+  "unit_price_usd": 6754.35,
+  "price_status": "confirmed",
+  "price_source_note": "Same listing as FS-VESDA ($6,754.35 seen 2026-11-07); qty = modules + 1.",
+  "price_checked": "2026-11-07",
+  "lead_time_weeks": 6,
+  "availability_note": "Stock to 6 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "modules + 1"
+ },
+ {
+  "code": "FS-PREACTION",
+  "name": "Pre-action (double-interlock) sprinkler system for the hall, option per AHJ: riser, valve trim, piping, heads, air compressor, releasing panel, per m2 of floor",
+  "manufacturer": "Viking / Tyco (via fire contractor)",
+  "mpn": "pre-action riser",
+  "vendor": "licensed fire contractor",
+  "vendor_url": "",
+  "unit": "m2",
+  "unit_price_usd": 75.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $75/m2 installed (US pre-action systems $6-9/ft2). OPTION: delete when the AHJ accepts clean agent only.",
+  "price_checked": null,
+  "lead_time_weeks": 12,
+  "availability_note": "10-14 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "ceil(footprint_m2)"
+ },
+ {
+  "code": "SITE-SLAB",
+  "name": "Slab on grade 200 mm with grade beams under module rails, 35 MPa, double-mat #4 rebar, vapour barrier, compacted base; hall + power module + plant-yard pads, per m2",
+  "manufacturer": "local concrete contractor",
+  "mpn": "SLAB-200",
+  "vendor": "civil contractor (RFQ email 15)",
+  "vendor_url": "https://concreteslabcost-d2e.pages.dev/8-inch-concrete-slab-cost/",
+  "unit": "m2",
+  "unit_price_usd": 140.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $140/m2 ($13/ft2): 8 in double-mat slab $9.50/ft2 national (2026 guide, x1.25-1.40 in high-cost regions) + grade beams and thickened edges ~$3/ft2. Qty = hall footprint x 1.35 + 450 m2 power module/yard pads.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "6-8 wk incl. cure.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "ceil(footprint_m2*1.35 + 450)"
+ },
+ {
+  "code": "SITE-MV-INTERCONNECT",
+  "name": "MV utility interconnect allowance: primary metering, 12.47 kV riser/ductbank 150 m, utility contribution-in-aid, protection study and witness test",
+  "manufacturer": "utility + MV contractor",
+  "mpn": "MV-IC",
+  "vendor": "utility / MV contractor (RFQ email 15/20)",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 350000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $350k regional allowance (+/-50 %): ductbank $1,200/m x 150 m + primary metering $60k + utility CIAC $100-200k. Utility lead time is the critical path (26-78 wk).",
+  "price_checked": null,
+  "lead_time_weeks": 52,
+  "availability_note": "Utility-dependent.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "SITE-CRANE-HALL",
+  "name": "Mobile crane 100-130 t with operator and rigging crew, 4 days: set 9 hall sections + 3 power module sections, CDUs and dry coolers",
+  "manufacturer": "crane hire",
+  "mpn": "CRANE-3D",
+  "vendor": "crane hire",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 36000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $36k: 100 t AT crane $6-8k/day x 4 + rigging crew + mobilisation.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "SITE-FREIGHT-WB",
+  "name": "Oversize permitted flatbed/lowboy transport of a 12.2 x 3.66 x 4.2 m road section, escorts, ~500 km (per section: 3 per hall bay + 3 power module)",
+  "manufacturer": "heavy haul carrier",
+  "mpn": "OS-WB",
+  "vendor": "heavy haul carrier",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 9500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $9,500 per load: wide/high load permits and escorts; distance-dependent (+/-40 %).",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "modules*3 + 3"
+ },
+ {
+  "code": "SITE-PERMIT-HALL",
+  "name": "Building, electrical, fire and site permits, plan review, special inspections, certificate of occupancy for a Group B/F-1 modular building",
+  "manufacturer": "AHJ",
+  "mpn": "PERMIT-BLDG",
+  "vendor": "AHJ / expediter",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 45000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $45k: plan check and permit fees ~1-1.5 % of construction value + special inspections.",
+  "price_checked": null,
+  "lead_time_weeks": 12,
+  "availability_note": "AHJ-dependent.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "SVC-AE-HALL",
+  "name": "Architect / engineer of record package: civil, structural (module foundations, wind/seismic), MEP, fire protection, MV one-line, arc-flash and coordination study, PE stamps",
+  "manufacturer": "A/E firm",
+  "mpn": "AE-SET",
+  "vendor": "A/E firm",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 180000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $180k (~2 % of a $9M build); replaces SVC-PE for the hall.",
+  "price_checked": null,
+  "lead_time_weeks": 12,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "SVC-MODULE-SET",
+  "name": "Module set, alignment, joint sealing and continuity: 4 workers x 5 days + manufacturer field technician",
+  "manufacturer": "modular building manufacturer / rigging crew",
+  "mpn": "SET-LOT",
+  "vendor": "modular building manufacturer",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 28000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $28k: 160 labour hours at $110 + manufacturer technician 5 days.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "SVC-MV-COMMISSION",
+  "name": "MV/LV commissioning: transformer and switchgear acceptance tests (NETA ATS), relay settings, UPS and generator start-up, integrated systems test (pull-the-plug)",
+  "manufacturer": "NETA testing firm + OEM start-up",
+  "mpn": "CX-LOT",
+  "vendor": "NETA firm",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 95000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $95k: NETA testing $45k + OEM start-up $30k + IST $20k.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "STR-FLOOD-PLINTH",
+  "name": "Flood plinth 600 mm: hot-dip galvanised steel frame with cross-bracing, grating step and sealed service risers, per m of enclosure perimeter (H2 severe environment)",
+  "manufacturer": "local steel fabricator",
+  "mpn": "PLINTH-600",
+  "vendor": "steel fabricator",
+  "vendor_url": "",
+  "unit": "m",
+  "unit_price_usd": 420.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $420/m: 600 mm galvanised frame ~55 kg/m at $4.2/kg fabricated + anchors and grating step.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "6-8 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(2*(tier_len_m + footprint_m2/tier_len_m))",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "ENV-C5M-COATING",
+  "name": "Coating uplift ISO 12944 C5-M (zinc-rich epoxy primer + epoxy MIO + polyurethane topcoat, 320 um) over the C3 base, per m2 of envelope (H2)",
+  "manufacturer": "Hempel / Jotun / Sherwin-Williams (applicator)",
+  "mpn": "C5-M system",
+  "vendor": "coating applicator",
+  "vendor_url": "",
+  "unit": "m2",
+  "unit_price_usd": 38.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $38/m2 uplift: C5-M three-coat systems $55-75/m2 applied vs C3 $20-30/m2.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(envelope_area_m2)",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "ENV-EPM1-FILTER",
+  "name": "Sand/dust filtration: ISO 16890 ePM1 65 % filter bank with IP66 weather hood and sand-trap louvre on each air intake (H2)",
+  "manufacturer": "Camfil / AAF",
+  "mpn": "ePM1 bank + hood",
+  "vendor": "filter distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1450.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,450 per intake: sand-trap louvre $600, ePM1 bank and housing $650, hood $200.",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "max(2, modules*2)",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-HURRICANE-HW",
+  "name": "Hurricane-rated door hardware: FBC HVHZ / Miami-Dade NOA listed multipoint latch, hinges and impact-rated leaf reinforcement, per door (H2, 67 m/s)",
+  "manufacturer": "Hager / ASSA ABLOY Ceco",
+  "mpn": "HVHZ door kit",
+  "vendor": "door hardware distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1350.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,350 per door: NOA-listed multipoint hardware $700-900 + reinforcement.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "1 if tier_len_m < 2 else modules + 1 + ceil(tier_len_m/7)",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-SNOWGUARD",
+  "name": "Roof snow guards (pad-style, rail) with ice-dam heat trace at the eave, per m of eave (H2, 3 kPa snow)",
+  "manufacturer": "S-5! / Alpine SnowGuards",
+  "mpn": "S-5 ColorGard",
+  "vendor": "roofing distributor",
+  "vendor_url": "",
+  "unit": "m",
+  "unit_price_usd": 65.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $65/m: rail-type snow guard $35/m + heat trace $30/m.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(tier_len_m*2)",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-SS-FASTENERS",
+  "name": "Stainless steel A4 (316) fastener and bracket kit replacing zinc-flake hardware, with isolation washers, per m of enclosure length (H2)",
+  "manufacturer": "Bossard / McMaster",
+  "mpn": "A4-316 kit",
+  "vendor": "fastener distributor",
+  "vendor_url": "",
+  "unit": "m",
+  "unit_price_usd": 210.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $210/m: 316 fasteners ~4x zinc-flake cost; isolation washers for dissimilar metals.",
+  "price_checked": null,
+  "lead_time_weeks": 3,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(tier_len_m)",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-ANODES",
+  "name": "Sacrificial zinc anodes bolted to the skid / plinth / module rails, with inspection tag (H2)",
+  "manufacturer": "Canada Metal / Martyr",
+  "mpn": "Z-11 bolt-on",
+  "vendor": "marine distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 85.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $85 each (11 kg zinc anode $60-90).",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "max(2, ceil(tier_len_m/3))",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "CTL-INTRUSION",
+  "name": "Intrusion detection: dual-tech PIR, vibration/shock sensors on walls, door and cutout contacts, siren/strobe, panel with dry contacts to the BEN Controller, per module (H2)",
+  "manufacturer": "Bosch / Honeywell",
+  "mpn": "B-series panel + sensors",
+  "vendor": "security distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 2800.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $2,800 per module: panel $600, 6 sensors $900, siren/strobe $250, wiring and programming $1,000.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "modules",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "ENV-LIGHTING-SEC",
+  "name": "Security and perimeter lighting: LED floods 50 W IP66 with PE cell on each long face, controller relay output (H2)",
+  "manufacturer": "Lithonia / RAB",
+  "mpn": "WPX / FFLED",
+  "vendor": "electrical distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 420.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $420 per luminaire installed.",
+  "price_checked": null,
+  "lead_time_weeks": 3,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "max(2, modules*2)",
+  "applies_to_hardening": [
+   "H2",
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-BALLISTIC-UL752",
+  "name": "Ballistic wall panel UL 752 Level 3 (Level 4-8 selectable), fibreglass 11-12 mm / 24 kg/m2, fitted inside the envelope with battens and seam strips, per m2 of wall (H3)",
+  "manufacturer": "ArmorCore (Waco Composites) / Defenselite / TSS",
+  "mpn": "ArmorCore Level 3",
+  "vendor": "ballistic panel maker (RFQ email 21)",
+  "vendor_url": "https://www.armorcore.com/bullet-resistant-panels/level-3/",
+  "unit": "m2",
+  "unit_price_usd": 1500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,500/m2 installed. Defenselite guides give UL 752 Level 1-3 material at $90-150/ft2 ($970-1,600/m2) and material as 40-60 % of final price (2026-11-08); ArmorCore publishes no price. Level 8 roughly 3x. Qty = wall area (roof excluded; roof panels optional).",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "6-10 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(wall_area_m2)",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-DOOR-FE",
+  "name": "Forced-entry resistant door assembly ASTM F3038 15 min + UL 752 Level 3 ballistic, steel, with 3-point lock, IP66 compression gasket, per door (H3)",
+  "manufacturer": "TSS / Overly / Hope's (steel security doors)",
+  "mpn": "FE/BR door 15 min",
+  "vendor": "security door maker (RFQ email 21)",
+  "vendor_url": "https://www.tssbulletproof.com/astm-f3038",
+  "unit": "ea",
+  "unit_price_usd": 19500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $19,500 per door: vendors state FE/BR doors run up to 6x a plain bullet-resistant door (TSS, 2026-11-08); comparable quotes $14-25k. Quote-only.",
+  "price_checked": null,
+  "lead_time_weeks": 14,
+  "availability_note": "12-16 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "1 if tier_len_m < 2 else modules + 1 + ceil(tier_len_m/7)",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-DOOR-IK10",
+  "name": "IK10 impact-rated (IEC 62262, 20 J) equipment and service access doors/hatches with anti-pry edges, per module (H3)",
+  "manufacturer": "Rittal / Zarges / custom",
+  "mpn": "IK10 hatch",
+  "vendor": "enclosure distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 3800.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $3,800 per module: IK10 steel hatch set and anti-pry frames.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "modules",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "ENV-HEMP-SHIELD",
+  "name": "HEMP shielding option MIL-STD-188-125-1: welded 2 mm steel shield liner inside the envelope, 80 dB (10 kHz-1 GHz), shielded door with RF gasket/knife edge, per m2 of envelope (H3 option)",
+  "manufacturer": "ETS-Lindgren / Armag / Holland Shielding",
+  "mpn": "5230 / Red Edge class",
+  "vendor": "EMP shielding firm (RFQ email 21)",
+  "vendor_url": "https://www.ets-lindgren.com/product/red-edge-emp-enclosure/",
+  "unit": "m2",
+  "unit_price_usd": 2400.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $2,400/m2. ETS-Lindgren congressional statement (2013) cites $182/ft2 (~$1,960/m2) added cost for HEMP-protected space (ambiguous scope); vendors quote only (2026-11-08). OPTION at H3: delete when HEMP is not required.",
+  "price_checked": null,
+  "lead_time_weeks": 20,
+  "availability_note": "16-26 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(envelope_area_m2)",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "ENV-HEMP-PENETRATIONS",
+  "name": "Filtered penetrations for the HEMP shield: power-line HEMP filters (MIL-STD-188-125 PLF) per feeder, waveguide-below-cutoff for pipes, fibre-only data entry, per penetration (H3 option)",
+  "manufacturer": "ETS-Lindgren / Captor / MPE",
+  "mpn": "HEMP PLF + WBC",
+  "vendor": "EMP shielding firm (RFQ email 21)",
+  "vendor_url": "https://media.ets-lindgren.com/wp-content/uploads/2026/01/datasheet-shielding-EMP-Mitigation-rev1.0.pdf",
+  "unit": "ea",
+  "unit_price_usd": 8500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $8,500 per penetration (power-line filters $6-15k each, waveguides $1-3k). Quote-only.",
+  "price_checked": null,
+  "lead_time_weeks": 20,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "2 if tier_len_m < 2 else 3 + cooling_units_total + modules",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-TAMPER-SEALS",
+  "name": "Tamper-evident seals (numbered, serialised) on every access panel and tamper switches wired to the PLC, per module (H3)",
+  "manufacturer": "TydenBrooks / Honeywell",
+  "mpn": "seal kit + tamper switches",
+  "vendor": "security distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 650.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $650 per module: 50 serialised seals + 8 tamper switches.",
+  "price_checked": null,
+  "lead_time_weeks": 3,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "modules",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "STR-MANTRAP",
+  "name": "Secure vestibule with mantrap: interlocked door pair or Circlelock-class portal with anti-piggyback detection, added to the service vestibule (H3)",
+  "manufacturer": "Boon Edam / built vestibule",
+  "mpn": "Circlelock Combi class",
+  "vendor": "Boon Edam dealer (RFQ email 21)",
+  "vendor_url": "https://www.boonedam.com/en-us/mantrap-security-doors",
+  "unit": "ea",
+  "unit_price_usd": 48000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $48k: Boon Edam portals are quote-only (2026-11-08); interlocked-door mantraps built from two FE doors + controller $35-60k.",
+  "price_checked": null,
+  "lead_time_weeks": 14,
+  "availability_note": "12-16 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "1",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "CTL-2FA-ACCESS",
+  "name": "Two-factor access control: card + PIN/biometric reader, Mercury-based controller, door strike/maglock, audit trail to BEN Care, per module (H3)",
+  "manufacturer": "HID Signo / LenelS2 / Genetec",
+  "mpn": "Signo 40K + LP1502",
+  "vendor": "security integrator",
+  "vendor_url": "https://www.hidglobal.com",
+  "unit": "ea",
+  "unit_price_usd": 4200.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $4,200 per module: readers $700 x 2, controller $1,500, locks and programming $1,300.",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "modules",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "SVC-SHIELD-TEST",
+  "name": "Shield integrity test 80 dB per IEEE 299 / MIL-STD-188-125-1 acceptance by an accredited test house, with report (H3 option)",
+  "manufacturer": "accredited EMC test house",
+  "mpn": "SE-TEST",
+  "vendor": "EMC test house",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 18000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $18k: 2-3 day on-site shielding effectiveness survey + report.",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "1",
+  "applies_to_hardening": [
+   "H3"
+  ]
+ },
+ {
+  "code": "SVC-COMPLIANCE-PACK",
+  "name": "CMMC / NIST SP 800-171 controls pack: SSP, POA&M, physical-security procedures, audit-trail configuration in BEN Care (documentation lot, H3)",
+  "manufacturer": "Schreiber AI + compliance consultant",
+  "mpn": "CMMC-PACK",
+  "vendor": "internal + consultant",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 9500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $9,500: 60 h consultant + internal templates.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "1",
+  "applies_to_hardening": [
+   "H3"
+  ]
  }
 ]

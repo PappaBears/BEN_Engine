@@ -5,19 +5,19 @@ Margin assumptions are explicit inputs here, not hidden in a spreadsheet.
 import sys, os, re, json
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
-from ben_engine.config import Config
+from ben_engine.config import Config, TIER_GEOMETRY
 try:
     from ben_engine.bom import generate_bom, totals
 except ImportError as e:
     print("bom module not available:", e); sys.exit(1)
 
 MARGIN_HW = 0.28          # target gross margin on purchased hardware + build labour
-CONTROLS_LICENCE_PER_UNIT_YR = {"micro": 1200, "ben10": 4800, "ben20": 12000, "ben40": 30000}
+CONTROLS_LICENCE_PER_UNIT_YR = {"ben5": 1200, "ben30": 4800, "ben150": 12000, "ben500": 30000, "ben2000": 90000}
 MANAGED_PER_KW_MONTH = 45  # USD; below retail colocation (110–220) because the customer owns the asset
 
 rows = []
 pricing = {}
-for tier in ("micro", "ben10", "ben20", "ben40"):
+for tier in TIER_GEOMETRY:  # five tiers: ben5 ... ben2000
     cfg = Config.preset(tier)
     bom = generate_bom(cfg)
     t = totals(bom)
@@ -37,7 +37,7 @@ for tier in ("micro", "ben10", "ben20", "ben40"):
                      "confirmed": sum(r["ext_price_usd"] for r in sub if r["price_status"] == "confirmed") / (1 - MARGIN_HW),
                      "list": sum(r["ext_price_usd"] for r in sub if r["price_status"] == "list") / (1 - MARGIN_HW),
                      "estimate": sum(r["ext_price_usd"] for r in sub if r["price_status"] == "estimate") / (1 - MARGIN_HW)}
-    pricing[tier] = {"preset_it_kw": cfg.it_kw, "preset_cooling_units": cfg.derived()["cooling_units_total"], "by_subsystem": by_sub, "priced_on": "2026-11-07", "margin": MARGIN_HW}
+    pricing[tier] = {"preset_it_kw": cfg.it_kw, "preset_cooling_units": cfg.derived()["cooling_units_total"], "by_subsystem": by_sub, "priced_on": "2026-11-08", "margin": MARGIN_HW}
 
 tbl = ["| Tier (preset) | IT kW | BOM cost (all modules) | Sell price (28 % GM) | Infrastructure-only sell price (no compute) | Gross profit | Confirmed / list / estimate share of cost | Controls licence /yr | Managed service /yr | Price per kW IT |",
        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]

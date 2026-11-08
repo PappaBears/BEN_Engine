@@ -29,7 +29,7 @@ bash tests/e2e/run_e2e.sh                            # Playwright: loads the UI,
 ```
 
 The e2e run writes `docs/media/screens/*.png` (desktop exterior iso, interior walkthrough, alarms,
-sweeps, selector micro / BEN 40, 390 px narrow) and 24 ordered guided-tour frames to
+sweeps, selector BEN 5 / BEN 500 / BEN 2000, 390 px narrow) and 24 ordered guided-tour frames to
 `docs/media/frames/tour-NN.png` for the README GIF.
 
 ## What is simulated vs live
@@ -76,7 +76,7 @@ Built procedurally from `/api/config` + `/api/sensors` every time the configurat
   utility pedestal outside, generator skid when fitted. Rack row with server fronts whose glow follows
   `pdu_kw`, cold aisle (cyan) and hot aisle (amber) volumes, containment doors, raised cable tray,
   gateway/network cabinet on the cold wall.
-- Cooling: in-row DX cabinets packed into the row (extras wall-mounted), cabinet DX on the Micro,
+- Cooling: in-row DX cabinets packed into the row (extras wall-mounted), cabinet DX on the BEN 5,
   CDU + manifolds + roof dry coolers (spinning fans at `fan_pct`) for RDHx / DLC.
 - Sensors as spheres coloured by live value; airflow particles cold → rack → hot → unit at fan speed
   and air temperature; power pulses utility → ATS → UPS → panel → tray → racks at kW, amber on

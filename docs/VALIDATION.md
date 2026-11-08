@@ -49,6 +49,16 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 | Decks | `build_presentation.py` | 12 + 12 slides with notes; visual review of the HTML decks **not performed** |
 | Demo GIF | `make_demo_gif.py` | 24 real tour frames, 6 s, 4.5 MB |
 
+## 4a. Generation-2 refactor (2026-11-08): names, BEN 2000, hardening
+
+| Item | Status | Evidence |
+| --- | --- | --- |
+| Tier keys renamed to `ben5/ben30/ben150/ben500` with alias map for `micro/ben10/ben20/ben40` | **verified** (`python -m ben_engine.config --tier ben150 --hardening H3` prints BEN 150, H3 Hardened / government) | `software/ben_engine/config.py` |
+| BEN 2000 sizing (`--tier ben2000`): 1,600 kW IT in 48 racks, 12.47 kV MV service, 2 transformers, 2 UPS strings of 1,937 kVA, 3 generators, 7 cooling units, PUE 1.134, gross 109 t, 102 Pods | **verified in config only**; twin, CFD per module, sweeps, drawings (site plan A-000 + per-module sheets), BOM (`docs/BOM-ben2000.md`), proposal and dashboard scene for BEN 2000: **pending** the core and catalog agents — the lead updates this row | `python -m ben_engine.config --tier ben2000` |
+| Hardening H1/H2/H3 in the config (rating, coating, wind, envelope mass adder, recommendation by profile/climate) | **verified in config**; catalog cost lines `applies_to_hardening`, compliance pack rows, maintenance add-ons and proposal text: **pending** | `config.py` HARDENING table |
+| Documents renamed and extended (compliance §14/§15, process flow §5 with Gantt, site requirements BEN 2000 column, maintenance §4a/§5a, tests E14–E16, contracts, decks, risk register R27–R33) | **verified** by grep: no generation-1 tier names and no rain-only 3R enclosure rating remain outside the decision records and `PROJECT_NOTES.md` | grep for the retired names and the retired rating over `docs`, `README.md`, `web/index.html`, `web/kit` returns nothing |
+| Envelope hose test E14, joint seal test E15, transfer test E16 | **documented only**; no hardware | `docs/TEST_GUIDE.md` |
+
 ## 5. Implemented, unverified
 
 - EFR32MG24 HAL (`hal_efr32`) and `main.cpp` against the real Gecko SDK / OpenThread APIs (never compiled; toolchain not available). The first build for the MGM240P will need fixes; Secure Vault provisioning and attestation have not run on silicon.
@@ -56,7 +66,8 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 - PLCnext project (interlocks, watchdog relay) on an AXC F 2152; UL 508A panel build; FCC Part 15 B test of the assembled Pod.
 - Modbus/SNMP adapters for third-party equipment (interfaces described, not coded).
 - Any physical behaviour: thermal time constants, ride-through, fan curves, pressure, acoustics.
-- Contract templates (counsel review), compliance edition years listed as unconfirmed in `docs/COMPLIANCE.md` §13.
+- Contract templates (counsel review), compliance edition years listed as unconfirmed in `docs/COMPLIANCE.md` §13; UL 752 / ASTM F3038 / MIL-STD-188-125-1 / ASHRAE 188 editions from memory.
+- BEN 2000 physical design values (module mass, slab, water use 2–8 m³/day per 1,000 kW, noise distances, utility lead time 26–52 weeks) are engineering estimates from public rules of thumb, not vendor data.
 
 ## 6. Blocked / deferred
 

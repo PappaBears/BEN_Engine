@@ -1,13 +1,13 @@
 # Statement of Work (SOW) — BEN Engine Unit
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOW_TEMPLATE.md` · Template rev da41cc2
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOW_TEMPLATE.md` · Template rev ac1285f
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. The configuration block in Section 2 is pasted verbatim from the frozen `config.json`. Delete this box before signature.
 
-**SOW ID:** SOW-BEN150-20261108-4842D366
+**SOW ID:** SOW-BEN150-20261108-C10DE35C
 **Under MSA:** MSA-ACMECLINIC-2026 dated [EFFECTIVE_DATE] between Schreiber AI ("Schreiber AI") and Acme Clinic ("Customer")
-**Proposal:** SAI-BEN150-20261108-4842D366 dated 2026-11-08
-**Unit serial (assigned at H4):** BEN-BEN150-4842D366
+**Proposal:** SAI-BEN150-20261108-C10DE35C dated 2026-11-08
+**Unit serial (assigned at H4):** BEN-BEN150-C10DE35C
 **Site:** Austin, TX, Austin, TX
 **SOW date:** 2026-11-08
 
@@ -21,7 +21,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 | Delivery model | Managed service (hardware only / hardware + BEN Controls / white-label / managed) |
 | Modules ordered | power, cooling, compute, controls (any of: power, cooling, compute, controls) |
 | White-label | false (yes / no); brand to apply: Schreiber AI |
-| Managed Services | true (yes / no); if yes, SLA `docs/contracts/MANAGED_SERVICES_SLA.md` rev da41cc2 attached, term 36 months |
+| Managed Services | true (yes / no); if yes, SLA `docs/contracts/MANAGED_SERVICES_SLA.md` rev ac1285f attached, term 36 months |
 | Turnkey site works by Schreiber AI | no (yes / no / partial, list: [TURNKEY_SITE_WORKS_LIST]) |
 | Factory | [FACTORY_NAME], [FACTORY_ADDRESS] (Schreiber AI facility or Contract Manufacturer under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md`) |
 | Schreiber AI project manager | [SCHREIBER_PM_NAME], [SCHREIBER_PM_EMAIL], [SCHREIBER_PM_PHONE] |
@@ -30,7 +30,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 ## 2. Configuration
 
-2.1 **Frozen configuration.** The Configuration below is identified as SAI-BEN150-20261108-4842D366-cfg-v1.0 and conforms to `spec/ben-config.schema.json`. It is frozen at Hold Point H4. Before H4 the values are the Proposal values and may be adjusted by agreement without a Change Order; after H4 every change is a Change Order.
+2.1 **Frozen configuration.** The Configuration below is identified as SAI-BEN150-20261108-C10DE35C-cfg-v1.0 and conforms to `spec/ben-config.schema.json`. It is frozen at Hold Point H4. Before H4 the values are the Proposal values and may be adjusted by agreement without a Change Order; after H4 every change is a Change Order.
 
 ```json
 {
@@ -52,7 +52,8 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
   "ups_minutes": 10,
   "generator": true,
   "site_name": "Austin, TX",
-  "controls_tier": "auto"
+  "controls_tier": "auto",
+  "hardening": "H2"
 }
 ```
 
@@ -77,7 +78,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 | Controls tier | BEN Controls Pro |
 | BEN Pods | 12 plus spares per `docs/MAINTENANCE.md` Section 7 (logical node ids: 4) |
 | Estimated PUE (model, to be measured at SAT) | 1.185 |
-| Gross shipped mass (to be weighed at Q-11) | 8,274 kg |
+| Gross shipped mass (to be weighed at Q-11) | 8,658 kg |
 | Design wind speed / exposure / seismic category / snow load | 58 m/s (ASCE 7 basic; confirm per site) / [EXPOSURE_CATEGORY] / [SEISMIC_CATEGORY] / [SNOW_LOAD] |
 | Corrosivity class (ISO 9223) | C4 |
 
@@ -85,17 +86,17 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 | Document | Revision |
 | --- | --- |
-| `docs/PROCESS_FLOW.md` | da41cc2 |
-| `docs/SITE_REQUIREMENTS.md` (signed copy attached as Annex A) | da41cc2 |
-| `docs/COMPLIANCE.md` compliance pack for profile healthcare | da41cc2 |
-| `docs/TEST_GUIDE.md` | da41cc2 |
-| `docs/TURNOVER.md` | da41cc2 |
-| `docs/MAINTENANCE.md` | da41cc2 |
-| `docs/RISK_REGISTER.md` (risk acknowledgement signed [RISK_ACK_DATE]) | da41cc2 |
-| `docs/CYBERSECURITY.md` | da41cc2 |
-| `design/assembly/QC_FORMS.md` (Q-01 to Q-12) | da41cc2 |
-| `spec/PROTOCOL.md`, `spec/INTERFACES.md` | da41cc2 |
-| Issue-for-construction drawing set `design/drawings/ben150/` | issued at H4, index IFC Rev A (da41cc2) |
+| `docs/PROCESS_FLOW.md` | ac1285f |
+| `docs/SITE_REQUIREMENTS.md` (signed copy attached as Annex A) | ac1285f |
+| `docs/COMPLIANCE.md` compliance pack for profile healthcare | ac1285f |
+| `docs/TEST_GUIDE.md` | ac1285f |
+| `docs/TURNOVER.md` | ac1285f |
+| `docs/MAINTENANCE.md` | ac1285f |
+| `docs/RISK_REGISTER.md` (risk acknowledgement signed [RISK_ACK_DATE]) | ac1285f |
+| `docs/CYBERSECURITY.md` | ac1285f |
+| `design/assembly/QC_FORMS.md` (Q-01 to Q-12) | ac1285f |
+| `spec/PROTOCOL.md`, `spec/INTERFACES.md` | ac1285f |
+| Issue-for-construction drawing set `design/drawings/ben150/` | issued at H4, index IFC Rev A (ac1285f) |
 
 ## 3. Scope by module
 
@@ -105,10 +106,14 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 
 | Scope item | Included / Excluded | Notes |
 | --- | --- | --- |
-| One-trip high-cube ISO container (ben150) or NEMA 4X / IP66 outdoor cabinet on skid (BEN 5), received and inspected (Q-01, W6) | Included | |
+| One-trip high-cube ISO-frame module (ben150) or NEMA 4X / IP66 outdoor cabinet on skid (BEN 5), received and inspected (Q-01, W6); BEN 2000: 1 factory-built wide-body hall modules plus one power module from the modular manufacturer, state modular label on each | Included | |
 | Structural modification by AWS D1.1 certified welder to IFC drawings; CWI inspection (H7, Q-02) | Included | Not applicable to BEN 5 |
-| Envelope: 100 mm PIR/spray-foam insulation, vapour barrier, non-combustible liner, personnel doors with panic hardware, coating system to ISO 9223 class C4, seals, drains (W8, Q-03) | Included | |
-| Electrical vestibule 1.1 m (BEN 150/40); second egress door (BEN 500 at ≥ 1000 A) | Included | |
+| Envelope: 100 mm PIR/spray-foam insulation, vapour barrier, non-combustible liner, personnel doors with compression gaskets, three-point latches and panic hardware, gasketed penetrations, drip edges, positive-pressure interior, coating system to ISO 12944 class per hardening level (C3 at H1; C5-M at H2/H3) for site corrosivity C4, seals, drains (W8, Q-03) | Included | Every Unit is NEMA 4X / IP66 |
+| **Hardening level H2** (NEMA 4X / IP66 + flood plinth 600 mm): H1 Standard; H2 Severe environment (600 mm flood plinth, ISO 16890 ePM1 filtration with weather hoods, hurricane-rated door hardware, roof snow guards, stainless fasteners, sacrificial anodes, intrusion detection and lighting); H3 Hardened / government (as H2 plus UL 752 ballistic panels at Level [BALLISTIC_LEVEL], ASTM F3038 forced-entry doors, IK10 doors, secure vestibule / mantrap, two-factor access, tamper detection, tamper-evident seals, CMMC / NIST 800-171 controls pack) | Included | Certificates for ballistic, forced-entry and shielding items per `SUPPLIER_TERMS.md` Q1 are turnover item B9a |
+| HEMP / EMI shielding option (MIL-STD-188-125-1, 80 dB shielded enclosure with filtered penetrations and waveguide vents; IEEE 299 shielding effectiveness test at FAT) | Excluded | H3 only; TEMPEST-ready, not TEMPEST-certified |
+| **Envelope hose test E14** (UL 50E type 4X method, `docs/TEST_GUIDE.md`) after all penetrations, witnessed (H8, Q-03), pass = no water inside; repeated after relocation | Included | Record dated [ENVELOPE_TEST_DATE] starts the envelope warranty (`WARRANTY_TERMS.md` 1.3) |
+| BEN 2000: module set with 100 t crane (3 days), hall join (structural bolting, EPDM cover strips, roof seams, busway and DLC couplings, fibre across joints), **module joint seal test E15** per joint (H17a) | Not applicable | BEN 2000 only |
+| Electrical vestibule 1.1 m (BEN 150/500); second egress door (BEN 500 at ≥ 1000 A) | Included | |
 | Floor channels, anchor clips, torque record (Q-04) | Included | |
 | Lighting, emergency lighting (90-minute self-contained), signage (arc-flash, NFPA 704, refrigerant, agent, entry procedure) | Included | |
 | Door access control (badge reader, camera on controls LAN) | Included | |
@@ -121,7 +126,8 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | --- | --- | --- |
 | Main panelboard/switchboard rated 100 A, SCCR 65 kA, SPD | Included | |
 | UPS 2 x 61 kVA, UL 1778, with lithium (LFP) battery 9.3 kWh, UL 1973 / UL 9540 | Included | NFPA 855 package where ≥ 20 kWh: false |
-| Step-down transformers 480→208Y/120 V (BEN 150/40) | Included | |
+| Step-down transformers 480→208Y/120 V (BEN 150/500) | Included | |
+| BEN 2000 medium-voltage and plant: false service, 0 × 2,500 kVA pad-mount transformers (2N), 15 kV loop-feed switch, MV cable and duct bank from the utility point of delivery, UL 1558 main-tie-main switchgear 4,000 A, 2N UPS strings, NFPA 855 battery rooms, 1 × 1,250 kW generators (N+1) with 48 h fuel, NETA acceptance tests, E16 transfer test | Not applicable | BEN 2000 only; utility works and fees are Customer's (Section 3.7); SPCC plan by PE |
 | Rack PDUs (A/B per rack, metered), whips, receptacles | Included | |
 | Power meters per power path; E9 reconciliation | Included | |
 | Grounding and bonding inside the Unit; two 2/0 AWG bonding lugs at diagonal corners | Included | Site electrode per Section 3.7 |
@@ -173,6 +179,7 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | VEWFD aspirating smoke detection plus spot detectors; UL 864 releasing panel; outdoor horn/strobe | Included | |
 | Clean agent system (FK-5-1-12 class) with 10-minute hold, pre-discharge delay, abort station, door fan test (Q-09) | Included | BEN 30/150/500; BEN 5: aerosol unit, detection and extinguisher |
 | EPO at exit door; HVAC shutdown on second-stage alarm | Included | Hardwired, never on the controls bus |
+| BEN 2000: clean agent and VESDA per module, pre-action sprinkler option for the hall, NFPA 855 battery rooms with 2-hour separation, gas detection and deflagration venting | Not applicable | BEN 2000 only; occupancy Group B / F-1 per AHJ |
 | Fire marshal plan review and permit by licensed fire protection contractor | Included (submittal support; Customer pulls permit) | |
 | Connection to central station / Customer monitoring | Included | Site-dependent |
 
@@ -277,30 +284,30 @@ Hold points H7, H10a, H10b, H11, H18 and the fire system commissioning may only 
 
 | Line | Amount (USD) | Basis |
 | --- | --- | --- |
-| Enclosure, structure, envelope, fire and life safety | 83,894.53 | Firm |
-| Power module | 271,133.68 | Firm |
+| Enclosure, structure, envelope, fire and life safety | 117,702.86 | Firm |
+| Power module | 273,828.12 | Firm |
 | Cooling module | 272,472.22 | Firm |
 | Compute module | 1,072,379.14 | Firm (or Customer-supplied: 0) |
-| Controls module (hardware and integration) | 22,902.65 | Firm |
-| Engineering, FAT, transport, set-down, hook-up, SAT, training, turnover | 50,638.89 | Firm |
-| **Unit price (basis for milestones and liquidated damages)** | **1,807,448.89** | |
+| Controls module (hardware and integration) | 26,791.54 | Firm |
+| Engineering, FAT, transport, set-down, hook-up, SAT, training, turnover | 51,694.44 | Firm |
+| **Unit price (basis for milestones and liquidated damages)** | **1,848,896.11** | |
 | Software Licence (perpetual per-Unit fee, or first-year subscription) | 12,000.00 | Per Software Licence |
 | Turnkey site works | 34,027.78 | Allowance; reconciled to actual with 10 % markup |
 | Permit services | 0.00 | Time and materials at Section 7.5 rates; fees at cost |
 | Options selected: none | 0.00 | Firm |
 | Managed Services | USD 45 per kW-month x 50 kW = 2,250.00 per month | Per SLA, from SAT Acceptance |
-| **Total contract value at signature** | **1,834,448.89** | Excludes taxes |
+| **Total contract value at signature** | **1,875,896.11** | Excludes taxes |
 
-Price confidence: the bill of materials behind this price carries a confirmed / list / estimate split of 64 % confirmed / 0 % list / 36 % estimate as of 2026-11-08; items marked "estimate" are firm to Customer once this SOW is signed, and the risk of their variance is Schreiber AI's except under MSA 6.6 and 17.2.
+Price confidence: the bill of materials behind this price carries a confirmed / list / estimate split of 62 % confirmed / 0 % list / 38 % estimate as of 2026-11-08; items marked "estimate" are firm to Customer once this SOW is signed, and the risk of their variance is Schreiber AI's except under MSA 6.6 and 17.2.
 
 7.2 **Milestones (MSA 9.1).**
 
 | # | Trigger | Share | Amount | Baseline invoice date |
 | --- | --- | --- | --- | --- |
-| 1 | SOW signature | 30 % | 542,234.67 | 2026-11-08 |
-| 2 | H4 Engineering Release | 40 % | 722,979.56 | 2026-12-20 |
-| 3 | H13 FAT Acceptance (title passes; Unit ships on receipt) | 25 % | 451,862.22 | 2027-06-06 |
-| 4 | H19 SAT Acceptance and Turnover, less LD credits and Punch List holdback | 5 % | 90,372.44 | 2027-07-04 |
+| 1 | SOW signature | 30 % | 554,668.83 | 2026-11-08 |
+| 2 | H4 Engineering Release | 40 % | 739,558.44 | 2026-12-20 |
+| 3 | H13 FAT Acceptance (title passes; Unit ships on receipt) | 25 % | 462,224.03 | 2027-06-06 |
+| 4 | H19 SAT Acceptance and Turnover, less LD credits and Punch List holdback | 5 % | 92,444.81 | 2027-07-04 |
 
 Payment terms 30 days. Milestones delayed by Customer-Caused Delay are invoiced on the baseline date (MSA 9.3).
 
@@ -397,8 +404,8 @@ Running totals: price [CO_PRICE_TOTAL_DELTA]; schedule [CO_SCHEDULE_TOTAL_DELTA_
 | Annex | Content |
 | --- | --- |
 | A | Signed Site Requirements (`docs/SITE_REQUIREMENTS.md`) |
-| B | Proposal SAI-BEN150-20261108-4842D366 with risk register extract and signed risk acknowledgement |
-| C | Frozen `config.json` (SAI-BEN150-20261108-4842D366-cfg-v1.0) and derived sizing printout |
+| B | Proposal SAI-BEN150-20261108-C10DE35C with risk register extract and signed risk acknowledgement |
+| C | Frozen `config.json` (SAI-BEN150-20261108-C10DE35C-cfg-v1.0) and derived sizing printout |
 | D | Issue-for-construction drawing index (issued at H4) |
 | E | Managed Services SLA with Unit-specific values (if ordered) |
 | F | Software Licence order form (licence type, fees, escrow election) |

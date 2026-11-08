@@ -83,22 +83,22 @@ def test_schedule_derived_from_bom_lead_times(built):
         assert fat - release >= max_lead
         crit = [m["week"] for m in p.milestones if m["path"] == "critical"]
         assert crit == sorted(crit)
-        if tier == "ben20" and opt == "hardware_controls":
+        if tier == "ben150" and opt == "hardware_controls":
             assert 24 <= p.milestones[-1]["week"] <= 36
 
 
 def test_proposal_id_is_hash_of_config_and_date():
-    cfg = Config.preset("ben10")
+    cfg = Config.preset("ben30")
     a = P.build_proposal(cfg, customer="A", date=DATE)
     b = P.build_proposal(cfg, customer="A", date=DATE)
     c = P.build_proposal(cfg, customer="A", date="2026-11-09")
     assert a.proposal_id == b.proposal_id != c.proposal_id
-    assert a.proposal_id.startswith("SAI-BEN10-20261108-")
+    assert a.proposal_id.startswith("SAI-BEN30-20261108-")
     assert a.valid_until == "2027-01-07"
 
 
 def test_modules_option_honours_subsystems():
-    cfg = Config.preset("ben20"); cfg.subsystems = ["power", "cooling"]
+    cfg = Config.preset("ben150"); cfg.subsystems = ["power", "cooling"]
     p = P.build_proposal(cfg, option="modules", date=DATE)
     assert p.headline.subsystems == ["power", "cooling"]
     assert p.headline.recurring_usd_per_year == 0
@@ -109,7 +109,7 @@ def test_modules_option_honours_subsystems():
 
 
 def test_white_label_uses_partner_brand():
-    cfg = Config.preset("ben10"); cfg.brand = "Northwind Partners"; cfg.white_label = True
+    cfg = Config.preset("ben30"); cfg.brand = "Northwind Partners"; cfg.white_label = True
     p = P.build_proposal(cfg, option="white_label", date=DATE)
     assert p.brand == "Northwind Partners"
     html = P.to_html(p)
@@ -117,13 +117,13 @@ def test_white_label_uses_partner_brand():
 
 
 def test_profile_and_climate_sections_from_docs():
-    p = P.build_proposal(Config.preset("ben20", "healthcare", "hot_humid"), option="managed", date=DATE)
+    p = P.build_proposal(Config.preset("ben150", "healthcare", "hot_humid"), option="managed", date=DATE)
     md = P.to_markdown(p)
     assert "HIPAA physical safeguards" in md               # COMPLIANCE.md section 11 row
     assert "ISO 12944 C4-H" in md                          # section 12 climate row
     assert "R07" in md and "Lithium battery thermal runaway" in md  # risks.json filtered to healthcare
     assert "R04" not in md                                 # not a healthcare risk
-    assert "8.0 × 4.5 m" in md                             # SITE_REQUIREMENTS pad size for BEN 20
+    assert "8.0 × 4.5 m" in md                             # SITE_REQUIREMENTS pad size for BEN 150
     assert "A-001" in md and "C-001" in md                 # drawing index
     assert "Pre-power visual checklist" in md and "Export CSV and signed report" in md
     assert p.notes == []
@@ -153,10 +153,10 @@ def test_json_round_trip(built):
 
 
 def test_fill_contract_stub():
-    p = P.build_proposal(Config.preset("ben20", "healthcare"), option="managed", customer="Acme Clinic", site="Austin, TX", date=DATE)
+    p = P.build_proposal(Config.preset("ben150", "healthcare"), option="managed", customer="Acme Clinic", site="Austin, TX", date=DATE)
     txt = P.fill_contract(ROOT / "tests/fixtures/SOW_STUB.md", p)
     assert "[PROPOSAL_ID]" not in txt and p.proposal_id in txt
-    assert "Acme Clinic" in txt and "Austin, TX" in txt and "BEN 20" in txt
+    assert "Acme Clinic" in txt and "Austin, TX" in txt and "BEN 150" in txt
     assert f"{p.headline.capital_price_usd:,.2f}" in txt
     assert "0.5 % per week capped at 5 %" in txt
     assert txt.unfilled == ["CUSTOMER_SIGNATORY", "GOVERNING_STATE"]
@@ -168,7 +168,7 @@ def test_fill_contract_stub():
 
 
 def test_contract_fields_vocabulary():
-    p = P.build_proposal(Config.preset("micro"), date=DATE)
+    p = P.build_proposal(Config.preset("ben5"), date=DATE)
     f = P.contract_fields(p)
     for k in ("PROPOSAL_ID", "CUSTOMER_NAME", "SITE_ADDRESS", "TIER", "IT_KW", "PRICE_TOTAL", "MILESTONE_FAT_DATE",
               "MILESTONE_SAT_DATE", "LD_RATE_PCT_PER_WEEK", "LD_CAP_PCT", "STORAGE_FEE_PER_DAY"):
@@ -182,15 +182,15 @@ def test_contract_fields_vocabulary():
 
 def test_invalid_option_and_config():
     with pytest.raises(ValueError):
-        P.build_proposal(Config.preset("ben20"), option="rent_to_own")
-    bad = Config.preset("ben20"); bad.racks = 99
+        P.build_proposal(Config.preset("ben150"), option="rent_to_own")
+    bad = Config.preset("ben150"); bad.racks = 99
     with pytest.raises(ValueError):
         P.build_proposal(bad)
 
 
 def test_cli_writes_files(tmp_path):
     out = tmp_path / "p.md"; html = tmp_path / "p.html"; js = tmp_path / "p.json"; sow = tmp_path / "sow.md"
-    rc = P.main(["--tier", "ben20", "--profile", "healthcare", "--climate", "hot_humid", "--option", "managed",
+    rc = P.main(["--tier", "ben150", "--profile", "healthcare", "--climate", "hot_humid", "--option", "managed",
                  "--customer", "Acme Clinic", "--site", "Austin, TX", "--date", DATE, "--out", str(out), "--html", str(html), "--json", str(js),
                  "--fill-sow", str(ROOT / "tests/fixtures/SOW_STUB.md"), "--out-sow", str(sow), "--field", "GOVERNING_STATE=Texas"])
     assert rc == 0
