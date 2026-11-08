@@ -80,16 +80,22 @@ ITEMS = {
     "PWR-150": "Power cable set (feeders, branch circuits), pre-cut and labelled",
     "PWR-160": "Grounding kit: TMGB bar, ground rods, exothermic moulds, 6 AWG",
     "PWR-170": "Receptacle set for rack PDUs, IEC 60309, labelled",
-    "CTL-001": "Gateway cabinet: Raspberry Pi 5, PoE switch, DIN PSU, 600 x 600 x 300",
-    "CTL-002": "BEN Node ESP32-S3 on Olimex ESP32-POE-ISO, DIN enclosure",
-    "CTL-003": "DS18B20 probe string, 4 probes, 3 m, labelled",
-    "CTL-004": "SHT45 RH/T module in radiation shield",
-    "CTL-005": "SDP810-125Pa dP sensor + 2 x 3 m tubing + pitot taps",
+    "CTL-001": "BEN Controller: UL 508A panel with PLCnext AXC F 2152, Axioline F I/O, Karbon 400 edge computer, 2 x QUINT4 24 VDC, managed switch, SPD; or BEN Controls Lite cabinet with RevPi Connect 4, DIO/AIO, 24 VDC, switch",
+    "CTL-002": "BEN Pod: MGM240P Thread module, Secure Vault, 4 x Pt1000 inputs, rack-rail / DIN enclosure, provisioned",
+    "CTL-003": "Pt1000 class A 3-wire probe string, 4 probes, 3 m, M12, labelled",
+    "CTL-004": "Room RH/T transmitter Vaisala HMW90, 4-20 mA to the PLC",
+    "CTL-005": "Aisle differential pressure: Setra 264 4-20 mA on Pro, Pod SDP810 on Lite, + 2 x 3 m tubing + pitot taps",
     "CTL-007": "Door contact, magnetic reed, surface mount",
-    "CTL-008": "PoE switch 8/16 port 802.3at, DIN mount",
+    "CTL-008": "Industrial Ethernet switch, 8 port, DIN mount, controls LAN",
     "CTL-009": "Cat6A patch cables, shielded, labelled set",
     "CTL-010": "Conductive leak rope 30 m + end-of-line terminator",
     "CTL-011": "Label kit: laminated tags 10 mm text, cable markers",
+    "CTL-012": "PLCnext AXC F 2152 controller with Axioline F I/O, inside CTL-001, Pro",
+    "CTL-013": "RevPi Connect 4 controller with RevPi DIO / AIO, inside CTL-001, Lite",
+    "CTL-014": "OnLogic Karbon 400 edge computer, TPM 2.0, inside CTL-001, Pro",
+    "CTL-015": "Thread border router radio, MGM240P RCP on USB, 1 or 2",
+    "CTL-016": "SeaHawk LD2100 leak detection controller, Pro",
+    "CTL-017": "24 VDC power supply QUINT4, 2 redundant on Pro, 1 on Lite",
     "FS-001": "Aerosol fire suppression unit, cabinet size (BEN Micro)",
     "FS-010": "Clean-agent cylinder (FK-5-1-12), wall bracket, sized per room",
     "FS-020": "Fire releasing panel with abort, 2 detection zones",
@@ -109,6 +115,11 @@ import json as _json
 import re as _re
 _CAT_PATH = os.path.join(os.path.dirname(os.path.dirname(HERE)), "purchasing", "parts_catalog.json")
 CATALOG = {p["code"]: p for p in _json.load(open(_CAT_PATH))}
+
+
+def _by_controls(lite, pro):
+    """lite / pro: catalog code by the resolved controls tier (Config.controls_tier_resolved)."""
+    return lambda lay: pro if lay.cfg.controls_tier_resolved() == "pro" else lite
 
 
 def _by_tier(**kw):
@@ -136,8 +147,10 @@ MAP = {
     "PWR-120": _by_tier(micro="PWR-LOADCTR", ben10="PWR-PANEL-NQ", default="PWR-PANEL-ILINE"), "PWR-121": "PWR-PANEL-NQ",
     "PWR-122": _by_tier(ben40="PWR-XFMR-300", default="PWR-XFMR"), "PWR-130": _by_tier(micro="FS-EPO-MICRO", default="FS-EPO"),
     "PWR-140": "PWR-SVC-ENCL", "PWR-150": "PWR-FEEDER", "PWR-160": "PWR-GROUNDBAR", "PWR-170": "PWR-RCPT",
-    "CTL-001": "CTL-GW-PI5", "CTL-002": "CTL-NODE-MCU", "CTL-003": "CTL-DS18B20", "CTL-004": "CTL-SHT45", "CTL-005": "CTL-SDP810",
-    "CTL-007": "CTL-DOOR", "CTL-008": "CTL-POE-SW", "CTL-009": "CTL-CAT6A", "CTL-010": "CTL-LEAK", "CTL-011": "CTL-LABELS",
+    "CTL-001": _by_controls("CTL-ENCL", "CTL-PANEL"), "CTL-002": "CTL-POD", "CTL-003": "CTL-PT1000", "CTL-004": "CTL-VAISALA-HMW90",
+    "CTL-005": _by_controls("CTL-SDP810", "CTL-SETRA264"), "CTL-007": "CTL-DOOR", "CTL-008": _by_controls("CTL-SWITCH-LITE", "CTL-SWITCH"),
+    "CTL-009": "CTL-CAT6A", "CTL-010": "CTL-LEAK", "CTL-011": "CTL-LABELS", "CTL-012": "CTL-PLC", "CTL-013": "CTL-REVPI",
+    "CTL-014": "CTL-EDGE", "CTL-015": "CTL-RCP", "CTL-016": "CTL-LEAK-CTRL", "CTL-017": "CTL-PSU-QUINT",
     "FS-001": "FS-AEROSOL", "FS-010": "FS-CLEAN-AGENT", "FS-020": "FS-CLEAN-AGENT", "FS-030": "FS-SMOKE", "FS-040": "FS-CLEAN-AGENT",
     "SITE-001": "SITE-PAD", "SITE-002": "STR-TIEDOWN", "SITE-003": "SITE-GROUND", "SITE-004": "SITE-FIBER",
     "SITE-005": _by_tier(micro="SITE-FORKLIFT", default="SITE-CRANE"), "SITE-006": "SITE-TRANSPORT-KIT",
@@ -145,8 +158,10 @@ MAP = {
 ALSO = {
     "PWR-SVC-ENCL": ["PWR-MAIN-BKR", "PWR-SPD", "PWR-ATS-400", "PWR-ATS-200", "PWR-EPO-RELAY"],
     "PWR-PANEL-ILINE": ["PWR-PANEL-BOX"],
-    "CTL-GW-PI5": ["CTL-GW-M2HAT", "CTL-GW-SSD", "CTL-GW-CASE", "CTL-GW-PSU", "CTL-ENCL"],
-    "CTL-NODE-MCU": ["CTL-PCB", "CTL-ENCL", "CTL-PSU24", "CTL-TERM", "CTL-MISC", "CTL-RELAY", "CTL-ADS1115"],
+    "CTL-PANEL": ["CTL-PLC", "CTL-IO-DIO", "CTL-IO-RTD", "CTL-IO-AI", "CTL-PSU-QUINT", "CTL-PSU-ORING", "CTL-SPD", "CTL-SWITCH", "CTL-EDGE",
+                  "CTL-RCP", "CTL-PANEL-BUILD", "CTL-PANEL-KIT", "CTL-RELAY", "CTL-TERM", "CTL-RS485"],
+    "CTL-ENCL": ["CTL-REVPI", "CTL-REVPI-DIO", "CTL-REVPI-AIO", "CTL-PSU-QUINT", "CTL-SWITCH-LITE", "CTL-RCP", "CTL-PANEL-KIT", "CTL-RELAY", "CTL-TERM", "CTL-RS485"],
+    "CTL-POD": ["CTL-POD-ENCL", "CTL-MGM240P", "CTL-SDP810"],
     "CTL-LEAK": ["CTL-LEAK-LEADER"], "PWR-GROUNDBAR": ["SITE-GROUND"], "STR-CONT-ROOF": ["STR-CONT-FRAME", "STR-CONT-DOOR"],
     "FS-CLEAN-AGENT": ["FS-SMOKE", "FS-VESDA", "FS-EXT", "FS-SIGNS"], "SVC-MODS-MAT": ["SVC-WELDER"],
 }
@@ -206,6 +221,7 @@ TOOLS = {
     "T-14": "Label printer",
     "T-15": "PPE: hard hat, safety glasses, gloves, steel-toe boots, hearing protection",
     "T-16": "Rack lifter / stair climber for 100 kg modules",
+    "T-17": "Ferrule crimper, torque screwdriver 0.5-2.5 N·m (controls terminals), RS-485 / loop test meter",
 }
 
 STEPS_LEAD = "**Step**"
@@ -465,7 +481,7 @@ def generate(lay: L.Layout) -> Doc:
                      "Mark the tray hanger positions on the ceiling liner at 1500 mm pitch. The data tray TR-D is at y 1370 to 1670. The power tray TR-P is at y 1770 to 2070.",
                      "Fit the hangers STR-022 to the tray bosses with M10 rod. Fit the trays STR-020 and STR-021 at z 2250 (underside).",
                      "Fit the tray ground bonding jumper at each tray joint.",
-                     "Lay the leak rope CTL-010 on the floor around the perimeter 100 mm from the walls. Fix the rope with clips every 500 mm. Leave the ends at the gateway position.",
+                     "Lay the leak rope CTL-010 on the floor around the perimeter 100 mm from the walls. Fix the rope with clips every 500 mm. Leave the ends at the controller position.",
                  ]),
                   doc.checks([
                       ("CTP-S1", reg["CTP-S1"].criterion + ". WITNESS POINT.", "Q-04"),
@@ -636,38 +652,52 @@ def generate(lay: L.Layout) -> Doc:
                           ("CTQ-E4", reg["CTQ-E4"].criterion + ".", "Q-07"),
                           ("CTQ-E3", reg["CTQ-E3"].criterion + ".", "Q-10")])])
 
-    # ---------------------------------------------------------------- T09 controls
-    n_nodes = lay.notes.get("n_nodes", 1)
-    nodes = [i for i in lay.items if i.tag.startswith("N") and i.kind == "controls"]
-    steps = [("C", "Static electricity can damage a node. Touch the rack frame before you touch a circuit board."),
+    # ---------------------------------------------------------------- T09 controls (docs/CONTROLS_HARDWARE_DECISION.md)
+    pro = lay.cfg.controls_tier_resolved() == "pro"
+    pods = [i for i in lay.items if i.tag.startswith("P") and i.code == "CTL-POD"]
+    n_pods = len(pods)
+    cp = lay.find("CP1")
+    hz = lay.notes["probe_heights"]
+    steps = [("C", "Static electricity can damage a Pod or an I/O module. Touch the rack frame before you touch a circuit board. Do not open a Pod: there is nothing to solder or set inside. A Pod with a broken seal is returned, not repaired."),
+             ("W", "The controls panel is fed from PNL-M. Only a licensed electrician lands the panel feeder. Lock out the feeder before you work inside the panel."),
              ("N", "Sensor names on the labels must match spec/PROTOCOL.md exactly. The software finds each sensor by its name."),
-             f"Mount the gateway cabinet CTL-001 on the end wall at z 1500 to 2100." if is_c else "Fit the gateway shelf CTL-001 in the rack at the U position on A-002.",
-             (f"Mount the {n_nodes} node enclosure(s) CTL-002 on the tray bracket. The positions are:\n" + "\n".join(f"   - {n.tag} at x {n.x0:.0f}" for n in nodes)) if is_c else "Mount the node enclosure CTL-002 on the cabinet rear wall at x 200, z 1250.",
-             "Connect each node to the PoE switch CTL-008 with a labelled Cat6A cable CTL-009 in the data tray TR-D.",
-             "Fit three inlet probes of string CTL-003 on the front door of each rack at z " + ", ".join(str(z) for z in lay.notes["probe_heights"][:2]) + f" and {lay.notes['probe_heights'][2]}. Put each probe 50 mm in front of the door face. Fix with the clip.",
-             f"Fit one outlet probe at the rear of each rack at z {lay.notes['probe_heights'][1]}.",
-             "Label each probe at the sensor and at the node terminal: " + ", ".join(f"T_in_r1_{z/1000:g}" for z in lay.notes["probe_heights"]) + ", T_out_r1, and so on.",
-             "Fit the supply probe T_supply at the first cooling unit outlet at z 300. Fit the return probe T_return at the unit inlet at z 2200." if is_c else "Fit T_supply at the air conditioner outlet and T_return at the inlet.",
-             "Fit the SHT45 module CTL-004 at the room centre at z 1500. Label RH_room.",
-             "Fit the dP sensor CTL-005 on node N1. Route one tube to the cold aisle and one tube to the hot plenum at z 1500. Label dP_aisle." if lay.notes.get("plenum", 0) else "Fit the dP sensor CTL-005 on node N1. Route one tube to the rack front and one tube to the rack rear. Label dP_aisle.",
-             "Connect the leak rope CTL-010 to the node N1 leak input. Fit the end-of-line terminator.",
-             "Fit the door contact CTL-007 on the door at z 1000. Connect to node N1. Label door_main.",
-             "Connect the utility meter pulse output to node N1 pulse_kwh (meter1).",
-             "Connect the Modbus cables from the UPS, the cooling units and the PDUs to the gateway.",
-             "Connect the dry contacts from the fire releasing panel and the EPO to node N1. These are monitor contacts only.",
-             "Power the gateway. Start `ben_engine` on the laptop T-12. Make sure each node shows status online.",
+             (f"Mount the BEN Controller panel CTL-001 on the end wall with four M10 anchors at x {cp.x0:.0f}, z {cp.z0:.0f} to {cp.z1:.0f}. The panel arrives built, wired and labelled by the UL 508A shop with the PLC CTL-012, the I/O, the edge computer CTL-014, the two 24 VDC supplies CTL-017 and the switch CTL-008 inside. Do not change the wiring inside the panel."
+              if pro else f"Mount the BEN Controls Lite cabinet CTL-001 on the end wall at x {cp.x0:.0f}, z {cp.z0:.0f} to {cp.z1:.0f}. Fit the RevPi CTL-013, the DIO and AIO modules, the 24 VDC supply CTL-017 and the switch CTL-008 on the DIN rail. Fit the RevPi watchdog relay in the cooling-enable circuit.")
+             if is_c else "Fit the BEN Controls Lite shelf CTL-001 in the rack at the U position on A-002. Fit the RevPi CTL-013 with the DIO and AIO modules, the 24 VDC supply CTL-017 and the switch CTL-008 on the shelf DIN rail.",
+             "Electrician: land the panel feeder from PNL-M and the ground. Land 24 VDC to the field terminal strip: one fused 24 VDC branch per Pod E, one per transmitter, one for the leak controller. Torque the terminals to the value on the label (T-17).",
+             (f"Mount the {n_pods} Pods CTL-002. Pods P1 to P{2 * nr} go on the top rail of each rack: odd numbers on the cold face, even numbers on the hot face. The positions are:\n" + "\n".join(f"   - {p_.tag} at x {p_.x0:.0f}, y {p_.y0:.0f}, z {p_.z0:.0f}" for p_ in pods)),
+             f"Fit the probe string CTL-003 of each Pod: three inlet probes on the front door of the rack at z {hz[0]}, {hz[1]} and {hz[2]} (50 mm in front of the door face) on the cold-face Pod, one outlet probe at the rear at z {hz[1]} on the hot-face Pod. Plug the M12 connector into the Pod. Fix each probe with its clip.",
+             "Label each probe at the sensor and at the Pod: " + ", ".join(f"T_in_r1_{z/1000:g}" for z in hz) + ", T_out_r1, and so on.",
+             "Fit the supply probe T_supply at the first cooling unit outlet at z 300. Fit the return probe T_return at the unit inlet at z 2200. These two go to the panel RTD input, not to a Pod." if (is_c and pro) else "Fit T_supply at the cooling unit outlet and T_return at the inlet. Connect them to the room Pod E.",
+             "Connect the room Pod E to the controller with the RS-485 cable (A, B, shield; shield grounded at the panel only) and with a Cat6A cable CTL-009 to the switch CTL-008. Connect the outdoor Pod E with 24 VDC and RS-485 in the same cable run to the dry cooler / condenser pad." if is_c else "Connect the room Pod E to the RevPi with the RS-485 cable (A, B, shield) and 24 VDC.",
+             "Fit the RH/T transmitter CTL-004 at the room centre at z 1500. Wire the 4-20 mA loop to the panel AI module (loop powered from 24 VDC). Label RH_room." if pro else "The room Pod E carries the RH sensor. Mount the Pod at the room centre position on C-001 if the layout shows it there. Label RH_room.",
+             ("Fit the dP transmitter CTL-005 beside the panel. Route one tube to the cold aisle and one tube to the hot plenum at z 1500. Wire the 4-20 mA loop to the panel AI module. Label dP_aisle." if lay.notes.get("plenum", 0) else "Fit the dP transmitter CTL-005 beside the panel. Route one tube to the rack front and one tube to the rack rear. Wire the 4-20 mA loop to the panel AI module. Label dP_aisle.") if pro
+             else ("Route the dP tubes of the room Pod E: one to the cold aisle and one to the hot plenum at z 1500. Label dP_aisle." if lay.notes.get("plenum", 0) else "Route the dP tubes of the room Pod E: one to the rack front and one to the rack rear. Label dP_aisle."),
+             "Connect the leak rope CTL-010 to the leak controller CTL-016 in the panel. Fit the end-of-line terminator. The controller relay and Modbus go to the PLC." if pro else "Connect the leak rope CTL-010 to the room Pod E leak input. Fit the end-of-line terminator.",
+             "Fit the door contact CTL-007 on the door at z 1000. Wire it to a DI on the panel. Label door_main.",
+             "Connect the utility meter pulse output to a DI on the panel (meter1, pulse_kwh).",
+             "Connect the Modbus TCP cables from the UPS, the cooling units and the PDUs to the switch CTL-008. Set the switch to the controls VLAN only. No route to the internet.",
+             "Connect the dry contacts from the fire releasing panel and the EPO to the panel DI. These are monitor contacts only. Life safety stays hard-wired.",
+             "Close the panel. Energise the panel feeder. Make sure both 24 VDC supplies show DC OK and the redundancy module shows both inputs." if pro else "Energise the cabinet. Make sure the 24 VDC supply shows DC OK and the RevPi boots.",
+             "Plug the border router radio CTL-015 into the edge computer USB port (two radios on BEN 20/40)." if pro else "Plug the border router radio CTL-015 into the RevPi USB port.",
+             f"Start `ben_engine` on the laptop T-12. Run `python -m ben_engine.commissioning --stage provisioning-check`. Make sure all {n_pods} Pods join the mesh, show attestation OK and a valid firmware signature. A Pod that does not attest is replaced, not re-flashed in the field.",
              "Open the containment doors. Send the tare command to dP_aisle. Close the doors.",
-             "Put the probes of rack R1 in the ice-point bath, then the 40 C bath. Enter the reference values in the calibration tool. Store the coefficients in the node.",
-             "Wet a finger and touch the leak rope at each 1 m. Make sure the node reports leak = 1 within 10 seconds.",
-             "Open and close the door. Make sure door_main changes within 2 seconds."]
-    doc.task("Controls nodes and sensors", "2 workers, 1 controls technician", h(8 + 2 * nr),
-             ["T-01", "T-04", "T-12", "T-14", "T-15"],
-             [("CTL-001", 1), ("CTL-002", n_nodes), ("CTL-008", 1), ("CTL-009", 1), ("CTL-003", nr + 1), ("CTL-004", 1), ("CTL-005", 1), ("CTL-007", 1), ("CTL-011", 1)],
+             "Put the probes of rack R1 in the ice-point bath, then the 40 C bath. Enter the reference values in the calibration tool. The coefficients are stored in the Pod.",
+             "Wet a finger and touch the leak rope at each 1 m. Make sure the controller reports leak = 1 within 10 seconds.",
+             "Open and close the door. Make sure door_main changes within 2 seconds.",
+             "Stop `ben_engine` on the edge computer. Make sure the cooling units go to local control and the watchdog relay drops within 5 seconds. Restart. Make sure the alarm is logged." if pro else "Stop `ben_engine` on the RevPi. Make sure the watchdog relay drops within 5 seconds and the cooling units keep running on local control. Restart."]
+    parts = [("CTL-001", 1), ("CTL-002", n_pods), ("CTL-003", 2 * nr + 1), ("CTL-005", 1), ("CTL-007", 1), ("CTL-008", 1), ("CTL-009", 1), ("CTL-010", 1), ("CTL-011", 1), ("CTL-015", 2 if nr >= 3 else 1), ("CTL-017", 2 if pro else 1)]
+    parts += [("CTL-012", 1), ("CTL-014", 1), ("CTL-004", 1), ("CTL-016", 1)] if pro else [("CTL-013", 1)]
+    doc.task("BEN Controller panel, BEN Pods and transmitters", "2 workers, 1 controls technician, 1 licensed electrician (panel feeder)", h(6 + 1.5 * nr),
+             ["T-01", "T-04", "T-12", "T-14", "T-15", "T-17"], parts,
              [doc.steps(steps),
               doc.checks([("CTQ-K1", reg["CTQ-K1"].criterion + ".", "Q-08"),
                           ("CTQ-K2", reg["CTQ-K2"].criterion + ".", "Q-08"),
                           ("CTQ-K3", reg["CTQ-K3"].criterion + ". WITNESS POINT.", "Q-08"),
                           ("CTQ-K4", reg["CTQ-K4"].criterion + ".", "Q-08"),
+                          ("CTQ-K5", reg["CTQ-K5"].criterion + ". WITNESS POINT.", "Q-08"),
+                          ("CTP-K2", reg["CTP-K2"].criterion + ". WITNESS POINT.", "Q-08"),
+                          ("CTQ-K6", reg["CTQ-K6"].criterion + (". HOLD POINT." if pro else "."), "Q-08"),
                           ("CTQ-M3", reg["CTQ-M3"].criterion + ".", "Q-08"),
                           ("CTP-K1", reg["CTP-K1"].criterion + ". HOLD POINT.", "Q-09")])])
 
@@ -685,7 +715,7 @@ def generate(lay: L.Layout) -> Doc:
                      "Mount the releasing panel FS-020 on the aisle wall at x 150, z 1500. Mount the abort button beside the door.",
                      "Mount two smoke detectors FS-030 on the ceiling in the cold aisle and two in the hot plenum.",
                      "Fit the discharge pipe FS-040 and the nozzles at the ceiling. Support the pipe every 1.5 m.",
-                     "Installer: connect the detectors, the releasing circuit, the EPO interlock and the cooling shutdown relay. Connect the monitor contacts to node N1.",
+                     "Installer: connect the detectors, the releasing circuit, the EPO interlock and the cooling shutdown relay. Connect the monitor contacts to the controller DI in CTL-001.",
                      "Installer: do the door-fan room integrity test. Record the hold time.",
                      "Installer: do the functional test with the release solenoid disconnected. Fit the actuator last.",
                  ]),
@@ -695,7 +725,7 @@ def generate(lay: L.Layout) -> Doc:
         doc.task("Fire suppression unit", "1 worker", h(1),
                  ["T-04", "T-15"], [("FS-001", 1)],
                  [doc.steps(["Mount the aerosol unit FS-001 at the top rear of the cabinet at x 200 to 400.",
-                             "Connect the thermal actuator cable to node N1 monitor input. Do not connect the actuator to the node outputs.",
+                             "Connect the thermal actuator monitor contact to the RevPi DI. Do not connect the actuator to any controller or Pod output.",
                              "Fit the warning label on the door."]),
                   doc.checks([("CTP-K1", "Actuator independent of the controls bus. Label fitted.", "Q-09")])])
 
@@ -755,7 +785,7 @@ def generate(lay: L.Layout) -> Doc:
                  "Electrician: measure the ground resistance. Target 5 ohm, maximum 25 ohm.",
                  "Electrician: connect the utility conductors to the service section. Check the phase rotation.",
                  "HVAC technician: set the dry cooler on its pad. Connect the primary pipes. Fill, vent and pressure test the primary loop." if lay.find("DC1") else "HVAC technician: check the refrigerant pressures and the condenser fans.",
-                 "Pull the fibre SITE-004 through the controls entry to the gateway cabinet. Terminate on the ODF.",
+                 "Pull the fibre SITE-004 through the controls entry to the BEN Controller panel. Terminate on the ODF.",
                  "Fit the IT servers in the racks if they were removed. Connect each server to PDU A and PDU B.",
                  "Close the battery disconnect. Energise the unit. Start the UPS.",
                  "Run `python -m ben_engine.commissioning --stage site` on the laptop. The script now takes over. Follow the script steps.",

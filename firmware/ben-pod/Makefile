@@ -1,4 +1,4 @@
-# BEN Node — host fallback build. Used when the PlatformIO `native` platform cannot be
+# BEN Pod — host fallback build. Used when the PlatformIO `native` platform cannot be
 # downloaded (network-restricted build hosts). Builds lib/bencore + the mock HAL with the
 # system g++ and runs test/test_core against a Unity-compatible shim (test/support/unity.h).
 #

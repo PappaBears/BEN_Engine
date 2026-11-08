@@ -42,7 +42,8 @@ LIB: Dict[str, Dict[str, Any]] = {
     "ups800":    {"w": 800, "d": 1000, "h": 2000, "kg": 500, "label": "Modular UPS frame 800", "code": "PWR-UPS-GVS100"},
     "batt":      {"w": 600, "d": 1000, "h": 2000, "kg": 450, "label": "Li-ion battery cabinet 32.6 kWh", "code": "PWR-BATT-LI"},
     "panel":     {"w": 500, "d": 250,  "h": 1000, "kg": 60,  "label": "Panelboard, wall mounted", "code": "PWR-PANEL-ILINE"},
-    "gateway":   {"w": 600, "d": 300,  "h": 600,  "kg": 25,  "label": "Gateway / controls cabinet", "code": "CTL-GW-PI5"},
+    "controller": {"w": 610, "d": 305, "h": 762, "kg": 45, "label": "BEN Controller panel (UL 508A, PLC + edge computer)", "code": "CTL-PANEL"},
+    "controller_lite": {"w": 300, "d": 180, "h": 200, "kg": 8, "label": "BEN Controls Lite cabinet (RevPi, DIN rail)", "code": "CTL-ENCL"},
     "cylinder":  {"w": 400, "d": 400,  "h": 1400, "kg": 90,  "label": "Clean-agent cylinder", "code": "FS-CLEAN-AGENT"},
     "cabdx":     {"w": _CL["cabinet_dx"]["width_mm"], "d": 250, "h": 1500, "kg": _CL["cabinet_dx"]["mass_kg"], "label": "Cabinet DX air conditioner 5.8 kW", "code": "CLG-CABAC"},
 }
@@ -50,7 +51,7 @@ LIB: Dict[str, Dict[str, Any]] = {
 CATALOG_FOOTPRINT = {"PWR-UPS-GVS100": 521, "PWR-BATT-LI": 600, "PWR-UPS-93PM50": 495, "STR-RACK48_depth": 1200}
 
 HOT_PLENUM = 200          # rear hot-aisle plenum between rack rear and wall (air layouts)
-END_ZONE = 500            # dead-end zone at the blind end: cylinder, gateway cabinet, mech panel
+END_ZONE = 500            # dead-end zone at the blind end: cylinder, BEN Controller panel, mech panel
 EGRESS_MIN = 900          # clear egress path, mm
 NEC_WS_COND1 = 914        # NEC 110.26 condition 1 working space depth, mm
 NEC_WS_COND2 = 1067       # NEC 110.26 condition 2
@@ -213,7 +214,7 @@ def _resolve_micro(lay: Layout):
         lay.items.append(Item("PWR-UPS-SRT6K-XBP", f"BAT{i+1}", "power", "Rack battery pack (3U)",
                               x0, 100, x0 + r["w"], 100 + r["d"], u_used * 44.45, (u_used + 3) * 44.45, mount="rack", kg=60))
         u_used += 3
-    lay.items.append(Item("CTL-GW-PI5", "GW1", "controls", "Gateway + node shelf (1U)",
+    lay.items.append(Item("CTL-REVPI", "CP1", "controls", "BEN Controls Lite shelf (1U): RevPi Connect 4 + DIO/AIO on DIN bracket, switch, 24 VDC",
                           x0, 100, x0 + r["w"], 100 + r["d"], u_used * 44.45, (u_used + 1) * 44.45, mount="rack", kg=5))
     u_used += 1
     lay.items.append(Item("PWR-PDU", "PDU1", "power", "Rack PDU 30 A, zero-U", x0 + r["w"] - 60, 100, x0 + r["w"], 160, 0, r["h"], mount="rack", kg=5))
@@ -236,7 +237,7 @@ def _resolve_micro(lay: Layout):
     lay.items.append(Item("STR-SKID", "SKID", "structure", "Steel skid 1.3 x 1.1 m with fork pockets", -50, -50, L + 50, W + 50, -150, 0, kg=120))
 
     # checks
-    _chk(lay, "I-M1", "A-002", "Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and gateway (1U)",
+    _chk(lay, "I-M1", "A-002", "Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and controls shelf (1U)",
          f"24U - {u_used}U", 24 - u_used, 6, ">=", resolution="9U for IT at 5 kW: 2 x 2U servers + 1U switch + 1U patch fits; was 12U rule")
     per_side = math.ceil(n / 2)
     _chk(lay, "I-M2", "A-001", "Cabinet DX units fit on cabinet exterior long face",
@@ -381,13 +382,16 @@ def _resolve_container(lay: Layout):
         lay.items.append(Item("STR-CONT-ROOF", "HAC", "cooling", "Hot-aisle containment: top panels + end doors",
                               0, 0, x, plenum, 0, H, mount="wall", kg=40, note="plenum"))
 
-    # ---- step 3: end zone (blind end): cylinder + gateway cabinet on the rack-wall side, mech panel on the aisle side
+    # ---- step 3: end zone (blind end): cylinder + BEN Controller panel on the rack-wall side, mech panel on the aisle side
     cyl = LIB["cylinder"]
     lay.items.append(Item("FS-CLEAN-AGENT", "FS1", "fire", f"{cyl['label']} (clean agent, wall bracket)",
                           L - END_ZONE + 50, 100, L - END_ZONE + 50 + cyl["w"], 100 + cyl["d"], 0, cyl["h"], kg=cyl["kg"], front="+x"))
-    gw = LIB["gateway"]
-    lay.items.append(Item("CTL-GW-PI5", "GW1", "controls", gw["label"] + " (end wall, 1500 AFF)",
-                          L - gw["d"], 100, L, 100 + gw["w"], 1500, 1500 + gw["h"], mount="wall", kg=gw["kg"], front="-x"))
+    # controls tier (docs/CONTROLS_HARDWARE_DECISION.md §2a): Pro = UL 508A panel ~800x600x300 class; Lite = DIN cabinet
+    pro = cfg.controls_tier_resolved() == "pro"
+    gw = LIB["controller" if pro else "controller_lite"]
+    lay.notes["controls_tier"] = "pro" if pro else "lite"
+    lay.items.append(Item(gw["code"], "CP1", "controls", gw["label"] + " (end wall, 1200 AFF)",
+                          L - gw["d"], 100, L, 100 + gw["w"], 1200, 1200 + gw["h"], mount="wall", kg=gw["kg"], front="-x"))
     pn = LIB["panel"]
     # panels on the end wall, aisle side: PNL-M (mechanical) low, PNL-IT high when rack-mounted UPS is used
     pnl_code = "PWR-PANEL-NQ" if d["voltage"].startswith("208") else "PWR-PANEL-ILINE"
@@ -513,7 +517,9 @@ def _sensors(lay: Layout):
     """Sensor placement rule (matches twin.sensors() and PROTOCOL.md channel names):
     3 inlet probes per rack at 0.4 / 1.2 / 1.8 m on the cold face, 1 outlet probe at 1.2 m on the hot face,
     supply and return probes at the first cooling unit, dP taps across the containment, RH at room centre,
-    leak rope on the floor, door contact on the cargo door. One node per 2 racks."""
+    leak rope on the floor, door contact on the cargo door. Logical node ids stay node{k} (one per two racks, as the
+    twin and the API use them); the physical BEN Pods are two per rack (cold face P{2i+1}, hot face P{2i+2}) plus a
+    room Pod and an outdoor Pod (docs/CONTROLS_HARDWARE_DECISION.md §3)."""
     racks = lay.by_kind("rack")
     rf = lay.aisle_y0
     heights = (400, 1200, 1800) if lay.is_container else (300, 700, 1100)
@@ -535,12 +541,24 @@ def _sensors(lay: Layout):
     lay.sensors.append(Sensor("door_main", "door", "node1", 50 if lay.is_container else lay.L / 2, lay.W / 2 if lay.is_container else lay.W - 20, 1000, "door"))
     lay.sensors.append(Sensor("P_utility", "kWh", "meter1", lay.L - 100, lay.W - 300, zmid, "pulse_kwh"))
     n_nodes = max(1, math.ceil(len(racks) / 2))
-    for k in range(n_nodes):
-        rr = racks[min(2 * k, len(racks) - 1)]
-        ny0 = rf + 100 if lay.is_container else 20
-        lay.items.append(Item("CTL-NODE-MCU", f"N{k+1}", "controls", "BEN Node (ESP32-S3, PoE) on tray bracket" if lay.is_container else "BEN Node (ESP32-S3, PoE) on cabinet rear wall",
-                              rr.x0, ny0, rr.x0 + 200, ny0 + 200, TRAY_Z - 150 if lay.is_container else 1250, TRAY_Z - 50 if lay.is_container else 1330, mount="wall", kg=1))
     lay.notes["n_nodes"] = n_nodes
+    # BEN Pods: cold-face and hot-face Pod on the top rail of every rack, one room Pod beside the controller, one outdoor Pod
+    pods = []
+    for i, r in enumerate(racks):
+        ztop = r.z1 - 150
+        cold_y = rf + 20 if lay.is_container else r.y1 + 10
+        hot_y = (r.y0 - 70 if lay.notes.get("plenum", 0) else r.y0 - 70) if lay.is_container else r.y0 - 60
+        pods.append(Item("CTL-POD", f"P{2*i+1}", "controls", f"BEN Pod W (cold face R{i+1}, Thread, 4 x Pt1000)", r.x0 + 40, cold_y, r.x0 + 140, cold_y + 50, ztop, ztop + 120, mount="rack", kg=0.3))
+        pods.append(Item("CTL-POD", f"P{2*i+2}", "controls", f"BEN Pod W (hot face R{i+1}, Thread, 4 x Pt1000)", r.x0 + 40, max(hot_y, 0), r.x0 + 140, max(hot_y, 0) + 50, ztop, ztop + 120, mount="rack", kg=0.3))
+    cp = lay.find("CP1")
+    k = len(pods) + 1
+    if lay.is_container and cp:
+        pods.append(Item("CTL-POD", f"P{k}", "controls", "BEN Pod E (room: RH, dP, leak, door; RS-485 to controller; Thread router)", cp.x0 - 220, cp.y0, cp.x0 - 100, cp.y0 + 50, cp.z1 + 100, cp.z1 + 220, mount="wall", kg=0.4))
+        pods.append(Item("CTL-POD", f"P{k+1}", "controls", "BEN Pod E (outdoor: dry cooler / condenser pad, IP65)", lay.L + 160, -300, lay.L + 280, -250, 1800, 1920, mount="ext", kg=0.5))
+    else:
+        pods.append(Item("CTL-POD", f"P{k}", "controls", "BEN Pod E (room: RH, dP, leak, door; RS-485 to RevPi; Thread router)", 200, 20, 320, 70, 1250, 1370, mount="wall", kg=0.4))
+    lay.items.extend(pods)
+    lay.notes["n_pods"] = len(pods)
 
 
 # ------------------------------------------------------------------ reporting

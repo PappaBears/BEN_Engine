@@ -1078,7 +1078,7 @@
   "unit": "per unit",
   "unit_price_usd": 900.0,
   "price_status": "estimate",
-  "price_source_note": "Engineering estimate: 7/8 + 3/8 ACR Cu 40 ft, insulation, charge, nitrogen braze Re-estimated for R-513A (typically 1.5\u20132x R-410A per kg).",
+  "price_source_note": "Engineering estimate: 7/8 + 3/8 ACR Cu 40 ft, insulation, charge, nitrogen braze Re-estimated for R-513A (typically 1.5–2x R-410A per kg).",
   "price_checked": null,
   "lead_time_weeks": 1,
   "availability_note": "Stock. Changed from R-410A: AIM Act 700-GWP limit for new IT-room cooling from 2027-01-01 and A2L charge limits (UL 60335-2-40 / ASHRAE 15) make R-454B/R-32 unusable inside a container; specify R-513A or R-515B factory charge from the DX vendor.",
@@ -1417,123 +1417,8 @@
   "qty_rule": "racks*4"
  },
  {
-  "code": "CTL-GW-PI5",
-  "name": "Raspberry Pi 5 8 GB (gateway)",
-  "manufacturer": "Raspberry Pi Ltd",
-  "mpn": "SC1112 / SC1432",
-  "vendor": "DigiKey",
-  "vendor_url": "https://www.digikey.com/en/product-highlight/r/raspberry-pi/raspberry-pi-5",
-  "unit": "ea",
-  "unit_price_usd": 172.72,
-  "price_status": "confirmed",
-  "price_source_note": "DigiKey US $172.72 (SC1432, 5 in stock) seen 2026-11-07; TME US $174.99; official MSRP raised to ~$130 Oct 2026 (Tom's Hardware). Volatile due to DRAM shortage.",
-  "price_checked": "2026-11-07",
-  "lead_time_weeks": 2,
-  "availability_note": "Constrained; DRAM-driven price rises in 2026.",
-  "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "1"
- },
- {
-  "code": "CTL-GW-M2HAT",
-  "name": "Raspberry Pi M.2 HAT+",
-  "manufacturer": "Raspberry Pi Ltd",
-  "mpn": "SC1148",
-  "vendor": "Waveshare",
-  "vendor_url": "https://waveshare.com/Raspberry-Pi-M.2-HAT-Plus.htm",
-  "unit": "ea",
-  "unit_price_usd": 13.99,
-  "price_status": "confirmed",
-  "price_source_note": "Waveshare $13.99 seen 2026-11-07",
-  "price_checked": "2026-11-07",
-  "lead_time_weeks": 1,
-  "availability_note": "Stock.",
-  "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "1"
- },
- {
-  "code": "CTL-GW-SSD",
-  "name": "NVMe SSD M.2 2230, 256 GB (gateway database)",
-  "manufacturer": "Kioxia / Patriot",
-  "mpn": "BG5 256GB",
-  "vendor": "Amazon / DigiKey",
-  "vendor_url": "",
-  "unit": "ea",
-  "unit_price_usd": 38.0,
-  "price_status": "estimate",
-  "price_source_note": "Not priced this session; typical $30-45",
-  "price_checked": null,
-  "lead_time_weeks": 1,
-  "availability_note": "Stock.",
-  "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "1"
- },
- {
-  "code": "CTL-GW-CASE",
-  "name": "Raspberry Pi 5 official case",
-  "manufacturer": "Raspberry Pi Ltd",
-  "mpn": "SC1159",
-  "vendor": "The Pi Hut",
-  "vendor_url": "https://thepihut.com/products/raspberry-pi-5-case",
-  "unit": "ea",
-  "unit_price_usd": 12.0,
-  "price_status": "confirmed",
-  "price_source_note": "The Pi Hut GBP 9 inc VAT seen 2026-11-07 (~$12 converted at 1.30)",
-  "price_checked": "2026-11-07",
-  "lead_time_weeks": 1,
-  "availability_note": "Stock.",
-  "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "1"
- },
- {
-  "code": "CTL-GW-PSU",
-  "name": "Raspberry Pi 27 W USB-C power supply",
-  "manufacturer": "Raspberry Pi Ltd",
-  "mpn": "SC1152",
-  "vendor": "official reseller",
-  "vendor_url": "",
-  "unit": "ea",
-  "unit_price_usd": 12.0,
-  "price_status": "list",
-  "price_source_note": "Manufacturer published $12 MSRP; not re-checked on a vendor page this session",
-  "price_checked": null,
-  "lead_time_weeks": 1,
-  "availability_note": "Stock.",
-  "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "1"
- },
- {
   "code": "CTL-POE-SW",
-  "name": "UniFi Industrial 10-port switch, 8x PoE++ 802.3bt, 430 W, -40..+70 C",
+  "name": "[WITHDRAWN] UniFi Industrial 10-port switch, 8x PoE++ 802.3bt, 430 W, -40..+70 C",
   "manufacturer": "Ubiquiti",
   "mpn": "USW-Industrial",
   "vendor": "CDW",
@@ -1544,42 +1429,18 @@
   "price_source_note": "CDW $609.99 seen 2026-11-07; Altex $549.99; wifi-stock $456.25. Netgear GS110TUP as alternate (~$456-525).",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 2,
-  "availability_note": "Stock at US distributors.",
+  "availability_note": "Withdrawn 2026-11-08: hobby-grade PoE switch; Pod E is 24 VDC powered from the panel, control LAN on CTL-SWITCH (Pro) / CTL-SWITCH-LITE (Lite). Stock at US distributors.",
   "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "ceil(nodes/8)"
- },
- {
-  "code": "CTL-NODE-MCU",
-  "name": "ESP32-POE-ISO-EA (isolated PoE ESP32 board, external antenna)",
-  "manufacturer": "Olimex Ltd",
-  "mpn": "ESP32-POE-ISO-EA",
-  "vendor": "TME",
-  "vendor_url": "https://www.tme.com/mx/en/details/esp32-poe-iso-ea/development-kits-for-data-transmission/olimex/",
-  "unit": "ea",
-  "unit_price_usd": 39.16,
-  "price_status": "confirmed",
-  "price_source_note": "TME $39.16 (1 pc), $36.85 (3+) net seen 2026-11-07; Mouser -EA-16MB $32.98; -IND variant 12 wk factory lead on Mouser. Olimex direct ~EUR 22-28.",
-  "price_checked": "2026-11-07",
-  "lead_time_weeks": 2,
-  "availability_note": "Spotty distributor stock; buy direct from Olimex for 10-unit run. Industrial-temp (-IND) variant 12 wk.",
-  "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "nodes"
+  "applies_to_tiers": [],
+  "qty_rule": "ceil(nodes/8)",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-SHT45",
-  "name": "SHT45 precision temp/RH breakout, STEMMA QT",
+  "name": "[WITHDRAWN] SHT45 precision temp/RH breakout, STEMMA QT",
   "manufacturer": "Adafruit (Sensirion)",
   "mpn": "5665",
   "vendor": "Jameco",
@@ -1590,6 +1451,158 @@
   "price_source_note": "Jameco $16.55 seen 2026-11-07 (adafruit.com blocked in session; Adafruit list typically $14.95)",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 1,
+  "availability_note": "Withdrawn 2026-11-08: hobby breakout; the SHT45 is now a reflowed component on the BEN Pod PCB (CTL-POD). Stock.",
+  "moq": 1,
+  "applies_to_tiers": [],
+  "qty_rule": "nodes",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
+ },
+ {
+  "code": "CTL-POD",
+  "name": "BEN Pod v1 assembled and provisioned (MGM240P Thread module w/ Secure Vault High, 4x Pt1000 3-wire 24-bit front end, SHT45, 2x dry contact, leak-rope input, 2x isolated 4-20 mA; Pod E adds Ethernet/PoE PD, RS-485, 2x relay) - make item, per unit",
+  "manufacturer": "Schreiber AI (contract electronics manufacturer)",
+  "mpn": "BEN-POD-v1",
+  "vendor": "contract electronics manufacturer (RFQ 14)",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 88.0,
+  "price_status": "estimate",
+  "price_source_note": "Engineering estimate at 500 pcs: MGM240P $9.86 (Mouser) + 24-bit RTD AFE ~$9 + SHT45 ~$4 + Ethernet PHY/PoE PD ~$6 (Pod E) + RS-485/iso 4-20 mA ~$8 + relays, passives, connectors ~$14 + 4-layer PCB ~$6 + SMT assembly and test ~$18 + certificate provisioning ~$3; blended Pod W/Pod E (2 Pod E per unit, rest Pod W)",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "First article 8 wk after Gerbers; production 4 wk. 1,000 pcs module RFQ queued (email 13).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "pods"
+ },
+ {
+  "code": "CTL-MGM240P",
+  "name": "MGM240PB32VNA3R Thread/802.15.4 module, EFR32MG24, Secure Vault High, PCB antenna, FCC/IC/CE modular approval (consigned component of CTL-POD)",
+  "manufacturer": "Silicon Labs",
+  "mpn": "MGM240PB32VNA3R",
+  "vendor": "Mouser (via FindChips)",
+  "vendor_url": "https://www.findchips.com/detail/mgm240pb32vna3r/Silicon-Laboratories-Inc",
+  "unit": "ea",
+  "unit_price_usd": 9.86,
+  "price_status": "confirmed",
+  "price_source_note": "Mouser $9.86 T&R, 2,099 in stock seen 2026-11-08 via FindChips; DigiKey $5.65 at 1,000 (cut tape), 12 wk lead on EU sites; Symmetry $11.03",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 12,
+  "availability_note": "Consigned to the CM; cost is inside CTL-POD so applies_to_tiers is empty. 1,000 pcs pricing requested (email 13).",
+  "moq": 1,
+  "applies_to_tiers": [],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "pods"
+ },
+ {
+  "code": "CTL-POD-ENCL",
+  "name": "BEN Pod enclosure: Phoenix Contact ICS 50 DIN-rail housing set with rack-rail clip (IP40); IP65 outdoor variant for the outdoor Pod",
+  "manufacturer": "Phoenix Contact / Hammond",
+  "mpn": "ICS50-B122X98 + 1554 (outdoor)",
+  "vendor": "onlinecomponents / DigiKey",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 16.0,
+  "price_status": "estimate",
+  "price_source_note": "ICS50 mounting base 1118656 $11.50 (onlinecomponents, 5 pc) + cover + rail clip; Hammond 1554 IP65 ~$28 for the outdoor Pod; blended",
+  "price_checked": null,
+  "lead_time_weeks": 5,
+  "availability_note": "ICS50 bases ship in ~5 wk from Phoenix; Hammond in stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "pods"
+ },
+ {
+  "code": "CTL-PT1000",
+  "name": "Pt1000 class A 3-wire RTD probe string: 4 probes (3 inlet, 1 outlet), 6 mm SS tip, 3 m PTFE leads, M12 to Pod, labelled",
+  "manufacturer": "Omega / OEM probe house",
+  "mpn": "P1K-M-A-6-150 class, string assembly",
+  "vendor": "Omega / OEM (RFQ)",
+  "vendor_url": "",
+  "unit": "string",
+  "unit_price_usd": 72.0,
+  "price_status": "estimate",
+  "price_source_note": "Engineering estimate: Omega P1K-M-A-6-150 with 3 m cable EUR 103 single (Farnell); OEM class A thin-film Pt1000 with 3 m leads $12-18 each at 200 pcs + M12 connectors + labels; quote queued",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "OEM string 6 wk; Omega singles in stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "racks*2+1"
+ },
+ {
+  "code": "CTL-RCP",
+  "name": "xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 20/40",
+  "manufacturer": "Silicon Labs",
+  "mpn": "XG24-EK2703A",
+  "vendor": "Silicon Labs / DigiKey",
+  "vendor_url": "https://www.silabs.com/development-tools/wireless/efr32xg24-explorer-kit",
+  "unit": "ea",
+  "unit_price_usd": 39.0,
+  "price_status": "list",
+  "price_source_note": "Silicon Labs MSRP $39.00 on the product page seen 2026-11-08; DigiKey $40.26 (41 in stock), Arrow $35.00",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "Stock. Production RCP is the same MGM240P on a USB stick PCB from the Pod CM (later).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "2 if racks >= 3 else 1"
+ },
+ {
+  "code": "CTL-RS485",
+  "name": "RS-485 cable Belden 3106A 22 AWG shielded pair, 100 ft (Pod E to PLC/RevPi Modbus RTU)",
+  "manufacturer": "Belden",
+  "mpn": "3106A 100 ft",
+  "vendor": "Allied / Mouser",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 95.0,
+  "price_status": "estimate",
+  "price_source_note": "Not priced this session; typical $85-110 per 100 ft",
+  "price_checked": null,
+  "lead_time_weeks": 1,
   "availability_note": "Stock.",
   "moq": 1,
   "applies_to_tiers": [
@@ -1598,11 +1611,533 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "nodes"
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-PSU-QUINT",
+  "name": "QUINT4-PS/1AC/24DC/10 DIN-rail 24 VDC 10 A power supply (UL 508 listed; 2 redundant on Pro, 1 on Lite)",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2904601",
+  "vendor": "RSP Supply",
+  "vendor_url": "https://rspsupply.com/p-36888-phoenix-contact-2904601-power-supply-quint4-ps1ac24dc10.aspx",
+  "unit": "ea",
+  "unit_price_usd": 295.53,
+  "price_status": "confirmed",
+  "price_source_note": "RSP Supply $295.53 sale (list $354.64) seen 2026-11-08; Buerklin EUR 211.49; DigiKey $204.48-225.77 via FindChips",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 1,
+  "availability_note": "Stock (5,671 pcs at Buerklin).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "1 + controls_pro"
+ },
+ {
+  "code": "CTL-PANEL-KIT",
+  "name": "Controls panel hardware lot: DIN rail, wire duct, 600 V MTW wire, ferrules, fuse holders + fuses, ground and shield bars, end brackets, labels",
+  "manufacturer": "Phoenix Contact / Panduit / various",
+  "mpn": "BEN-PANEL-KIT",
+  "vendor": "Graybar / RSP Supply",
+  "vendor_url": "",
+  "unit": "lot",
+  "unit_price_usd": 350.0,
+  "price_status": "estimate",
+  "price_source_note": "Engineering estimate from the panel layout; Lite cabinet uses about half (rule)",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "1 if controls_pro else 0.5"
+ },
+ {
+  "code": "CTL-PLC",
+  "name": "PLCnext AXC F 2152 controller (IEC 61131-3 + Linux, 2x Ethernet, Axioline F local bus, UL 508 listed, IEC 62443-4-1 certified development)",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2404267",
+  "vendor": "TTI (via FindChips)",
+  "vendor_url": "https://www.findchips.com/detail/axcf2152/Phoenix-Contact",
+  "unit": "ea",
+  "unit_price_usd": 1034.59,
+  "price_status": "confirmed",
+  "price_source_note": "TTI Americas $1,034.59 (1), $1,086.32, 5 in stock seen 2026-11-08 via FindChips; RS UK GBP 851.13; Buerklin EUR 928.90 (0 stock); Elektromax24 EUR 611.10 net",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 3,
+  "availability_note": "Constrained; order with the 10-unit panel run (email 17). Alternates Beckhoff CX9240, WAGO PFC200.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-IO-DIO",
+  "name": "AXL F DI8/1 DO8/1 1H Axioline F 8 DI 24 VDC + 8 DO 24 VDC 0.5 A (door, EPO/fire monitor contacts, cooling unit status; outputs via CTL-RELAY)",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2701916",
+  "vendor": "RSP Supply",
+  "vendor_url": "https://rspsupply.com/p-71071-phoenix-contact-2701916-digital-module-axl-f-di81-do81-1h.aspx",
+  "unit": "ea",
+  "unit_price_usd": 270.49,
+  "price_status": "confirmed",
+  "price_source_note": "RSP Supply $270.49 sale (list $324.59) seen 2026-11-08; RS UK GBP 150.65; FindChips US $233-241",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1 if racks <= 2 else 2"
+ },
+ {
+  "code": "CTL-IO-RTD",
+  "name": "AXL F RTD4 1H Axioline F 4-channel RTD input (Pt1000 2/3/4-wire) for cooling unit supply/return and outdoor probes on the PLC",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2688556",
+  "vendor": "RSP Supply",
+  "vendor_url": "https://rspsupply.com/p-71080-phoenix-contact-2688556-temperature-module-axl-f-rtd4-1h.aspx",
+  "unit": "ea",
+  "unit_price_usd": 578.61,
+  "price_status": "confirmed",
+  "price_source_note": "RSP Supply $578.61 sale (list $694.33) seen 2026-11-08; RS UK GBP 333.76; Buerklin EUR 393.75",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-IO-AI",
+  "name": "AXL F AI4 I 1H Axioline F 4-channel 4-20 mA analog input (Setra 264 dP, Vaisala RH/T, spare)",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2688491",
+  "vendor": "RSP Supply",
+  "vendor_url": "https://rspsupply.com/p-71304-phoenix-contact-2688491-analog-module-axl-f-ai4-i-1h.aspx",
+  "unit": "ea",
+  "unit_price_usd": 492.24,
+  "price_status": "confirmed",
+  "price_source_note": "RSP Supply $492.24 sale (list $590.69) seen 2026-11-08; RS IE EUR 363.44; Lieske EUR 309.12 net",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1 if racks <= 6 else 2"
+ },
+ {
+  "code": "CTL-PSU-ORING",
+  "name": "QUINT4-S-ORING/12-24DC/1X40 redundancy (diode) module for the two QUINT4 supplies",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2907752",
+  "vendor": "RSP Supply",
+  "vendor_url": "https://rspsupply.com/p-36911-phoenix-contact-2907752-redundancy-module-quint4-s-oring12-24dc1x40.aspx",
+  "unit": "ea",
+  "unit_price_usd": 129.34,
+  "price_status": "confirmed",
+  "price_source_note": "RSP Supply $129.34 sale (list $155.21) seen 2026-11-08; Buerklin EUR 111.86 incl. VAT; RS UK GBP 124.61",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 1,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-SPD",
+  "name": "VAL-MS 230/3+1 Type 2 surge arrester, pluggable, for the controls panel supply",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2838209",
+  "vendor": "RSP Supply",
+  "vendor_url": "https://rspsupply.com/p-1138-phoenix-contact-2838209-type2-surge-arrester-val-ms-23031.aspx",
+  "unit": "ea",
+  "unit_price_usd": 536.44,
+  "price_status": "confirmed",
+  "price_source_note": "RSP Supply $536.44 sale (list $643.73) seen 2026-11-08; RS UK GBP 291.19; e-sonic CAD 776.63 (1) / 403.44 (50)",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock; FM (remote contact) variant 2838199 +~10 %.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-SWITCH",
+  "name": "FL SWITCH 2008 managed industrial Ethernet switch, 8x RJ45, RSTP, DIN rail (controls LAN: PLC, edge computer, Pod E, fibre uplink via media converter)",
+  "manufacturer": "Phoenix Contact",
+  "mpn": "2702324",
+  "vendor": "PLC Direct",
+  "vendor_url": "https://plc-direct.com/products/2702324",
+  "unit": "ea",
+  "unit_price_usd": 353.67,
+  "price_status": "confirmed",
+  "price_source_note": "PLC Direct $353.67 sale seen 2026-11-08; onlinecomponents $487.76; Farnell AT EUR 397.86 (8 in stock). Alternate Moxa EDS-2008-EL $144.75 (unmanaged)",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-EDGE",
+  "name": "OnLogic Karbon 400 (K410) industrial edge computer: Atom x6425E, 16 GB, 256 GB NVMe, TPM 2.0, 2x LAN, -40..70 C, DIN rail, UL 62368-1 (runs ben_engine, MQTT, OTBR)",
+  "manufacturer": "OnLogic",
+  "mpn": "K410",
+  "vendor": "OnLogic (configure to order)",
+  "vendor_url": "https://www.onlogic.com/",
+  "unit": "ea",
+  "unit_price_usd": 1450.0,
+  "price_status": "estimate",
+  "price_source_note": "No public list price (configure-to-order); Karbon 300 class $800-1,000, Karbon 520 from $2,997 (Sept 2025), used K410 $480 (reseller). Quote queued (email 18). Alternate Siemens SIMATIC IPC227G.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Built to order 3-4 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-PANEL",
+  "name": "Wall-mount enclosure Type 12/IP65, 30x24x12 in (762x610x305 mm, the 800x600x300 class), steel, hinged cover - BEN Controller panel (UL 508A listed by the panel shop)",
+  "manufacturer": "nVent Hoffman",
+  "mpn": "A302412LP",
+  "vendor": "Platt",
+  "vendor_url": "https://www.platt.com/p/0027204/nvent-hoffman/enclosure-nema-3r-4-12-13-hinge-cover-30-x-24-x-12-steel-gray/783510285302/hofa302412lp",
+  "unit": "ea",
+  "unit_price_usd": 1206.3,
+  "price_status": "confirmed",
+  "price_source_note": "Platt $1,206.30 seen 2026-11-08 (in stock at 3 locations); Zoro $907.92-1,044.04; DigiKey $1,080.43. Metric alternate Rittal AE 1380 (quote)",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 1,
+  "availability_note": "Stock. Includes back panel.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-PANEL-BUILD",
+  "name": "UL 508A panel shop: assembly, wiring, SCCR calculation and label, point-to-point drawings, listing mark (per panel)",
+  "manufacturer": "UL 508A panel partner (RFQ)",
+  "mpn": "BEN-CONTROLLER-BUILD",
+  "vendor": "UL 508A panel shop (email 17)",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 2600.0,
+  "price_status": "estimate",
+  "price_source_note": "Engineering estimate: 22-28 h at $95-110/h + UL 508A label and drawing package; 10-unit run quote queued",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Partner selection via email 17.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-SETRA264",
+  "name": "Setra 264 very low differential pressure transmitter 0-0.25 in WC, 4-20 mA (aisle dP on the PLC AI)",
+  "manufacturer": "Setra Systems",
+  "mpn": "2641R25WD11T1C",
+  "vendor": "Jackson Systems",
+  "vendor_url": "https://jacksonsystems.com/product/setra-2641r25wd11t1c/",
+  "unit": "ea",
+  "unit_price_usd": 219.71,
+  "price_status": "confirmed",
+  "price_source_note": "Jackson Systems $219.71 (MSRP $252.67) seen 2026-11-08; Instrumart call for price",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-DWYER-MS2",
+  "name": "Dwyer Magnesense II MS2-W102 differential pressure transmitter (alternate to CTL-SETRA264)",
+  "manufacturer": "Dwyer",
+  "mpn": "MS2-W102",
+  "vendor": "Dwyer / Instrumentation2000",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 260.0,
+  "price_status": "estimate",
+  "price_source_note": "Alternate, not in any preset: resellers list MS2-W102 variants CAD 251-599; Dwyer MSX-W10-IN $141.62; quote",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "Alternate only.",
+  "moq": 1,
+  "applies_to_tiers": [],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-VAISALA-HMW90",
+  "name": "Vaisala HMW90 wall humidity and temperature transmitter, +/-1.7 %RH, 4-20 mA (room RH on the PLC AI; Pods cross-check)",
+  "manufacturer": "Vaisala",
+  "mpn": "HMW90",
+  "vendor": "Vaisala / Blackhawk Supply (quote)",
+  "vendor_url": "https://www.vaisala.com/HMW90",
+  "unit": "ea",
+  "unit_price_usd": 640.0,
+  "price_status": "estimate",
+  "price_source_note": "Quote-only at Vaisala and resellers; basis Vaisala HMW89D $312.20 (Transcat) and HMW92 $986.44 sale / $1,897 list (Kele). Alternate HMD60 duct type",
+  "price_checked": null,
+  "lead_time_weeks": 3,
+  "availability_note": "Configure to order.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-LEAK-CTRL",
+  "name": "SeaHawk LD2100 distance-read leak detection controller, web enabled, relay + Modbus to the PLC",
+  "manufacturer": "RLE Technologies",
+  "mpn": "LD2100",
+  "vendor": "Building Controls Group",
+  "vendor_url": "https://buildingcontrolsgroup.com/products/ld2100",
+  "unit": "ea",
+  "unit_price_usd": 1730.19,
+  "price_status": "confirmed",
+  "price_source_note": "Building Controls Group $1,730.19 sale seen 2026-11-08; Kele $2,359.24 (list $4,537); Vacker $2,847.26",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Available to order. Needs isolated 24 VDC (from CTL-PSU-QUINT).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben10",
+   "ben20",
+   "ben40"
+  ],
+  "applies_to_controls": [
+   "pro"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-REVPI",
+  "name": "RevPi Connect 4 industrial controller (CM4-based industrial controller, 8 GB eMMC, 2x Ethernet, RS-485, DIN rail, UL/CE listed, hardware watchdog relay) - runs ben_engine, interlock logic and the Thread border router",
+  "manufacturer": "KUNBUS",
+  "mpn": "PR100376",
+  "vendor": "RS Components (NL)",
+  "vendor_url": "https://nl.rs-online.com/web/p/industrial-computers/2713625",
+  "unit": "ea",
+  "unit_price_usd": 525.0,
+  "price_status": "confirmed",
+  "price_source_note": "RS Netherlands EUR 484.88 excl. VAT seen 2026-11-08 (~$525 at 1.08); RS UK GBP 383.30; 32 GB variant PR100378 GBP 422.72. Alternate RevPi Connect S.",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock at RS. RevPi Connect 5 is the successor if lead times slip.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10"
+  ],
+  "applies_to_controls": [
+   "lite"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-REVPI-DIO",
+  "name": "RevPi DIO module, 14 DI + 14 DO 24 VDC (door, EPO/fire monitor contacts, cooling status; outputs via CTL-RELAY)",
+  "manufacturer": "KUNBUS",
+  "mpn": "PR100197",
+  "vendor": "DigiKey / Mouser / TME",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 239.0,
+  "price_status": "list",
+  "price_source_note": "DigiKey $239.00 (listing name ambiguous), TME $220.72 net, Mouser EUR 192.30 seen 2026-11-08; not confirmed on a vendor page with URL",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "Stock at distributors.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10"
+  ],
+  "applies_to_controls": [
+   "lite"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-REVPI-AIO",
+  "name": "RevPi AIO module, 4 AI (4-20 mA / 0-10 V) + 2 AO + 2 RTD inputs (cooling unit supply/return RTD, optional dP transmitter)",
+  "manufacturer": "KUNBUS",
+  "mpn": "PR100250",
+  "vendor": "DigiKey / Mouser / TME",
+  "vendor_url": "https://www.digikey.co.uk/en/products/detail/kunbus-gmbh/PR100250/10384220",
+  "unit": "ea",
+  "unit_price_usd": 386.0,
+  "price_status": "list",
+  "price_source_note": "DigiKey $386.00 (0 in stock), Mouser EUR 312.14, TME $353.61 net seen 2026-11-08; US page price not captured directly",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Spotty stock; order early.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10"
+  ],
+  "applies_to_controls": [
+   "lite"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-SWITCH-LITE",
+  "name": "Moxa EDS-2008-EL compact industrial Ethernet switch, 8x RJ45, DIN rail, 9.6-60 VDC (Lite controls LAN; managed upgrade FL SWITCH 2008 or EDS-G2008-EL)",
+  "manufacturer": "Moxa",
+  "mpn": "EDS-2008-EL",
+  "vendor": "Industrial Networking",
+  "vendor_url": "https://www.industrialnetworking.com/eds-2008-el-series-switches",
+  "unit": "ea",
+  "unit_price_usd": 144.75,
+  "price_status": "confirmed",
+  "price_source_note": "Industrial Networking $144.75 seen 2026-11-08; FindChips/RS $146.94 (14 wk); -T wide-temp variant $200.25",
+  "price_checked": "2026-11-08",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "micro",
+   "ben10"
+  ],
+  "applies_to_controls": [
+   "lite"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-PROV-FIXTURE",
+  "name": "Secure provisioning fixture: SEGGER J-Link BASE (SWD), bed-of-nails Pod fixture, provisioning PC, PKI HSM token; one per factory cell",
+  "manufacturer": "SEGGER / custom",
+  "mpn": "8.08.00 + fixture",
+  "vendor": "RS Components / fixture shop",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 3200.0,
+  "price_status": "estimate",
+  "price_source_note": "J-Link BASE GBP 451.26 excl. VAT (RS UK, ~$590) + custom bed-of-nails fixture ~$1,500 + PC ~$700 + HSM token ~$400; factory capex, not per unit (applies_to_tiers empty)",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "Fixture shop 6 wk.",
+  "moq": 1,
+  "applies_to_tiers": [],
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ],
+  "qty_rule": "1"
  },
  {
   "code": "CTL-SDP810",
-  "name": "SDP810-125Pa differential pressure sensor, I2C",
+  "name": "SDP810-125Pa differential pressure sensor, I2C (fitted on the two room Pods: aisle dP and twin cross-check)",
   "manufacturer": "Sensirion",
   "mpn": "SDP810-125PA",
   "vendor": "DigiKey",
@@ -1621,11 +2156,15 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "nodes"
+  "qty_rule": "2",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-ADS1115",
-  "name": "ADS1115 16-bit 4-ch ADC breakout, STEMMA QT",
+  "name": "[WITHDRAWN] ADS1115 16-bit 4-ch ADC breakout, STEMMA QT",
   "manufacturer": "Adafruit (TI)",
   "mpn": "1085",
   "vendor": "Mouser",
@@ -1636,19 +2175,18 @@
   "price_source_note": "Mouser $14.95, 538 in stock seen 2026-11-07; Adafruit $13.46 (10-99)",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 1,
-  "availability_note": "Stock.",
+  "availability_note": "Withdrawn 2026-11-08: hobby ADC breakout; the Pod carries a 24-bit RTD front end on the PCB (CTL-POD). Stock.",
   "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "nodes"
+  "applies_to_tiers": [],
+  "qty_rule": "nodes",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-DS18B20",
-  "name": "Waterproof DS18B20 1-Wire temperature probe, 1 m",
+  "name": "[WITHDRAWN] Waterproof DS18B20 1-Wire temperature probe, 1 m",
   "manufacturer": "Adafruit",
   "mpn": "381",
   "vendor": "Adafruit",
@@ -1659,19 +2197,18 @@
   "price_source_note": "Adafruit $9.95 (1-9), $8.96 (10-99), $7.96 (100+) seen 2026-11-07 via listing snippet; Mouser 485-381 251 in stock",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 1,
-  "availability_note": "Stock; 100+ price break applies for 10-unit run.",
+  "availability_note": "Withdrawn 2026-11-08: hobby 1-Wire probe; replaced by Pt1000 class A probe strings (CTL-PT1000). Stock; 100+ price break applies for 10-unit run.",
   "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "racks*8"
+  "applies_to_tiers": [],
+  "qty_rule": "racks*8",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-RELAY",
-  "name": "PLC-RSC-24DC/21 DIN interface relay 6 A SPDT",
+  "name": "PLC-RSC-24DC/21 DIN interface relay 6 A SPDT (PLC/RevPi DO to cooling enable, fan boost, valves, lights)",
   "manufacturer": "Phoenix Contact",
   "mpn": "2966171",
   "vendor": "RSP Supply",
@@ -1690,11 +2227,15 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "nodes*4"
+  "qty_rule": "10 if racks <= 6 else 20",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-LEAK",
-  "name": "SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised",
+  "name": "SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised (to LD2100 on Pro; to Pod E leak input on Lite)",
   "manufacturer": "RLE Technologies",
   "mpn": "SC-50",
   "vendor": "Kele",
@@ -1713,7 +2254,11 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "max(1, ceil(tier_len_m*2/15.24))"
+  "qty_rule": "max(1, ceil(tier_len_m*2/15.24))",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-LEAK-LEADER",
@@ -1736,7 +2281,11 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-DOOR",
@@ -1759,11 +2308,15 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "racks+2"
+  "qty_rule": "racks+2",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-ENCL",
-  "name": "CAB PC polycarbonate wall box 300x200x180 mm IP65 with DIN rail",
+  "name": "CAB PC polycarbonate wall box 300x200x180 mm IP65 with DIN rail (BEN Controls Lite cabinet: RevPi, DIO/AIO, PSU, switch)",
   "manufacturer": "Fibox",
   "mpn": "CAB PC 203018 G3B",
   "vendor": "RS Components",
@@ -1778,11 +2331,12 @@
   "moq": 1,
   "applies_to_tiers": [
    "micro",
-   "ben10",
-   "ben20",
-   "ben40"
+   "ben10"
   ],
-  "qty_rule": "nodes"
+  "qty_rule": "1",
+  "applies_to_controls": [
+   "lite"
+  ]
  },
  {
   "code": "CTL-TERM",
@@ -1805,11 +2359,15 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "nodes*30"
+  "qty_rule": "100 if racks <= 2 else 200",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-PSU24",
-  "name": "DIN-rail 24 VDC 2.5 A power supply (relay coil power)",
+  "name": "[WITHDRAWN] DIN-rail 24 VDC 2.5 A power supply (relay coil power)",
   "manufacturer": "Mean Well",
   "mpn": "HDR-60-24",
   "vendor": "DigiKey / Mouser",
@@ -1820,19 +2378,18 @@
   "price_source_note": "Not priced this session; typical $19-26",
   "price_checked": null,
   "lead_time_weeks": 1,
-  "availability_note": "Stock.",
+  "availability_note": "Withdrawn 2026-11-08: replaced by QUINT4 24 VDC supply (CTL-PSU-QUINT). Stock.",
   "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "nodes"
+  "applies_to_tiers": [],
+  "qty_rule": "nodes",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-PCB",
-  "name": "BEN Node carrier PCB (4-layer, 100x80 mm, assembled passives) - make item",
+  "name": "[WITHDRAWN] BEN Node carrier PCB (4-layer, 100x80 mm, assembled passives) - make item",
   "manufacturer": "Schreiber AI (JLCPCB/PCBWay fab)",
   "mpn": "BEN-NODE-PCB-v1",
   "vendor": "JLCPCB",
@@ -1843,19 +2400,18 @@
   "price_source_note": "Engineering estimate at 50 pcs with SMT passives; quote queued",
   "price_checked": null,
   "lead_time_weeks": 3,
-  "availability_note": "2-3 wk fab+assembly.",
+  "availability_note": "Withdrawn 2026-11-08: node carrier PCB superseded by the BEN Pod PCBA (CTL-POD); RFQ 14 now covers the Pod PCB. 2-3 wk fab+assembly.",
   "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "nodes"
+  "applies_to_tiers": [],
+  "qty_rule": "nodes",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-MISC",
-  "name": "Node electronics lot: 165 ohm 0.1% shunts, 4.7k pull-ups, JST/STEMMA cables, M12 glands, fuses",
+  "name": "[WITHDRAWN] Node electronics lot: 165 ohm 0.1% shunts, 4.7k pull-ups, JST/STEMMA cables, M12 glands, fuses",
   "manufacturer": "various",
   "mpn": "BEN-NODE-KIT",
   "vendor": "DigiKey / Mouser",
@@ -1866,15 +2422,14 @@
   "price_source_note": "Engineering estimate from node schematic",
   "price_checked": null,
   "lead_time_weeks": 1,
-  "availability_note": "Stock.",
+  "availability_note": "Withdrawn 2026-11-08: node electronics lot rolled into the BEN Pod BOM (CTL-POD). Stock.",
   "moq": 1,
-  "applies_to_tiers": [
-   "micro",
-   "ben10",
-   "ben20",
-   "ben40"
-  ],
-  "qty_rule": "nodes"
+  "applies_to_tiers": [],
+  "qty_rule": "nodes",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-CAT6A",
@@ -1897,7 +2452,11 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "nodes*2+racks*4"
+  "qty_rule": "racks*4+6",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-PATCH",
@@ -1920,7 +2479,11 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "ceil(racks/8)"
+  "qty_rule": "ceil(racks/8)",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "CTL-LABELS",
@@ -1943,7 +2506,11 @@
    "ben20",
    "ben40"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "applies_to_controls": [
+   "lite",
+   "pro"
+  ]
  },
  {
   "code": "FS-CLEAN-AGENT",

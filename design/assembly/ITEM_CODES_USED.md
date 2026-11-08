@@ -1,6 +1,6 @@
 # Item codes — reconciled with purchasing/parts_catalog.json
 
-Generated 2026-11-07 by `design/assembly/gen_assembly.py`. Every code in the assembly instructions and on the drawings is a code from `purchasing/parts_catalog.json` (129 parts). Codes marked **new** were appended to the catalog by the design generator as `estimate` lines (basis note on each) because no catalog part covered them; purchasing confirms or replaces them.
+Generated 2026-11-07 by `design/assembly/gen_assembly.py`. Every code in the assembly instructions and on the drawings is a code from `purchasing/parts_catalog.json` (151 parts). Codes marked **new** were appended to the catalog by the design generator as `estimate` lines (basis note on each) because no catalog part covered them; purchasing confirms or replaces them.
 
 | Catalog code | Catalog name | Status | Used in assembly docs (tiers) | On drawings (tiers) | Working code it replaced |
 |---|---|---|---|---|---|
@@ -17,28 +17,40 @@ Generated 2026-11-07 by `design/assembly/gen_assembly.py`. Every code in the ass
 | CLG-RDHX | Active rear-door heat exchanger, 42/48U, up to 40 kW | estimate | ben20 |  | CLG-031 |
 | CLG-REFRIG | Refrigerant line set, insulation, R-513A (A1, GWP ~630) charge per DX unit | estimate | ben10, ben40 |  | CLG-016 |
 | CMP-BLANK | 1U tool-less blanking panels, pack of 10 (every open U, CTQ-B5) | **new** (estimate) | ben10, ben20, ben40 |  | CMP-010 |
-| CTL-ADS1115 | ADS1115 16-bit 4-ch ADC breakout, STEMMA QT | confirmed | via CTL-NODE-MCU |  |  |
 | CTL-CAT6A | Cat6A UTP patch cable 10 ft | confirmed | micro, ben10, ben20, ben40 |  | CTL-009 |
 | CTL-DOOR | Surface-mount magnetic door contact | confirmed | micro, ben10, ben20, ben40 |  | CTL-007 |
-| CTL-DS18B20 | Waterproof DS18B20 1-Wire temperature probe, 1 m | confirmed | micro, ben10, ben20, ben40 |  | CTL-003 |
-| CTL-ENCL | CAB PC polycarbonate wall box 300x200x180 mm IP65 with DIN rail | confirmed | via CTL-GW-PI5, CTL-NODE-MCU |  |  |
-| CTL-GW-CASE | Raspberry Pi 5 official case | confirmed | via CTL-GW-PI5 |  |  |
-| CTL-GW-M2HAT | Raspberry Pi M.2 HAT+ | confirmed | via CTL-GW-PI5 |  |  |
-| CTL-GW-PI5 | Raspberry Pi 5 8 GB (gateway) | confirmed | micro, ben10, ben20, ben40 | ben10, ben20, ben40, micro | CTL-001 |
-| CTL-GW-PSU | Raspberry Pi 27 W USB-C power supply | list | via CTL-GW-PI5 |  |  |
-| CTL-GW-SSD | NVMe SSD M.2 2230, 256 GB (gateway database) | estimate | via CTL-GW-PI5 |  |  |
+| CTL-EDGE | OnLogic Karbon 400 (K410) industrial edge computer: Atom x6425E, 16 GB, 256 GB NVMe, TPM 2 | estimate | ben20, ben40 |  | CTL-014 |
+| CTL-ENCL | CAB PC polycarbonate wall box 300x200x180 mm IP65 with DIN rail (BEN Controls Lite cabinet | confirmed | micro, ben10 | ben10 | CTL-001 |
+| CTL-IO-AI | AXL F AI4 I 1H Axioline F 4-channel 4-20 mA analog input (Setra 264 dP, Vaisala RH/T, spar | confirmed | via CTL-PANEL |  |  |
+| CTL-IO-DIO | AXL F DI8/1 DO8/1 1H Axioline F 8 DI 24 VDC + 8 DO 24 VDC 0.5 A (door, EPO/fire monitor co | confirmed | via CTL-PANEL |  |  |
+| CTL-IO-RTD | AXL F RTD4 1H Axioline F 4-channel RTD input (Pt1000 2/3/4-wire) for cooling unit supply/r | confirmed | via CTL-PANEL |  |  |
 | CTL-LABELS | Label printer cartridges, cable labels, engraved phenolic tags (lot) | estimate | micro, ben10, ben20, ben40 |  | CTL-011 |
-| CTL-LEAK | SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised | confirmed | micro, ben10, ben20, ben40 | ben10, ben20, ben40 | CTL-010 |
+| CTL-LEAK | SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised (to LD2100 on Pro; to Pod | confirmed | micro, ben10, ben20, ben40 | ben10, ben20, ben40 | CTL-010 |
+| CTL-LEAK-CTRL | SeaHawk LD2100 distance-read leak detection controller, web enabled, relay + Modbus to the | confirmed | ben20, ben40 |  | CTL-016 |
 | CTL-LEAK-LEADER | Leak cable leader + end-of-line terminator | estimate | via CTL-LEAK |  |  |
-| CTL-MISC | Node electronics lot: 165 ohm 0.1% shunts, 4.7k pull-ups, JST/STEMMA cables, M12 glands, f | estimate | via CTL-NODE-MCU |  |  |
-| CTL-NODE-MCU | ESP32-POE-ISO-EA (isolated PoE ESP32 board, external antenna) | confirmed | micro, ben10, ben20, ben40 | ben10, ben20, ben40, micro | CTL-002 |
-| CTL-PCB | BEN Node carrier PCB (4-layer, 100x80 mm, assembled passives) - make item | estimate | via CTL-NODE-MCU |  |  |
-| CTL-POE-SW | UniFi Industrial 10-port switch, 8x PoE++ 802.3bt, 430 W, -40..+70 C | confirmed | micro, ben10, ben20, ben40 |  | CTL-008 |
-| CTL-PSU24 | DIN-rail 24 VDC 2.5 A power supply (relay coil power) | estimate | via CTL-NODE-MCU |  |  |
-| CTL-RELAY | PLC-RSC-24DC/21 DIN interface relay 6 A SPDT | confirmed | via CTL-NODE-MCU |  |  |
-| CTL-SDP810 | SDP810-125Pa differential pressure sensor, I2C | confirmed | micro, ben10, ben20, ben40 |  | CTL-005 |
-| CTL-SHT45 | SHT45 precision temp/RH breakout, STEMMA QT | confirmed | micro, ben10, ben20, ben40 |  | CTL-004 |
-| CTL-TERM | UT 2,5 feed-through DIN terminal block | confirmed | via CTL-NODE-MCU |  |  |
+| CTL-MGM240P | MGM240PB32VNA3R Thread/802.15.4 module, EFR32MG24, Secure Vault High, PCB antenna, FCC/IC/ | confirmed | via CTL-POD |  |  |
+| CTL-PANEL | Wall-mount enclosure Type 12/IP65, 30x24x12 in (762x610x305 mm, the 800x600x300 class), st | confirmed | ben20, ben40 | ben20, ben40 | CTL-001 |
+| CTL-PANEL-BUILD | UL 508A panel shop: assembly, wiring, SCCR calculation and label, point-to-point drawings, | estimate | via CTL-PANEL |  |  |
+| CTL-PANEL-KIT | Controls panel hardware lot: DIN rail, wire duct, 600 V MTW wire, ferrules, fuse holders + | estimate | via CTL-PANEL, CTL-ENCL |  |  |
+| CTL-PLC | PLCnext AXC F 2152 controller (IEC 61131-3 + Linux, 2x Ethernet, Axioline F local bus, UL  | confirmed | ben20, ben40 |  | CTL-012 |
+| CTL-POD | BEN Pod v1 assembled and provisioned (MGM240P Thread module w/ Secure Vault High, 4x Pt100 | estimate | micro, ben10, ben20, ben40 | ben10, ben20, ben40, micro | CTL-002 |
+| CTL-POD-ENCL | BEN Pod enclosure: Phoenix Contact ICS 50 DIN-rail housing set with rack-rail clip (IP40); | estimate | via CTL-POD |  |  |
+| CTL-PSU-ORING | QUINT4-S-ORING/12-24DC/1X40 redundancy (diode) module for the two QUINT4 supplies | confirmed | via CTL-PANEL |  |  |
+| CTL-PSU-QUINT | QUINT4-PS/1AC/24DC/10 DIN-rail 24 VDC 10 A power supply (UL 508 listed; 2 redundant on Pro | confirmed | micro, ben10, ben20, ben40 |  | CTL-017 |
+| CTL-PT1000 | Pt1000 class A 3-wire RTD probe string: 4 probes (3 inlet, 1 outlet), 6 mm SS tip, 3 m PTF | estimate | micro, ben10, ben20, ben40 |  | CTL-003 |
+| CTL-RCP | xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-process | list | micro, ben10, ben20, ben40 |  | CTL-015 |
+| CTL-RELAY | PLC-RSC-24DC/21 DIN interface relay 6 A SPDT (PLC/RevPi DO to cooling enable, fan boost, v | confirmed | via CTL-PANEL, CTL-ENCL |  |  |
+| CTL-REVPI | RevPi Connect 4 industrial controller (CM4-based industrial controller, 8 GB eMMC, 2x Ethe | confirmed | micro, ben10 | micro | CTL-013 |
+| CTL-REVPI-AIO | RevPi AIO module, 4 AI (4-20 mA / 0-10 V) + 2 AO + 2 RTD inputs (cooling unit supply/retur | list | via CTL-ENCL |  |  |
+| CTL-REVPI-DIO | RevPi DIO module, 14 DI + 14 DO 24 VDC (door, EPO/fire monitor contacts, cooling status; o | list | via CTL-ENCL |  |  |
+| CTL-RS485 | RS-485 cable Belden 3106A 22 AWG shielded pair, 100 ft (Pod E to PLC/RevPi Modbus RTU) | estimate | via CTL-PANEL, CTL-ENCL |  |  |
+| CTL-SDP810 | SDP810-125Pa differential pressure sensor, I2C (fitted on the two room Pods: aisle dP and  | confirmed | micro, ben10 |  | CTL-005 |
+| CTL-SETRA264 | Setra 264 very low differential pressure transmitter 0-0.25 in WC, 4-20 mA (aisle dP on th | confirmed | ben20, ben40 |  | CTL-005 |
+| CTL-SPD | VAL-MS 230/3+1 Type 2 surge arrester, pluggable, for the controls panel supply | confirmed | via CTL-PANEL |  |  |
+| CTL-SWITCH | FL SWITCH 2008 managed industrial Ethernet switch, 8x RJ45, RSTP, DIN rail (controls LAN:  | confirmed | ben20, ben40 |  | CTL-008 |
+| CTL-SWITCH-LITE | Moxa EDS-2008-EL compact industrial Ethernet switch, 8x RJ45, DIN rail, 9.6-60 VDC (Lite c | confirmed | micro, ben10 |  | CTL-008 |
+| CTL-TERM | UT 2,5 feed-through DIN terminal block | confirmed | via CTL-PANEL, CTL-ENCL |  |  |
+| CTL-VAISALA-HMW90 | Vaisala HMW90 wall humidity and temperature transmitter, +/-1.7 %RH, 4-20 mA (room RH on t | estimate | ben20, ben40 |  | CTL-004 |
 | ENV-DOORSEAL | EPDM bulb door seal 20 mm, self-adhesive, 10 m roll (secondary seal on cargo doors) | **new** (estimate) | ben10, ben20, ben40 |  | ENV-005 |
 | ENV-DRAIN | Floor drain 50 mm with trap and exterior cap, stainless | **new** (estimate) | ben10, ben20, ben40 |  | ENV-011 |
 | ENV-FLOOR | Anti-static vinyl floor tile over container plywood floor | estimate | ben10, ben20, ben40 |  | ENV-007 |

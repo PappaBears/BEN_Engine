@@ -1,0 +1,17 @@
+{
+  "_comment": "BEN Controls Lite — PiCtory I/O names -> interlock roles. Edit at panel build; the service never hardcodes a terminal. Example for BEN Micro: 2 cooling units, 1 leak zone, 1 door. DIO module 1 = position 32 (I_1..I_16, O_1..O_16), AIO module = position 33.",
+  "plant": {"n_cooling": 2, "unit_kw": 15.0, "n_leak_zones": 1, "n_doors": 1, "redundancy": "N+1", "supply_setpoint_c": 20.0, "it_kw_fs": 40.0},
+  "di": {
+    "cool1_run": "I_1", "cool1_fault": "I_2", "cool2_run": "I_3", "cool2_fault": "I_4",
+    "leak_zone1": "I_5", "valve1_closed": "I_6", "door1_open": "I_7",
+    "epo_loop_ok": "I_8", "fire_alarm": "I_9", "fire_trouble": "I_10", "fire_released": "I_11", "fire_supervisory": "I_12",
+    "utility_ok": "I_13", "ats_on_generator": "I_14", "gen_running": "I_15", "gen_fault": "I_16",
+    "ups_on_battery": "I_1_2", "psu_redundancy_ok": "I_2_2", "hmi_manual": "I_3_2", "hmi_off": "I_4_2"
+  },
+  "do": {
+    "cool1_cmd": "O_1", "cool2_cmd": "O_2", "valve1_close": "O_3", "cdu_pump_stop": "O_4", "beacon": "O_5",
+    "watchdog_relay": "O_14"
+  },
+  "ai": {"it_kw": "InputValue_1", "aisle_dp": "InputValue_2", "rh": "InputValue_3"},
+  "rtd": {"supply_c": "RTDValue_1", "return_c": "RTDValue_2", "outdoor_c": "RTDValue_3"}
+}

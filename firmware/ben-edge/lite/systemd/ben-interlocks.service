@@ -1,0 +1,33 @@
+# BEN Controls Lite — software interlock controller on the RevPi (Schreiber AI)
+# Runs ben_engine.interlocks against RevPi DIO/AIO through piControl at 10 Hz, serves the PROTOCOL.md
+# register map over Modbus TCP, and is the ONLY process that pets the hardware watchdog. If this unit
+# stops, the RevPi reboots and piControl zeroes the outputs: the watchdog relay opens the cooling-enable chain.
+[Unit]
+Description=BEN Controls Lite interlock controller (software PLC) — Schreiber AI
+After=local-fs.target
+Before=ben-api.service ben-plc-bridge.service
+DefaultDependencies=no
+Conflicts=watchdog.service
+
+[Service]
+Type=notify
+User=root
+Group=root
+EnvironmentFile=/etc/ben/ben.env
+Environment=BEN_REVPI_IO_MAP=/etc/ben/revpi_io_map.json
+WorkingDirectory=/opt/ben_engine/software
+ExecStart=/opt/ben_engine/.venv/bin/python /opt/ben_engine/firmware/ben-edge/lite/ben_interlocks_service.py
+WatchdogSec=10
+Restart=always
+RestartSec=1
+StartLimitIntervalSec=0
+Nice=-10
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=50
+DeviceAllow=/dev/piControl0 rw
+DeviceAllow=/dev/watchdog rw
+StandardOutput=append:/var/log/ben/interlocks.log
+StandardError=append:/var/log/ben/interlocks.log
+
+[Install]
+WantedBy=multi-user.target

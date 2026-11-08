@@ -284,11 +284,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const floor = box(extL, G.floorTop, extW, MAT.shell(color), 0, G.floorTop / 2, 0); g.add(floor);
     const floorTop = new THREE.Mesh(new THREE.PlaneGeometry(G.intL, G.intW), MAT.floor); floorTop.rotation.x = -Math.PI / 2; floorTop.position.y = G.floorTop + 0.001; floorTop.receiveShadow = true; floorTop.userData = { type: 'container', id: 'container' }; g.add(floorTop);
     roof = box(extL, extH - G.ceiling, extW, MAT.shell(color), 0, (extH + G.ceiling) / 2, 0); g.add(roof);
+    roof.userData = { type: 'container', id: 'container' }; pickables.push(roof);
     // long walls (corrugated)
     wallPos = corrugatedWall(extL, extH, color); wallPos.position.set(0, extH / 2, extW / 2); g.add(wallPos);
     wallNeg = corrugatedWall(extL, extH, color); wallNeg.rotation.y = Math.PI; wallNeg.position.set(0, extH / 2, -extW / 2); g.add(wallNeg);
+    for (const w of [wallPos, wallNeg]) { w.userData = { type: 'container', id: 'container' }; pickables.push(w); }
     // far end wall
     const endWall = corrugatedWall(extW, extH, color); endWall.rotation.y = Math.PI / 2; endWall.position.set(extL / 2, extH / 2, 0); g.add(endWall);
+    endWall.userData = { type: 'container', id: 'container' }; pickables.push(endWall);
     // door end: frame + two leaves hinged at outer edges
     const doorGroup = new THREE.Group(); doorGroup.position.set(-extL / 2, 0, 0); doorGroup.userData = { type: 'doors', id: 'doors' };
     const frameMat = MAT.casting;
@@ -320,10 +323,10 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       }
     }
     // utility pedestal + generator outside
-    const util = box(0.7, 1.1, 0.5, MAT.powerDark, -extL / 2 - 1.4, 0.55, extW / 2 - 0.4); util.userData = { type: 'ats', id: 'ats' }; g.add(util); pickables.push(util); objects.utility = util;
+    const util = box(0.7, 1.1, 0.5, MAT.powerDark, -extL / 2 - 1.4, 0.55, extW / 2 - 0.4); util.userData = { type: 'utility', id: 'utility' }; g.add(util); pickables.push(util); objects.utility = util;
     util.add(box(0.5, 0.25, 0.05, MAT.power, 0, 0.2, 0.26));
     if (cfg.generator) {
-      const gen = box(1.6, 1.5, 0.9, MAT.powerDark, extL / 2 + 1.6, 0.75, 0); gen.userData = { type: 'ats', id: 'ats' };
+      const gen = box(1.6, 1.5, 0.9, MAT.powerDark, extL / 2 + 1.6, 0.75, 0); gen.userData = { type: 'generator', id: 'generator' };
       const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.6, 12), MAT.casting); pipe.position.set(-0.5, 1.0, 0); gen.add(pipe);
       g.add(gen); pickables.push(gen); objects.generator = gen;
     }
@@ -351,6 +354,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     if (!G.micro) {
       for (const x of [-1, 1]) {
         const door = new THREE.Mesh(new THREE.PlaneGeometry(G.hotW - 0.04, aisleH), MAT.glass); door.rotation.y = Math.PI / 2; door.position.set(x * (G.intL / 2 - 0.05), G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + G.hotW / 2); groups.cooling.add(door);
+        door.userData = { type: 'containment', id: `containment${x > 0 ? 2 : 1}`, index: x > 0 ? 1 : 0 }; pickables.push(door); objects[door.userData.id] = door;
         const frame = box(0.04, aisleH, 0.04, MAT.tray, x * (G.intL / 2 - 0.05), G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + 0.02); groups.cooling.add(frame);
       }
     }
@@ -512,8 +516,11 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const g = groups.controls;
     // gateway / network cabinet on the cold-aisle wall at the door end
     const gw = box(0.45, 0.55, 0.18, MAT.gateway, -G.intL / 2 + (G.micro ? 0.2 : 0.5), G.floorTop + (G.micro ? 1.2 : 1.7), -(G.intW / 2 - 0.09));
-    gw.userData = { type: 'gateway', id: 'gateway' }; edges(gw, 0x66e3ff, 0.35); g.add(gw); pickables.push(gw); objects.gateway = gw;
+    gw.userData = { type: 'controller', id: 'controller' }; edges(gw, 0x66e3ff, 0.35); g.add(gw); pickables.push(gw); objects.controller = gw; objects.gateway = gw;
     for (let k = 0; k < 4; k++) gw.add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.01), MAT.led(k % 2 ? C.cyan : C.green)).translateX(-0.15 + k * 0.08).translateY(0.2).translateZ(0.115));
+    // leak-detection rope along the floor under the rack row (BEN Pod leak input)
+    const rope = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.3, 0.015, 0.04), new THREE.MeshStandardMaterial({ color: 0xffc66d, roughness: 0.8 }));
+    rope.position.set(0, G.floorTop + 0.01, G.zOff + G.rackD / 2 + 0.06); rope.userData = { type: 'leak_rope', id: 'leak_rope' }; g.add(rope); pickables.push(rope); objects.leak_rope = rope;
     // sensors as small spheres (clamped into the interior)
     const r = G.micro ? 0.02 : 0.03;
     const geo = new THREE.SphereGeometry(r, 12, 10);
@@ -635,7 +642,9 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   // --------------------------------------------------------------------------- highlights
   const highlights = new Map();
   function targetObject(t) {
+    if (t.object) return t.object;
     if (t.type === 'sensor') return objects[`sensor:${t.id}`];
+    if (t.type === 'container') return objects.liner;
     if (t.type === 'rack') return objects[`rack${t.index + 1}`];
     if (t.type === 'cooling' || t.type === 'drycooler') return objects[`cooling${(t.index || 0) + 1}`];
     return objects[t.id] || objects[t.type];
@@ -680,18 +689,64 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     highlightSel = sel;
   }
 
-  // --------------------------------------------------------------------------- picking
+  // --------------------------------------------------------------------------- picking + hover
   const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2(); let downAt = null;
+  const hoverable = (o) => o.visible && o.parent && isVisibleChain(o) && !(o.material && o.material.transparent && o.material.opacity < 0.2 && o.userData.type !== 'containment');
+  function pickAt(clientX, clientY) {
+    const r = canvas.getBoundingClientRect(); ndc.set((clientX - r.left) / r.width * 2 - 1, -((clientY - r.top) / r.height * 2 - 1));
+    ray.setFromCamera(ndc, camera);
+    const hits = ray.intersectObjects(pickables.filter(hoverable), false);
+    const hit = hits.find(hh => hh.object.userData && hh.object.userData.type);
+    return hit ? { type: hit.object.userData.type, index: hit.object.userData.index, id: hit.object.userData.id, object: hit.object } : null;
+  }
+  const keyOf = (sel) => sel.type === 'sensor' ? `sensor:${sel.id}` : (sel.id || sel.type);
+  let hoverKey = null, hoverOutline = null, hoverRaf = false, lastPointer = null;
+  function setHover(sel, screen, source = 'pointer') {
+    const key = sel ? keyOf(sel) : null;
+    if (key !== hoverKey) {
+      hoverKey = key;
+      if (hoverOutline) { groups.hl.remove(hoverOutline); hoverOutline = null; }
+      if (sel) { const obj = sel.object || targetObject(sel); if (obj) { hoverOutline = makeOutline(obj, C.cyan); if (hoverOutline) { hoverOutline.material.opacity = 0.55; groups.hl.add(hoverOutline); } } }
+      canvas.style.cursor = sel ? 'pointer' : '';
+    }
+    if (api.onHover) api.onHover(sel ? { type: sel.type, index: sel.index, id: sel.id, key, screen, source } : null);
+  }
+  canvas.addEventListener('pointermove', (e) => {
+    if (mode.walk || mode.tour) return;
+    lastPointer = [e.clientX, e.clientY];
+    if (hoverRaf) return; hoverRaf = true;
+    requestAnimationFrame(() => { hoverRaf = false; if (!lastPointer) return; const sel = pickAt(lastPointer[0], lastPointer[1]); setHover(sel, { x: lastPointer[0], y: lastPointer[1] }); });
+  });
+  canvas.addEventListener('pointerleave', () => { lastPointer = null; setHover(null); });
   canvas.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; });
   canvas.addEventListener('pointerup', (e) => {
     if (!downAt || mode.walk) return; const moved = Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]); downAt = null; if (moved > 5) return;
-    const r = canvas.getBoundingClientRect(); ndc.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height * 2 - 1));
-    ray.setFromCamera(ndc, camera);
-    const hits = ray.intersectObjects(pickables.filter(o => o.visible && o.parent && isVisibleChain(o)), false);
-    const hit = hits.find(hh => hh.object.userData && hh.object.userData.type);
-    const sel = hit ? { type: hit.object.userData.type, index: hit.object.userData.index, id: hit.object.userData.id } : { type: 'container', id: 'container' };
+    const hit = pickAt(e.clientX, e.clientY);
+    const sel = hit ? { type: hit.type, index: hit.index, id: hit.id } : { type: 'container', id: 'container' };
     setSelection(sel); onSelect && onSelect(sel);
   });
+  /** Ordered, de-duplicated list of hoverable objects for keyboard cycling. */
+  function hoverList() {
+    const seen = new Set(), out = [];
+    for (const o of pickables) { if (!hoverable(o) || !o.userData.type) continue; const k = keyOf(o.userData); if (seen.has(k)) continue; seen.add(k); out.push({ type: o.userData.type, index: o.userData.index, id: o.userData.id, object: o, key: k }); }
+    const order = { container: 0, doors: 1, rack: 2, cooling: 3, drycooler: 4, cdu: 5, ups: 6, battery: 7, ats: 8, panel: 9, utility: 10, generator: 11, controller: 12, tray: 13, containment: 14, leak_rope: 15, sensor: 16 };
+    return out.sort((a, b) => (order[a.type] ?? 20) - (order[b.type] ?? 20) || (a.index ?? 0) - (b.index ?? 0) || String(a.id).localeCompare(String(b.id)));
+  }
+  /** Page coordinates of an object's centre (for tooltips and tests). */
+  function screenPositionOf(keyOrSel) {
+    const obj = typeof keyOrSel === 'string' ? (objects[keyOrSel] || objects[`sensor:${keyOrSel}`]) : (keyOrSel.object || targetObject(keyOrSel));
+    if (!obj) return null;
+    const c = new THREE.Box3().setFromObject(obj).getCenter(new THREE.Vector3()).project(camera);
+    const r = canvas.getBoundingClientRect();
+    return { x: r.left + (c.x + 1) / 2 * r.width, y: r.top + (1 - c.y) / 2 * r.height, visible: c.z < 1 && Math.abs(c.x) <= 1 && Math.abs(c.y) <= 1 };
+  }
+  function hoverCycle(dir = 1) {
+    const list = hoverList(); if (!list.length) return null;
+    let i = list.findIndex(h => h.key === hoverKey); i = (i + dir + list.length) % list.length;
+    const h = list[i]; const sp = screenPositionOf(h) || { x: 0, y: 0 };
+    setHover(h, sp, 'keyboard'); return h;
+  }
+  function hoverSelect() { if (!hoverKey) return; const h = hoverList().find(x => x.key === hoverKey); if (h) { const sel = { type: h.type, index: h.index, id: h.id }; setSelection(sel); onSelect && onSelect(sel); } }
   function isVisibleChain(o) { while (o) { if (!o.visible) return false; o = o.parent; } return true; }
 
   // --------------------------------------------------------------------------- cameras
@@ -761,7 +816,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   walk.addEventListener('unlock', () => { if (mode.walk && !walkNoLock) exitWalk(); });
   let walkNoLock = false;
   function enterWalk({ lock = true } = {}) {
-    if (!payload) return; tour.stop(false);
+    if (!payload) return; tour.stop(false); setHover(null);
     mode.walk = true; mode.cutaway = true; orbit.enabled = false; walkNoLock = !lock;
     const eye = G.floorTop + 1.7;
     const zc = G.zOff - (G.rackD / 2 + G.coldW / 2);
@@ -885,6 +940,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   Object.assign(api, {
     rebuild, update, setCamera, toggleWalk, enterWalk, exitWalk, toggleCutaway, toggleDoors, tour, setSelection,
     render: () => renderer.render(scene, camera),
+    screenPositionOf, hoverCycle, hoverSelect, hoverList, clearHover: () => setHover(null), setHoverByKey(k) { const h = hoverList().find(x => x.key === k); if (h) setHover(h, screenPositionOf(h) || { x: 0, y: 0 }, 'keyboard'); return !!h; },
     setPixelRatio(r) { renderer.setPixelRatio(r); resize(); renderer.render(scene, camera); return renderer.getPixelRatio(); },
     rackCount: () => racks.length, coolingCount: () => coolingUnits.length, sensorCount: () => sensorMeshes.size,
     mode, camera, objects, G,

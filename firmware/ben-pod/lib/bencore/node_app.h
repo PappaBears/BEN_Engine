@@ -1,5 +1,5 @@
 // BEN Engine — bencore — the node application, platform independent.
-// main.cpp (ESP32) feeds raw sensor readings in and calls tick(); the mock HAL does the
+// main.cpp (target) feeds raw sensor readings in and calls tick(); the mock HAL does the
 // same under test. Everything in PROTOCOL.md that is "node behaviour" lives here.
 #pragma once
 #include <cstdint>

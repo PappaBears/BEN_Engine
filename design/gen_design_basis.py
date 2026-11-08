@@ -97,7 +97,7 @@ def main():
     A("- Single row along the rack wall; the cold aisle is the egress path to the cargo doors. Drawn clear width " + ", ".join(f"{lay.d['tier_label']} {lay.aisle_width:.0f} mm" for lay in lays.values() if lay.is_container) + " (≥ 900 mm egress, ≥ 914 mm NEC 110.26 condition 1). Cargo doors open outward 270° and are fitted with inside panic releases **(add to BOM: FS-050)**. Dead-end length equals the container length; under NFPA 75 a single exit is acceptable for a room this size with occupancy limited to service staff.")
     A("- NEC 110.26 condition 2 (1067 mm) is not met and is not required: the surface opposite the row is the insulated liner with no exposed grounded conductive parts at working height; the opposing-wall items (EPO, FRP) are ≤ 100 mm deep and above/below the 914 mm zone or within 600 mm of the door. If a customer places grounded equipment on the aisle wall, condition 2 applies and fails — this is a design constraint written on A-002.")
     A("- Working space width 762 mm is satisfied by the continuous aisle; height 2.0 m is satisfied (tray underside 2250 mm).")
-    A("- Lighting: LED 4000 K luminaires over the aisle at the ceiling, 500 lx at 1 m AFF on the rack faces, emergency light at the door (90 min). Lights on PNL-M with a node relay (relay2) for remote control.")
+    A("- Lighting: LED 4000 K luminaires over the aisle at the ceiling, 500 lx at 1 m AFF on the rack faces, emergency light at the door (90 min). Lights on PNL-M with a controller relay output (relay2) for remote control.")
     A("")
     # ------------------------------------------------------------------ power / cooling / controls basis
     A("## 7. Power, cooling and controls basis (from the configuration rules)")
@@ -119,7 +119,7 @@ def main():
             units.append(f"{lay.notes.get('n_cdu')} × CDU + dry cooler")
         A(f"| {d['tier_label']} | {lay.cfg.it_kw:.0f} | {lay.cfg.racks} | {d['per_rack_kw']} | {d['voltage']} | {d['service_amps_calc']} / {d['service_breaker_a']} | {d['ups_modules']} × {d['ups_kva_each']} kVA | {d['battery_kwh']} | {lay.cfg.cooling} → {drawn} | {'; '.join(units)} | {d['airflow_cfm']} | {d['pue_estimate']} | {d['row_length_mm']} / {d['row_fits']} |")
     A("")
-    A("Rules: UPS carries IT only with 15 % headroom; service sized at 80 % continuous; cooling N units at 1.05 × IT with 1.5 %/K DX derate above 35 °C; DLC removes 75 % of rack heat at the cold plate, the rest is air **(assumption)**; airflow 125 cfm/kW air-cooled, 40 cfm/kW liquid. Controls: one BEN Node per two racks, three inlet probes per rack (0.4 / 1.2 / 1.8 m; 0.3 / 0.7 / 1.1 m in the Micro), one outlet probe, supply/return probes, RH, dP across the containment, leak rope, door contact, utility pulse — identical to `Twin.sensors()` and `spec/PROTOCOL.md`.")
+    A("Rules: UPS carries IT only with 15 % headroom; service sized at 80 % continuous; cooling N units at 1.05 × IT with 1.5 %/K DX derate above 35 °C; DLC removes 75 % of rack heat at the cold plate, the rest is air **(assumption)**; airflow 125 cfm/kW air-cooled, 40 cfm/kW liquid. Controls (docs/CONTROLS_HARDWARE_DECISION.md): BEN Controls Pro (PLCnext AXC F 2152 + Axioline F I/O in a UL 508A panel, OnLogic Karbon 400 edge computer) on BEN 20/40, BEN Controls Lite (Revolution Pi RevPi Connect 4 + DIO/AIO) on BEN Micro, selectable on BEN 10; BEN Pods on BEN Mesh (Thread, MGM240P): two per rack (cold and hot face) + room + outdoor, Micro 3; logical node ids one per two racks; three inlet probes per rack (0.4 / 1.2 / 1.8 m; 0.3 / 0.7 / 1.1 m in the Micro), one outlet probe, supply/return probes, RH, dP across the containment, leak rope, door contact, utility pulse — identical to `Twin.sensors()` and `spec/PROTOCOL.md`.")
     A("")
     # ------------------------------------------------------------------ interference
     A("## 8. Interference checks (generated)")
@@ -147,7 +147,7 @@ def main():
     A("4. **As-purchased footprints (new checks I-C21 / I-C22).** The catalog quantity rules do not fit the rows: BEN 10 `PWR-UPS-93PM50` towers (2 × 495 mm) → row 3090 > 2200; BEN 20 `PWR-UPS-GVS100` × 4 + `PWR-BATT-LI` × 2 → 7484 > 5250; BEN 40 × 6 + × 4 → 13926 > 11350. Drawings use rack-mount 20 kVA modules in R1 (BEN 10, new catalog item `PWR-UPS-RM20`) and one modular UPS frame per unit (BEN 20/40). `STR-RACK48` is 1200 deep → BEN 40 aisle 800 mm (< 900 egress); drawings use a 1070-deep 48U rack. These are purchasing / configuration decisions, listed in `design/assembly/ITEM_CODES_USED.md`.")
     A("5. **NEC 110.26 condition 2** (1067 mm) fails on every container tier; condition 1 (914 mm) passes with 16 mm margin. Constraint on what may be mounted on the aisle wall (§6).")
     A("6. **Door zone.** BEN 10 has 100 mm between the cargo doors and the first cooling unit; BEN 10 R1 keeps only 6U for IT after three 10U UPS modules and a 6U battery (alternative: 20 kW preset).")
-    A("7. **Micro.** 5 kW, 2 cabinet AC units (one per long face), 9U left for IT after 2 × (4U UPS + 3U battery pack) + 1U gateway; gross 1087 kg, 2.5 t forklift.")
+    A("7. **Micro.** 5 kW, 2 cabinet AC units (one per long face), 9U left for IT after 2 × (4U UPS + 3U battery pack) + 1U controls shelf (RevPi); gross 1087 kg, 2.5 t forklift.")
     A("")
     A("## 9. Component footprints used (catalogue-typical, mm)")
     A("")

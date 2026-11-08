@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Optional outbound-only WireGuard tunnel for Schreiber AI remote support.
-# The gateway initiates; nothing listens on WAN. Customer enables/disables it: `ben-vpn-support.sh up|down`.
+# The edge computer initiates; nothing listens on WAN. Customer enables/disables it: `ben-vpn-support.sh up|down`.
 # Status: implemented, unverified on hardware.
 set -euo pipefail
 case "${1:-}" in

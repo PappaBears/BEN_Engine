@@ -1,0 +1,48 @@
+# BEN Engine — OpenThread Border Router on the edge computer (Schreiber AI)
+# Image: openthread/border-router (pinned digest recorded at commissioning in the turnover package).
+# One service per RCP; the second is started only when RCP2 is set (BEN 20/40 redundancy: both RCPs join
+# the same Thread network as border routers; Pods pick either; the broker address fd00:ben::1 is on the
+# host, so a failed RCP changes nothing for the Pods beyond a re-attach).
+services:
+  otbr:
+    image: openthread/border-router:latest
+    container_name: otbr
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    devices:
+      - ${RCP1}:/dev/ttyACM0
+    environment:
+      - RADIO_URL=spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=460800
+      - BACKBONE_INTERFACE=${CTRL_IF}
+      - THREAD_IF=wpan0
+      - NAT64=0
+      - DNS64=0
+      - WEB_GUI=0
+    volumes:
+      - otbr-data:/var/lib/thread
+    sysctls:
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv6.conf.all.disable_ipv6=0
+  otbr2:
+    image: openthread/border-router:latest
+    container_name: otbr2
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    profiles: ["redundant"]
+    devices:
+      - ${RCP2:-/dev/null}:/dev/ttyACM1
+    environment:
+      - RADIO_URL=spinel+hdlc+uart:///dev/ttyACM1?uart-baudrate=460800
+      - BACKBONE_INTERFACE=${CTRL_IF}
+      - THREAD_IF=wpan1
+      - NAT64=0
+      - DNS64=0
+      - WEB_GUI=0
+      - OT_DAEMON_SOCKET=/run/openthread-wpan1.sock
+    volumes:
+      - otbr2-data:/var/lib/thread
+volumes:
+  otbr-data:
+  otbr2-data:

@@ -101,6 +101,14 @@
     "site_name": {
       "type": "string",
       "maxLength": 80
+    },
+    "controls_tier": {
+      "enum": [
+        "auto",
+        "lite",
+        "pro"
+      ],
+      "description": "BEN Controls tier: auto (by size and profile), lite (Revolution Pi + Pods) or pro (PLCnext + UL 508A panel + edge computer + Pods)"
     }
   },
   "x-tier-limits": {

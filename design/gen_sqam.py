@@ -41,11 +41,11 @@ INSTRUMENTS = [
     ("refractometer", "Glycol refractometer (propylene glycol scale)", "+/-1 %"),
     ("flow meter", "CDU / pumping unit flow meter (electromagnetic)", "+/-2 % of reading"),
     ("ice-point", "Ice-point bath + 40 C stirred bath + reference PRT (k=2 0.05 C)", "0.05 C"),
-    ("manometer", "Digital manometer 0-125 Pa (or node dP channel after tare)", "+/-0.4 Pa"),
-    ("dP across", "Node dP_aisle channel (SDP810) after tare", "+/-0.4 Pa"),
-    ("wet-finger", "Wet finger / damp cloth + gateway log", "n/a (functional)"),
-    ("commissioning sweep", "Commissioning script + calibrated node probes", "+/-0.25 C per probe"),
-    ("functional test", "Stopwatch / gateway event log", "0.1 s"),
+    ("manometer", "Digital manometer 0-125 Pa (or Pod dP channel after tare)", "+/-0.4 Pa"),
+    ("dP across", "Pod dP_aisle channel (SDP810) after tare; Setra 264 on the PLC (Pro)", "+/-0.4 Pa"),
+    ("wet-finger", "Wet finger / damp cloth + controller event log", "n/a (functional)"),
+    ("commissioning sweep", "Commissioning script + calibrated Pod Pt1000 probes", "+/-0.25 C per probe"),
+    ("functional test", "Stopwatch / controller event log", "0.1 s"),
     ("weigh-bridge", "Certified weigh-bridge or crane scale", "+/-0.5 % of reading"),
     ("crane scale", "Certified crane scale", "+/-0.5 % of reading"),
     ("hose test", "Hose nozzle 6.3 mm, 12.5 L/min, 3 m (IEC 60529 IPX5)", "qualitative"),
@@ -184,7 +184,7 @@ def write_sqam(lays):
     A("|---|---|")
     A("| Contract manufacturer (CM) | All sections. The CM is responsible for the hold and witness points inside its shop and for the sub-tier suppliers it uses (welders, electricians, HVAC, fire installer). |")
     A("| System integrator | Sections 1-4, 5 (controls and electrical items), 6 (electrical, controls, final/FAT), 8-16. |")
-    A("| Component supplier (racks, UPS, cooling units, nodes, cabinets) | Sections 1, 2 (quality system), 4, 9, 10 (serial numbers and certificates), 12, 15. The supplier's own CTQs are the catalogue specification referenced on the purchase order. |")
+    A("| Component supplier (racks, UPS, cooling units, PLC and I/O, edge computer, BEN Pods, UL 508A panel shop, cabinets) | Sections 1, 2 (quality system), 4, 9, 10 (serial numbers and certificates), 12, 15. The supplier's own CTQs are the catalogue specification referenced on the purchase order. |")
     A("")
     A("**Definitions.**")
     A("")
@@ -284,7 +284,7 @@ def write_sqam(lays):
     # 8
     A("## 8. Factory acceptance test (FAT) linkage")
     A("")
-    A("- The FAT is the pre-ship test of Task 11 run with the Schreiber AI commissioning script. In the factory the script runs in simulation-assisted mode against the real gateway and nodes (`python -m ben_engine.commissioning --live --url <gateway> --tier <tier> --out FAT-<serial>.md --operator <name>`); where the gateway is not yet networked, the `--sim` run proves the controls software path and is attached as a separate report, never as the FAT.")
+    A("- The FAT is the pre-ship test of Task 11 run with the Schreiber AI commissioning script. In the factory the script runs in simulation-assisted mode against the real BEN Controller (PLC or RevPi, edge computer) and BEN Pods (`python -m ben_engine.commissioning --live --url <gateway> --tier <tier> --out FAT-<serial>.md --operator <name>`); where the controller is not yet networked, the `--sim` run proves the controls software path and is attached as a separate report, never as the FAT.")
     A("- Load: resistive load bank on the rack PDUs at 50 % for 1 h and 100 % for 2 h; utility-loss test on battery; EPO test (< 1 s, witnessed).")
     A("- Output: the markdown report, the telemetry CSV and the CSV's SHA-256 hash printed in the report. The report is valid only with a data file whose hash matches. Schreiber AI Quality signs the certificate of conformance (form COC-01) referencing the report hash, the unit serial number and the IFC revision.")
     A("- Acceptance: all CTQ-M5 / CTQ-E3 limits met, no open critical or major NCR, all Q-forms complete, FAI approved (first unit).")
@@ -308,7 +308,7 @@ def write_sqam(lays):
     A("| Racks | Manufacturer serial per tag (R1…Rn) | Q-05 |")
     A("| UPS frames / modules and battery cabinets / modules | Serial numbers, firmware version, UL 9540A report reference, SoC at shipment | Q-07, Q-11 |")
     A("| Cooling units, condensers, CDUs, RDHx doors, dry cooler | Serial numbers, refrigerant type and charge per circuit, glycol concentration | Q-06 |")
-    A("| Nodes and gateway | Node MAC / node_id, firmware version, `cal_id` per channel, gateway image version and database backup ID | Q-08, FAT report |")
+    A("| BEN Pods and controller | Pod EUI-64 / node_id, certificate serial, attestation state, firmware version and signature, `cal_id` per channel; PLC project hash and firmware; edge computer image version, TPM PCR baseline and database backup ID | Q-08, FAT report |")
     A("| Sensors | Channel name (PROTOCOL.md), position (x, y, z), calibration coefficients | C-001 schedule, Q-08 |")
     A("| Fire system | Cylinder serial, agent mass, hydrostatic test date, installer certificate | Q-09 |")
     A("| Torque records | Bolt map (S-001 marked up) with every bolt numbered, wrench ID, value | Q-04, Q-07 |")
@@ -328,7 +328,7 @@ def write_sqam(lays):
     A("Electrical lugs and breaker terminals: the value on the device label, recorded per lug (CTP-E2). Never re-use a nyloc nut. Never torque over insulation or shims that can creep.")
     A("")
     A("- **Labelling:** every item carries the tag from A-002 / C-001 / E-001 (R1, CU2, UPS1, PNL-M, N1, T_in_r1_0.4 …) on a laminated or engraved label, 10 mm text minimum, at the top front; every cable at both ends; every breaker, receptacle and terminal. Sensor names are the PROTOCOL.md channel names exactly. Arc-flash and warning labels per E-001 notes.")
-    A("- **Cable management:** power in tray TR-P, data in TR-D, 300 mm apart, crossings at 90 degrees; bend radius >= 8 x cable diameter (4 x for Cat6A); hook-and-loop ties only on data; no cable rests on a sharp edge; service loops 300 mm at nodes; separate life-safety wiring (FRP, EPO) in its own conduit, red-identified.")
+    A("- **Cable management:** power in tray TR-P, data in TR-D, 300 mm apart, crossings at 90 degrees; bend radius >= 8 x cable diameter (4 x for Cat6A); hook-and-loop ties only on data; no cable rests on a sharp edge; service loops 300 mm at Pods and at the panel; separate life-safety wiring (FRP, EPO) in its own conduit, red-identified.")
     A("- **Conduit and glands:** liquid-tight or EMT inside; every shell penetration through a welded frame or curb with an EPDM boot or IP66 gland; fire-stop where required; bonding bushings on metallic conduit.")
     A("- **Penetration sealing:** butyl + EPDM boot on roof curbs, sleeved and sealed pipe penetrations, PU sealant on every liner lap; smoke-pencil test (CTQ-C2).")
     A("- **Welding:** AWS D1.1 visual acceptance; no undercut > 0.5 mm, no porosity, full fillet both sides of reinforcement frames; grind flush where a seal lands.")
@@ -340,7 +340,7 @@ def write_sqam(lays):
     A("")
     A("- Follow Task 12 of the instructions and record on Q-11. Containers: CSC re-inspection after modification (HOLD, CTP-A2); 4-leg lift on top castings only, sling angle >= 60 degrees (HOLD, CTP-S4); tie-down by the bottom castings; doors sealed and seal number recorded.")
     A("- Batteries at 30-50 % SoC, disconnect open, dangerous-goods paperwork; UPS transport locks fitted; IT removed or strapped; racks blocked; drains capped and traps drained.")
-    A("- Humidity: two humidity indicator cards (30/40/50 %) inside the unit — one at the gateway cabinet, one at the far rack — plus desiccant 1 kg per 10 m3 in sealed units; the indicators are photographed at set-down (Q-12).")
+    A("- Humidity: two humidity indicator cards (30/40/50 %) inside the unit — one at the BEN Controller panel, one at the far rack — plus desiccant 1 kg per 10 m3 in sealed units; the indicators are photographed at set-down (Q-12).")
     A("- Shock: a tilt indicator and a 10 g shock indicator on the UPS frame and on rack R1; tripped indicators are recorded as an NCR and trigger a re-check of hold-downs and connections at site.")
     A("- Micro: forklift only from the long side with the cabinet empty of IT; the skid lifting label and CoG label fitted.")
     A("")
@@ -388,7 +388,7 @@ def write_sqam(lays):
     A("")
     A("- Schreiber AI changes: a change to the configuration model, a drawing, the CTQ/CTP register or the instructions is issued as a new revision of the generated set with a change note. The supplier acknowledges receipt, removes superseded sheets, and states which units in progress are affected; Engineering decides whether in-progress units follow the old or new revision.")
     A("- Supplier changes: no change to materials, parts (including equivalents), sub-tier suppliers, process, location or key personnel without a deviation request or change notice approved by Schreiber AI before use. Part substitutions are checked against the catalogue footprint and the interference checks (`design/drawings/INTERFERENCE_CHECKS.md`) before approval.")
-    A("- Firmware and software: nodes and gateway run the firmware version named in the build contract; the supplier does not update firmware without instruction; versions are recorded in the FAT report.")
+    A("- Firmware and software: BEN Pods, PLC and edge computer run the signed firmware / image version named in the build contract; the supplier does not update firmware without instruction; versions are recorded in the FAT report.")
     A("")
     # 16
     A("## 16. Forms index")

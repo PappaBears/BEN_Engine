@@ -33,7 +33,7 @@ QC_FORMS = {
     "Q-05": "Racks, hold-downs and containment",
     "Q-06": "Cooling: piping, pressure test, charge",
     "Q-07": "Electrical installation and tests",
-    "Q-08": "Controls nodes, sensors and calibration",
+    "Q-08": "Controls: panel, BEN Pods, transmitters and calibration",
     "Q-09": "Fire detection and suppression",
     "Q-10": "Final QC and pre-ship test",
     "Q-11": "Transport preparation",
@@ -72,7 +72,7 @@ def register(lay) -> List[CTQ]:
     A(CTQ("CTQ-B3", "CTQ", "A-002", "Rack rails plumb", "1.8 m spirit level or laser, both axes", "Within 2 mm over 2 m", "Q-05"))
     A(CTQ("CTQ-B4", "CTQ", "A-002", "Rack-to-rack gap and alignment of fronts", "Feeler gauge / straight-edge", "Gap <= 3 mm; fronts within 3 mm of a straight line", "Q-05"))
     if is_c and lay.notes.get("plenum", 0):
-        A(CTQ("CTQ-B5", "CTQ", "A-002", "Hot-aisle containment leakage", "dP across containment at full fan speed (node dP_aisle)", ">= 5 Pa cold-to-hot with all doors closed; blanking panels in every open U", "Q-05"))
+        A(CTQ("CTQ-B5", "CTQ", "A-002", "Hot-aisle containment leakage", "dP across containment at full fan speed (Pod dP_aisle / Setra 264)", ">= 5 Pa cold-to-hot with all doors closed; blanking panels in every open U", "Q-05"))
     A(CTQ("CTQ-B6", "CTQ", "A-002", "Labels on every item match drawing tags", "Visual against A-002", "100 % of tags present, laminated, 10 mm text minimum", "Q-10"))
 
     # ---- A-003 envelope
@@ -109,7 +109,7 @@ def register(lay) -> List[CTQ]:
           "Nitrogen purge while brazing; vacuum <= 500 micron held 30 min; charge per nameplate", "Q-06", "HOLD"))
     A(CTQ("CTQ-M1", "CTQ", "M-001", "Refrigerant / coolant pressure test", "Dry nitrogen or hydrostatic, calibrated gauge", "Refrigerant: 1.1 x design pressure 24 h, drop <= 1 %; water: 1.5 x working pressure 2 h, no drop", "Q-06", "WITNESS"))
     A(CTQ("CTQ-M2", "CTQ", "M-001", "Condensate / drip-tray drains run to drain", "Pour 1 L water in each tray", "Clears in < 60 s; no pooling", "Q-06"))
-    A(CTQ("CTQ-M3", "CTQ", "M-001", "Leak rope under every cooling unit and along manifolds", "Wet-finger test at each 1 m", "Node reports leak = 1 within 10 s at every point", "Q-08"))
+    A(CTQ("CTQ-M3", "CTQ", "M-001", "Leak rope under every cooling unit and along manifolds", "Wet-finger test at each 1 m", "Controller reports leak = 1 within 10 s at every point (LD2100 on Pro, Pod E leak input on Lite)", "Q-08"))
     if lay.notes.get("cooling_resolved") in ("rdhx_drycooler", "dlc_cdu"):
         A(CTQ("CTQ-M4", "CTQ", "M-001", "Coolant mix and flow", "Refractometer; CDU flow meter", "30 % propylene glycol +/-2 %; flow per rack within +/-10 % of design", "Q-06"))
     A(CTQ("CTQ-M5", "CTQ", "M-001", "Supply air / coolant temperature at design load", "Commissioning sweep (software)", f"Rack inlet 18-27 C (ASHRAE {d['ashrae_class']}); all units share load within 15 %", "Q-10"))
@@ -117,10 +117,20 @@ def register(lay) -> List[CTQ]:
     # ---- C-001 controls
     hz = " / ".join(str(z) for z in lay.notes.get("probe_heights", (400, 1200, 1800)))
     A(CTQ("CTQ-K1", "CTQ", "C-001", "Sensor positions", "Steel tape from rack centre and floor", f"Inlet probes at {hz} mm +/-20 mm; 50 mm in front of the rack face", "Q-08"))
-    A(CTQ("CTQ-K2", "CTQ", "C-001", "Sensor ID labels match PROTOCOL.md channel names", "Visual against C-001 schedule", "100 % match; label at sensor and at node terminal", "Q-08"))
-    A(CTQ("CTQ-K3", "CTQ", "C-001", "Temperature probes calibrated against reference", "Ice-point and 40 C bath, 3 points", "Within +/-0.25 C after correction; cal_id stored in node", "Q-08", "WITNESS"))
+    A(CTQ("CTQ-K2", "CTQ", "C-001", "Sensor ID labels match PROTOCOL.md channel names", "Visual against C-001 schedule", "100 % match; label at sensor and at Pod / panel terminal", "Q-08"))
+    A(CTQ("CTQ-K3", "CTQ", "C-001", "Temperature probes calibrated against reference", "Ice-point and 40 C bath, 3 points", "Within +/-0.25 C after correction; cal_id stored in the Pod (Secure Vault NVM)", "Q-08", "WITNESS"))
     A(CTQ("CTQ-K4", "CTQ", "C-001", "dP tare and door contact function", "Tare with containment open; open/close door", "dP reads 0 +/-0.4 Pa after tare; door = 1 within 2 s", "Q-08"))
-    A(CTQ("CTP-K1", "CTP", "C-001", "Life-safety contacts (fire, EPO) hard-wired, not on MQTT bus", "Visual trace of wiring", "Dry contacts only to node; releasing circuit independent", "Q-09", "HOLD"))
+    A(CTQ("CTP-K1", "CTP", "C-001", "Life-safety contacts (fire, EPO) hard-wired, not on MQTT bus or BEN Mesh", "Visual trace of wiring", "Dry contacts only to the controller DI (and Pod monitor input); releasing circuit independent", "Q-09", "HOLD"))
+    A(CTQ("CTQ-K5", "CTQ", "C-001", "Pod attestation = OK on all Pods; rogue join rejected", "Commissioning script mesh report (`--stage pre-ship`); join attempt with an unprovisioned Pod",
+          f"All {lay.notes.get('n_pods', 3)} Pods attested (certificate chain valid, firmware signature valid, Secure Vault state locked); unprovisioned Pod rejected at join", "Q-08", "WITNESS"))
+    A(CTQ("CTP-K2", "CTP", "C-001", "Controller watchdog proven", "Stop ben_engine / unplug the edge computer or RevPi network; stopwatch",
+          "Cooling units fall back to local control and the watchdog relay drops within 5 s; alarm logged on return; no IT power affected", "Q-08", "WITNESS"))
+    if lay.notes.get("controls_tier", "pro") == "pro":
+        A(CTQ("CTQ-K6", "CTQ", "C-001", "BEN Controller panel SCCR label and UL 508A listing mark", "Visual; compare to panel shop drawing",
+              "UL 508A mark present; SCCR >= available fault current at the panel feeder; nameplate lists voltage, FLA, drawing number", "Q-08", "HOLD"))
+    else:
+        A(CTQ("CTQ-K6", "CTQ", "C-001", "BEN Controls Lite cabinet: listed components and 24 VDC fusing", "Visual against component list",
+              "RevPi, I/O, PSU and switch all UL/CE listed; each 24 VDC branch fused; cabinet labelled", "Q-08"))
     A(CTQ("CTP-F1", "CTP", "C-001", "Clean-agent system installed and commissioned by certified installer", "Certificate; room integrity (door fan) test",
           "Hold time >= 10 min at design concentration; certificate on file", "Q-09", "HOLD"))
     return items

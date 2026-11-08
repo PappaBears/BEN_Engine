@@ -1,0 +1,110 @@
+# BEN Engine — BEN Pod v1 — Simplicity Studio / SLC project (Schreiber AI)
+# Open in Simplicity Studio 5 (File > Import) or generate with:
+#   slc generate -p gecko/ben_pod.slcp -d gecko/build --with brd4186c   (dev kit)  or  --with mgm240pb32vna (module)
+# Then `make -C gecko/build -f ben_pod.Makefile` or use the CMakeLists.txt in this folder.
+# STATUS: not generated or compiled here (no Simplicity SDK / toolchain on the build host). See firmware/README.md.
+project_name: ben_pod
+label: BEN Pod v1 (Thread FTD, MQTT/TLS, Secure Vault)
+description: >
+  Schreiber AI BEN Pod v1 sensor node. Thread (OpenThread FTD; MTD variant for battery Pod W), MQTT 3.1.1 over
+  TLS 1.2 with mutual X.509 (PSA opaque device key in Secure Vault), SNTP over Thread, NVM3 settings,
+  Gecko Bootloader signed OTA. Application logic is the platform independent lib/bencore (host tested).
+category: Thread Examples
+package: OpenThread
+quality: experimental
+sdk: {id: simplicity_sdk, version: 2024.6.2}
+sdk_extension:
+  - {id: ot_sdk, version: 2024.6.2}
+
+component:
+  # ---- board / device (choose one at generate time with --with)
+  - id: brd4186c                               # EFR32MG24 radio board for bench work; swap for the module
+  - id: device_init
+  - id: sl_system
+  - id: sleeptimer
+  - id: power_manager
+  - id: memory_manager
+  - id: iostream_rtt
+  - id: iostream_retarget_stdio
+  - id: emlib_gpio
+  - id: gpiointerrupt
+  - id: nvm3_default
+  - id: i2cspm
+    instance: [sensor]                          # SHT45 0x44, SDP810 0x25
+  - id: spidrv
+    instance: [rtd]                             # ADS124S08 24-bit RTD ADC
+  # ---- security
+  - id: psa_crypto
+  - id: psa_crypto_ecdsa
+  - id: psa_crypto_sha256
+  - id: psa_crypto_ecdh
+  - id: psa_crypto_aes
+  - id: psa_crypto_gcm
+  - id: psa_its                                # persistent key storage (Secure Vault wrapped)
+  - id: mbedtls_x509
+  - id: mbedtls_tls
+  - id: mbedtls_ecdsa
+  - id: mbedtls_ecdhe_key_exchange
+  - id: bootloader_interface                   # btl_interface: verify, set image to bootload, slot write
+  - id: bootloader_app_properties              # ApplicationProperties_t with version for anti-rollback
+  # ---- OpenThread
+  - id: ot_stack_ftd                           # use ot_stack_mtd for the battery Pod W (sleepy end device)
+  - id: ot_platform_abstraction
+  - id: ot_mbedtls
+  - id: ot_psa_crypto
+  - id: ot_cli_source                          # bench only; remove for production image
+  - id: rail_util_pti
+  - id: rail_util_pa
+
+configuration:
+  - {name: SL_BOARD_ENABLE_VCOM, value: 1}
+  - {name: SL_HEAP_SIZE, value: 24576}
+  - {name: SL_STACK_SIZE, value: 6144}
+  - {name: OPENTHREAD_CONFIG_JOINER_ENABLE, value: 1}
+  - {name: OPENTHREAD_CONFIG_SNTP_CLIENT_ENABLE, value: 1}
+  - {name: OPENTHREAD_CONFIG_TCP_ENABLE, value: 1}
+  - {name: OPENTHREAD_CONFIG_COAP_API_ENABLE, value: 1}
+  - {name: OPENTHREAD_CONFIG_LOG_LEVEL, value: OT_LOG_LEVEL_WARN}
+  - {name: OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE, value: 0}
+  - {name: SL_OPENTHREAD_RADIO_TX_POWER, value: 10}      # dBm; MGM240P modular approval limit per datasheet
+  - {name: NVM3_DEFAULT_NVM_SIZE, value: 40960}
+  - {name: SL_PSA_ITS_SUPPORT_V3_DRIVER, value: 1}
+  - {name: SL_SE_MANAGER_CONFIG_... , value: 1, condition: [never]}   # placeholder: SE manager config is per-SDK version
+
+define:
+  - {name: BEN_TARGET_EFR32}
+  - {name: BEN_FW_VERSION, value: '"1.0.0"'}
+  - {name: BEN_RING_SECONDS, value: 3600}
+  - {name: MBEDTLS_USE_PSA_CRYPTO}
+  # Battery Pod W:  - {name: BEN_POD_W_BATTERY}
+
+include:
+  - path: ../lib
+  - path: ../lib/bencore
+  - path: ../lib/benhal
+  - path: ../src
+
+source:
+  - path: ../src/main.cpp
+  - path: ../lib/benhal/hal_efr32.cpp
+  - path: ../lib/bencore/alarms.cpp
+  - path: ../lib/bencore/channels.cpp
+  - path: ../lib/bencore/commands.cpp
+  - path: ../lib/bencore/node_app.cpp
+  - path: ../lib/bencore/outputs.cpp
+  - path: ../lib/bencore/ringbuf.cpp
+  - path: ../lib/bencore/telemetry.cpp
+  - path: ../lib/bencore/timesync.cpp
+
+toolchain_settings:
+  - {option: gcc_compiler_option, value: -std=gnu++17}
+  - {option: gcc_compiler_option, value: -Wall}
+  - {option: gcc_compiler_option, value: -Wextra}
+  - {option: gcc_compiler_option, value: -Wno-unused-parameter}
+
+post_build:
+  profile: ben_pod_gbl            # gecko/ben_pod_gbl.slpb: commander gbl create --sign ben-pod-signing-key.pem --app ... (see firmware/README.md)
+
+ui_hints:
+  highlight:
+    - {path: README.md, focus: true}

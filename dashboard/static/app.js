@@ -1,6 +1,7 @@
 // BEN Engine dashboard — app controller: store, WebSocket, panels, inspector, status strip.
 import { api, h, fmt, sensorValue, reducedMotion } from './util.js';
 import { createScene } from './scene.js';
+import { initTooltip } from './tooltip.js';
 import selectorPanel from './panels/selector.js';
 import livePanel from './panels/live.js';
 import alarmsPanel from './panels/alarms.js';
@@ -105,7 +106,8 @@ function initScene() {
     caption: document.getElementById('tour-caption'),
     walkHint: document.getElementById('walk-hint'),
   });
-  window.__ben = { store, scene, api, panels: PANELS, showPanel, render: () => scene.render(), tour: scene.tour };
+  const tooltip = initTooltip({ store, scene });
+  window.__ben = { store, scene, api, panels: PANELS, showPanel, render: () => scene.render(), tour: scene.tour, tooltip };
   document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { scene.setCamera(b.dataset.cam); markCam(b.dataset.cam); }));
   document.getElementById('btn-walk').addEventListener('click', () => scene.toggleWalk());
   document.getElementById('btn-tour').addEventListener('click', () => scene.tour.toggle());
@@ -186,8 +188,20 @@ function renderInspector() {
     case 'panel': title = 'Distribution panel'; tag = 'power';
       body = [kv([['Breaker frame', `${d.service_breaker_a} A`], ['Calculated', `${d.service_amps_calc} A`], ['Voltage', d.voltage], ['PDU circuits', `${cfg.racks}`], ['IT now', `${fmt.num(st.it_kw)} kW`]])];
       break;
-    case 'gateway': title = 'Gateway / network'; tag = 'controls';
-      body = [kv([['Gateway', 'Raspberry Pi 5 · ben_engine'], ['Nodes', `${new Set(store.sensors.map(s => s.node)).size} virtual`], ['Transport', 'MQTT, isolated LAN'], ['Mode', st.mode], ['Seq', st.seq]])];
+    case 'utility': title = 'Utility service'; tag = 'power';
+      body = [kv([['Utility', p.utility_ok ? 'OK' : 'LOST'], ['Import', `${fmt.num(p.utility_kw)} kW`], ['Service', `${d.voltage}, ${d.service_breaker_a} A`], ['PUE now', fmt.num(st.pue, 3)]]), evidence(['P_utility'], st)];
+      break;
+    case 'generator': title = 'Generator'; tag = 'power';
+      body = [kv([['State', p.generator_on ? 'RUNNING' : 'standby'], ['Utility', p.utility_ok ? 'OK' : 'LOST'], ['Start delay', '12 s'], ['Fitted', cfg.generator ? 'yes' : 'no']])];
+      break;
+    case 'containment': title = `Containment door ${(sel.index || 0) + 1}`; tag = 'cooling';
+      body = [kv([['Aisle ΔP', `${fmt.num(st.aisle_dp_pa)} Pa`], ['Return', `${fmt.num(st.return_c)} °C`]]), evidence(['dP_aisle', 'T_return'], st)];
+      break;
+    case 'leak_rope': title = 'Leak-detection rope'; tag = 'controls';
+      body = [kv([['Leak', st.leak ? 'DETECTED' : 'clear']]), evidence(['leak_floor'], st)];
+      break;
+    case 'gateway': case 'controller': title = 'BEN Controller'; tag = 'controls';
+      body = [kv([['Controller', cfg.tier === 'micro' ? 'RevPi · ben_engine' : 'PLC + edge computer · ben_engine'], ['BEN Pods', `${new Set(store.sensors.map(s => s.node)).size} virtual`], ['Transport', 'BEN Mesh (MQTT, isolated LAN)'], ['Mode', st.mode], ['Seq', st.seq]])];
       break;
     case 'doors': title = 'Doors'; tag = 'envelope';
       body = [kv([['State', st.door_open ? 'OPEN' : 'closed'], ['Humidity', `${fmt.num(st.rh_pct)} %RH`], ['Outdoor', `${fmt.num(st.outdoor_c)} °C`]]), evidence(['door_main', 'RH_room'], st)];

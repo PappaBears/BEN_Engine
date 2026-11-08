@@ -65,6 +65,20 @@ COOLING_LIBRARY: Dict[str, Dict[str, Any]] = {
     "dlc_cdu":        {"label": "Direct liquid cooling + CDU + dry cooler", "unit_kw": 300.0, "cop": 12.0, "medium": "liquid", "max_rack_kw": 80, "width_mm": 600, "mass_kg": 400},
 }
 
+CONTROLS_TIERS: Dict[str, Dict[str, Any]] = {
+    # docs/CONTROLS_HARDWARE_DECISION.md §2a. Both tiers run the same ben_engine software, the same BEN Pods on BEN Mesh
+    # and the same protocol; life safety is hardwired in both.
+    "auto": {"label": "Automatic (by tier and profile)"},
+    "lite": {"label": "BEN Controls Lite", "controller": "Revolution Pi RevPi Connect 4 + RevPi DIO/AIO (DIN rail, UL/CE listed)",
+             "edge": "same RevPi runs ben_engine and the Thread border router", "panel": "DIN-rail cabinet, listed components",
+             "for": ["micro", "ben10"]},
+    "pro":  {"label": "BEN Controls Pro", "controller": "Phoenix Contact PLCnext AXC F 2152 + Axioline F I/O",
+             "edge": "OnLogic Karbon 400 industrial edge computer (TPM 2.0)", "panel": "UL 508A listed BEN Controller panel",
+             "for": ["ben10", "ben20", "ben40"]},
+}
+# BEN 10 profiles that default to BEN Controls Pro
+CONTROLS_PRO_PROFILES = ("healthcare", "public_sector", "ai_training")
+
 PROFILE_DEFAULTS: Dict[str, Dict[str, Any]] = {
     "ai_inference":      {"label": "AI inference edge",     "redundancy": "N+1", "ashrae": "A2", "rack_kw": 20},
     "ai_training":       {"label": "AI training pod",       "redundancy": "N+1", "ashrae": "A1", "rack_kw": 60},
@@ -102,6 +116,10 @@ class Config:
     ups_minutes: int = 10
     generator: bool = False
     site_name: str = "Demo site"
+    # Controls tier (docs/CONTROLS_HARDWARE_DECISION.md §2a): "lite" = BEN Controls Lite (Revolution Pi RevPi Connect 4
+    # + RevPi DIO/AIO, BEN Pods on BEN Mesh), "pro" = BEN Controls Pro (PLCnext AXC F 2152 + Axioline F I/O in a UL 508A
+    # panel + OnLogic Karbon 400 edge computer + BEN Pods). "auto" resolves by size and profile, see controls_tier_resolved().
+    controls_tier: str = "auto"
 
     # ------------------------------------------------------------ validation
     def validate(self) -> List[str]:
@@ -132,11 +150,27 @@ class Config:
         for s in self.subsystems:
             if s not in ("power", "cooling", "compute", "controls"):
                 errs.append(f"unknown subsystem {s}")
+        if self.controls_tier not in CONTROLS_TIERS:
+            errs.append(f"unknown controls_tier {self.controls_tier}")
+        elif self.controls_tier == "lite" and self.tier in ("ben20", "ben40"):
+            errs.append("BEN Controls Lite is for BEN Micro and BEN 10 only; BEN 20/40 use BEN Controls Pro")
         if not errs and self.tier != "micro":
             d = self.derived()
             if not d["row_fits"]:
                 errs.append(f"single row of {self.racks} racks + {d['cooling_units_total']} cooling units is {d['row_length_mm']} mm, exceeds interior {int(TIER_GEOMETRY[self.tier]['int_l_m']*1000)} mm; use fewer racks, rear-door or liquid cooling")
         return errs
+
+    # ------------------------------------------------------------ controls tier
+    def controls_tier_resolved(self) -> str:
+        """Resolve ``controls_tier`` "auto": Lite for BEN Micro, Pro for BEN 20/40, and for BEN 10 Lite unless the
+        profile is one where the buyer expects a PLC and a UL 508A panel (healthcare, public sector, AI training)."""
+        if self.controls_tier in ("lite", "pro"):
+            return self.controls_tier
+        if self.tier == "micro":
+            return "lite"
+        if self.tier == "ben10":
+            return "pro" if self.profile in CONTROLS_PRO_PROFILES else "lite"
+        return "pro"
 
     # ------------------------------------------------------------ derived sizing
     def derived(self) -> Dict[str, Any]:
@@ -209,6 +243,9 @@ class Config:
         row_len_mm = self.racks * 600 + (n_units_total * cl["width_mm"] if cl["medium"] == "air" or cl["medium"] == "liquid" else 0) + 500
         row_fits = (self.tier == "micro") or (row_len_mm <= g["int_l_m"] * 1000)
         nfpa_855 = battery_kwh >= 20.0
+        # controls: tier and BEN Pod count (two per rack: cold face and hot face, + room + outdoor; Micro: 3)
+        ct = self.controls_tier_resolved()
+        pods = 3 if self.tier == "micro" else self.racks * 2 + 2
 
         return {
             "tier_label": g["label"], "enclosure": g["enclosure"],
@@ -223,6 +260,8 @@ class Config:
             "envelope_gain_kw": round(envelope_gain_kw, 2), "pue_estimate": pue_est,
             "row_length_mm": int(row_len_mm), "row_fits": row_fits, "nfpa_855_scope": nfpa_855,
             "ashrae_class": PROFILE_DEFAULTS[self.profile]["ashrae"],
+            "controls_tier_resolved": ct, "controls_label": CONTROLS_TIERS[ct]["label"],
+            "pods": pods,
             "climate": clim, "geometry": g,
         }
 
@@ -271,10 +310,11 @@ def main(argv=None):
     ap.add_argument("--racks", type=int)
     ap.add_argument("--cooling", choices=list(COOLING_LIBRARY))
     ap.add_argument("--redundancy", choices=["N", "N+1", "2N"])
+    ap.add_argument("--controls-tier", dest="controls_tier", choices=list(CONTROLS_TIERS))
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args(argv)
     cfg = Config.preset(a.tier, a.profile, a.climate)
-    for k in ("it_kw", "racks", "cooling", "redundancy"):
+    for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier"):
         v = getattr(a, k)
         if v is not None:
             setattr(cfg, k, v)
@@ -288,7 +328,8 @@ def main(argv=None):
     else:
         print(f"{d['tier_label']} — {PROFILE_DEFAULTS[cfg.profile]['label']} — {cfg.it_kw} kW IT in {cfg.racks} racks")
         for k in ("per_rack_kw", "cooling_label", "cooling_units_total", "total_kw", "voltage", "service_breaker_a",
-                  "ups_modules", "ups_kva_each", "battery_kwh", "airflow_cfm", "gross_kg", "pue_estimate", "row_length_mm", "row_fits", "nfpa_855_scope"):
+                  "ups_modules", "ups_kva_each", "battery_kwh", "airflow_cfm", "gross_kg", "pue_estimate", "row_length_mm", "row_fits", "nfpa_855_scope",
+                  "controls_tier_resolved", "pods"):
             print(f"  {k:24s} {d[k]}")
     return 0
 

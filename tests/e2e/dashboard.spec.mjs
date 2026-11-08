@@ -17,6 +17,10 @@ const SCREENS = resolve(ROOT, 'docs', 'media', 'screens');
 const FRAMES = resolve(ROOT, 'docs', 'media', 'frames');
 const PY = process.env.PYTHON || 'python';
 const HEADLESS = process.env.HEADED ? false : true;
+// `--only <substring>`: run only the steps whose name contains it (plus the bootstrap steps).
+const onlyIdx = process.argv.indexOf('--only');
+const ONLY = onlyIdx > 0 ? process.argv[onlyIdx + 1] : null;
+const BOOT = ['server up', 'dashboard loads', 'websocket connected', '3D scene built', 'no uncaught page errors'];
 mkdirSync(SCREENS, { recursive: true }); mkdirSync(FRAMES, { recursive: true });
 
 const results = [];
@@ -27,6 +31,7 @@ function check(name, ok, detail = '') {
   if (!ok) failures++;
 }
 async function step(name, fn) {
+  if (ONLY && !name.includes(ONLY) && !BOOT.some(b => name.startsWith(b))) { console.log(`SKIP  ${name}`); return; }
   try { const d = await fn(); check(name, true, d || ''); }
   catch (e) { check(name, false, e && e.message ? e.message.split('\n')[0] : String(e)); }
 }
@@ -129,13 +134,39 @@ try {
   });
 
   // back to BEN 20 for the rest
+  if (!ONLY) {
   await page.click('.panel-body[data-panel="selector"] .row button:has-text("BEN 20")');
   await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben20');
   await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
   await page.click('#btn-apply-config');
   await page.waitForFunction(() => window.__ben.store.config.tier === 'ben20' && window.__ben.scene.rackCount() === 5, null, { timeout: 15000, polling: 200 });
+  }
+
+  // ---------------------------------------------------------------------------------------------- hover tooltip
+  await step('hover tooltip: rack name, BOM part and kW over a rack', async () => {
+    await page.evaluate(() => { window.__ben.scene.setCamera('power_room', true); window.__ben.render(); });
+    await page.waitForFunction(() => window.__ben.tooltip && document.querySelector('#tip') && true, null, { timeout: 5000, polling: 200 });
+    await page.waitForTimeout(600);
+    const pos = await page.evaluate(() => window.__ben.scene.screenPositionOf('rack2'));
+    if (!pos || !pos.visible) throw new Error('rack2 not on screen: ' + JSON.stringify(pos));
+    await page.mouse.move(pos.x - 30, pos.y - 30); await page.mouse.move(pos.x, pos.y);
+    await page.waitForFunction(() => { const t = document.getElementById('tip'); return t && !t.hidden && /Rack 2/.test(t.textContent); }, null, { timeout: 10000, polling: 150 });
+    const text = (await page.textContent('#tip')).replace(/\s+/g, ' ');
+    if (!/\d+(\.\d+)? kW/.test(text)) throw new Error('no kW value in tooltip: ' + text);
+    if (!/STR-RACK|STR-CAB|no catalog line/.test(text)) throw new Error('no BOM part in tooltip: ' + text);
+    const box = await page.evaluate(() => { const r = document.getElementById('tip').getBoundingClientRect(); return [r.width, r.right <= innerWidth, r.bottom <= innerHeight]; });
+    if (box[0] > 330 || !box[1] || !box[2]) throw new Error('tooltip geometry ' + JSON.stringify(box));
+    await shot(page, `${SCREENS}/hover-tooltip.png`);
+    // keyboard cycling reaches the same tooltip
+    await page.mouse.move(5, 5); await page.focus('#scene'); await page.keyboard.press('Tab');
+    await page.waitForFunction(() => { const t = document.getElementById('tip'); return t && !t.hidden && /Enter: inspect/.test(t.textContent); }, null, { timeout: 5000, polling: 150 });
+    const kb = (await page.textContent('#tip')).replace(/\s+/g, ' ').slice(0, 60);
+    await page.keyboard.press('Escape');
+    return `${text.slice(0, 90)}… | keyboard: ${kb}`;
+  });
 
   // ---------------------------------------------------------------------------------------------- walkthrough
+  if (!ONLY) {
   await step('walkthrough: first-person camera at eye height with collision', async () => {
     await page.evaluate(() => window.__ben.scene.enterWalk({ lock: false }));
     await page.waitForTimeout(300);
@@ -268,6 +299,7 @@ try {
     return 'no horizontal scroll, panels stacked';
   });
 
+  }
   await step('no uncaught page errors', async () => {
     const real = pageErrors.filter(e => !/GL Driver|WebGL|swiftshader|favicon/i.test(e));
     if (real.length) throw new Error(real.slice(0, 3).join(' | '));

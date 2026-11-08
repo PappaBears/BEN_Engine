@@ -1,0 +1,9 @@
+# PLACEHOLDER — replace with the real Schreiber AI Device CA chain (PEM: Device CA intermediate then root)
+# exported from the provisioning cell's HSM. install.sh copies this file to /etc/ben/pki/device-ca-chain.crt
+# only if none exists. A unit shipped with this placeholder accepts NO Pod certificates (by design).
+-----BEGIN CERTIFICATE-----
+MIIBPLACEHOLDERREPLACEWITHDEVICECAINTERMEDIATEPEM
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIIBPLACEHOLDERREPLACEWITHSCHREIBERAIROOTPEM
+-----END CERTIFICATE-----

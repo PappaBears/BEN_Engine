@@ -26,7 +26,7 @@ def test_catalog_loads_and_has_required_fields(catalog):
         assert p["unit_price_usd"] > 0
         assert set(p["applies_to_tiers"]) <= set(TIERS)  # empty = catalogued alternate, not in any preset
         if p["price_status"] == "confirmed":
-            assert p["price_checked"] == "2026-11-07", p["code"]
+            assert p["price_checked"] in ("2026-11-07", "2026-11-08"), p["code"]
             assert p["vendor_url"].startswith("http"), f"{p['code']} confirmed price needs the URL it was seen on"
         else:
             assert p["price_checked"] is None, p["code"]
@@ -119,13 +119,37 @@ def test_micro_has_fs_but_no_clean_agent(catalog):
     assert "FS-CLEAN-AGENT" in codes40
 
 
-def test_controls_node_count_rule(catalog):
+def test_controls_pod_count_rule(catalog):
+    """BEN Pods: two per rack (cold and hot face) + room + outdoor on container tiers, 3 on BEN Micro."""
     for tier in TIERS:
         cfg = Config.preset(tier)
         rows = {r["code"]: r for r in generate_bom(cfg, catalog)}
-        assert rows["CTL-NODE-MCU"]["qty"] == math.ceil(cfg.racks / 2) + 1
-        assert rows["CTL-GW-PI5"]["qty"] == 1
+        expected = 3 if tier == "micro" else cfg.racks * 2 + 2
+        assert rows["CTL-POD"]["qty"] == expected
+        assert rows["CTL-POD-ENCL"]["qty"] == expected
+        assert rows["CTL-RCP"]["qty"] == (2 if cfg.racks >= 3 else 1)
         assert rows["PWR-PDU"]["qty"] == cfg.racks * 2
+        # no hobby-grade controls hardware in any preset
+        assert not {"CTL-GW-PI5", "CTL-NODE-MCU", "CTL-DS18B20", "CTL-SHT45", "CTL-ADS1115", "CTL-POE-SW"} & set(rows)
+
+
+def test_controls_tier_filter(catalog):
+    """applies_to_controls splits BEN Controls Lite (RevPi) from BEN Controls Pro (PLCnext panel + edge computer)."""
+    lite = {r["code"] for r in generate_bom(Config.preset("micro"), catalog)}
+    assert {"CTL-REVPI", "CTL-REVPI-DIO", "CTL-REVPI-AIO", "CTL-SWITCH-LITE", "CTL-ENCL", "CTL-POD", "CTL-PSU-QUINT"} <= lite
+    assert not {"CTL-PLC", "CTL-EDGE", "CTL-PANEL", "CTL-PANEL-BUILD", "CTL-IO-DIO", "CTL-LEAK-CTRL"} & lite
+    pro = {r["code"]: r for r in generate_bom(Config.preset("ben40"), catalog)}
+    assert {"CTL-PLC", "CTL-IO-DIO", "CTL-IO-RTD", "CTL-IO-AI", "CTL-EDGE", "CTL-PANEL", "CTL-PANEL-BUILD", "CTL-SWITCH",
+            "CTL-PSU-ORING", "CTL-SETRA264", "CTL-VAISALA-HMW90", "CTL-LEAK-CTRL", "CTL-POD"} <= set(pro)
+    assert not {"CTL-REVPI", "CTL-SWITCH-LITE"} & set(pro)
+    assert pro["CTL-PSU-QUINT"]["qty"] == 2
+    # BEN 10 defaults to Lite for ai_inference and to Pro for healthcare; the override is honoured
+    b10 = Config.preset("ben10")
+    assert "CTL-REVPI" in {r["code"] for r in generate_bom(b10, catalog)}
+    b10.controls_tier = "pro"
+    codes = {r["code"] for r in generate_bom(b10, catalog)}
+    assert "CTL-PLC" in codes and "CTL-REVPI" not in codes
+    assert "CTL-PLC" in {r["code"] for r in generate_bom(Config.preset("ben10", "healthcare"), catalog)}
 
 
 def test_moq_respected(catalog):

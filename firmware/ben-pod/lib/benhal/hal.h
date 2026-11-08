@@ -1,6 +1,7 @@
 // BEN Engine — benhal — thin hardware abstraction.
 // Everything the application needs from the platform goes through these interfaces so
-// lib/bencore compiles unchanged on ESP32 (Arduino) and on the host (mock, for tests).
+// lib/bencore compiles unchanged on the EFR32MG24 / MGM240P target (Simplicity SDK + OpenThread) and on
+// the host (mock, for tests).
 #pragma once
 #include <cstdint>
 #include <cstddef>
@@ -35,7 +36,7 @@ struct OneWireBus {
     virtual bool read_c(const uint8_t rom[8], float& out_c) = 0;
 };
 
-// Key/value non-volatile storage (ESP-IDF NVS on target, in-memory map on host).
+// Key/value non-volatile storage (NVM3 on target, in-memory map on host).
 struct Nvs {
     virtual ~Nvs() = default;
     virtual bool get_str(const char* key, char* out, size_t cap) = 0;
@@ -57,7 +58,7 @@ struct Net {
     virtual bool subscribe(const char* topic) = 0;
     virtual void set_rx_handler(RxHandler h, void* ctx) = 0;
     virtual void poll() = 0;                       // service the transport
-    virtual int  rssi() { return 0; }              // 0 for wired Ethernet
+    virtual int  rssi() { return 0; }              // dBm to the Thread parent; 0 for wired Ethernet (Pod E)
     virtual const char* ip() { return "0.0.0.0"; }
 };
 

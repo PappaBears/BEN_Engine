@@ -30,7 +30,8 @@
   </aside>
 
   <main class="viewport" id="viewport">
-    <canvas id="scene" aria-label="3D digital twin"></canvas>
+    <canvas id="scene" aria-label="3D digital twin" tabindex="0"></canvas>
+    <div class="tip" id="tip" role="tooltip" hidden></div>
     <div class="view-toolbar" id="view-toolbar">
       <div class="seg" role="group" aria-label="Camera">
         <button data-cam="exterior_iso" class="active">Exterior</button>
@@ -76,7 +77,9 @@
     <h3>Keyboard & mouse</h3>
     <table>
       <tr><td>Drag / wheel</td><td>Orbit, zoom (orbit mode)</td></tr>
+      <tr><td>Hover</td><td>Name, BOM part, purpose and live values of the part under the cursor</td></tr>
       <tr><td>Click object</td><td>Inspect it (racks, cooling, UPS, sensors…)</td></tr>
+      <tr><td>Tab / arrows</td><td>With the 3D view focused: cycle through parts with the same tooltip; Enter inspects</td></tr>
       <tr><td>1 – 5</td><td>Camera presets</td></tr>
       <tr><td>F</td><td>Walkthrough (first person). W A S D move, Shift run, mouse look, Esc exit</td></tr>
       <tr><td>G</td><td>Guided tour on / off</td></tr>

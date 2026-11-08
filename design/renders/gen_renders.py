@@ -34,7 +34,7 @@ STAGES = [
     (4, "Racks", "Racks on channels, hold-downs torqued, rails plumb"),
     (5, "Containment and cooling units", "Hot-aisle containment, in-row / RDHx / CDU, condensers"),
     (6, "Power cabinets", "UPS, batteries, panels, service section (HOLD: electrician)"),
-    (7, "Controls and sensors", "Nodes, gateway, probes at 0.4 / 1.2 / 1.8 m, dP, leak, door"),
+    (7, "Controls and sensors", "BEN Pods on the rack rails, BEN Controller panel, probes at 0.4 / 1.2 / 1.8 m, dP, leak, door"),
     (8, "Complete unit", "Roof closed, brand panel, ready for pre-ship test"),
 ]
 

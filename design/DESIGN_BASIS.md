@@ -67,7 +67,7 @@ Source levels **(assumptions from vendor-typical data)**: in-row DX unit 65 dB(A
 - Single row along the rack wall; the cold aisle is the egress path to the cargo doors. Drawn clear width BEN 10 930 mm, BEN 20 930 mm, BEN 40 930 mm (≥ 900 mm egress, ≥ 914 mm NEC 110.26 condition 1). Cargo doors open outward 270° and are fitted with inside panic releases **(add to BOM: FS-050)**. Dead-end length equals the container length; under NFPA 75 a single exit is acceptable for a room this size with occupancy limited to service staff.
 - NEC 110.26 condition 2 (1067 mm) is not met and is not required: the surface opposite the row is the insulated liner with no exposed grounded conductive parts at working height; the opposing-wall items (EPO, FRP) are ≤ 100 mm deep and above/below the 914 mm zone or within 600 mm of the door. If a customer places grounded equipment on the aisle wall, condition 2 applies and fails — this is a design constraint written on A-002.
 - Working space width 762 mm is satisfied by the continuous aisle; height 2.0 m is satisfied (tray underside 2250 mm).
-- Lighting: LED 4000 K luminaires over the aisle at the ceiling, 500 lx at 1 m AFF on the rack faces, emergency light at the door (90 min). Lights on PNL-M with a node relay (relay2) for remote control.
+- Lighting: LED 4000 K luminaires over the aisle at the ceiling, 500 lx at 1 m AFF on the rack faces, emergency light at the door (90 min). Lights on PNL-M with a controller relay output (relay2) for remote control.
 
 ## 7. Power, cooling and controls basis (from the configuration rules)
 
@@ -78,7 +78,7 @@ Source levels **(assumptions from vendor-typical data)**: in-row DX unit 65 dB(A
 | BEN 20 | 96 | 5 | 19.2 | 480 V 3ph | 175 / 200 | 2 × 116 kVA | 17.8 | rdhx_drycooler → rdhx_drycooler | 5 × RDHx + 2 row CDU + dry cooler | 3840 | 1.18 | 3500 / True |
 | BEN 40 | 192 | 10 | 19.2 | 480 V 3ph | 336 / 400 | 2 × 232 kVA | 35.6 | dlc_cdu → dlc_cdu | 4 × in-row 300 / 20 kW; 2 × CDU + dry cooler | 7680 | 1.136 | 7700 / True |
 
-Rules: UPS carries IT only with 15 % headroom; service sized at 80 % continuous; cooling N units at 1.05 × IT with 1.5 %/K DX derate above 35 °C; DLC removes 75 % of rack heat at the cold plate, the rest is air **(assumption)**; airflow 125 cfm/kW air-cooled, 40 cfm/kW liquid. Controls: one BEN Node per two racks, three inlet probes per rack (0.4 / 1.2 / 1.8 m; 0.3 / 0.7 / 1.1 m in the Micro), one outlet probe, supply/return probes, RH, dP across the containment, leak rope, door contact, utility pulse — identical to `Twin.sensors()` and `spec/PROTOCOL.md`.
+Rules: UPS carries IT only with 15 % headroom; service sized at 80 % continuous; cooling N units at 1.05 × IT with 1.5 %/K DX derate above 35 °C; DLC removes 75 % of rack heat at the cold plate, the rest is air **(assumption)**; airflow 125 cfm/kW air-cooled, 40 cfm/kW liquid. Controls (docs/CONTROLS_HARDWARE_DECISION.md): BEN Controls Pro (PLCnext AXC F 2152 + Axioline F I/O in a UL 508A panel, OnLogic Karbon 400 edge computer) on BEN 20/40, BEN Controls Lite (Revolution Pi RevPi Connect 4 + DIO/AIO) on BEN Micro, selectable on BEN 10; BEN Pods on BEN Mesh (Thread, MGM240P): two per rack (cold and hot face) + room + outdoor, Micro 3; logical node ids one per two racks; three inlet probes per rack (0.4 / 1.2 / 1.8 m; 0.3 / 0.7 / 1.1 m in the Micro), one outlet probe, supply/return probes, RH, dP across the containment, leak rope, door contact, utility pulse — identical to `Twin.sensors()` and `spec/PROTOCOL.md`.
 
 ## 8. Interference checks (generated)
 
@@ -86,7 +86,7 @@ The layout engine places the row and checks it against the enclosure. The table 
 
 | Tier | ID | Sheet | Check | Numbers | Limit | Result | Resolution |
 |---|---|---|---|---|---|---|---|
-| BEN Micro | I-M1 | A-002 | Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and gateway (1U) | 24U - 15U | >= 6 | **OK*** | 9U for IT at 5 kW: 2 x 2U servers + 1U switch + 1U patch fits; was 12U rule |
+| BEN Micro | I-M1 | A-002 | Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and controls shelf (1U) | 24U - 15U | >= 6 | **OK*** | 9U for IT at 5 kW: 2 x 2U servers + 1U switch + 1U patch fits; was 12U rule |
 | BEN Micro | I-M2 | A-001 | Cabinet DX units fit on cabinet exterior long face | 1 x 400 + 2 x 100 gap vs ext 1200 | <= 1200 | **OK** |  |
 | BEN Micro | I-M3 | A-003 | Rack depth + front/rear air gap vs cabinet interior width | 600 + 100 + 100 vs 800 | <= 800 | **OK** |  |
 | BEN Micro | I-M4 | S-001 | Skid + cabinet gross mass vs 2.5 t forklift / tail-lift | gross 1087 kg | <= 2500 | **OK** |  |
@@ -113,7 +113,7 @@ The layout engine places the row and checks it against the enclosure. The table 
 | BEN 20 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
 | BEN 20 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 3500 vs 5750 | <= 5750 | **OK** |  |
 | BEN 20 | I-C2 | A-002 | Row length with layout footprints (rdhx_drycooler: 5 racks, 4 cooling units, power cabinets) vs usable length | 4800 vs 5250 | <= 5250 | **OK** |  |
-| BEN 20 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (3 x Galaxy VS 100 kW @521 + 1 x Li cab @600, catalog qty rules) vs usable length | 6363 vs 5250 | <= 5250 | **FAIL** | Over by 1113 mm with 3 Galaxy VS 100 kW frames. Drawings assume one modular frame with internal N+1 modules (600 mm incl. batteries). Options: Galaxy VS 150 kW single frame with redundant power module (521 mm) - still 71 mm over for BEN 20: reduce end zone to 430 mm or preset 4 racks |
+| BEN 20 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 0 x Li cab @600, catalog qty rules) vs usable length | 4200 vs 5250 | <= 5250 | **OK** |  |
 | BEN 20 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 0 - 1270 = 930 | >= 900 | **OK** |  |
 | BEN 20 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK42: 600 x 1070 deep + RDHx) vs 900 egress / 914 NEC | 2200 - 0 - 1070 = 930 | >= 914 | **OK** |  |
 | BEN 20 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
@@ -133,7 +133,7 @@ The layout engine places the row and checks it against the enclosure. The table 
 | BEN 40 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
 | BEN 40 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 7700 vs 11850 | <= 11850 | **OK** |  |
 | BEN 40 | I-C2 | A-002 | Row length with layout footprints (dlc_cdu: 10 racks, 2 cooling units, power cabinets) vs usable length | 10400 vs 11350 | <= 11350 | **OK** |  |
-| BEN 40 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (4 x Galaxy VS 100 kW @521 + 2 x Li cab @600, catalog qty rules) vs usable length | 11684 vs 11350 | <= 11350 | **FAIL** | Over by 334 mm with 4 Galaxy VS 100 kW frames. Drawings assume one modular frame with internal N+1 modules (2000 mm incl. batteries). Options: Galaxy VS 150 kW single frame with redundant power module (521 mm) or BEN 40 preset at 9 racks (frees 600 mm) |
+| BEN 40 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 2 x Li cab @600, catalog qty rules) vs usable length | 9600 vs 11350 | <= 11350 | **OK** |  |
 | BEN 40 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 200 - 1070 = 930 | >= 900 | **OK** |  |
 | BEN 40 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK48: 600 x 1070 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1070 = 930 | >= 914 | **OK** |  |
 | BEN 40 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
@@ -163,7 +163,7 @@ The layout engine places the row and checks it against the enclosure. The table 
 4. **As-purchased footprints (new checks I-C21 / I-C22).** The catalog quantity rules do not fit the rows: BEN 10 `PWR-UPS-93PM50` towers (2 × 495 mm) → row 3090 > 2200; BEN 20 `PWR-UPS-GVS100` × 4 + `PWR-BATT-LI` × 2 → 7484 > 5250; BEN 40 × 6 + × 4 → 13926 > 11350. Drawings use rack-mount 20 kVA modules in R1 (BEN 10, new catalog item `PWR-UPS-RM20`) and one modular UPS frame per unit (BEN 20/40). `STR-RACK48` is 1200 deep → BEN 40 aisle 800 mm (< 900 egress); drawings use a 1070-deep 48U rack. These are purchasing / configuration decisions, listed in `design/assembly/ITEM_CODES_USED.md`.
 5. **NEC 110.26 condition 2** (1067 mm) fails on every container tier; condition 1 (914 mm) passes with 16 mm margin. Constraint on what may be mounted on the aisle wall (§6).
 6. **Door zone.** BEN 10 has 100 mm between the cargo doors and the first cooling unit; BEN 10 R1 keeps only 6U for IT after three 10U UPS modules and a 6U battery (alternative: 20 kW preset).
-7. **Micro.** 5 kW, 2 cabinet AC units (one per long face), 9U left for IT after 2 × (4U UPS + 3U battery pack) + 1U gateway; gross 1087 kg, 2.5 t forklift.
+7. **Micro.** 5 kW, 2 cabinet AC units (one per long face), 9U left for IT after 2 × (4U UPS + 3U battery pack) + 1U controls shelf (RevPi); gross 1087 kg, 2.5 t forklift.
 
 ## 9. Component footprints used (catalogue-typical, mm)
 
@@ -181,7 +181,8 @@ The layout engine places the row and checks it against the enclosure. The table 
 | ups800 | 800 × 1000 × 2000 | 500 | Modular UPS frame 800 |
 | batt | 600 × 1000 × 2000 | 450 | Li-ion battery cabinet 32.6 kWh |
 | panel | 500 × 250 × 1000 | 60 | Panelboard, wall mounted |
-| gateway | 600 × 300 × 600 | 25 | Gateway / controls cabinet |
+| controller | 610 × 305 × 762 | 45 | BEN Controller panel (UL 508A, PLC + edge computer) |
+| controller_lite | 300 × 180 × 200 | 8 | BEN Controls Lite cabinet (RevPi, DIN rail) |
 | cylinder | 400 × 400 × 1400 | 90 | Clean-agent cylinder |
 | cabdx | 400 × 250 × 1500 | 60 | Cabinet DX air conditioner 5.8 kW |
 

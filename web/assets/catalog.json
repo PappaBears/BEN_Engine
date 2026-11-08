@@ -215,5 +215,36 @@
    "corrosion": "C3",
    "wind_ms": 51
   }
- }
+ },
+ "controls_tiers": {
+  "auto": {
+   "label": "Automatic (by tier and profile)"
+  },
+  "lite": {
+   "label": "BEN Controls Lite",
+   "controller": "Revolution Pi RevPi Connect 4 + RevPi DIO/AIO (DIN rail, UL/CE listed)",
+   "edge": "same RevPi runs ben_engine and the Thread border router",
+   "panel": "DIN-rail cabinet, listed components",
+   "for": [
+    "micro",
+    "ben10"
+   ]
+  },
+  "pro": {
+   "label": "BEN Controls Pro",
+   "controller": "Phoenix Contact PLCnext AXC F 2152 + Axioline F I/O",
+   "edge": "OnLogic Karbon 400 industrial edge computer (TPM 2.0)",
+   "panel": "UL 508A listed BEN Controller panel",
+   "for": [
+    "ben10",
+    "ben20",
+    "ben40"
+   ]
+  }
+ },
+ "controls_pro_profiles": [
+  "healthcare",
+  "public_sector",
+  "ai_training"
+ ]
 }

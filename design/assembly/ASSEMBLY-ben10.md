@@ -154,7 +154,7 @@ All positions are in millimetres. x is along the length from the door-end liner.
 **Personnel:** 2 workers, 1 QC inspector (witness)  
 **Time:** 1.0 days (8 h)  
 **Tools:** T-01 Steel tape 8 m; T-02 Spirit level 1.8 m / laser level; T-03 Calibrated torque wrench 20-200 N·m (cal. within 12 months); T-04 Cordless drill, step drill, hole saws; T-15 PPE: hard hat, safety glasses, gloves, steel-toe boots, hearing protection  
-**Parts:** STR-FLOORCHAN (Floor channel C100x50x5 hot-dip galvanised, 3 m length (2 runs under the row, S-001)) x 2; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)), zinc flake) x 24; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)) x 1; STR-TRAY (Wire-mesh cable tray 300 x 100 mm, 3 m length, with ceiling hangers (data + power runs))) x 1; STR-TRAY (Wire-mesh cable tray 300 x 100 mm, 3 m length, with ceiling hangers (data + power runs))) x 1; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)) x 4; CTL-LEAK (SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised) x 1  
+**Parts:** STR-FLOORCHAN (Floor channel C100x50x5 hot-dip galvanised, 3 m length (2 runs under the row, S-001)) x 2; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)), zinc flake) x 24; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)) x 1; STR-TRAY (Wire-mesh cable tray 300 x 100 mm, 3 m length, with ceiling hangers (data + power runs))) x 1; STR-TRAY (Wire-mesh cable tray 300 x 100 mm, 3 m length, with ceiling hangers (data + power runs))) x 1; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)) x 4; CTL-LEAK (SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised (to LD2100 on Pro; to Pod E leak input on Lite)) x 1  
 
 
 > **NOTE:** The floor channels carry the rack feet. The channels must bear on the plywood over the cross members, not on insulation.
@@ -176,7 +176,7 @@ All positions are in millimetres. x is along the length from the door-end liner.
 9. Mark the tray hanger positions on the ceiling liner at 1500 mm pitch. The data tray TR-D is at y 1370 to 1670. The power tray TR-P is at y 1770 to 2070.
 10. Fit the hangers STR-FASTENERS to the tray bosses with M10 rod. Fit the trays STR-TRAY and STR-TRAY at z 2250 (underside).
 11. Fit the tray ground bonding jumper at each tray joint.
-12. Lay the leak rope CTL-LEAK on the floor around the perimeter 100 mm from the walls. Fix the rope with clips every 500 mm. Leave the ends at the gateway position.
+12. Lay the leak rope CTL-LEAK on the floor around the perimeter 100 mm from the walls. Fix the rope with clips every 500 mm. Leave the ends at the controller position.
 
 **Check:**
 
@@ -320,48 +320,62 @@ All positions are in millimetres. x is along the length from the door-end liner.
 - [CTQ-E3] All IT power off < 1 s; recorded on Q-10. Record on form Q-10.
 
 
-## Task 09 — Controls nodes and sensors
+## Task 09 — BEN Controller panel, BEN Pods and transmitters
 
-**Personnel:** 2 workers, 1 controls technician  
-**Time:** 1.5 days (12 h)  
-**Tools:** T-01 Steel tape 8 m; T-04 Cordless drill, step drill, hole saws; T-12 Laptop with ben_engine software and USB-serial cable; T-14 Label printer; T-15 PPE: hard hat, safety glasses, gloves, steel-toe boots, hearing protection  
-**Parts:** CTL-GW-PI5 (Raspberry Pi 5 8 GB (gateway)) x 1; CTL-NODE-MCU (ESP32-POE-ISO-EA (isolated PoE ESP32 board, external antenna)) x 1; CTL-POE-SW (UniFi Industrial 10-port switch, 8x PoE++ 802.3bt, 430 W, -40..+70 C) x 1; CTL-CAT6A (Cat6A UTP patch cable 10 ft) x 1; CTL-DS18B20 (Waterproof DS18B20 1-Wire temperature probe, 1 m) x 3; CTL-SHT45 (SHT45 precision temp/RH breakout, STEMMA QT) x 1; CTL-SDP810 (SDP810-125Pa differential pressure sensor, I2C) x 1; CTL-DOOR (Surface-mount magnetic door contact) x 1; CTL-LABELS (Label printer cartridges, cable labels, engraved phenolic tags (lot)) x 1  
+**Personnel:** 2 workers, 1 controls technician, 1 licensed electrician (panel feeder)  
+**Time:** 1.1 days (9 h)  
+**Tools:** T-01 Steel tape 8 m; T-04 Cordless drill, step drill, hole saws; T-12 Laptop with ben_engine software and USB-serial cable; T-14 Label printer; T-15 PPE: hard hat, safety glasses, gloves, steel-toe boots, hearing protection; T-17 Ferrule crimper, torque screwdriver 0.5-2.5 N·m (controls terminals), RS-485 / loop test meter  
+**Parts:** CTL-ENCL (CAB PC polycarbonate wall box 300x200x180 mm IP65 with DIN rail (BEN Controls Lite cabinet: RevPi, DIO/AIO, PSU, switch)) x 1; CTL-POD (BEN Pod v1 assembled and provisioned (MGM240P Thread module w/ Secure Vault High, 4x Pt1000 3-wire 24-bit front end, SHT45, 2x dry contact, leak-rope input, 2x isolated 4-20 mA; Pod E adds Ethernet/PoE PD, RS-485, 2x relay) - make item, per unit) x 6; CTL-PT1000 (Pt1000 class A 3-wire RTD probe string: 4 probes (3 inlet, 1 outlet), 6 mm SS tip, 3 m PTFE leads, M12 to Pod, labelled) x 5; CTL-SDP810 (SDP810-125Pa differential pressure sensor, I2C (fitted on the two room Pods: aisle dP and twin cross-check)) x 1; CTL-DOOR (Surface-mount magnetic door contact) x 1; CTL-SWITCH-LITE (Moxa EDS-2008-EL compact industrial Ethernet switch, 8x RJ45, DIN rail, 9.6-60 VDC (Lite controls LAN; managed upgrade FL SWITCH 2008 or EDS-G2008-EL)) x 1; CTL-CAT6A (Cat6A UTP patch cable 10 ft) x 1; CTL-LEAK (SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised (to LD2100 on Pro; to Pod E leak input on Lite)) x 1; CTL-LABELS (Label printer cartridges, cable labels, engraved phenolic tags (lot)) x 1; CTL-RCP (xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 20/40) x 1; CTL-PSU-QUINT (QUINT4-PS/1AC/24DC/10 DIN-rail 24 VDC 10 A power supply (UL 508 listed; 2 redundant on Pro, 1 on Lite)) x 1; CTL-REVPI (RevPi Connect 4 industrial controller (CM4-based industrial controller, 8 GB eMMC, 2x Ethernet, RS-485, DIN rail, UL/CE listed, hardware watchdog relay) - runs ben_engine, interlock logic and the Thread border router) x 1  
 
 
-> **CAUTION:** Static electricity can damage a node. Touch the rack frame before you touch a circuit board.
+> **CAUTION:** Static electricity can damage a Pod or an I/O module. Touch the rack frame before you touch a circuit board. Do not open a Pod: there is nothing to solder or set inside. A Pod with a broken seal is returned, not repaired.
+
+
+> **WARNING:** The controls panel is fed from PNL-M. Only a licensed electrician lands the panel feeder. Lock out the feeder before you work inside the panel.
 
 
 > **NOTE:** Sensor names on the labels must match spec/PROTOCOL.md exactly. The software finds each sensor by its name.
 
-1. Mount the gateway cabinet CTL-GW-PI5 on the end wall at z 1500 to 2100.
-2. Mount the 1 node enclosure(s) CTL-NODE-MCU on the tray bracket. The positions are:
-   - N1 at x 300
-3. Connect each node to the PoE switch CTL-POE-SW with a labelled Cat6A cable CTL-CAT6A in the data tray TR-D.
-4. Fit three inlet probes of string CTL-DS18B20 on the front door of each rack at z 400, 1200 and 1800. Put each probe 50 mm in front of the door face. Fix with the clip.
-5. Fit one outlet probe at the rear of each rack at z 1200.
-6. Label each probe at the sensor and at the node terminal: T_in_r1_0.4, T_in_r1_1.2, T_in_r1_1.8, T_out_r1, and so on.
-7. Fit the supply probe T_supply at the first cooling unit outlet at z 300. Fit the return probe T_return at the unit inlet at z 2200.
-8. Fit the SHT45 module CTL-SHT45 at the room centre at z 1500. Label RH_room.
-9. Fit the dP sensor CTL-SDP810 on node N1. Route one tube to the cold aisle and one tube to the hot plenum at z 1500. Label dP_aisle.
-10. Connect the leak rope CTL-LEAK to the node N1 leak input. Fit the end-of-line terminator.
-11. Fit the door contact CTL-DOOR on the door at z 1000. Connect to node N1. Label door_main.
-12. Connect the utility meter pulse output to node N1 pulse_kwh (meter1).
-13. Connect the Modbus cables from the UPS, the cooling units and the PDUs to the gateway.
-14. Connect the dry contacts from the fire releasing panel and the EPO to node N1. These are monitor contacts only.
-15. Power the gateway. Start `ben_engine` on the laptop T-12. Make sure each node shows status online.
-16. Open the containment doors. Send the tare command to dP_aisle. Close the doors.
-17. Put the probes of rack R1 in the ice-point bath, then the 40 C bath. Enter the reference values in the calibration tool. Store the coefficients in the node.
-18. Wet a finger and touch the leak rope at each 1 m. Make sure the node reports leak = 1 within 10 seconds.
-19. Open and close the door. Make sure door_main changes within 2 seconds.
+1. Mount the BEN Controls Lite cabinet CTL-ENCL on the end wall at x 2520, z 1200 to 1400. Fit the RevPi CTL-REVPI, the DIO and AIO modules, the 24 VDC supply CTL-PSU-QUINT and the switch CTL-SWITCH-LITE on the DIN rail. Fit the RevPi watchdog relay in the cooling-enable circuit.
+2. Electrician: land the panel feeder from PNL-M and the ground. Land 24 VDC to the field terminal strip: one fused 24 VDC branch per Pod E, one per transmitter, one for the leak controller. Torque the terminals to the value on the label (T-17).
+3. Mount the 6 Pods CTL-POD. Pods P1 to P4 go on the top rail of each rack: odd numbers on the cold face, even numbers on the hot face. The positions are:
+   - P1 at x 340, y 1290, z 1850
+   - P2 at x 340, y 130, z 1850
+   - P3 at x 1240, y 1290, z 1850
+   - P4 at x 1240, y 130, z 1850
+   - P5 at x 2300, y 100, z 1500
+   - P6 at x 2860, y -300, z 1800
+4. Fit the probe string CTL-PT1000 of each Pod: three inlet probes on the front door of the rack at z 400, 1200 and 1800 (50 mm in front of the door face) on the cold-face Pod, one outlet probe at the rear at z 1200 on the hot-face Pod. Plug the M12 connector into the Pod. Fix each probe with its clip.
+5. Label each probe at the sensor and at the Pod: T_in_r1_0.4, T_in_r1_1.2, T_in_r1_1.8, T_out_r1, and so on.
+6. Fit T_supply at the cooling unit outlet and T_return at the inlet. Connect them to the room Pod E.
+7. Connect the room Pod E to the controller with the RS-485 cable (A, B, shield; shield grounded at the panel only) and with a Cat6A cable CTL-CAT6A to the switch CTL-SWITCH-LITE. Connect the outdoor Pod E with 24 VDC and RS-485 in the same cable run to the dry cooler / condenser pad.
+8. The room Pod E carries the RH sensor. Mount the Pod at the room centre position on C-001 if the layout shows it there. Label RH_room.
+9. Route the dP tubes of the room Pod E: one to the cold aisle and one to the hot plenum at z 1500. Label dP_aisle.
+10. Connect the leak rope CTL-LEAK to the room Pod E leak input. Fit the end-of-line terminator.
+11. Fit the door contact CTL-DOOR on the door at z 1000. Wire it to a DI on the panel. Label door_main.
+12. Connect the utility meter pulse output to a DI on the panel (meter1, pulse_kwh).
+13. Connect the Modbus TCP cables from the UPS, the cooling units and the PDUs to the switch CTL-SWITCH-LITE. Set the switch to the controls VLAN only. No route to the internet.
+14. Connect the dry contacts from the fire releasing panel and the EPO to the panel DI. These are monitor contacts only. Life safety stays hard-wired.
+15. Energise the cabinet. Make sure the 24 VDC supply shows DC OK and the RevPi boots.
+16. Plug the border router radio CTL-RCP into the RevPi USB port.
+17. Start `ben_engine` on the laptop T-12. Run `python -m ben_engine.commissioning --stage provisioning-check`. Make sure all 6 Pods join the mesh, show attestation OK and a valid firmware signature. A Pod that does not attest is replaced, not re-flashed in the field.
+18. Open the containment doors. Send the tare command to dP_aisle. Close the doors.
+19. Put the probes of rack R1 in the ice-point bath, then the 40 C bath. Enter the reference values in the calibration tool. The coefficients are stored in the Pod.
+20. Wet a finger and touch the leak rope at each 1 m. Make sure the controller reports leak = 1 within 10 seconds.
+21. Open and close the door. Make sure door_main changes within 2 seconds.
+22. Stop `ben_engine` on the RevPi. Make sure the watchdog relay drops within 5 seconds and the cooling units keep running on local control. Restart.
 
 **Check:**
 
 - [CTQ-K1] Inlet probes at 400 / 1200 / 1800 mm +/-20 mm; 50 mm in front of the rack face. Record on form Q-08.
-- [CTQ-K2] 100 % match; label at sensor and at node terminal. Record on form Q-08.
-- [CTQ-K3] Within +/-0.25 C after correction; cal_id stored in node. WITNESS POINT. Record on form Q-08.
+- [CTQ-K2] 100 % match; label at sensor and at Pod / panel terminal. Record on form Q-08.
+- [CTQ-K3] Within +/-0.25 C after correction; cal_id stored in the Pod (Secure Vault NVM). WITNESS POINT. Record on form Q-08.
 - [CTQ-K4] dP reads 0 +/-0.4 Pa after tare; door = 1 within 2 s. Record on form Q-08.
-- [CTQ-M3] Node reports leak = 1 within 10 s at every point. Record on form Q-08.
-- [CTP-K1] Dry contacts only to node; releasing circuit independent. HOLD POINT. Record on form Q-09.
+- [CTQ-K5] All 6 Pods attested (certificate chain valid, firmware signature valid, Secure Vault state locked); unprovisioned Pod rejected at join. WITNESS POINT. Record on form Q-08.
+- [CTP-K2] Cooling units fall back to local control and the watchdog relay drops within 5 s; alarm logged on return; no IT power affected. WITNESS POINT. Record on form Q-08.
+- [CTQ-K6] RevPi, I/O, PSU and switch all UL/CE listed; each 24 VDC branch fused; cabinet labelled. Record on form Q-08.
+- [CTQ-M3] Controller reports leak = 1 within 10 s at every point (LD2100 on Pro, Pod E leak input on Lite). Record on form Q-08.
+- [CTP-K1] Dry contacts only to the controller DI (and Pod monitor input); releasing circuit independent. HOLD POINT. Record on form Q-09.
 
 
 ## Task 10 — Fire detection and suppression
@@ -382,7 +396,7 @@ All positions are in millimetres. x is along the length from the door-end liner.
 3. Mount the releasing panel FS-CLEAN-AGENT on the aisle wall at x 150, z 1500. Mount the abort button beside the door.
 4. Mount two smoke detectors FS-SMOKE on the ceiling in the cold aisle and two in the hot plenum.
 5. Fit the discharge pipe FS-CLEAN-AGENT and the nozzles at the ceiling. Support the pipe every 1.5 m.
-6. Installer: connect the detectors, the releasing circuit, the EPO interlock and the cooling shutdown relay. Connect the monitor contacts to node N1.
+6. Installer: connect the detectors, the releasing circuit, the EPO interlock and the cooling shutdown relay. Connect the monitor contacts to the controller DI in CTL-ENCL.
 7. Installer: do the door-fan room integrity test. Record the hold time.
 8. Installer: do the functional test with the release solenoid disconnected. Fit the actuator last.
 
@@ -473,7 +487,7 @@ All positions are in millimetres. x is along the length from the door-end liner.
 5. Electrician: measure the ground resistance. Target 5 ohm, maximum 25 ohm.
 6. Electrician: connect the utility conductors to the service section. Check the phase rotation.
 7. HVAC technician: check the refrigerant pressures and the condenser fans.
-8. Pull the fibre SITE-FIBER through the controls entry to the gateway cabinet. Terminate on the ODF.
+8. Pull the fibre SITE-FIBER through the controls entry to the BEN Controller panel. Terminate on the ODF.
 9. Fit the IT servers in the racks if they were removed. Connect each server to PDU A and PDU B.
 10. Close the battery disconnect. Energise the unit. Start the UPS.
 11. Run `python -m ben_engine.commissioning --stage site` on the laptop. The script now takes over. Follow the script steps.
@@ -508,6 +522,7 @@ The commissioning script writes the signed report. Give the customer the turnove
 - T-14: Label printer
 - T-15: PPE: hard hat, safety glasses, gloves, steel-toe boots, hearing protection
 - T-16: Rack lifter / stair climber for 100 kg modules
+- T-17: Ferrule crimper, torque screwdriver 0.5-2.5 N·m (controls terminals), RS-485 / loop test meter
 
 ## Item codes used in this document
 
@@ -520,16 +535,18 @@ Codes are purchasing catalog codes (`purchasing/parts_catalog.json`); see `desig
 - CLG-INROW (InRow DX 300 mm 30 kW air-cooled in-row unit (indoor section) (ACRD301S is the 300 mm, ~20 kW class unit = config inrow_dx_300; 600 mm/30 kW class ACRD600 series to be quoted for inrow_dx))
 - CMP-BLANK (1U tool-less blanking panels, pack of 10 (every open U, CTQ-B5))
 - PWR-GROUNDBAR (Telecom grounding busbar kit 1/4 x 4 x 12 in with insulators/brackets))
-- CTL-GW-PI5 (Raspberry Pi 5 8 GB (gateway))
-- CTL-NODE-MCU (ESP32-POE-ISO-EA (isolated PoE ESP32 board, external antenna))
-- CTL-DS18B20 (Waterproof DS18B20 1-Wire temperature probe, 1 m)
-- CTL-SHT45 (SHT45 precision temp/RH breakout, STEMMA QT)
-- CTL-SDP810 (SDP810-125Pa differential pressure sensor, I2C)
+- CTL-ENCL (CAB PC polycarbonate wall box 300x200x180 mm IP65 with DIN rail (BEN Controls Lite cabinet: RevPi, DIO/AIO, PSU, switch))
+- CTL-POD (BEN Pod v1 assembled and provisioned (MGM240P Thread module w/ Secure Vault High, 4x Pt1000 3-wire 24-bit front end, SHT45, 2x dry contact, leak-rope input, 2x isolated 4-20 mA; Pod E adds Ethernet/PoE PD, RS-485, 2x relay) - make item, per unit)
+- CTL-PT1000 (Pt1000 class A 3-wire RTD probe string: 4 probes (3 inlet, 1 outlet), 6 mm SS tip, 3 m PTFE leads, M12 to Pod, labelled)
+- CTL-SDP810 (SDP810-125Pa differential pressure sensor, I2C (fitted on the two room Pods: aisle dP and twin cross-check))
 - CTL-DOOR (Surface-mount magnetic door contact)
-- CTL-POE-SW (UniFi Industrial 10-port switch, 8x PoE++ 802.3bt, 430 W, -40..+70 C)
+- CTL-SWITCH-LITE (Moxa EDS-2008-EL compact industrial Ethernet switch, 8x RJ45, DIN rail, 9.6-60 VDC (Lite controls LAN; managed upgrade FL SWITCH 2008 or EDS-G2008-EL))
 - CTL-CAT6A (Cat6A UTP patch cable 10 ft)
-- CTL-LEAK (SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised)
+- CTL-LEAK (SeaHawk conductive-fluid leak sensing cable 50 ft, connectorised (to LD2100 on Pro; to Pod E leak input on Lite))
 - CTL-LABELS (Label printer cartridges, cable labels, engraved phenolic tags (lot))
+- CTL-REVPI (RevPi Connect 4 industrial controller (CM4-based industrial controller, 8 GB eMMC, 2x Ethernet, RS-485, DIN rail, UL/CE listed, hardware watchdog relay) - runs ben_engine, interlock logic and the Thread border router)
+- CTL-RCP (xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 20/40)
+- CTL-PSU-QUINT (QUINT4-PS/1AC/24DC/10 DIN-rail 24 VDC 10 A power supply (UL 508 listed; 2 redundant on Pro, 1 on Lite))
 - ENV-PIR (Polyiso (PIR) foil-faced board 2 in x 4 ft x 8 ft, R-13 (two layers = 100 mm))
 - ENV-LINER (Ribbed 29-ga galvanized steel liner panel 3 ft x 8 ft)
 - ENV-SEAL (Fire-rated sealant / low-expansion PU foam)

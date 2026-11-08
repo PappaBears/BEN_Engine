@@ -365,7 +365,7 @@ def sheet_a002(lay: L.Layout, out):
         for it in lay.items:
             if it.kind == "tray":
                 ve.rect(0, it.z0, it.x1, it.z1, fc="none", ec=MUTED, lw=0.5, ls="--")
-        ve.text(lay.L - L.END_ZONE / 2, lay.H / 2, "END ZONE:\nFS1 cylinder\nGW1 above\nPNL-M aisle side", h=1.6, ha="center", va="center", c=MUTED)
+        ve.text(lay.L - L.END_ZONE / 2, lay.H / 2, "END ZONE:\nFS1 cylinder\nCP1 controller\nPNL-M aisle side", h=1.6, ha="center", va="center", c=MUTED)
         ve.dim_v(0, lay.H, 0, -8, label=f"{lay.H:.0f}")
         tr = lay.find("TR-D")
         if tr:
@@ -802,7 +802,7 @@ def sheet_e001(lay: L.Layout, out):
     sh.line(xu, y_bus - 20, xu, y_bus - 30, lw=1.0)
     ups_lbl = f"UPS x{nups} ({cfg.redundancy})"
     ups_lines = [f"{ups_kva} kVA each, {'rack-mount' if lay.notes.get('rack_ups') or not lay.is_container else 'modular frame'}",
-                 f"Battery {d['battery_kwh']} kWh Li-ion, {cfg.ups_minutes} min", "Internal static + maintenance bypass", "Modbus TCP to gateway"]
+                 f"Battery {d['battery_kwh']} kWh Li-ion, {cfg.ups_minutes} min", "Internal static + maintenance bypass", "Modbus TCP to BEN Controller"]
     sym_box(sh, xu - 32, y_bus - 72, 64, 42, ups_lbl, ups_lines, kind="power")
     sh.text(xu + 34, y_bus - 40, "EPO: shunt-trip UPS output (CTQ-E3)", h=1.8, c=RED)
     sh.line(xu, y_bus - 72, xu, y_bus - 84, lw=1.0)
@@ -870,7 +870,7 @@ def sheet_e001(lay: L.Layout, out):
                 ["IT distribution", f"{v_pdu} V; {cfg.racks} racks x 2 PDU x {pdu_a} A; {d['per_rack_kw']} kW/rack"],
                 ["Mechanical panel", f"{pnlm_a} A main; {len(cus)} x cooling unit {cool_a} A" + (f"; {len(pumps)} x pump/CDU" if pumps else "") + ("; dry cooler" if dc else "")],
                 ["Generator (optional)", f"{gen_kva} kVA, ATS {d['service_breaker_a']} A 4P"],
-                ["EPO", "Mushroom button at door (int) and on SVC (ext): shunt-trip UPS output + PNL-M main; hard-wired, monitored by node dry contact"],
+                ["EPO", "Mushroom button at door (int) and on SVC (ext): shunt-trip UPS output + PNL-M main; hard-wired, monitored by a controller dry-contact input"],
                 ["PUE estimate", f"{d['pue_estimate']}"]]
         y = sh.table(x, y, ["ITEM", "VALUE"], rows, [RW * 0.26, RW * 0.74], title="ELECTRICAL SCHEDULE (preliminary)", h=1.9)
         y -= 6
@@ -930,7 +930,7 @@ def sheet_m001(lay: L.Layout, out):
         sh.text(min(xh1 + 2, 300), y0 - 116, "Condensate header 32 mm PVC, fall 1:100 -> exterior drain / pump (CTQ-M2)", h=1.8, va="center", c=CTQ_C, bg=PAPER)
         # leak rope
         sh.line(xh0, y0 - 122, xh1, y0 - 122, c=RED, lw=0.6, ls=":")
-        sh.text(min(xh1 + 2, 300), y0 - 122, "Leak rope under every unit -> node leak (CTQ-M3)", h=1.8, va="center", c=RED, bg=PAPER)
+        sh.text(min(xh1 + 2, 300), y0 - 122, "Leak rope under every unit -> leak controller / Pod E (CTQ-M3)", h=1.8, va="center", c=RED, bg=PAPER)
         notes_y = y0 - 130
         sh.text(xleft, notes_y, f"Refrigerant: R-454B (A2L) or R-410A per unit nameplate; line sizes PLACEHOLDER L 3/8\" / S 7/8\" for <= 15 m equivalent — HVAC technician sizes per manufacturer table (CTP-M1 HOLD).", h=1.9, c=MUTED)
         sh.text(xleft, notes_y - 3.5, f"Each unit: {L.LIB.get(lay.notes.get('air_key', 'inrow300'), {}).get('kw', 5.8) if lay.is_container else 5.8} kW sensible; EC fans modulate on supply temp 18-22 C and dP_aisle setpoint; A2L refrigerant detector in hot plenum interlocked to fans.", h=1.9, c=MUTED)
@@ -969,7 +969,7 @@ def sheet_m001(lay: L.Layout, out):
             sym_hx(sh, xc, yc, 44, 34, f"{u.tag} {'PUMPING UNIT' if u.tag.startswith('PU') else 'CDU'} ({cfg.redundancy})")
             sh.text(xc + 22, yc + 26, "plate HX, pumps N+1", h=1.6, ha="center", c=MUTED)
             sh.text(xc + 22, yc + 22, "VFD, 2-way CV, leak tray", h=1.6, ha="center", c=MUTED)
-            sh.text(xc + 22, yc + 18, "Modbus TCP -> gateway", h=1.6, ha="center", c=MUTED)
+            sh.text(xc + 22, yc + 18, "Modbus TCP -> controller", h=1.6, ha="center", c=MUTED)
             if k > 0:
                 sh.line(xp, yb + 8, xp, yc + 8, lw=1.2, c=CTQ_C); sh.line(xp - 4, yb + 26, xp - 4, yc + 26, lw=1.2, c=RED)
                 sh.line(xp - 4, yc + 26, xc, yc + 26, lw=1.2, c=RED)
@@ -1028,7 +1028,7 @@ def sheet_m001(lay: L.Layout, out):
                  "Line sizes on this sheet are placeholders; final sizes, traps and oil return per the unit manufacturer's installation manual for the measured equivalent length.",
                  "A2L refrigerant: detector in the hot plenum, fan interlock, no ignition sources in the plenum; follow UL 60335-2-40 charge limits per room volume.",
                  "Every drain and drip tray is water-tested before the floor is closed (CTQ-M2).",
-                 "Controls: unit supply temperature setpoint and fan speed follow the gateway; units default to local control on loss of comms (PROTOCOL.md safety rules)."]
+                 "Controls: unit supply temperature setpoint and fan speed follow the gateway; units default to local control on loss of comms; PLC / RevPi watchdog relay (CTP-K2); PROTOCOL.md safety rules."]
         return sh.notes(x, y, "COOLING NOTES", notes, h=2.0, lead=3.1)
     right_column(sh, lay, "M-001", extra)
     sh.title_block()
@@ -1041,7 +1041,7 @@ def sheet_c001(lay: L.Layout, out):
     sh = new_sheet(lay, "C-001", "Controls layout", f"1:{s}", 7)
     ox, y_top = 40.0, TOP - 14
     oy = y_top - lay.W / s - 24
-    sh.view_title(ox, y_top + 6, "SENSOR AND NODE PLAN", f"1:{s}")
+    sh.view_title(ox, y_top + 6, "SENSOR AND BEN POD PLAN", f"1:{s}")
     v = plan_view(sh, lay, ox, oy, s, labels=False)
     # racks labelled lightly
     for it in lay.items:
@@ -1079,7 +1079,7 @@ def sheet_c001(lay: L.Layout, out):
     tr = lay.find("TR-D")
     if tr:
         v.line(tr.x0, tr.cy, tr.x1, tr.cy, c=PURPLE, lw=0.9, ls="-.", z=3)
-        v.text(tr.x1 - 100, tr.cy + 60, "Controls LAN: Cat6A PoE on TR-D to each node; fibre uplink to GW1", h=1.5, ha="right", va="bottom", c=PURPLE, bg=PAPER)
+        v.text(tr.x1 - 100, tr.cy + 60, "Controls LAN on TR-D: RS-485 + 24 VDC to Pod E; Modbus TCP to UPS/cooling; fibre uplink to CP1. Pod W on BEN Mesh (Thread)", h=1.5, ha="right", va="bottom", c=PURPLE, bg=PAPER)
     if racks:
         v.bubble(racks[0].cx, rf + 50, -14, 18, "CTQ-K1"); v.bubble(racks[-1].cx, rf + 50, 14, 18, "CTQ-K2")
     sh.north_arrow(RX - 45, TOP - 30)
@@ -1101,32 +1101,36 @@ def sheet_c001(lay: L.Layout, out):
         for k, z in enumerate(lay.notes["probe_heights"]):
             ve.dim_v(0, z, 0, -8 - 7 * k, label=f"{z}", side="left", h=1.8)
     for it in lay.items:
-        if it.kind == "controls" and it.tag.startswith("N"):
+        if it.kind == "controls" and it.code == "CTL-POD" and it.mount != "ext":
             ve.rect(it.x0, it.z0, it.x1, it.z1, fc=FILL["controls"], ec=PURPLE, lw=0.7)
             ve.text(it.cx, it.z1 + 60, it.tag, h=1.6, ha="center", c=PURPLE, bold=True)
-    gw = lay.find("GW1")
+    gw = lay.find("CP1")
     if gw and lay.is_container:
         ve.rect(Lm - 350, gw.z0, Lm - 50, gw.z1, fc=FILL["controls"], ec=PURPLE, lw=0.7, ls="--")
-        ve.text(Lm - 200, (gw.z0 + gw.z1) / 2, "GW1\n(end wall)", h=1.4, ha="center", va="center", c=PURPLE)
+        ve.text(Lm - 200, (gw.z0 + gw.z1) / 2, "CP1\n(end wall)", h=1.4, ha="center", va="center", c=PURPLE)
     # network diagram, bottom-left
     nx, ny = 30, 125
-    sh.text(nx, ny + 22, "CONTROLS NETWORK (isolated controls LAN, no internet dependency)", h=2.8, bold=True)
-    sym_box(sh, nx, ny - 6, 54, 24, "GW1 GATEWAY", ["Raspberry Pi 5, ben_engine server", "MQTT broker, Modbus/SNMP poller", "Local DB + dashboard"], kind="controls")
-    sym_box(sh, nx + 66, ny - 6, 44, 24, "PoE SWITCH", ["8/16 port, 802.3at", "VLAN: controls only"], kind="controls")
+    pro = lay.notes.get("controls_tier", "pro") == "pro"
+    sh.text(nx, ny + 22, ("BEN CONTROLS PRO" if pro else "BEN CONTROLS LITE") + " — CONTROLS NETWORK (isolated controls LAN + BEN Mesh, no internet dependency)", h=2.8, bold=True)
+    if pro:
+        sym_box(sh, nx, ny - 6, 54, 24, "CP1 BEN CONTROLLER (UL 508A)", ["PLCnext AXC F 2152 + Axioline F I/O", "Karbon 400 edge: ben_engine, MQTT, OTBR", "2 x QUINT4 24 VDC, SPD, TPM 2.0"], kind="controls")
+    else:
+        sym_box(sh, nx, ny - 6, 54, 24, "CP1 BEN CONTROLS LITE", ["RevPi Connect 4 + DIO/AIO", "ben_engine, MQTT, OTBR on the RevPi", "QUINT4 24 VDC, watchdog relay"], kind="controls")
+    sym_box(sh, nx + 66, ny - 6, 44, 24, "SWITCH", ["FL SWITCH 2008 (managed)" if pro else "Moxa EDS-2008-EL", "VLAN: controls only"], kind="controls")
     sh.line(nx + 54, ny + 6, nx + 66, ny + 6, lw=1.0, c=PURPLE)
-    nn = lay.notes.get("n_nodes", 1)
+    nn = min(lay.notes.get("n_pods", 3), 5)
     for k in range(nn):
-        xk = nx + 122 + k * 30
-        sh.line(nx + 110, ny + 6, xk, ny + 6, lw=0.8, c=PURPLE)
-        sym_box(sh, xk - 10, ny - 2, 20, 16, f"N{k+1}", ["ESP32-S3", "PoE"], kind="controls", title_h=2.2)
-    xm = nx + 122 + nn * 30 + 10
+        xk = nx + 122 + k * 26
+        sh.line(nx + 110, ny + 6, xk, ny + 6, lw=0.8, c=PURPLE, ls="--" if k < nn - 1 else "-")
+        sym_box(sh, xk - 10, ny - 2, 20, 16, f"P{k+1}" if k < nn - 1 else "Pod E", ["MGM240P", "Thread" if k < nn - 1 else "RS-485"], kind="controls", title_h=2.2)
+    xm = nx + 122 + nn * 26 + 10
     sym_box(sh, xm, ny - 6, 50, 24, "MODBUS / SNMP", ["UPS, cooling units, CDU", "meter1 (P_utility), PDUs"], kind="power")
     sh.line(nx + 54, ny - 2, nx + 60, ny - 2, lw=0.8, c=CTP_C); sh.line(nx + 60, ny - 2, nx + 60, ny - 14, lw=0.8, c=CTP_C); sh.line(nx + 60, ny - 14, xm, ny - 14, lw=0.8, c=CTP_C); sh.line(xm, ny - 14, xm, ny - 6, lw=0.8, c=CTP_C)
-    sh.text(nx, ny - 20, "Life-safety (fire releasing panel FRP, EPO) is HARD-WIRED; nodes only monitor dry contacts (CTP-K1 HOLD). Node outputs: relay1 cooling enable, relay2 lights, relay3 fan boost, relay4 spare.", h=1.9, c=RED)
-    sh.text(nx, ny - 24, "Node telemetry 1 Hz on ben/<unit>/node/<id>/telemetry; channel names per spec/PROTOCOL.md; calibration (gain, offset, cal_id) stored in node NVS (CTQ-K3).", h=1.9, c=MUTED)
+    sh.text(nx, ny - 20, f"Life-safety (fire releasing panel FRP, EPO) is HARD-WIRED; the controller only monitors dry contacts (CTP-K1 HOLD). Controller outputs via interface relays: cooling enable, lights, fan boost, spare. {lay.notes.get('n_pods', 3)} BEN Pods (dashed = Thread mesh, solid = Pod E wired RS-485 + 24 VDC).", h=1.9, c=RED)
+    sh.text(nx, ny - 24, "Pod telemetry 1 Hz on ben/<unit>/node/<id>/telemetry over Thread/IPv6 (mutual TLS); channel names per spec/PROTOCOL.md; calibration (gain, offset, cal_id) in the Pod Secure Vault NVM (CTQ-K3); attestation at join (CTQ-K5).", h=1.9, c=MUTED)
     # legend
-    lx, ly = 300, ny + 14
-    for k, (kind, lab) in enumerate([("T", "Temperature DS18B20 (inlet 3 heights / outlet / supply / return)"), ("RH", "SHT45 RH + T_ref"), ("dP", "SDP810 dP taps (cold vs hot)"), ("leak", "Leak rope (route dotted)"), ("door", "Door contact"), ("kWh", "Meter pulse S0")]):
+    lx, ly = xm + 60, ny + 14
+    for k, (kind, lab) in enumerate([("T", "Temperature Pt1000 class A on Pods (inlet 3 heights / outlet); supply / return on panel RTD"), ("RH", "RH: Vaisala HMW90 (Pro) + Pod SHT45"), ("dP", "dP taps cold vs hot: Setra 264 (Pro) / Pod SDP810"), ("leak", "Leak rope (route dotted)"), ("door", "Door contact"), ("kWh", "Meter pulse S0")]):
         m, c = marker[kind]
         ax.plot([lx], [ly - k * 4.2], marker=m, ms=4.5, mfc=PAPER if kind == "T" else c, mec=c, mew=0.7, zorder=8)
         sh.text(lx + 4, ly - k * 4.2, lab, h=1.9, va="center")
@@ -1134,14 +1138,14 @@ def sheet_c001(lay: L.Layout, out):
     def extra(sh, x, y):
         rows = []
         for sn in lay.sensors:
-            rows.append([sn.id, sn.channel, sn.node, f"{sn.x:.0f}", f"{sn.y:.0f}", f"{sn.z:.0f}", {"T": "DS18B20 ±0.25 C", "RH": "SHT45 ±1.5 %RH", "dP": "SDP810 ±0.4 Pa", "leak": "rope 0/1", "door": "reed 0/1", "kWh": "S0 pulse"}[sn.kind]])
+            rows.append([sn.id, sn.channel, sn.node, f"{sn.x:.0f}", f"{sn.y:.0f}", f"{sn.z:.0f}", {"T": "Pt1000 A ±0.25 C", "RH": "HMW90/SHT45 ±1.5 %RH", "dP": "264/SDP810 ±0.4 Pa", "leak": "rope 0/1", "door": "reed 0/1", "kWh": "S0 pulse"}[sn.kind]])
         # cap rows to fit: group inlet sensors
         if len(rows) > 40:
             grouped = [r for r in rows if not r[0].startswith("T_in_r")]
             n = len(racks)
-            grouped.insert(0, [f"T_in_r1..r{n}_{{0.4,1.2,1.8}}", "T_in_1..3", f"node1..{lay.notes.get('n_nodes', 1)}", "rack cx", f"{rf + 50:.0f}", "400/1200/1800", "DS18B20 ±0.25 C"])
+            grouped.insert(0, [f"T_in_r1..r{n}_{{0.4,1.2,1.8}}", "T_in_1..3", f"node1..{lay.notes.get('n_nodes', 1)}", "rack cx", f"{rf + 50:.0f}", "400/1200/1800", "Pt1000 A ±0.25 C"])
             rows = grouped
-        y = sh.table(x, y, ["SENSOR ID", "CHANNEL", "NODE", "x", "y", "z", "TYPE / u95"], rows,
+        y = sh.table(x, y, ["SENSOR ID", "CHANNEL", "NODE ID", "x", "y", "z", "TYPE / u95"], rows,
                      [RW * 0.26, RW * 0.14, RW * 0.11, RW * 0.1, RW * 0.1, RW * 0.11, RW * 0.18], h=1.7, rowh=3.3,
                      title="SENSOR SCHEDULE (interior mm; matches twin.sensors() and PROTOCOL.md)")
         return y

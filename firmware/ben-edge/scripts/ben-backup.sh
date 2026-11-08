@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# BEN Engine gateway — nightly consistent SQLite backup to USB stick or NAS mount.
+# BEN Engine edge computer — nightly consistent SQLite backup to USB stick or NAS mount.
 # Data recovery is separate from code recovery (BRIEF.md §7.9): this file IS the unit's history.
 # Status: implemented, unverified on hardware.
 set -euo pipefail

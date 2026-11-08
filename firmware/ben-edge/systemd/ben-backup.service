@@ -7,6 +7,6 @@ Type=oneshot
 User=ben
 Group=ben
 EnvironmentFile=/etc/ben/ben.env
-ExecStart=/opt/ben_engine/firmware/ben-gateway/scripts/ben-backup.sh
+ExecStart=/opt/ben_engine/firmware/ben-edge/scripts/ben-backup.sh
 StandardOutput=append:/var/log/ben/backup.log
 StandardError=append:/var/log/ben/backup.log

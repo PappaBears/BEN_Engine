@@ -9,7 +9,10 @@ Subsystem membership is by code prefix:
     PWR -> power, CLG -> cooling, CMP -> compute, CTL -> controls.
 STR / ENV / FS / SITE / SVC lines are always included when at least one subsystem is selected
 (they are the enclosure, site and labour that every delivered unit needs). A part may also carry
-``applies_to_cooling`` (list of cooling keys) so DX, RDHx and DLC lines do not all appear at once.
+``applies_to_cooling`` (list of cooling keys) so DX, RDHx and DLC lines do not all appear at once, and a CTL part
+carries ``applies_to_controls`` (``["lite"]``, ``["pro"]`` or both) so the BEN Controls Lite (Revolution Pi + Pods)
+and BEN Controls Pro (PLCnext + UL 508A panel + edge computer + Pods) lines follow ``Config.controls_tier_resolved()``
+(docs/CONTROLS_HARDWARE_DECISION.md §2a).
 
 Decision (recorded here and in purchasing/SOURCING_NOTES.md): FS lines are *not* excluded for
 BEN Micro. Instead the catalog carries Micro-specific FS parts (aerosol unit, E-stop) and the
@@ -126,7 +129,10 @@ def rule_variables(cfg: Config) -> Dict[str, float]:
         "service_breaker_a": d["service_breaker_a"],
         "total_kw": d["total_kw"],
         "total_kva": d["total_kva"],
-        "nodes": math.ceil(cfg.racks / 2) + 1,
+        # BEN Pods: two per rack (cold face, hot face) + room + outdoor; BEN Micro 3. "nodes" kept as an alias.
+        "pods": d["pods"],
+        "nodes": d["pods"],
+        "controls_pro": 1 if d["controls_tier_resolved"] == "pro" else 0,
         "tier_len_m": g["ext_l_m"],
         "generator": 1 if cfg.generator else 0,
     }
@@ -143,12 +149,16 @@ def generate_bom(cfg: Config, catalog: List[Dict[str, Any]] | None = None) -> Li
     if not subs:
         return []
     variables = rule_variables(cfg)
+    controls_tier = cfg.controls_tier_resolved()
     rows: List[Dict[str, Any]] = []
     for p in catalog:
         if cfg.tier not in p["applies_to_tiers"]:
             continue
         cooling_filter = p.get("applies_to_cooling")
         if cooling_filter and cfg.cooling not in cooling_filter:
+            continue
+        controls_filter = p.get("applies_to_controls")
+        if controls_filter and controls_tier not in controls_filter:
             continue
         prefix = p["code"].split("-", 1)[0]
         sub = subsystem_of(p["code"])
@@ -239,7 +249,8 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
         out.append(f"**Configuration:** {d['tier_label']} · {cfg.profile} · {cfg.it_kw:.0f} kW IT in {cfg.racks} rack(s) · "
                    f"{d['cooling_label']} ({d['cooling_units_total']} units, {cfg.redundancy}) · {d['voltage']} · "
                    f"{d['service_breaker_a']} A service · UPS {d['ups_modules']} × {d['ups_kva_each']} kVA · "
-                   f"battery {d['battery_kwh']} kWh · generator {'yes' if cfg.generator else 'no'} · subsystems: {', '.join(cfg.subsystems)}\n")
+                   f"battery {d['battery_kwh']} kWh · generator {'yes' if cfg.generator else 'no'} · controls: {d['controls_label']} "
+                   f"({d['pods']} BEN Pods) · subsystems: {', '.join(cfg.subsystems)}\n")
     out.append(f"**Total: ${t['total_usd']:,.2f}** across {t['items']} lines — "
                f"${t['by_status']['confirmed']:,.0f} confirmed ({t['confirmed_pct']}%), "
                f"${t['by_status']['list']:,.0f} list price, ${t['by_status']['estimate']:,.0f} estimate. "

@@ -158,6 +158,19 @@ table.data td.num { font-family: var(--mono); text-align: right; }
 .scene-legend { position: absolute; left: 10px; bottom: 10px; display: flex; gap: 10px; font-size: 11px; color: var(--muted); background: rgba(11,16,24,0.7); border-radius: 8px; padding: 4px 8px; }
 .scene-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 
+.tip { position: fixed; z-index: 30; max-width: 320px; pointer-events: none; background: rgba(11,16,24,0.94); border: 1px solid #3a5479; border-left: 3px solid var(--cyan); border-radius: 9px; padding: 8px 11px; font-size: 12.5px; line-height: 1.35; box-shadow: 0 8px 24px rgba(0,0,0,0.45); backdrop-filter: blur(6px); }
+.tip .tip-name { font-weight: 600; font-size: 13.5px; display: flex; gap: 8px; align-items: baseline; }
+.tip .tip-name small { color: var(--muted); font-weight: 400; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; }
+.tip .tip-part { font-family: var(--mono); color: var(--cyan); font-size: 11.5px; margin-top: 1px; }
+.tip .tip-part span { color: var(--muted); font-family: var(--font); }
+.tip .tip-desc { color: var(--muted); margin: 4px 0 5px; }
+.tip .tip-live { display: grid; grid-template-columns: auto 1fr; gap: 1px 10px; }
+.tip .tip-live dt { color: var(--muted); margin: 0; }
+.tip .tip-live dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.tip .tip-live dd.warn { color: var(--amber); } .tip .tip-live dd.bad { color: var(--red); } .tip .tip-live dd.ok { color: var(--green); }
+.tip .tip-hint { color: var(--muted); font-size: 10.5px; margin-top: 5px; }
+#scene:focus-visible { box-shadow: inset 0 0 0 2px var(--cyan); }
+
 /* ---------- status strip ---------- */
 .status-item { display: inline-flex; align-items: center; gap: 6px; }
 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); display: inline-block; }

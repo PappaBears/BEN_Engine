@@ -1,5 +1,5 @@
 [Unit]
-Description=BEN Engine gateway firewall (nftables ruleset) — Schreiber AI
+Description=BEN Engine edge computer firewall (nftables ruleset) — Schreiber AI
 Before=network-pre.target mosquitto.service ben-api.service
 Wants=network-pre.target
 DefaultDependencies=no

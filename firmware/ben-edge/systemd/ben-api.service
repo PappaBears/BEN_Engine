@@ -1,7 +1,7 @@
-# BEN Engine gateway — ben_engine API / data service
+# BEN Engine edge computer — ben_engine API / data service
 [Unit]
 Description=BEN Engine controls API (ben_engine.api) — Schreiber AI
-Documentation=file:///opt/ben_engine/firmware/ben-gateway/README.md
+Documentation=file:///opt/ben_engine/firmware/ben-edge/README.md
 After=network-online.target mosquitto.service chrony.service
 Wants=network-online.target mosquitto.service
 

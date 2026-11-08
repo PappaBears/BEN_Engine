@@ -1,0 +1,30 @@
+# BEN Engine edge computer — PLC <-> MQTT bridge: polls the controller's Modbus TCP register map at 1 Hz,
+# publishes ben/<unit>/plc/interlocks and ben/<unit>/node/plcN/{telemetry,status}, writes EDGE_WATCHDOG,
+# SUPPLY_TRIM_x10 and TEST_REQUEST (the only three writable registers). Same service on Pro (PLCnext at
+# BEN_PLC_IP) and Lite (software controller on 127.0.0.1).
+[Unit]
+Description=BEN Engine PLC/Modbus bridge — Schreiber AI
+After=network-online.target mosquitto.service
+Wants=network-online.target mosquitto.service
+
+[Service]
+Type=simple
+User=ben
+Group=ben
+EnvironmentFile=/etc/ben/ben.env
+WorkingDirectory=/opt/ben_engine/software
+ExecStart=/opt/ben_engine/.venv/bin/python -m ben_engine.plc_bridge
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/log/ben
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryMax=256M
+StandardOutput=append:/var/log/ben/plc-bridge.log
+StandardError=append:/var/log/ben/plc-bridge.log
+
+[Install]
+WantedBy=multi-user.target

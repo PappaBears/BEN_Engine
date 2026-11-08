@@ -1,6 +1,16 @@
 // BEN Engine selector — JavaScript port of software/ben_engine/config.py (keep in sync; tests/test_selector_parity.py checks numbers)
 export const FRAMES = [30, 50, 60, 100, 150, 200, 225, 250, 400, 600, 800, 1000, 1200, 1600, 2000];
 
+// controls tier (docs/CONTROLS_HARDWARE_DECISION.md §2a): "auto" -> lite for micro, pro for ben20/ben40,
+// ben10 lite unless the profile is in cat.controls_pro_profiles
+export function controlsTierResolved(cfg, cat) {
+  const ct = cfg.controls_tier ?? 'auto';
+  if (ct === 'lite' || ct === 'pro') return ct;
+  if (cfg.tier === 'micro') return 'lite';
+  if (cfg.tier === 'ben10') return (cat.controls_pro_profiles ?? ['healthcare', 'public_sector', 'ai_training']).includes(cfg.profile) ? 'pro' : 'lite';
+  return 'pro';
+}
+
 export function validate(cfg, cat) {
   const errs = [];
   const g = cat.tiers[cfg.tier];
@@ -15,6 +25,9 @@ export function validate(cfg, cat) {
   }
   if (cfg.tier === 'micro' && cfg.cooling !== 'cabinet_dx') errs.push('BEN Micro uses cabinet_dx cooling only');
   if (cfg.tier !== 'micro' && cfg.cooling === 'cabinet_dx') errs.push('cabinet_dx is for BEN Micro only');
+  const ct = cfg.controls_tier ?? 'auto';
+  if (!['auto', 'lite', 'pro'].includes(ct)) errs.push(`unknown controls_tier ${ct}`);
+  else if (ct === 'lite' && (cfg.tier === 'ben20' || cfg.tier === 'ben40')) errs.push('BEN Controls Lite is for BEN Micro and BEN 10 only; BEN 20/40 use BEN Controls Pro');
   if (!errs.length && cfg.tier !== 'micro') {
     const d = derived(cfg, cat);
     if (!d.row_fits) errs.push(`single row of ${cfg.racks} racks + ${d.cooling_units_total} cooling units is ${d.row_length_mm} mm, exceeds interior ${Math.round(g.int_l_m * 1000)} mm; use fewer racks, rear-door or liquid cooling`);
@@ -62,6 +75,9 @@ export function derived(cfg, cat) {
     envelope_gain_kw: +envGain.toFixed(2), pue_estimate: +(totalKw / cfg.it_kw + 0.03).toFixed(3),
     row_length_mm: Math.trunc(rowLen), row_fits: rowFits, nfpa_855_scope: nfpa855,
     ashrae_class: cat.profiles[cfg.profile].ashrae,
+    controls_tier_resolved: controlsTierResolved(cfg, cat),
+    controls_label: (cat.controls_tiers ?? {})[controlsTierResolved(cfg, cat)]?.label ?? (controlsTierResolved(cfg, cat) === 'pro' ? 'BEN Controls Pro' : 'BEN Controls Lite'),
+    pods: cfg.tier === 'micro' ? 3 : cfg.racks * 2 + 2,
   };
 }
 
@@ -73,7 +89,7 @@ export function preset(tier, profile = 'ai_inference', climate = 'temperate', ca
   if (tier !== 'micro' && itKw / racks > cat.cooling[cooling].max_rack_kw) cooling = 'dlc_cdu';
   const cfg = { tier, profile, it_kw: Math.round(itKw), racks, cooling, redundancy: p.redundancy, climate,
     subsystems: ['power', 'cooling', 'compute', 'controls'], white_label: false, brand: 'Schreiber AI', ups_minutes: 10,
-    generator: ['healthcare', 'public_sector', 'off_grid'].includes(profile), site_name: 'Demo site' };
+    generator: ['healthcare', 'public_sector', 'off_grid'].includes(profile), site_name: 'Demo site', controls_tier: 'auto' };
   if (tier !== 'micro') for (const alt of [cooling, 'inrow_dx_300', 'rdhx_drycooler', 'dlc_cdu']) { cfg.cooling = alt; if (!validate(cfg, cat).length) break; }
   return cfg;
 }

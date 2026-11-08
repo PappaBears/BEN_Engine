@@ -1,7 +1,7 @@
 // BEN Engine — bencore — minimal dependency-free JSON writer and flat-object reader.
 // The node's protocol (spec/PROTOCOL.md) only needs flat objects plus one level of
 // nesting on the way OUT (telemetry "ch"/"raw"), and flat objects on the way IN (cmd).
-// Keeping this in-house means the same bytes are produced on ESP32 and on the host.
+// Keeping this in-house means the same bytes are produced on the target and on the host.
 #pragma once
 #include <cstddef>
 #include <cstdint>

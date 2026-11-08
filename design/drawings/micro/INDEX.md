@@ -19,7 +19,7 @@ Status: **ISSUE FOR CONSTRUCTION Rev A** — Drawn: BEN Engine generator; Checke
 
 | Tier | ID | Sheet | Check | Numbers | Limit | Result | Resolution |
 |---|---|---|---|---|---|---|---|
-| BEN Micro | I-M1 | A-002 | Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and gateway (1U) | 24U - 15U | >= 6 | **OK*** | 9U for IT at 5 kW: 2 x 2U servers + 1U switch + 1U patch fits; was 12U rule |
+| BEN Micro | I-M1 | A-002 | Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and controls shelf (1U) | 24U - 15U | >= 6 | **OK*** | 9U for IT at 5 kW: 2 x 2U servers + 1U switch + 1U patch fits; was 12U rule |
 | BEN Micro | I-M2 | A-001 | Cabinet DX units fit on cabinet exterior long face | 1 x 400 + 2 x 100 gap vs ext 1200 | <= 1200 | **OK** |  |
 | BEN Micro | I-M3 | A-003 | Rack depth + front/rear air gap vs cabinet interior width | 600 + 100 + 100 vs 800 | <= 800 | **OK** |  |
 | BEN Micro | I-M4 | S-001 | Skid + cabinet gross mass vs 2.5 t forklift / tail-lift | gross 1087 kg | <= 2500 | **OK** |  |

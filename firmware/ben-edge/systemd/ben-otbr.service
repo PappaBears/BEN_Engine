@@ -1,0 +1,18 @@
+# BEN Engine edge computer — OpenThread Border Router (docker compose, one container per MGM240P RCP).
+# wpan0 (and wpan1 on BEN 20/40 for the redundant RCP) carries the Thread mesh prefix fd00:ben::/64.
+[Unit]
+Description=BEN Engine OpenThread Border Router (OTBR + MGM240P RCP) — Schreiber AI
+After=docker.service network-online.target ben-firewall.service
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/ben/otbr.env
+ExecStart=/usr/bin/docker compose -f /etc/ben/otbr-compose.yml up -d
+ExecStop=/usr/bin/docker compose -f /etc/ben/otbr-compose.yml down
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target
