@@ -1014,9 +1014,122 @@ def contract_fields(p: Proposal, extra_fields: Optional[Dict[str, Any]] = None) 
         "DRAWING_SET": f"design/drawings/{cfg['tier']}/INDEX.md", "COMMISSIONING_SCRIPT": "software/ben_engine/commissioning.py",
         "DATE": p.date, "GENERATED_BY": "ben_engine.proposal",
     }
+    f.update({k: v for k, v in _extended_fields(p, f, ms, week).items() if k not in f})
     if extra_fields:
         f.update(extra_fields)
     return {k: str(v) for k, v in f.items()}
+
+
+def _git_rev() -> str:
+    try:
+        import subprocess
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=5).stdout.strip() or "untracked"
+    except Exception:
+        return "untracked"
+
+
+def _extended_fields(p: Proposal, base: Dict[str, Any], ms: Dict[str, Any], week) -> Dict[str, Any]:
+    """Fill the rest of docs/contracts/fields.json that can be derived from the proposal: configuration,
+    derived sizing, module prices from the BOM, schedule baselines, SOW scope rows, repository revisions,
+    document identifiers, entity defaults and every field default declared in fields.json."""
+    cfg = p.config; d = p.derived; h = p.headline
+    tier = cfg["tier"]; subs = set(cfg.get("subsystems") or [])
+    clim = CLIMATE_DESIGN[cfg["climate"]]
+    inc = lambda c: "Included" if c else "Excluded"
+    liquid = COOLING_LIBRARY[cfg["cooling"]]["medium"] in ("water", "liquid")
+    gen = bool(cfg.get("generator"))
+    managed = h.key == "managed"; white = h.key == "white_label"
+    # module prices at the headline margin, from the BOM rows the proposal already priced
+    try:
+        from .bom import generate_bom
+        from .config import Config as _C
+        rows = generate_bom(_C.from_dict(cfg))
+    except Exception:
+        rows = []
+    m = 1.0 / (1.0 - MARGIN_HW)
+    by = lambda *ss: sum(r["ext_price_usd"] for r in rows if r["subsystem"] in ss) * m
+    price_power, price_cool, price_comp, price_ctl = by("power"), by("cooling"), by("compute"), by("controls")
+    price_encl = by("str", "env", "fs")
+    price_site, price_svc = by("site"), by("svc")
+    licence = {"micro": 1200, "ben10": 4800, "ben20": 12000, "ben40": 30000}[tier]
+    a_max = {"A1": 27, "A2": 35, "A3": 40, "A4": 45}.get(d.get("ashrae_class", "A2"), 35)
+    avail = {"N": "99.5", "N+1": "99.9", "2N": "99.99"}[cfg["redundancy"]]
+    pid = p.proposal_id; stem = pid.replace("SAI-", "")
+    w_fat = ms.get("H11, W12, H13"); w_sat = ms.get("H19"); w_turn = ms.get("W20")
+    w_ship = next((mm["week"] for mm in p.milestones if mm["milestone"].startswith("Transport")), None)
+    w_set = ms.get("W17, H18"); w_h3 = ms.get("H3"); w_h4 = ms.get("H4"); w_h10 = ms.get("H10"); w_h16 = ms.get("H16")
+    w_w6 = ms.get("W6, H7, W8")
+    end_warranty = (_dt.date.fromisoformat(p.date) + _dt.timedelta(weeks=(w_turn or 0)) + _dt.timedelta(days=30 * WARRANTY_WORKMANSHIP_MONTHS)).isoformat()
+    f: Dict[str, Any] = {
+        # config
+        "CONFIG_ID": f"{pid}-cfg-v1.0", "CONFIG_JSON": json.dumps(cfg, indent=2), "TIER_DIR": tier, "SUBSYSTEMS": ", ".join(cfg.get("subsystems") or []),
+        "WHITE_LABEL": str(bool(cfg.get("white_label"))).lower(), "GENERATOR": str(gen).lower(), "BRAND_NAME": cfg.get("brand") or "Schreiber AI",
+        # derived
+        "ASHRAE_CLASS": d.get("ashrae_class", ""), "ASHRAE_MAX_C": str(a_max), "AVAILABILITY_TARGET_PCT": avail,
+        "BATTERY_KWH": f"{d['battery_kwh']:g}", "CLIMATE_DESIGN_TEMP_C": str(clim["t_design_c"]), "COOLING_UNITS_TOTAL": str(d["cooling_units_total"]),
+        "GENERATOR_KW": f"{math.ceil(d['total_kw'] * 1.25 / 10) * 10:g}" if gen else "0", "GLYCOL_PCT": "35" if clim["t_min_c"] <= -20 else "25",
+        "NFPA855_PACKAGE": str(bool(d.get("nfpa_855_scope"))).lower(), "NODE_COUNT": str(1 + math.ceil(cfg["racks"] / 2)),
+        "PUE_ESTIMATE": f"{d['pue_estimate']:.3f}", "TOTAL_KVA": f"{d['total_kva']:g}", "UPS_KVA_EACH": str(d["ups_kva_each"]), "UPS_MODULES": str(d["ups_modules"]),
+        "CORROSIVITY_CLASS": clim["corrosion"], "WIND_SPEED": f"{clim['wind_ms']} m/s (ASCE 7 basic; confirm per site)",
+        # pricing by module
+        "PRICE_POWER": f"{price_power:,.2f}", "PRICE_COOLING": f"{price_cool:,.2f}", "PRICE_COMPUTE": f"{price_comp if 'compute' in subs else 0:,.2f}",
+        "PRICE_CONTROLS": f"{price_ctl:,.2f}", "PRICE_ENCLOSURE": f"{price_encl:,.2f}", "PRICE_SERVICES": f"{price_svc:,.2f}",
+        "PRICE_SITE_WORKS": f"{price_site:,.2f}", "PRICE_OPTIONS": "0.00", "PRICE_PERMIT_SERVICES": "0.00", "OPTIONS_LIST": "none", "PERMIT_SERVICES_LIST": "AHJ pre-submission support (included); permits pulled by Customer",
+        "CONTRACT_VALUE_TOTAL": f"{h.capital_price_usd + (h.recurring_usd_per_year if (managed or white) else 0):,.2f}",
+        "LICENSE_FEE": f"{licence * (1.25 if white else 1):,.2f}" if "controls" in subs else "0.00",
+        "WHITE_LABEL_LICENSE_FEE": f"{licence * 1.25:,.2f}", "LICENSE_MICRO_ANNUAL": "USD 1,200", "LICENSE_BEN10_ANNUAL": "USD 4,800",
+        "LICENSE_BEN20_ANNUAL": "USD 12,000", "LICENSE_BEN40_ANNUAL": "USD 30,000", "SLA_RATE_PER_KW_MONTH": "USD 45",
+        "SLA_MONTHLY_FEE": f"{45 * cfg['it_kw']:,.2f}", "MANAGED_SERVICES": str(managed).lower(),
+        "DELIVERY_MODEL": h.label, "COMPUTE_DESCRIPTION": "Reference GPU/CPU node set from the catalog (CMP- lines)" if "compute" in subs else "Customer-supplied compute",
+        "TURNKEY_SITE_WORKS": "no", "RECOMMISSIONING_FEE": "7,500.00", "CRANE_REMOB_FEE": "4,500.00", "STANDBY_RATE_PER_DAY": "1,200.00",
+        "RATE_PRINCIPAL_ENGINEER": "225.00", "RATE_CONTROLS_ENGINEER": "175.00", "RATE_PM": "165.00", "RATE_FIELD_TECH": "125.00",
+        "RATE_ELECTRICIAN": "110.00", "RATE_HVAC": "125.00", "RATE_WELDER": "135.00",
+        # schedule baselines
+        "DATE_ORDER": p.date, "SOW_DATE": p.date, "DATE_H3_BASELINE": week(w_h3), "DATE_H4_BASELINE": week(w_h4), "DATE_W6_BASELINE": week(w_w6),
+        "DATE_H7_BASELINE": week(w_w6), "DATE_W8_BASELINE": week((w_w6 or 0) + 1), "DATE_LONGLEAD_BASELINE": week(w_h10), "DATE_H10_BASELINE": week(w_h10),
+        "DATE_H11_BASELINE": week(max((w_fat or 1) - 1, 0)), "DATE_W12_BASELINE": week(w_fat), "DATE_FAT_BASELINE": week(w_fat), "DATE_SHIP_BASELINE": week(w_ship),
+        "DATE_SETDOWN_BASELINE": week(w_set), "DATE_H18_BASELINE": week(w_set), "DATE_SAT_BASELINE": week(w_sat), "DATE_TURNOVER_BASELINE": week(w_turn),
+        "DATE_PERMITS_APPLIED_BASELINE": week((w_h4 or 0) + 1), "DATE_H16_BASELINE": week(w_h16), "DATE_UTILITY_READY_BASELINE": week(w_h16), "DATE_FIBER_READY_BASELINE": week(w_h16),
+        "WARRANTY_END_DATE": end_warranty,
+        # SOW scope rows
+        "SCOPE_ENCLOSURE": inc(True), "SCOPE_STRUCTURAL": inc(True), "SCOPE_ENVELOPE": inc(True), "SCOPE_FLOOR": inc(True), "SCOPE_LIGHTING_SIGNAGE": inc(True),
+        "SCOPE_VESTIBULE": inc(tier in ("ben20", "ben40")), "SCOPE_ACCESS_CONTROL": inc(True), "SCOPE_TRANSPORT_PREP": inc(True), "SCOPE_SPARES": inc(managed),
+        "SCOPE_PE_ANCHORAGE": inc(tier != "micro"), "SCOPE_CERTIFICATION": inc(True), "SCOPE_FIELD_EVAL": "Excluded (option)",
+        "SCOPE_PWR_MAIN": inc("power" in subs), "SCOPE_PWR_UPS": inc("power" in subs), "SCOPE_PWR_PDU": inc("power" in subs), "SCOPE_PWR_TRANSFORMERS": inc("power" in subs and tier in ("ben20", "ben40")),
+        "SCOPE_PWR_METERS": inc("power" in subs or "controls" in subs), "SCOPE_PWR_BONDING": inc("power" in subs), "SCOPE_PWR_ARCFLASH": inc("power" in subs), "SCOPE_PWR_INSTALL": inc("power" in subs),
+        "SCOPE_PWR_GENERATOR": inc(gen and "power" in subs), "SCOPE_PWR_COOLING_ON_UPS": inc(cfg["redundancy"] != "N" and "power" in subs),
+        "SCOPE_CLG_UNITS": inc("cooling" in subs), "SCOPE_CLG_INSTALL": inc("cooling" in subs), "SCOPE_CLG_OUTDOOR": inc("cooling" in subs), "SCOPE_CLG_CONTAINMENT": inc("cooling" in subs and not liquid),
+        "SCOPE_CLG_FLUIDS": inc("cooling" in subs and liquid), "SCOPE_CLG_SAFETY": inc("cooling" in subs), "SCOPE_CLG_ECONOMIZER": "Excluded (option)", "SCOPE_CLG_ACOUSTIC": "Excluded (option)",
+        "SCOPE_CMP_RACKS": inc("compute" in subs), "SCOPE_CMP_SERVERS": inc("compute" in subs), "SCOPE_CMP_NETWORK": inc("compute" in subs), "SCOPE_CMP_LOADBANKS": "Included (FAT/SAT rental)",
+        "SCOPE_CTL_PANEL": inc("controls" in subs), "SCOPE_CTL_NODES": inc("controls" in subs), "SCOPE_CTL_DASHBOARD": inc("controls" in subs), "SCOPE_CTL_FIRMWARE_CAL": inc("controls" in subs),
+        "SCOPE_CTL_LICENSE": inc("controls" in subs), "SCOPE_CTL_BACKUP": inc("controls" in subs), "SCOPE_CTL_REMOTE": inc(managed), "SCOPE_CTL_FORWARDING": inc(managed), "SCOPE_CTL_INTEGRATION": "Excluded (option)",
+        "SCOPE_FS_DETECTION": inc(True), "SCOPE_FS_SUPPRESSION": inc(True), "SCOPE_FS_EPO": inc(True), "SCOPE_FS_MONITORING": inc("controls" in subs), "SCOPE_FS_PERMIT": "Included (submittal support; Customer pulls permit)",
+        "SCOPE_SITE_CIVIL": "Excluded", "SCOPE_SITE_UTILITY": "Excluded", "SCOPE_SITE_GROUNDING": "Excluded", "SCOPE_SITE_FIBER": "Excluded", "SCOPE_SITE_CRANE": "Included (set-down)",
+        "SCOPE_SITE_FENCE": "Excluded", "SCOPE_SITE_WATER": inc(False), "SCOPE_SITE_PERMITS": "Excluded (Customer)",
+        # repository revisions and identifiers
+        "TEMPLATE_REV": _git_rev(), "DRAWING_INDEX_REV": f"IFC Rev A ({_git_rev()})", "BOM_REV": f"{p.date} ({_git_rev()})", "BOM_DATE": p.date, "ASSEMBLY_ISSUE": f"Issue 1 ({_git_rev()})",
+        "BOM_CONFIDENCE_SPLIT": f"{h.confirmed_pct:.0f} % confirmed / {h.list_pct:.0f} % list / {h.estimate_pct:.0f} % estimate", "BEN_ENGINE_VERSION": "0.1.0",
+        "MSA_ID": f"MSA-{p.customer[:12].upper().replace(' ', '')}-{p.date[:4]}", "SOW_ID": f"SOW-{stem}", "NDA_ID": f"NDA-{stem}", "LICENSE_ID": f"LIC-{stem}", "SLA_ID": f"SLA-{stem}",
+        "FAT_CERT_ID": f"FAT-{stem}", "SAT_CERT_ID": f"SAT-{stem}", "TURNOVER_CERT_ID": f"TOC-{stem}", "WARRANTY_CERT_ID": f"WAR-{stem}", "UNIT_SERIAL": f"BEN-{tier.upper()}-{stem[-8:]}",
+        "CO_NUMBER": "001", "INTEGRATOR_AGREEMENT_ID": f"INT-{p.date[:4]}-[SEQ]", "CM_AGREEMENT_ID": f"CMA-{p.date[:4]}-[SEQ]",
+        "MILESTONE_1_AMOUNT": base.get("MILESTONE_ENG_RELEASE_AMOUNT", ""), "MILESTONE_2_AMOUNT": base.get("MILESTONE_FAT_AMOUNT", ""),
+        "MILESTONE_3_AMOUNT": base.get("MILESTONE_SAT_AMOUNT", ""), "MILESTONE_4_AMOUNT": base.get("MILESTONE_TURNOVER_AMOUNT", ""),
+        # entity
+        "SCHREIBER_ENTITY_NAME": "Schreiber AI", "SCHREIBER_SIGNATORY_NAME": "Ben Schreiber", "SCHREIBER_SIGNATORY_TITLE": "Founder", "SCHREIBER_NOTICE_NAME": "Ben Schreiber",
+        "SCHREIBER_NOTICE_EMAIL": "Ben@SchreiberAI.com", "SCHREIBER_EXEC_SPONSOR": "Ben Schreiber", "RMA_EMAIL": "Ben@SchreiberAI.com", "WARRANTY_EMAIL": "Ben@SchreiberAI.com", "OPS_CENTER_EMAIL": "Ben@SchreiberAI.com",
+    }
+    for k in ("DOC_REV_ACCEPTANCE", "DOC_REV_CO", "DOC_REV_COMPLIANCE", "DOC_REV_CYBERSECURITY", "DOC_REV_MAINTENANCE", "DOC_REV_PROCESS_FLOW", "DOC_REV_PROTOCOL", "DOC_REV_QC_FORMS",
+              "DOC_REV_RISK_REGISTER", "DOC_REV_SITE_REQUIREMENTS", "DOC_REV_SLA", "DOC_REV_SOFTWARE_LICENSE", "DOC_REV_SOW", "DOC_REV_TEST_GUIDE", "DOC_REV_TURNOVER", "DOC_REV_WARRANTY"):
+        f[k] = _git_rev()
+    # declared defaults from fields.json for anything still unset
+    try:
+        data = json.loads((REPO_ROOT / "docs/contracts/fields.json").read_text(encoding="utf-8"))
+        for x in data.get("fields", []):
+            if x.get("default") not in (None, "") and x["name"] not in f and x["name"] not in base:
+                f[x["name"]] = x["default"]
+    except (OSError, ValueError):
+        pass
+    return f
 
 
 _FIELD_RE = re.compile(r"\[([A-Z][A-Z0-9_]{1,63})\]")
@@ -1047,6 +1160,8 @@ def known_fields_report(fields_json: Path | str, proposal: Proposal) -> Tuple[Li
         data = json.loads(Path(fields_json).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return [], []
+    if isinstance(data, dict) and isinstance(data.get("fields"), list):
+        data = data["fields"]  # docs/contracts/fields.json shape: {"_meta": …, "fields": [{"name": …}, …]}
     names = list(data.keys()) if isinstance(data, dict) else [x if isinstance(x, str) else x.get("name", "") for x in data]
     have = contract_fields(proposal)
     return [n for n in names if n in have], [n for n in names if n not in have]

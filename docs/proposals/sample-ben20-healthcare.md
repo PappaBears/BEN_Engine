@@ -27,7 +27,7 @@ Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Aust
 
 The unit arrives finished and factory-tested. It needs a pad, a 100 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the managed service option: $1,888,371 capital ($37,767 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 71 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 29 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the managed service option: $1,790,557 capital ($35,811 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 64 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 36 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 34 weeks, set by the longest-lead item (20 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -68,7 +68,7 @@ What this means for you: the environmental class sets the alarm limits your IT w
 
 | Module | Status | BOM lines | Sell price |
 |---|---|---|---|
-| Power module | included | 17 lines | $368,948 |
+| Power module | included | 16 lines | $271,134 |
 | Cooling module | included | 5 lines | $272,472 |
 | Compute module | included | 5 lines | $1,072,379 |
 | Controls module | included | 23 lines | $6,011 |
@@ -78,7 +78,7 @@ What this means for you: the environmental class sets the alarm limits your IT w
 | Site kit (anchors, embeds, signage) | included | 9 lines | $34,028 |
 | Build labour, FAT, logistics | included | 8 lines | $50,639 |
 
-Top 15 lines of the 98-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
+Top 15 lines of the 97-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
@@ -86,9 +86,8 @@ Top 15 lines of the 98-line bill of materials for this option (sell price at 28%
 | CLG-RDHX | Active rear-door heat exchanger, 42/48U, up to 40 kW | nVent Schroff / ColdLogik / Motivair RackChiller RDC active | 5 ea | $125,000 | estimate | 12 |
 | CLG-CDU-RDHX | Row CDU 70-100 kW liquid-to-liquid for RDHx loop | Vertiv / CoolIT XDU070 / CHx80 | 2 ea | $125,000 | estimate | 14 |
 | CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 5 ea | $124,993 | confirmed | 3 |
-| PWR-UPS-GVS100 | Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8 | Schneider Electric GVSUPS100KGS | 2 ea | $115,567 | confirmed | 10 |
 | PWR-GEN-150 | SD150 150 kW diesel standby generator, L2 enclosure, sub-base tank | Generac Industrial SD0150 | 1 ea | $104,167 | estimate | 20 |
-| PWR-BATT-LI | Galaxy Lithium-ion battery cabinet UL, 16 x 2.04 kWh modules (32.6 kWh) | Schneider Electric LIBSESMG16UL | 1 ea | $76,692 | confirmed | 10 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | Schneider Electric GVSUPS150KHS (configure-to-order) | 1 ea | $94,444 | estimate | 14 |
 | CMP-SW100G | Spectrum SN2700 32x100GbE QSFP28 switch, Cumulus Linux | NVIDIA Mellanox MSN2700-CS2RC | 2 ea | $29,425 | confirmed | 2 |
 | PWR-XFMR | Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben20) / 300 kVA (ben40), for rack PDUs | Square D / Eaton EX150T3H / EX300T3H | 2 ea | $26,389 | estimate | 8 |
 | FS-CLEAN-AGENT | Pre-engineered FK-5-1-12 (Novec 1230) clean agent system, installed: cylinder, nozzles, releasing panel, detection, design & AHJ submittal | Fike / Kidde (via licensed fire contractor) ECS-500 / Fike CA | 34 m3 protected | $25,972 | estimate | 8 |
@@ -97,6 +96,7 @@ Top 15 lines of the 98-line bill of materials for this option (sell price at 28%
 | PWR-ATS-400 | Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 3R | ASCO (Schneider) J03ATSB30400N5X | 1 ea | $15,361 | confirmed | 8 |
 | SVC-ELECTRICIAN | Licensed electrician (commercial journeyman, billed) | local electrical contractor ELEC-HR | 90 h | $13,750 | estimate | 1 |
 | CLG-PIPING | Glycol loop piping, valves, pumps skid, expansion tank, strainers (per m container length) | Victaulic / Grundfos FCW-LOOP | 7 per m | $11,667 | estimate | 6 |
+| FS-VESDA | VESDA-E VEU aspirating smoke detector, UL | Xtralis (Honeywell) VEU-A00-UL | 1 ea | $9,381 | confirmed | 4 |
 
 Explicitly excluded:
 
@@ -110,27 +110,27 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $1,882,360 | $37,647 | - | 1 yr | $1,882,360 | 71 / 0 / 29 % | 75 | alternative |
-| Hardware + BEN Controls | $1,888,371 | $37,767 | $12,000 | 1 yr | $1,900,371 | 71 / 0 / 29 % | 98 | alternative |
-| White-label | $1,888,371 | $37,767 | $15,000 | 1 yr | $1,903,371 | 71 / 0 / 29 % | 98 | alternative |
-| Managed service | $1,888,371 | $37,767 | $27,000 | 3 yr | $1,969,371 | 71 / 0 / 29 % | 98 | PROPOSED |
+| Hardware only | $1,784,546 | $35,691 | - | 1 yr | $1,784,546 | 64 / 0 / 36 % | 74 | alternative |
+| Hardware + BEN Controls | $1,790,557 | $35,811 | $12,000 | 1 yr | $1,802,557 | 64 / 0 / 36 % | 97 | alternative |
+| White-label | $1,790,557 | $35,811 | $15,000 | 1 yr | $1,805,557 | 64 / 0 / 36 % | 97 | alternative |
+| Managed service | $1,790,557 | $35,811 | $27,000 | 3 yr | $1,871,557 | 64 / 0 / 36 % | 97 | PROPOSED |
 
 Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $1,888,371 | $27,000 | $1,915,371 |
-| 3 years | $1,888,371 | $81,000 | $1,969,371 |
-| 5 years | $1,888,371 | $135,000 | $2,023,371 |
+| 1 year | $1,790,557 | $27,000 | $1,817,557 |
+| 3 years | $1,790,557 | $81,000 | $1,871,557 |
+| 5 years | $1,790,557 | $135,000 | $1,925,557 |
 
-Payment milestones for the proposed option (Managed service, capital $1,888,371):
+Payment milestones for the proposed option (Managed service, capital $1,790,557):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $566,511 | 6 |
-| Factory acceptance test (H13) | 40 % | $755,348 | 30 |
-| Site acceptance test (H19) | 25 % | $472,093 | 33 |
-| Turnover (W20) | 5 % | $94,419 | 34 |
+| Engineering release (H4) | 30 % | $537,167 | 6 |
+| Factory acceptance test (H13) | 40 % | $716,223 | 30 |
+| Site acceptance test (H19) | 25 % | $447,639 | 33 |
+| Turnover (W20) | 5 % | $89,528 | 34 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -159,9 +159,9 @@ Long-lead items (ordered at engineering release):
 |---|---|---|---|---|
 | PWR-GEN-150 | SD150 150 kW diesel standby generator, L2 enclosure, sub-base tank | Generac industrial dealer | 1 ea | 20 |
 | CLG-CDU-RDHX | Row CDU 70-100 kW liquid-to-liquid for RDHx loop | Vertiv / CoolIT sales | 2 ea | 14 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | AVENDOR | 1 ea | 14 |
 | CLG-DRYCOOLER | Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol | Guntner / Alfa Laval rep | 58 kW | 14 |
 | CLG-RDHX | Active rear-door heat exchanger, 42/48U, up to 40 kW | nVent / Legrand distributor | 5 ea | 12 |
-| PWR-UPS-GVS100 | Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8 | AVENDOR | 2 ea | 10 |
 
 ## 8. Drawings and documents delivered
 
@@ -339,7 +339,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 ## 15. Assumptions and what is not included
 
 - Configuration as on the cover: 50 kW IT, 5 rack(s), Rear-door heat exchanger + dry cooler, 2N, climate Hot / humid; any change is priced as a change order
-- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 71 % confirmed, 0 % list, 29 % estimate for this option; the estimate share is re-priced at engineering release
+- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 64 % confirmed, 0 % list, 36 % estimate for this option; the estimate share is re-priced at engineering release
 - Gross margin 28% on hardware and build labour; controls licence $12,000/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order

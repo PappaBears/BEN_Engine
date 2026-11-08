@@ -44,7 +44,8 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live gatewa
 | SQAM | `python design/gen_sqam.py` | 405 lines; CTQ/CTP register per tier (Micro 27, BEN 10 38, BEN 20 38, BEN 40 39 items) |
 | BOM | `python -m ben_engine.bom --all` | Micro 64 lines $135 k (69 % confirmed); BEN 10 90 lines $660 k (81 %); BEN 20 94 lines $1.87 M (79 %); BEN 40 95 lines $4.43 M (83 %). "Confirmed" = distributor listing seen in search results on 2026-11-07, not a quote |
 | Proposals | `python -m ben_engine.proposal …` | 4 samples in `docs/proposals/`; BEN 20 healthcare managed: $1.89 M capital, $27 k/yr, 34 weeks to in-service |
-| Packages | `python -m ben_engine.package …` | customer and partner zips built; MANIFEST lists missing sources explicitly |
+| Packages | `python -m ben_engine.package …` | customer package 22 files, partner package 21 files, 0 missing; zips built; MANIFEST lists per-document unfilled fields |
+| Contract pre-fill | `proposal.known_fields_report` | 369 of 891 vocabulary fields filled from a proposal (BEN 20 healthcare sample); remaining fields belong to later stages (commissioning report 128, turnover 63, CRM 62, change order 59, QC forms 24, counsel 8). MSA draft has 15 fields left (customer identity, arbitration venue); SOW draft 47 |
 | Decks | `build_presentation.py` | 12 + 12 slides with notes; visual review of the HTML decks **not performed** |
 | Demo GIF | `make_demo_gif.py` | 24 real tour frames, 6 s, 4.5 MB |
 
