@@ -19,7 +19,7 @@ Most small and mid-size businesses want AI on their own data, but their only opt
 
 ### Integrator / white-label partner
 **Headline:** A finished platform you can sell under your name.
-**Body:** BEN Controls (BEN Controller, BEN Pods on the BEN Mesh, dashboard, twin, commissioning, BEN Care) is local-first and brandable. Proof points: a listed PLC (Phoenix Contact PLCnext) in a UL 508A panel on BEN 20/40, a Revolution Pi on the Micro; sensor Pods with a hardware root of trust that attest before they join; no sensor cabling to pull; hardwired life safety; minutes-to-limit alarms and monthly proof of redundancy. Take the full unit, or only the power, cooling or controls module. Drawings, BOM and compliance pack are generated per configuration, so your proposal is engineering, not a brochure.
+**Body:** BEN Controls (BEN Controller, BEN Pods on the BEN Mesh, dashboard, twin, commissioning, BEN Care) is local-first and brandable. Proof points: a listed PLC (Phoenix Contact PLCnext) in a UL 508A panel on BEN 150/40, a Revolution Pi on the BEN 5; sensor Pods with a hardware root of trust that attest before they join; no sensor cabling to pull; hardwired life safety; minutes-to-limit alarms and monthly proof of redundancy. Take the full unit, or only the power, cooling or controls module. Drawings, BOM and compliance pack are generated per configuration, so your proposal is engineering, not a brochure.
 **Call to action:** Partner inquiry to Ben@SchreiberAI.com.
 
 ### Facilities / MEP lead

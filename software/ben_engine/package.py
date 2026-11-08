@@ -184,9 +184,9 @@ def _write_manifest(out: Path, prop: P.Proposal, manifest: List[Tuple[str, str, 
 
 def main(argv=None) -> int:
     import argparse
-    from .config import TIER_GEOMETRY, PROFILE_DEFAULTS, CLIMATE_DESIGN
+    from .config import TIER_GEOMETRY, TIER_ALIASES, PROFILE_DEFAULTS, CLIMATE_DESIGN
     ap = argparse.ArgumentParser(description="Assemble the customer and partner deal packages for a configuration")
-    ap.add_argument("--tier", default="ben20", choices=list(TIER_GEOMETRY))
+    ap.add_argument("--tier", default="ben150", choices=list(TIER_GEOMETRY) + list(TIER_ALIASES))
     ap.add_argument("--profile", default="ai_inference", choices=list(PROFILE_DEFAULTS))
     ap.add_argument("--climate", default="temperate", choices=list(CLIMATE_DESIGN))
     ap.add_argument("--config-json", help="use a saved configuration instead of the preset")

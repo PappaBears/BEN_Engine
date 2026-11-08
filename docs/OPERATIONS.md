@@ -17,7 +17,7 @@ cd firmware/ben-pod && pio test -e native
 ```bash
 python design/drawings/gen_drawings.py
 python design/renders/gen_renders.py
-PYTHONPATH=software python -m ben_engine.bom --tier ben20 --csv purchasing/bom-ben20.csv --md docs/BOM-ben20.md
+PYTHONPATH=software python -m ben_engine.bom --tier ben150 --csv purchasing/bom-ben150.csv --md docs/BOM-ben150.md
 python scripts/unit_economics.py       # refreshes VC table + web/assets/pricing.json
 ```
 

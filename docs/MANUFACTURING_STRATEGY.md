@@ -58,9 +58,9 @@ Roles in one line each: **Schreiber AI** owns what the unit *is* and proves that
 
 | Type | What they bring | What they lack (we supply) | Best fit |
 | --- | --- | --- | --- |
-| **Container modification companies** | Volume cutting/framing, insulation, liner, doors, paint; many have electricians and climate-control experience; fast and cheap on the shell | Data-center-grade electrical (480 V switchgear, UPS), refrigeration, controls, test | BEN 10 / BEN 20 shell and fit-out; Micro skid assembly |
-| **Modular electrical skid / e-house / PDC builders** | UL 508A panel shops, 480 V switchgear integration, licensed electricians, testing culture, steel fabrication, often ISO 9001 | Container-specific envelope work, HVAC/refrigeration | BEN 20 / BEN 40 power module and controls panel; can be the primary CM if they take the shell too |
-| **Data-center / containerized DC integrators and metal-intensive contract manufacturers** | Have built containerized data centers; understand cooling, hot-aisle containment, commissioning; some offer field installation | Cost (higher margin), may compete with us, IP exposure | BEN 40 first articles; overflow capacity; export units |
+| **Container modification companies** | Volume cutting/framing, insulation, liner, doors, paint; many have electricians and climate-control experience; fast and cheap on the shell | Data-center-grade electrical (480 V switchgear, UPS), refrigeration, controls, test | BEN 30 / BEN 150 shell and fit-out; BEN 5 skid assembly |
+| **Modular electrical skid / e-house / PDC builders** | UL 508A panel shops, 480 V switchgear integration, licensed electricians, testing culture, steel fabrication, often ISO 9001 | Container-specific envelope work, HVAC/refrigeration | BEN 150 / BEN 500 power module and controls panel; can be the primary CM if they take the shell too |
+| **Data-center / containerized DC integrators and metal-intensive contract manufacturers** | Have built containerized data centers; understand cooling, hot-aisle containment, commissioning; some offer field installation | Cost (higher margin), may compete with us, IP exposure | BEN 500 first articles; overflow capacity; export units |
 
 ### 3.1 Named US candidates found by web search (2026-11-08)
 
@@ -90,7 +90,7 @@ Score each criterion 1–5; weight as shown; a CM needs ≥ 70/100 and no "gate"
 | --- | --- | --- | --- | --- |
 | **Capabilities** — container cutting/framing, insulation/liner, 480 V electrical, refrigeration, paint booth, indoor high bay, 10–20 t crane, 480 V test power ≥ 400 A, load banks | 20 | All in-house incl. 480 V test power and load banks | Shell only, outsources electrical | Facility list, photos, equipment list |
 | **Certifications and licences** — UL 508A panel shop (own file), AWS D1.1 welders + CWI, state electrical/HVAC licences, EPA 608 techs, ISO 9001, NRTL field-evaluation experience | 20 | UL 508A file + ISO 9001 + CWI on staff | None in-house | Certificates, UL file number, licence numbers |
-| **Capacity** — bays, shifts, units/month available to us, ability to hold a bay for 6–8 weeks per BEN 20 | 10 | ≥ 3 BEN 20 bays, 2 shifts | 1 bay shared with other customers | Capacity statement, current backlog |
+| **Capacity** — bays, shifts, units/month available to us, ability to hold a bay for 6–8 weeks per BEN 150 | 10 | ≥ 3 BEN 150 bays, 2 shifts | 1 bay shared with other customers | Capacity statement, current backlog |
 | **Distance to pilot sites and freight** | 10 | < 500 km from the first three sites; rail/road access; crane on site | > 2,000 km | Address, dock and crane details |
 | **References** — containerized data center, e-house or telecom shelter work in the last 3 years; customer contacts | 15 | ≥ 3 relevant references, contactable | None relevant | Reference list, photos |
 | **Quality system** — documented QC, calibration of torque tools and meters, NCR process, traceability, willingness to use our Q-01..Q-12 | 10 | ISO 9001 with calibrated tools and NCR log | Informal | Quality manual, calibration records |
@@ -106,7 +106,7 @@ Score each criterion 1–5; weight as shown; a CM needs ≥ 70/100 and no "gate"
 | **2. NDA and package preview** | NDA with IP terms (§9); share one tier's drawing set and STE instructions for a buildability review and a budgetary quote | ENG + candidate | 2 weeks | Budgetary quote within our cost model (§7) |
 | **3. Site audit** | 2-day visit: facility walk, certificates verified (UL file, welder certs, licences), tool calibration records, a sample weld test, a sample 480 V termination, review of their last three projects' QC records, interview of the shop lead | Schreiber AI quality + ENG | 2 days + report 1 week | Audit score ≥ 70; no gate failures; corrective actions agreed |
 | **4. Quality agreement** | Signed document: our drawings and forms govern; hold/witness points; NCR and deviation process; traceability; access rights; consignment handling; warranty; change control (no substitution without ENG approval) | Both | 2 weeks | Signed |
-| **5. First article (FAI)** | One unit of the tier (usually a BEN 20) built with Schreiber AI engineering present full time; every CTQ measured; every Q form completed; FAT run by Schreiber AI; a formal first-article inspection report; lessons fed back into the drawings and STE instructions | CM + ENG + quality | One build cycle (~16 weeks incl. long-lead; shop time ~10 weeks) | FAI report signed; CM approved for that tier |
+| **5. First article (FAI)** | One unit of the tier (usually a BEN 150) built with Schreiber AI engineering present full time; every CTQ measured; every Q form completed; FAT run by Schreiber AI; a formal first-article inspection report; lessons fed back into the drawings and STE instructions | CM + ENG + quality | One build cycle (~16 weeks incl. long-lead; shop time ~10 weeks) | FAI report signed; CM approved for that tier |
 | **6. Pilot units** | Next 2–3 units with reduced presence (witness points only); defect and cycle-time data collected; CM scorecard updated quarterly | CM + quality | 2–3 build cycles | Defect rate and cycle time inside targets (§10); CM moves to "approved, standard surveillance" |
 
 A second CM is qualified before unit 10 to avoid single-source risk (§9).
@@ -132,7 +132,7 @@ A second CM is qualified before unit 10 to avoid single-source risk (§9).
 | Point | First article | Standard surveillance (after FAI and pilots) |
 | --- | --- | --- |
 | W6 container receiving | Present | Remote photo review |
-| H7 weld inspection | Present with CWI | CWI report review; present on every BEN 40 |
+| H7 weld inspection | Present with CWI | CWI report review; present on every BEN 500 |
 | W8 insulation before liner | Present | Photo witness within 24 h |
 | H10a rough-in | Present | Remote |
 | H10b torque/megger | Present | Present |
@@ -149,7 +149,7 @@ Non-conformances are raised on the CM's NCR form or ours; disposition (use-as-is
 
 | Element | Basis | Bracket |
 | --- | --- | --- |
-| **CM scope** | Shell modification, envelope, mechanical fit-out, electrical installation, cooling installation, controls kit mounting, FAT hosting, transport prep: labour + CM-supplied materials | Labour ≈ 600–900 h for a BEN 20 (first articles 1.5×); CM-supplied materials (container, steel, insulation, liner, wire, raceway, paint, consumables) ≈ US$ 35–60 k per BEN 20 at today's BOM estimates |
+| **CM scope** | Shell modification, envelope, mechanical fit-out, electrical installation, cooling installation, controls kit mounting, FAT hosting, transport prep: labour + CM-supplied materials | Labour ≈ 600–900 h for a BEN 150 (first articles 1.5×); CM-supplied materials (container, steel, insulation, liner, wire, raceway, paint, consumables) ≈ US$ 35–60 k per BEN 150 at today's BOM estimates |
 | **CM margin** | On labour and CM-supplied materials only; **not** on consigned equipment | **15–25 %** on labour and their materials (open-book target 18 %); a handling fee of 2–4 % on consigned equipment if they receive and store it |
 | **Schreiber AI-supplied (consigned)** | UPS, switchgear, cooling units, CDU, batteries, fire system, racks, controls kit — the majority of unit cost | Consigned at our cost; title stays with Schreiber AI; insured by us while at the CM; this keeps 60–70 % of the unit's material cost out of the CM margin base |
 | **Progress payments to CM** | Tied to hold points | 20 % at container receipt (Q-01), 30 % at H7+H10b, 30 % at H13 FAT, 20 % at shipping release (Q-10); retention 5 % until SAT |
@@ -161,15 +161,15 @@ Non-conformances are raised on the CM's NCR form or ours; disposition (use-as-is
 
 | Phase | Units/year | CMs | Notes |
 | --- | --- | --- | --- |
-| Pilot (first 12 months) | 3–6 | 1 primary (BEN 10/20), 1 panel-shop partner for the controls kit if the primary has no UL 508A file | First article + pilots; Schreiber AI presence high |
-| Ramp (year 2) | 10–25 | 2 CMs (second qualified before unit 10), one capable of BEN 40 | Regional split by pilot-site geography; frame agreements with reserved bay-weeks |
+| Pilot (first 12 months) | 3–6 | 1 primary (BEN 30/20), 1 panel-shop partner for the controls kit if the primary has no UL 508A file | First article + pilots; Schreiber AI presence high |
+| Ramp (year 2) | 10–25 | 2 CMs (second qualified before unit 10), one capable of BEN 500 | Regional split by pilot-site geography; frame agreements with reserved bay-weeks |
 | Scale (year 3+) | 25–60 | 2–3 CMs; decision point for greenfield (§10) | |
 
 ## 9. Risks and mitigations
 
 | Risk | Likelihood | Mitigation |
 | --- | --- | --- |
-| **IP leakage** — the CM learns the design and builds for a competitor, or a CM is itself a containerized-DC vendor | M | NDA with IP assignment for any improvement to our drawings; drawings watermarked per CM and unit; **the controls kit, firmware, config model and commissioning script never leave Schreiber AI** (the CM mounts a sealed panel and runs no software); split sourcing so no single CM sees the whole BEN 40 power + controls design unless needed; prefer shops that are not DC vendors for the primary role |
+| **IP leakage** — the CM learns the design and builds for a competitor, or a CM is itself a containerized-DC vendor | M | NDA with IP assignment for any improvement to our drawings; drawings watermarked per CM and unit; **the controls kit, firmware, config model and commissioning script never leave Schreiber AI** (the CM mounts a sealed panel and runs no software); split sourcing so no single CM sees the whole BEN 500 power + controls design unless needed; prefer shops that are not DC vendors for the primary role |
 | **Capacity allocation** — our bay is bumped by a larger customer | M | Frame agreement with reserved bay-weeks and penalties; second CM qualified before unit 10; long-lead equipment held by us so a unit can move shops |
 | **Quality drift** after the first articles | M | Hold points never waived; Q forms countersigned; FAT always run by Schreiber AI; quarterly scorecard; surveillance increases after any critical NCR; re-FAI after 6 months without a build or after key-person change |
 | **CM financial failure** mid-build | L | Consigned equipment titled to Schreiber AI and tagged; progress payments behind work; right to remove the unit and equipment; second CM |
@@ -184,8 +184,8 @@ The greenfield study starts only when **all** of the following hold for two cons
 
 | Criterion | Threshold |
 | --- | --- |
-| Shipped volume | ≥ 25 units/year (BEN 20-equivalent) with a firm backlog ≥ 12 months |
-| CM cost premium | CM labour + margin per unit ≥ 10 % of unit cost **and** equivalent own-factory cost (with realistic utilisation ≥ 60 %) is lower by ≥ US$ 25 k per BEN 20-equivalent |
+| Shipped volume | ≥ 25 units/year (BEN 150-equivalent) with a firm backlog ≥ 12 months |
+| CM cost premium | CM labour + margin per unit ≥ 10 % of unit cost **and** equivalent own-factory cost (with realistic utilisation ≥ 60 %) is lower by ≥ US$ 25 k per BEN 150-equivalent |
 | Lead time | CM shop time is on the critical path (i.e. shop time > long-lead equipment time) for ≥ 50 % of units, or CM capacity constrains bookings |
 | Quality | Critical defects at FAT ≤ 0.2 per unit and major ≤ 1.0 per unit at the CMs — the process is stable enough to transplant; **or** persistent quality drift that two CMs cannot fix |
 | Product stability | Drawing changes < 5 % per quarter; the STE instructions have not changed in substance for 2 quarters |
@@ -199,9 +199,9 @@ If the criteria are not met, the right answer is a third CM or a dedicated bay i
 
 | Item | Outline | Basis |
 | --- | --- | --- |
-| Size | 3,000–4,500 m² high bay (clear height ≥ 9 m, one 20 t and one 10 t bridge crane), 500 m² offices/lab, 2,000 m² yard with container storage and a test pad | A BEN 20 cell needs ~80 m² plus access; 6 cells plus receiving, paint and test ≈ 3,000 m² |
+| Size | 3,000–4,500 m² high bay (clear height ≥ 9 m, one 20 t and one 10 t bridge crane), 500 m² offices/lab, 2,000 m² yard with container storage and a test pad | A BEN 150 cell needs ~80 m² plus access; 6 cells plus receiving, paint and test ≈ 3,000 m² |
 | Cells | Receiving & structural (cutting/welding, fume extraction); envelope (insulation/liner); paint booth (ISO 12944 systems, C5 capable); electrical fit-out ×2; cooling/fluids; controls & FAT bays ×2 with 480 V 1,200 A test power, load banks to 500 kW, a heat-rejection yard; shipping prep | Flow in `PROCESS_FLOW.md` stages 6–14 |
-| Throughput | 40–60 BEN 20-equivalents per year on one shift with 6 cells (shop time ≈ 8–10 weeks per unit, cells in parallel) | Pilot cycle-time data will replace this |
+| Throughput | 40–60 BEN 150-equivalents per year on one shift with 6 cells (shop time ≈ 8–10 weeks per unit, cells in parallel) | Pilot cycle-time data will replace this |
 | Capex, order of magnitude | **US$ 6–12 M**: building lease fit-out or purchase of an existing industrial high bay (US$ 2–5 M), cranes and welding/cutting equipment (US$ 0.8–1.5 M), paint booth (US$ 0.5–1 M), 480 V test power infrastructure and load banks (US$ 0.8–1.5 M), tooling/fixtures (US$ 0.5 M), IT/quality systems (US$ 0.3 M), working capital for the first 6 units (US$ 1–2 M) | Industry ranges; to be replaced by quotes in the study |
 | Headcount | 25–40: plant manager, quality (3), production planning (2), certified welders (4), electricians (6, licensed), HVAC/refrigeration (3, EPA 608), fit-out technicians (6), controls/FAT technicians (3), logistics (2), EHS (1), plus the UL 508A panel shop MTR requirement | One shift; two shifts roughly doubles direct labour |
 | Certifications to obtain | UL 508A panel shop file, ISO 9001, state contractor licences, AWS D1.1 program with CWI, EPA 608 technicians, possibly NRTL field-evaluation partnership | 12–18 months to establish |

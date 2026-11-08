@@ -109,7 +109,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **[SCHREIBER_
 | CTP-E2 termination torque | Every lug to device label value, recorded | Q-07 |
 | Insulation resistance | ≥ 100 MΩ at 1 kV | Q-07 |
 | CTQ-E2 bonding | Every bond ≤ 0.1 Ω | Q-07 |
-| CTQ-E1 working space | NEC 110.26 clearances; vestibule 1.1 m (BEN 20/40) | Q-07 |
+| CTQ-E1 working space | NEC 110.26 clearances; vestibule 1.1 m (BEN 150/40) | Q-07 |
 | CTQ-K3 sensor placement and calibration check | Within ±0.25 °C after correction; `cal_id` stored | Q-08 |
 | CTP-K1 life-safety isolation | Dry contacts only to node; releasing circuit independent | Q-09 |
 | CTP-F1 hold time | ≥ 10 min at design concentration; certificate | Q-09 |
@@ -163,7 +163,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **[SCHREIBER_
 
 ## 9. Schedule, delivery and liquidated damages
 
-9.1 **Delivery date.** Each Build Order states the FAT-ready date and the FAT Acceptance date (the "**Delivery Date**"), set from `docs/PROCESS_FLOW.md` Section 3 durations for the Tier (Stages 6 to 13 typically 10 to 13 weeks for a BEN 20 once the container and long-lead items are at the Facility). Manufacturer confirms the Delivery Date within 5 Business Days of the Build Order or proposes an alternative with reasons; silence is acceptance.
+9.1 **Delivery date.** Each Build Order states the FAT-ready date and the FAT Acceptance date (the "**Delivery Date**"), set from `docs/PROCESS_FLOW.md` Section 3 durations for the Tier (Stages 6 to 13 typically 10 to 13 weeks for a BEN 150 once the container and long-lead items are at the Facility). Manufacturer confirms the Delivery Date within 5 Business Days of the Build Order or proposes an alternative with reasons; silence is acceptance.
 
 9.2 **Progress reporting.** Weekly written progress report per Unit: stage, QC forms closed, open NCRs, material shortages, forecast FAT-ready date, photographs. Manufacturer gives notice within 2 Business Days of any event that threatens the Delivery Date.
 
@@ -193,10 +193,10 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **[SCHREIBER_
 
 | Tier | Build price per Unit | Purchased Materials | Notes |
 | --- | --- | --- | --- |
-| BEN Micro | [CM_PRICE_MICRO] | At cost plus [CM_MATERIAL_MARKUP_PCT] % handling | Skid, cabinet fit-out, no structural stage |
-| BEN 10 | [CM_PRICE_BEN10] | At cost plus [CM_MATERIAL_MARKUP_PCT] % | |
-| BEN 20 | [CM_PRICE_BEN20] | At cost plus [CM_MATERIAL_MARKUP_PCT] % | Includes vestibule, 2 x welding frames |
-| BEN 40 | [CM_PRICE_BEN40] | At cost plus [CM_MATERIAL_MARKUP_PCT] % | Includes battery compartment partition, second egress door, DLC manifolds |
+| BEN 5 | [CM_PRICE_MICRO] | At cost plus [CM_MATERIAL_MARKUP_PCT] % handling | Skid, cabinet fit-out, no structural stage |
+| BEN 30 | [CM_PRICE_BEN30] | At cost plus [CM_MATERIAL_MARKUP_PCT] % | |
+| BEN 150 | [CM_PRICE_BEN150] | At cost plus [CM_MATERIAL_MARKUP_PCT] % | Includes vestibule, 2 x welding frames |
+| BEN 500 | [CM_PRICE_BEN500] | At cost plus [CM_MATERIAL_MARKUP_PCT] % | Includes battery compartment partition, second egress door, DLC manifolds |
 | Options | [CM_OPTION_PRICES] | | Cooling-on-UPS path, generator integration, RDHx in place of DX, C5 coating system, acoustic package |
 
 Prices are firm for Build Orders placed in the first [CM_PRICE_FIRM_MONTHS] months and then adjusted annually by [PRICE_INDEX], capped at [CM_PRICE_ESCALATION_CAP_PCT] %. Volume rebate: [CM_VOLUME_REBATE_SCHEDULE].

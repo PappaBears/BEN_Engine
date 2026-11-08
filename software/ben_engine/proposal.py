@@ -6,7 +6,7 @@ proposal is generated from one :class:`ben_engine.config.Config` with one call::
     from ben_engine.config import Config
     from ben_engine.proposal import build_proposal, to_markdown, to_html, to_json
 
-    p = build_proposal(Config.preset("ben20", "healthcare", "hot_humid"), option="managed",
+    p = build_proposal(Config.preset("ben150", "healthcare", "hot_humid"), option="managed",
                        customer="Acme Clinic", site="Austin, TX")
     open("proposal.md", "w").write(to_markdown(p))
     open("proposal.html", "w").write(to_html(p))
@@ -37,9 +37,9 @@ vocabulary.
 
 CLI::
 
-    python -m ben_engine.proposal --tier ben20 --profile healthcare --climate hot_humid \
+    python -m ben_engine.proposal --tier ben150 --profile healthcare --climate hot_humid \
         --option managed --customer "Acme Clinic" --site "Austin, TX" \
-        --out docs/proposals/sample-ben20-healthcare.md --html docs/proposals/sample-ben20-healthcare.html \
+        --out docs/proposals/sample-ben150-healthcare.md --html docs/proposals/sample-ben150-healthcare.html \
         [--json path] [--fill-sow docs/contracts/SOW_TEMPLATE.md --out-sow path] \
         [--fill-change-order docs/contracts/CHANGE_ORDER.md --out-change-order path]
 """
@@ -55,7 +55,7 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from .config import Config, TIER_GEOMETRY, PROFILE_DEFAULTS, CLIMATE_DESIGN, COOLING_LIBRARY
+from .config import Config, TIER_GEOMETRY, TIER_ALIASES, PROFILE_DEFAULTS, CLIMATE_DESIGN, COOLING_LIBRARY, canonical_tier
 from .bom import generate_bom, totals, load_catalog
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -65,7 +65,7 @@ RISKS_PATH = REPO_ROOT / "web" / "assets" / "risks.json"
 
 # ----------------------------------------------------------------------------- commercial inputs
 MARGIN_HW = 0.28                       # gross margin on purchased hardware + build labour (unit_economics.py)
-CONTROLS_LICENCE_PER_UNIT_YR = {"micro": 1200, "ben10": 4800, "ben20": 12000, "ben40": 30000}
+CONTROLS_LICENCE_PER_UNIT_YR = {"ben5": 1200, "ben30": 4800, "ben150": 12000, "ben500": 30000, "ben2000": 90000}
 WHITE_LABEL_UPLIFT = 1.25              # white-label licence = controls licence x 1.25 (partner brand, source escrow)
 MANAGED_PER_KW_MONTH = 45.0            # USD/kW-month; below retail colocation because the customer owns the asset
 MANAGED_TERM_YEARS = 3                 # headline managed term; 1 and 5 year totals are also shown
@@ -74,7 +74,7 @@ PAYMENT_MILESTONES = [("Engineering release (H4)", 0.30), ("Factory acceptance t
                       ("Site acceptance test (H19)", 0.25), ("Turnover (W20)", 0.05)]
 LD_RATE_PCT_PER_WEEK = 0.5             # delay liquidated damages, % of capital price per week of Schreiber AI-caused delay
 LD_CAP_PCT = 5.0                       # cap on delay LDs, % of capital price
-STORAGE_FEE_PER_DAY = {"micro": 60, "ben10": 150, "ben20": 300, "ben40": 600}  # finished unit that cannot ship (USD/day)
+STORAGE_FEE_PER_DAY = {"ben5": 60, "ben30": 150, "ben150": 300, "ben500": 600, "ben2000": 2500}  # finished unit/modules that cannot ship (USD/day)
 WARRANTY_WORKMANSHIP_MONTHS = 24
 WARRANTY_EQUIPMENT_MONTHS = 12         # pass-through of vendor warranties; longer vendor terms are passed through as-is
 
@@ -96,10 +96,13 @@ SUBSYSTEM_LABELS = {"power": "Power module", "cooling": "Cooling module", "compu
 # schedule building blocks per tier (weeks); totals calibrated to docs/PROCESS_FLOW.md section 3
 SCHEDULE_TIER = {
     # survey->H3, release->H4, short-lead (container), factory chain (receiving..electrical), cooling+controls, FAT, transport, hookup, SAT, turnover
-    "micro": {"survey": 1, "release": 1, "short_lead": 2, "factory": 2, "cool_ctl": 1, "fat": 1, "ship": 1, "hookup": 1, "sat": 1, "permits": 4, "civil": 2, "ref_total": "10-12 weeks"},
-    "ben10": {"survey": 2, "release": 2, "short_lead": 3, "factory": 6, "cool_ctl": 2, "fat": 1, "ship": 1, "hookup": 1, "sat": 1, "permits": 8, "civil": 4, "ref_total": "about 20 weeks"},
-    "ben20": {"survey": 3, "release": 3, "short_lead": 3, "factory": 9, "cool_ctl": 3, "fat": 1, "ship": 1, "hookup": 1, "sat": 1, "permits": 8, "civil": 6, "ref_total": "about 27 weeks"},
-    "ben40": {"survey": 4, "release": 3, "short_lead": 3, "factory": 12, "cool_ctl": 4, "fat": 2, "ship": 2, "hookup": 1, "sat": 1, "permits": 10, "civil": 8, "ref_total": "32-36 weeks"},
+    "ben5": {"survey": 1, "release": 1, "short_lead": 2, "factory": 2, "cool_ctl": 1, "fat": 1, "ship": 1, "hookup": 1, "sat": 1, "permits": 4, "civil": 2, "ref_total": "10-12 weeks"},
+    "ben30": {"survey": 2, "release": 2, "short_lead": 3, "factory": 6, "cool_ctl": 2, "fat": 1, "ship": 1, "hookup": 1, "sat": 1, "permits": 8, "civil": 4, "ref_total": "about 20 weeks"},
+    "ben150": {"survey": 3, "release": 3, "short_lead": 3, "factory": 9, "cool_ctl": 3, "fat": 1, "ship": 1, "hookup": 1, "sat": 1, "permits": 8, "civil": 6, "ref_total": "about 27 weeks"},
+    "ben500": {"survey": 4, "release": 3, "short_lead": 3, "factory": 12, "cool_ctl": 4, "fat": 2, "ship": 2, "hookup": 1, "sat": 1, "permits": 10, "civil": 8, "ref_total": "32-36 weeks"},
+    # BEN 2000: long-lead items (MV pad-mount transformers, 2 MW UPS strings, generators) typically 40 weeks from release;
+    # site works (slab, MV service, yard) run 20 weeks in parallel; order-to-service about 52 weeks.
+    "ben2000": {"survey": 4, "release": 8, "short_lead": 12, "factory": 20, "cool_ctl": 4, "fat": 2, "ship": 3, "hookup": 4, "sat": 2, "permits": 12, "civil": 20, "long_lead_typical": 40, "ref_total": "about 52 weeks"},
 }
 
 COMMISSIONING_STEPS = [
@@ -585,14 +588,21 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
     # 4 the unit
     s = Section(4, "The unit: sizing")
     s.table(["Item", "Value", "Basis"], [
-        ["Enclosure", d["enclosure"], f"External {g['ext_l_m']} x {g['ext_w_m']} x {g['ext_h_m']} m; interior {g['int_l_m']} x {g['int_w_m']} x {g['int_h_m']} m"],
+        ["Enclosure", d["enclosure"], f"External {g['ext_l_m']} x {g['ext_w_m']} x {g['ext_h_m']} m; interior {g['int_l_m']} x {g['int_w_m']} x {g['int_h_m']} m" + (f"; {d['modules']} site-joined modules" if d["modules"] > 1 else "")],
         ["IT load", f"{cfg.it_kw:.0f} kW in {cfg.racks} rack(s) of {g['rack_u']} U", f"{d['per_rack_kw']} kW per rack; tier range {g['it_kw_min']}–{g['it_kw_max']} kW"],
         ["Cooling", f"{d['cooling_units_total']} x {d['cooling_label']}", f"{d['cooling_units_n']} required at {d['cooling_unit_kw_derated']} kW each (derate {d['cooling_derate']}), {cfg.redundancy}"],
-        ["Row fit", "fits" if d["row_fits"] else "DOES NOT FIT - revise", f"single row {d['row_length_mm']} mm vs interior {int(g['int_l_m'] * 1000)} mm"],
+        ["Row fit", "fits" if d["row_fits"] else "DOES NOT FIT - revise", f"{d['rows']} row(s) of {d['racks_per_row']} racks, {d['row_length_mm']} mm per row vs interior {int(g['int_l_m'] * 1000)} mm"],
         ["Cooling electrical", f"{d['cooling_elec_kw']} kW", f"COP {COOLING_LIBRARY[cfg.cooling]['cop']} at design point"],
         ["Total electrical demand", f"{d['total_kw']} kW / {d['total_kva']} kVA", "IT + cooling + 2 % house + 0.5 kW controls, pf 0.95"],
         ["Controls tier", d["controls_label"], ("PLCnext AXC F 2152 + Axioline I/O in a UL 508A BEN Controller panel, OnLogic Karbon 400 edge computer (TPM 2.0)" if d["controls_tier_resolved"] == "pro" else "Revolution Pi RevPi Connect 4 + DIO/AIO (DIN rail, listed), software interlocks behind a hardware watchdog relay") + f"; {d['pods']} BEN Pods on the BEN Mesh (Thread, Secure Vault); selectable with controls_tier (docs/CONTROLS_HARDWARE_DECISION.md 2a)"],
-        ["Service", f"{d['voltage']}, {d['service_breaker_a']} A breaker", f"calculated {d['service_amps_calc']} A at 80 % continuous, rounded to the next frame"],
+        ["Service", f"{d['voltage']}, {d['service_breaker_a']} A breaker", f"calculated {d['service_amps_calc']} A at 80 % continuous, rounded to the next frame" + ("; medium-voltage utility service to pad-mount transformers" if d["mv_service"] else "")],
+    ] + ([
+        ["Transformers", f"{d['transformers_total']} x {d['transformer_kva']:,} kVA pad-mount (MV to 480 V)", f"{cfg.redundancy}: 2N transformer pairs when 2N or N+1; 90 % loading at {d['total_kva']} kVA"],
+        ["Generators", f"{d['generators_total']} x {d['generator_kw_each']:,} kW" if d["generators_total"] else "not included (option)", "N+1 standby with 48 h fuel; SPCC plan for the fuel yard"],
+    ] if d["mv_service"] else ([
+        ["Generator", f"1 x {d['generator_kw_each']:,} kW standby" if d["generators_total"] else "not included (option)", "total demand x 1.25, rounded to 10 kW"],
+    ])) + [
+        ["Hardening", f"{d['hardening_label']}: {d['hardening_rating']}", f"coating {d['hardening_coating']}; recommended for this profile/climate: {d['hardening_recommended']}; envelope {d['envelope_area_m2']} m²"],
         ["UPS", f"{d['ups_modules']} x {d['ups_kva_each']} kVA", f"IT only with 15 % headroom, {cfg.redundancy}"],
         ["Battery", f"{d['battery_kwh']} kWh lithium (LFP)", f"{cfg.ups_minutes} min at IT load, 90 % depth of discharge"],
         ["NFPA 855 scope", "YES - battery >= 20 kWh: UL 9540A data, gas detection and venting, AHJ review" if d["nfpa_855_scope"] else "no - battery below 20 kWh", "energy storage threshold"],
@@ -1052,7 +1062,7 @@ def _extended_fields(p: Proposal, base: Dict[str, Any], ms: Dict[str, Any], week
     price_power, price_cool, price_comp, price_ctl = by("power"), by("cooling"), by("compute"), by("controls")
     price_encl = by("str", "env", "fs")
     price_site, price_svc = by("site"), by("svc")
-    licence = {"micro": 1200, "ben10": 4800, "ben20": 12000, "ben40": 30000}[tier]
+    licence = CONTROLS_LICENCE_PER_UNIT_YR[tier]
     a_max = {"A1": 27, "A2": 35, "A3": 40, "A4": 45}.get(d.get("ashrae_class", "A2"), 35)
     avail = {"N": "99.5", "N+1": "99.9", "2N": "99.99"}[cfg["redundancy"]]
     pid = p.proposal_id; stem = pid.replace("SAI-", "")
@@ -1068,9 +1078,12 @@ def _extended_fields(p: Proposal, base: Dict[str, Any], ms: Dict[str, Any], week
         # derived
         "ASHRAE_CLASS": d.get("ashrae_class", ""), "ASHRAE_MAX_C": str(a_max), "AVAILABILITY_TARGET_PCT": avail,
         "BATTERY_KWH": f"{d['battery_kwh']:g}", "CLIMATE_DESIGN_TEMP_C": str(clim["t_design_c"]), "COOLING_UNITS_TOTAL": str(d["cooling_units_total"]),
-        "GENERATOR_KW": f"{math.ceil(d['total_kw'] * 1.25 / 10) * 10:g}" if gen else "0", "GLYCOL_PCT": "35" if clim["t_min_c"] <= -20 else "25",
+        "GENERATOR_KW": (f"{d['generators_total']} x {d['generator_kw_each']:g}" if d.get("mv_service") else f"{math.ceil(d['total_kw'] * 1.25 / 10) * 10:g}") if gen else "0", "GLYCOL_PCT": "35" if clim["t_min_c"] <= -20 else "25",
         "NFPA855_PACKAGE": str(bool(d.get("nfpa_855_scope"))).lower(), "NODE_COUNT": str(1 + math.ceil(cfg["racks"] / 2)),
-        "POD_COUNT": str(d.get("pods", 3 if tier == "micro" else cfg["racks"] * 2 + 2)), "CONTROLS_TIER_LABEL": d.get("controls_label", "BEN Controls Pro" if tier in ("ben20", "ben40") else "BEN Controls Lite"),
+        "POD_COUNT": str(d.get("pods", 3 if tier == "ben5" else cfg["racks"] * 2 + 2)), "CONTROLS_TIER_LABEL": d.get("controls_label", "BEN Controls Pro" if tier in ("ben150", "ben500", "ben2000") else "BEN Controls Lite"),
+        "HARDENING_LEVEL": d.get("hardening", cfg.get("hardening", "H1")), "HARDENING_LABEL": d.get("hardening_label", ""), "HARDENING_RATING": d.get("hardening_rating", ""),
+        "MV_SERVICE": str(bool(d.get("mv_service"))).lower(), "TRANSFORMERS_TOTAL": str(d.get("transformers_total", 0)), "TRANSFORMER_KVA": str(d.get("transformer_kva", 0)),
+        "GENERATORS_TOTAL": str(d.get("generators_total", 0)), "MODULES": str(d.get("modules", 1)), "RACK_ROWS": str(d.get("rows", 1)),
         "PUE_ESTIMATE": f"{d['pue_estimate']:.3f}", "TOTAL_KVA": f"{d['total_kva']:g}", "UPS_KVA_EACH": str(d["ups_kva_each"]), "UPS_MODULES": str(d["ups_modules"]),
         "CORROSIVITY_CLASS": clim["corrosion"], "WIND_SPEED": f"{clim['wind_ms']} m/s (ASCE 7 basic; confirm per site)",
         # pricing by module
@@ -1080,7 +1093,8 @@ def _extended_fields(p: Proposal, base: Dict[str, Any], ms: Dict[str, Any], week
         "CONTRACT_VALUE_TOTAL": f"{h.capital_price_usd + (h.recurring_usd_per_year if (managed or white) else 0):,.2f}",
         "LICENSE_FEE": f"{licence * (1.25 if white else 1):,.2f}" if "controls" in subs else "0.00",
         "WHITE_LABEL_LICENSE_FEE": f"{licence * 1.25:,.2f}", "LICENSE_MICRO_ANNUAL": "USD 1,200", "LICENSE_BEN10_ANNUAL": "USD 4,800",
-        "LICENSE_BEN20_ANNUAL": "USD 12,000", "LICENSE_BEN40_ANNUAL": "USD 30,000", "SLA_RATE_PER_KW_MONTH": "USD 45",
+        "LICENSE_BEN20_ANNUAL": "USD 12,000", "LICENSE_BEN40_ANNUAL": "USD 30,000",
+        "LICENSE_BEN5_ANNUAL": "USD 1,200", "LICENSE_BEN30_ANNUAL": "USD 4,800", "LICENSE_BEN150_ANNUAL": "USD 12,000", "LICENSE_BEN500_ANNUAL": "USD 30,000", "LICENSE_BEN2000_ANNUAL": "USD 90,000", "SLA_RATE_PER_KW_MONTH": "USD 45",
         "SLA_MONTHLY_FEE": f"{45 * cfg['it_kw']:,.2f}", "MANAGED_SERVICES": str(managed).lower(),
         "DELIVERY_MODEL": h.label, "COMPUTE_DESCRIPTION": "Reference GPU/CPU node set from the catalog (CMP- lines)" if "compute" in subs else "Customer-supplied compute",
         "TURNKEY_SITE_WORKS": "no", "RECOMMISSIONING_FEE": "7,500.00", "CRANE_REMOB_FEE": "4,500.00", "STANDBY_RATE_PER_DAY": "1,200.00",
@@ -1095,9 +1109,9 @@ def _extended_fields(p: Proposal, base: Dict[str, Any], ms: Dict[str, Any], week
         "WARRANTY_END_DATE": end_warranty,
         # SOW scope rows
         "SCOPE_ENCLOSURE": inc(True), "SCOPE_STRUCTURAL": inc(True), "SCOPE_ENVELOPE": inc(True), "SCOPE_FLOOR": inc(True), "SCOPE_LIGHTING_SIGNAGE": inc(True),
-        "SCOPE_VESTIBULE": inc(tier in ("ben20", "ben40")), "SCOPE_ACCESS_CONTROL": inc(True), "SCOPE_TRANSPORT_PREP": inc(True), "SCOPE_SPARES": inc(managed),
-        "SCOPE_PE_ANCHORAGE": inc(tier != "micro"), "SCOPE_CERTIFICATION": inc(True), "SCOPE_FIELD_EVAL": "Excluded (option)",
-        "SCOPE_PWR_MAIN": inc("power" in subs), "SCOPE_PWR_UPS": inc("power" in subs), "SCOPE_PWR_PDU": inc("power" in subs), "SCOPE_PWR_TRANSFORMERS": inc("power" in subs and tier in ("ben20", "ben40")),
+        "SCOPE_VESTIBULE": inc(tier in ("ben150", "ben500", "ben2000")), "SCOPE_ACCESS_CONTROL": inc(True), "SCOPE_TRANSPORT_PREP": inc(True), "SCOPE_SPARES": inc(managed),
+        "SCOPE_PE_ANCHORAGE": inc(tier != "ben5"), "SCOPE_CERTIFICATION": inc(True), "SCOPE_FIELD_EVAL": "Excluded (option)",
+        "SCOPE_PWR_MAIN": inc("power" in subs), "SCOPE_PWR_UPS": inc("power" in subs), "SCOPE_PWR_PDU": inc("power" in subs), "SCOPE_PWR_TRANSFORMERS": inc("power" in subs and tier in ("ben150", "ben500", "ben2000")),
         "SCOPE_PWR_METERS": inc("power" in subs or "controls" in subs), "SCOPE_PWR_BONDING": inc("power" in subs), "SCOPE_PWR_ARCFLASH": inc("power" in subs), "SCOPE_PWR_INSTALL": inc("power" in subs),
         "SCOPE_PWR_GENERATOR": inc(gen and "power" in subs), "SCOPE_PWR_COOLING_ON_UPS": inc(cfg["redundancy"] != "N" and "power" in subs),
         "SCOPE_CLG_UNITS": inc("cooling" in subs), "SCOPE_CLG_INSTALL": inc("cooling" in subs), "SCOPE_CLG_OUTDOOR": inc("cooling" in subs), "SCOPE_CLG_CONTAINMENT": inc("cooling" in subs and not liquid),
@@ -1173,7 +1187,7 @@ def known_fields_report(fields_json: Path | str, proposal: Proposal) -> Tuple[Li
 def main(argv=None) -> int:
     import argparse
     ap = argparse.ArgumentParser(description="BEN Engine proposal generator")
-    ap.add_argument("--tier", default="ben20", choices=list(TIER_GEOMETRY))
+    ap.add_argument("--tier", default="ben150", choices=list(TIER_GEOMETRY) + list(TIER_ALIASES))
     ap.add_argument("--profile", default="ai_inference", choices=list(PROFILE_DEFAULTS))
     ap.add_argument("--climate", default="temperate", choices=list(CLIMATE_DESIGN))
     ap.add_argument("--option", default="hardware_controls", choices=list(OPTIONS) + ["full"])

@@ -124,7 +124,7 @@ These requirements apply to every PO by category. Non-delivery of a required doc
 
 | Category (Schreiber AI code prefix) | Examples | Required documents and attributes |
 | --- | --- | --- |
-| STR Enclosure | One-trip high-cube ISO containers 10/20/40 ft; NEMA 3R / IP55 outdoor cabinets | CSC safety approval plate legible and photographed; manufacturer's certificate of conformance to ISO 1496-1 and ISO 668; one-trip condition statement (no dents > 20 mm, floor sound, doors seal); corner casting conformance to ISO 1161; steel mill certificates on request; for cabinets: UL 50 / UL 50E listing, NEMA type, integral AC listing (UL 1995 or UL 60335-2-40) and refrigerant/GWP declaration |
+| STR Enclosure | One-trip high-cube ISO containers 10/20/40 ft; NEMA 4X / IP66 / IP55 outdoor cabinets | CSC safety approval plate legible and photographed; manufacturer's certificate of conformance to ISO 1496-1 and ISO 668; one-trip condition statement (no dents > 20 mm, floor sound, doors seal); corner casting conformance to ISO 1161; steel mill certificates on request; for cabinets: UL 50 / UL 50E listing, NEMA type, integral AC listing (UL 1995 or UL 60335-2-40) and refrigerant/GWP declaration |
 | PWR Switchgear and panelboards | UL 891 switchboards, UL 67 panelboards, breakers, SPDs (UL 1449), ATS (UL 1008) | UL listing file numbers and labels; SCCR ≥ 65 kA at the rated voltage; time-current curves and trip-unit data (for coordination and arc-flash studies); Modbus or SNMP register map where metering or communication is fitted; dimensional drawings in STEP; torque values on device labels |
 | PWR UPS | Modular and monolithic UPS 208 V and 480 V | UL 1778 listing; efficiency curve; input THD and power factor data; battery compatibility list; Modbus/SNMP register map and MIB; STEP model; start-up requirement for warranty activation stated; firmware version on the packing list |
 | PWR Batteries | Lithium (LFP) battery cabinets and modules | UL 1973 listing of modules; **UL 9540 system listing and a current UL 9540A test report (unit-level, showing no cell-to-cell propagation) for any shipment that will be installed in a configuration ≥ 20 kWh**; BMS communication protocol and register map; storage SOC and temperature requirements; UN 38.3 test summary; UN 3480 shipping documents; SDS; capacity warranty terms with SOH threshold |
@@ -161,14 +161,14 @@ These requirements apply to every PO by category. Non-delivery of a required doc
 ### Q3.1 Refrigerant-charged equipment and refrigerant
 
 - Refrigerant designation (ASHRAE 34), safety class and GWP (AR4) on the quotation, CoC and packing list.
-- For Buyer's container tiers (BEN 10, BEN 20): **A1 class, GWP < 700**. A2L (R-454B, R-32) is not accepted for equipment installed inside the ITE space without Buyer's prior written approval and the listed charge-limit, leak-detection and mitigation data under UL 60335-2-40 and ASHRAE 15.
+- For Buyer's container tiers (BEN 30, BEN 150): **A1 class, GWP < 700**. A2L (R-454B, R-32) is not accepted for equipment installed inside the ITE space without Buyer's prior written approval and the listed charge-limit, leak-detection and mitigation data under UL 60335-2-40 and ASHRAE 15.
 - Compliance statement with the AIM Act Technology Transitions rule for new data-center / IT-room cooling installed on or after 1 January 2027 (GWP < 700). R-410A equipment is not accepted for new builds.
 - Any field charging, recovery or repair performed by Supplier is by **EPA Section 608 Type II or Universal certified technicians**, with certificate numbers on the service record, and with refrigerant quantities recorded per appliance.
 - Refrigerant cylinders: DOT-compliant, labelled, with CoC of refrigerant purity (AHRI 700).
 
 ### Q3.2 Batteries (lithium) — UL 9540 / UL 9540A
 
-- Modules UL 1973 listed; system (cabinet with BMS) **UL 9540 listed**; **UL 9540A test report at unit level** with the current edition, dated within [UL9540A_REPORT_MAX_AGE_MONTHS] months, delivered with the quotation for any configuration that will exceed 20 kWh total lithium in a Unit (BEN 20 optional package; BEN 40 always).
+- Modules UL 1973 listed; system (cabinet with BMS) **UL 9540 listed**; **UL 9540A test report at unit level** with the current edition, dated within [UL9540A_REPORT_MAX_AGE_MONTHS] months, delivered with the quotation for any configuration that will exceed 20 kWh total lithium in a Unit (BEN 150 optional package; BEN 500 always).
 - Report must show cell-to-cell and module-to-module propagation results, gas composition and volume data sufficient for NFPA 69 deflagration venting sizing, and the spacing basis.
 - BMS alarm and telemetry interface (Modbus or CAN with documented map) available to Buyer's BEN Controller (edge computer / PLC).
 - Storage, transport SOC, charging temperature limits (charging below 0 °C inhibited) and shelf-life stated.

@@ -38,7 +38,7 @@ Two budget claims in PROTOCOL.md were not met by the computed budgets (RH and dP
 
 ## 7. Controls: industrial platform, BEN Mesh, hardwired life safety
 
-BEN Controls Pro: Phoenix Contact PLCnext PLC in a UL 508A panel + OnLogic edge computer (TPM). BEN Controls Lite: Revolution Pi for the Micro. Both: our BEN Pods on a secure Thread mesh.
+BEN Controls Pro: Phoenix Contact PLCnext PLC in a UL 508A panel + OnLogic edge computer (TPM). BEN Controls Lite: Revolution Pi for the BEN 5. Both: our BEN Pods on a secure Thread mesh.
 
 Be precise: the EFR32/OpenThread HAL has never been compiled against the real SDK and attestation has not run on silicon. The PLC, edge computer and Pods are priced in the BOM (controls +0.3 to +0.9 % of a unit) and not yet bought. Everything platform-independent is tested. Decision record: docs/CONTROLS_HARDWARE_DECISION.md.
 
@@ -52,7 +52,7 @@ Renders are labelled concept renders. The interference checks table in design/dr
 
 Ten steps, pass/fail per step, CSV with SHA-256, signature block; the customer can run it.
 
-Run it live: PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben20 --yes --out /tmp/r.md. Show the report.
+Run it live: PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben150 --yes --out /tmp/r.md. Show the report.
 
 ## 10. Compliance findings that changed the design
 

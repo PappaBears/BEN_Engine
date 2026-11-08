@@ -1,29 +1,29 @@
-# Schreiber AI — BEN Engine proposal SAI-BEN10-20261108-8CF34A7C
+# Schreiber AI — BEN Engine proposal SAI-BEN30-20261108-8CF34A7C
 
-*BEN 10 · Industrial OT analytics · Lakeshore Foundry · Duluth, MN · 2026-11-08 · valid until 2027-01-07*
+*BEN 30 · Industrial OT analytics · Lakeshore Foundry · Duluth, MN · 2026-11-08 · valid until 2027-01-07*
 
 ## 1. Cover
 
 | Item | Value |
 |---|---|
-| Proposal | BEN Engine BEN 10 for Lakeshore Foundry |
+| Proposal | BEN Engine BEN 30 for Lakeshore Foundry |
 | Prepared by | Schreiber AI |
 | Customer | Lakeshore Foundry |
 | Site | Duluth, MN |
-| Tier | BEN 10 — 10 ft high-cube ISO container |
+| Tier | BEN 30 — 10 ft high-cube ISO container |
 | Mission profile | Industrial OT analytics (industrial_ot) |
 | Climate package | Cold |
 | Purchase option | Hardware + BEN Controls |
 | Date | 2026-11-08 |
 | Valid until | 2027-01-07 (60 days) |
-| Proposal ID | SAI-BEN10-20261108-8CF34A7C |
+| Proposal ID | SAI-BEN30-20261108-8CF34A7C |
 | Configuration | 13 kW IT in 2 rack(s), In-row DX cooling unit (300 mm, 20 kW), N+1, 10 min UPS |
 
 AI infrastructure that arrives finished. This proposal is generated from configuration version 71ef9b8a; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
 
 ## 2. Executive summary
 
-Lakeshore Foundry needs 13 kW of IT capacity for a Industrial OT analytics workload at Duluth, MN. We propose one BEN 10: a 10 ft high-cube ISO container fitted out as a complete data center with 2 rack(s), In-row DX cooling unit (300 mm, 20 kW) with N+1 redundancy, a 2 x 16 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
+Lakeshore Foundry needs 13 kW of IT capacity for a Industrial OT analytics workload at Duluth, MN. We propose one BEN 30: a 10 ft high-cube ISO container fitted out as a complete data center with 2 rack(s), In-row DX cooling unit (300 mm, 20 kW) with N+1 redundancy, a 2 x 16 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
 
 The unit arrives finished and factory-tested. It needs a pad, a 100 A 208 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
@@ -86,7 +86,7 @@ Top 15 lines of the 88-line bill of materials for this option (sell price at 28%
 | CMP-GPU-L40S | GPU SuperServer 4U, 2x Xeon, 8x NVIDIA L40S (~4 kW), configured | Supermicro SYS-421GE-TNRT | 2 ea | $228,692 | confirmed | 6 |
 | CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 2 ea | $49,997 | confirmed | 3 |
 | CLG-INROW | InRow DX 300 mm 30 kW air-cooled in-row unit (indoor section) (ACRD301S is the 300 mm, ~20 kW class unit = config inrow_dx_300; 600 mm/30 kW class ACRD600 series to be quoted for inrow_dx) | APC by Schneider Electric ACRD301S | 2 ea | $45,835 | confirmed | 10 |
-| PWR-UPS-RM20 | Rack/tower online UPS 20 kVA 208 V, 10U, parallel-capable (BEN 10 R1, 3 x in parallel for N+1; 93PM tower does not fit the row) | Vertiv GXT5-20KMVRT11UXLN | 2 ea | $26,389 | estimate | 6 |
+| PWR-UPS-RM20 | Rack/tower online UPS 20 kVA 208 V, 10U, parallel-capable (BEN 30 R1, 3 x in parallel for N+1; 93PM tower does not fit the row) | Vertiv GXT5-20KMVRT11UXLN | 2 ea | $26,389 | estimate | 6 |
 | CLG-COND | Outdoor air-cooled condensing unit for ACRD301S (30 kW), 460 V | APC by Schneider Electric ACCD75208 | 2 ea | $18,056 | estimate | 10 |
 | CMP-SW100G | Spectrum SN2700 32x100GbE QSFP28 switch, Cumulus Linux | NVIDIA Mellanox MSN2700-CS2RC | 1 ea | $14,712 | confirmed | 2 |
 | FS-CLEAN-AGENT | Pre-engineered FK-5-1-12 (Novec 1230) clean agent system, installed: cylinder, nozzles, releasing panel, detection, design & AHJ submittal | Fike / Kidde (via licensed fire contractor) ECS-500 / Fike CA | 17 m3 protected | $12,986 | estimate | 8 |
@@ -138,7 +138,7 @@ Recurring fees are invoiced annually in advance from turnover. Prices are in USD
 
 ## 7. Schedule
 
-Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 10 (reference order-to-service about 20 weeks) and the longest lead time in this bill of materials (10 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
+Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 30 (reference order-to-service about 20 weeks) and the longest lead time in this bill of materials (10 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
 
 | Week | Milestone | Owner | Hold / witness point | Path |
 |---|---|---|---|---|
@@ -167,7 +167,7 @@ Long-lead items (ordered at engineering release):
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 10, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
+Issue-for-construction drawing set for the BEN 30, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
 
 | Sheet | Title | Scale |
 |---|---|---|
@@ -265,11 +265,11 @@ Permits and who pulls them:
 
 | Permit | Typical need | Who pulls |
 |---|---|---|
-| Zoning / land use | Yes for 10/20/40 (accessory structure); often no for Micro | Customer |
-| Building permit (structure, foundation, anchorage) | Yes for 10/20/40 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
+| Zoning / land use | Yes for 30/150/500 (accessory structure); often no for BEN 5 | Customer |
+| Building permit (structure, foundation, anchorage) | Yes for 30/150/500 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
 | Electrical permit | Yes | Licensed electrical sub (ours for the unit, customer's for the feeder) |
 | Mechanical / refrigeration permit | Yes where DX or glycol piping is installed on site | Licensed HVAC sub |
-| Fire alarm / suppression permit and plan review | Yes for 10/20/40 | Licensed fire protection contractor |
+| Fire alarm / suppression permit and plan review | Yes for 30/150/500 | Licensed fire protection contractor |
 | Generator: air permit / registration, fuel tank permit | If generator selected | Customer (we provide engine certification and tank data) |
 | Utility interconnection (solar/export only) | off_grid with PV paralleling | Customer with our documents |
 | Stormwater / grading | Site dependent | Customer civil |
@@ -349,7 +349,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-BEN10-20261108-8CF34A7C) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-BEN30-20261108-8CF34A7C) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
@@ -359,4 +359,4 @@ By signing, the customer accepts this proposal (SAI-BEN10-20261108-8CF34A7C) and
 | Schreiber AI — compliance |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-BEN10-20261108-8CF34A7C. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-BEN30-20261108-8CF34A7C. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

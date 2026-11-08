@@ -4,9 +4,9 @@
 
 **For** small and mid-size businesses, integrators and public-sector sites that want AI and IT on their own pad.
 **The problem:** cloud bills that scale with success, colocation priced for hyperscalers, server closets nobody commissioned.
-**The outcome:** a family of modular data centers (BEN Micro 2–5 kW cabinet to BEN 40 500 kW liquid-cooled container) built from off-the-shelf enclosures, with Schreiber AI's controls layer, digital twin, commissioning script and a complete, generated deal package. Every drawing, part, price, alarm threshold and proposal comes from one configuration model.
+**The outcome:** a family of modular data centers (BEN 5 2–5 kW cabinet to BEN 500 500 kW liquid-cooled container) built from off-the-shelf enclosures, with Schreiber AI's controls layer, digital twin, commissioning script and a complete, generated deal package. Every drawing, part, price, alarm threshold and proposal comes from one configuration model.
 
-![BEN Engine dashboard guided tour: the 3-D twin of a BEN 20 with cutaway, racks, rear-door heat exchangers and roof dry coolers](docs/media/demo.gif)
+![BEN Engine dashboard guided tour: the 3-D twin of a BEN 150 with cutaway, racks, rear-door heat exchangers and roof dry coolers](docs/media/demo.gif)
 
 <sub>Static poster: [docs/media/demo-poster.png](docs/media/demo-poster.png). Real capture of the dashboard in simulation mode.</sub>
 
@@ -18,7 +18,7 @@
 | Digital twin: thermal + power chain, 7 faults, ASHRAE-class alarms | `software/ben_engine/twin.py` | verified in simulation |
 | 2-D thermal lattice-Boltzmann CFD per tier, recirculation profile into the twin | `software/ben_engine/cfd.py` | verified (runs, converges); relative tool only |
 | Calibration (GUM budgets, tares, placement effects) and analysis (parameter fit, 95 % prediction intervals, ride-through) | `calibration.py`, `analysis.py` | verified on synthetic data |
-| Automated sweeps with pass/fail and CSV | `sweeps.py` | verified (6/6 pass on BEN 20) |
+| Automated sweeps with pass/fail and CSV | `sweeps.py` | verified (6/6 pass on BEN 150) |
 | Commissioning script, FAT/SAT, signed report with SHA-256 | `commissioning.py` | verified in simulation (10/10 steps) |
 | Dashboard: 3-D twin, walkthrough, guided tour, sweeps, fault injection, I/O test, calibration, CFD, export, **proposal** | `dashboard/`, `api.py` | verified (26 API tests, Playwright e2e with screenshots) |
 | Proposal generator: selector → 16-section customer proposal, md/html/json, contract pre-fill | `proposal.py`, `docs/proposals/` | verified (16 tests; rendered and inspected) |
@@ -45,17 +45,17 @@ PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e
 bash scripts/run_dashboard.sh        # open http://localhost:8080
 ```
 
-First success: the dashboard opens on a BEN 20 in simulation. Change the tier to BEN 40 in the Selector, press Apply, inject a cooling-unit failure under Sweeps, watch the standby unit start and the alarm clear, then open the Proposal panel and generate a proposal for that configuration.
+First success: the dashboard opens on a BEN 150 in simulation. Change the tier to BEN 500 in the Selector, press Apply, inject a cooling-unit failure under Sweeps, watch the standby unit start and the alarm clear, then open the Proposal panel and generate a proposal for that configuration.
 
 More commands:
 
 ```bash
-PYTHONPATH=software python -m ben_engine.config --tier ben20 --profile healthcare --climate hot_humid
-PYTHONPATH=software python -m ben_engine.sweeps --tier ben40
-PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben20 --yes --out /tmp/report.md
-PYTHONPATH=software python -m ben_engine.cfd --tier ben20 --png /tmp/cfd.png
-PYTHONPATH=software python -m ben_engine.proposal --tier ben20 --profile healthcare --option managed --customer "Acme Clinic" --site "Austin, TX" --out /tmp/p.md --html /tmp/p.html
-PYTHONPATH=software python -m ben_engine.package --tier ben20 --profile healthcare --option managed --customer "Acme Clinic" --site "Austin, TX"
+PYTHONPATH=software python -m ben_engine.config --tier ben150 --profile healthcare --climate hot_humid
+PYTHONPATH=software python -m ben_engine.sweeps --tier ben500
+PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben150 --yes --out /tmp/report.md
+PYTHONPATH=software python -m ben_engine.cfd --tier ben150 --png /tmp/cfd.png
+PYTHONPATH=software python -m ben_engine.proposal --tier ben150 --profile healthcare --option managed --customer "Acme Clinic" --site "Austin, TX" --out /tmp/p.md --html /tmp/p.html
+PYTHONPATH=software python -m ben_engine.package --tier ben150 --profile healthcare --option managed --customer "Acme Clinic" --site "Austin, TX"
 PYTHONPATH=software python -m ben_engine.bom --all
 cd firmware/ben-pod && make test
 ```
@@ -64,10 +64,10 @@ cd firmware/ben-pod && make test
 
 | Tier | Enclosure | IT load | Cooling (preset) | Power |
 | --- | --- | --- | --- | --- |
-| BEN Micro | NEMA 3R 24U outdoor cabinet on a skid | 2–5 kW | 2 × 5.8 kW cabinet DX (N+1) | 208/240 V 1φ |
-| BEN 10 | 10 ft high-cube ISO container | 10–30 kW | 300 mm in-row DX, R-513A | 208 V 3φ |
-| BEN 20 | 20 ft high-cube | 50–150 kW | Rear-door heat exchangers + dry cooler | 480 V 3φ |
-| BEN 40 | 40 ft high-cube | 150–500 kW | Direct liquid cooling, CDU + dry cooler | 480 V 3φ |
+| BEN 5 | NEMA 4X / IP66 24U outdoor cabinet on a skid | 2–5 kW | 2 × 5.8 kW cabinet DX (N+1) | 208/240 V 1φ |
+| BEN 30 | 10 ft high-cube ISO container | 10–30 kW | 300 mm in-row DX, R-513A | 208 V 3φ |
+| BEN 150 | 20 ft high-cube | 50–150 kW | Rear-door heat exchangers + dry cooler | 480 V 3φ |
+| BEN 500 | 40 ft high-cube | 150–500 kW | Direct liquid cooling, CDU + dry cooler | 480 V 3φ |
 
 Mission profiles: AI inference, AI training, private cloud, disaster recovery, industrial OT, healthcare, public sector, off-grid. Modules (power, cooling, compute, controls) can be bought separately; white-label and managed options exist.
 

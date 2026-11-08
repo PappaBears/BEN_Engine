@@ -1,5 +1,5 @@
 {
-  "proposal_id": "SAI-BEN40-20261108-6F99E124",
+  "proposal_id": "SAI-BEN500-20261108-6F99E124",
   "date": "2026-11-08",
   "valid_until": "2027-01-07",
   "customer": "Northwind Partners (for Helix Labs)",
@@ -7,7 +7,7 @@
   "option": "white_label",
   "brand": "Northwind Partners",
   "config": {
-    "tier": "ben40",
+    "tier": "ben500",
     "profile": "ai_training",
     "it_kw": 500.0,
     "racks": 9,
@@ -27,7 +27,7 @@
     "site_name": "Phoenix, AZ"
   },
   "derived": {
-    "tier_label": "BEN 40",
+    "tier_label": "BEN 500",
     "enclosure": "40 ft high-cube ISO container",
     "per_rack_kw": 55.56,
     "cooling_label": "Direct liquid cooling + CDU + dry cooler",
@@ -360,7 +360,7 @@
           "rows": [
             [
               "Proposal",
-              "BEN Engine BEN 40 for Northwind Partners (for Helix Labs)"
+              "BEN Engine BEN 500 for Northwind Partners (for Helix Labs)"
             ],
             [
               "Prepared by",
@@ -376,7 +376,7 @@
             ],
             [
               "Tier",
-              "BEN 40 \u2014 40 ft high-cube ISO container"
+              "BEN 500 \u2014 40 ft high-cube ISO container"
             ],
             [
               "Mission profile",
@@ -400,7 +400,7 @@
             ],
             [
               "Proposal ID",
-              "SAI-BEN40-20261108-6F99E124"
+              "SAI-BEN500-20261108-6F99E124"
             ],
             [
               "Configuration",
@@ -423,7 +423,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Northwind Partners (for Helix Labs) needs 500 kW of IT capacity for a AI training pod workload at Phoenix, AZ. We propose one BEN 40: a 40 ft high-cube ISO container fitted out as a complete data center with 9 rack(s), Direct liquid cooling + CDU + dry cooler with N+1 redundancy, a 2 x 605 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
+          "text": "Northwind Partners (for Helix Labs) needs 500 kW of IT capacity for a AI training pod workload at Phoenix, AZ. We propose one BEN 500: a 40 ft high-cube ISO container fitted out as a complete data center with 9 rack(s), Direct liquid cooling + CDU + dry cooler with N+1 redundancy, a 2 x 605 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
           "items": [],
           "headers": [],
           "rows": []
@@ -1003,7 +1003,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 40 (reference order-to-service 32-36 weeks) and the longest lead time in this bill of materials (16 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
+          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 500 (reference order-to-service 32-36 weeks) and the longest lead time in this bill of materials (16 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
           "items": [],
           "headers": [],
           "rows": []
@@ -1170,7 +1170,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Issue-for-construction drawing set for the BEN 40, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
+          "text": "Issue-for-construction drawing set for the BEN 500, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
           "items": [],
           "headers": [],
           "rows": []
@@ -1310,7 +1310,7 @@
             ],
             [
               "Compliance / design add-ons",
-              "DX derate 0.835 \u2192 one extra cooling unit (config adds it automatically); condenser/dry-cooler rated to 50 \u00b0C ambient (verify vendor curve); sand/dust: MERV 13 pre-filters with hoods, NEMA 3R louvres with sand traps; solar: white cool-roof coating (SRI \u2265 80), optional shade canopy (reduces envelope_gain_kw ~1.5 kW on BEN 20)"
+              "DX derate 0.835 \u2192 one extra cooling unit (config adds it automatically); condenser/dry-cooler rated to 50 \u00b0C ambient (verify vendor curve); sand/dust: MERV 13 pre-filters with hoods, NEMA 4X / IP66 louvres with sand traps; solar: white cool-roof coating (SRI \u2265 80), optional shade canopy (reduces envelope_gain_kw ~1.5 kW on BEN 150)"
             ],
             [
               "Verification",
@@ -1640,7 +1640,7 @@
           "rows": [
             [
               "Zoning / land use",
-              "Yes for 10/20/40 (accessory structure); often no for Micro",
+              "Yes for 10/20/40 (accessory structure); often no for BEN 5",
               "Customer"
             ],
             [
@@ -1956,7 +1956,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "By signing, the customer accepts this proposal (SAI-BEN40-20261108-6F99E124) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
+          "text": "By signing, the customer accepts this proposal (SAI-BEN500-20261108-6F99E124) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
           "items": [],
           "headers": [],
           "rows": []

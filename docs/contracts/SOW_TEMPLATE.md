@@ -17,7 +17,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 | Item | Selection |
 | --- | --- |
-| Tier | [TIER] (BEN Micro / BEN 10 / BEN 20 / BEN 40) |
+| Tier | [TIER] (BEN 5 / BEN 30 / BEN 150 / BEN 500) |
 | Delivery model | [DELIVERY_MODEL] (hardware only / hardware + BEN Controls / white-label / managed) |
 | Modules ordered | [SUBSYSTEMS] (any of: power, cooling, compute, controls) |
 | White-label | [WHITE_LABEL] (yes / no); brand to apply: [BRAND_NAME] |
@@ -85,10 +85,10 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 
 | Scope item | Included / Excluded | Notes |
 | --- | --- | --- |
-| One-trip high-cube ISO container ([TIER]) or NEMA 3R outdoor cabinet on skid (BEN Micro), received and inspected (Q-01, W6) | [SCOPE_ENCLOSURE] | |
-| Structural modification by AWS D1.1 certified welder to IFC drawings; CWI inspection (H7, Q-02) | [SCOPE_STRUCTURAL] | Not applicable to BEN Micro |
+| One-trip high-cube ISO container ([TIER]) or NEMA 4X / IP66 outdoor cabinet on skid (BEN 5), received and inspected (Q-01, W6) | [SCOPE_ENCLOSURE] | |
+| Structural modification by AWS D1.1 certified welder to IFC drawings; CWI inspection (H7, Q-02) | [SCOPE_STRUCTURAL] | Not applicable to BEN 5 |
 | Envelope: 100 mm PIR/spray-foam insulation, vapour barrier, non-combustible liner, personnel doors with panic hardware, coating system to ISO 9223 class [CORROSIVITY_CLASS], seals, drains (W8, Q-03) | [SCOPE_ENVELOPE] | |
-| Electrical vestibule 1.1 m (BEN 20/40); second egress door (BEN 40 at ≥ 1000 A) | [SCOPE_VESTIBULE] | |
+| Electrical vestibule 1.1 m (BEN 150/40); second egress door (BEN 500 at ≥ 1000 A) | [SCOPE_VESTIBULE] | |
 | Floor channels, anchor clips, torque record (Q-04) | [SCOPE_FLOOR] | |
 | Lighting, emergency lighting (90-minute self-contained), signage (arc-flash, NFPA 704, refrigerant, agent, entry procedure) | [SCOPE_LIGHTING_SIGNAGE] | |
 | Door access control (badge reader, camera on controls LAN) | [SCOPE_ACCESS_CONTROL] | |
@@ -101,7 +101,7 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | --- | --- | --- |
 | Main panelboard/switchboard rated [SERVICE_BREAKER_A] A, SCCR 65 kA, SPD | [SCOPE_PWR_MAIN] | |
 | UPS [UPS_MODULES] x [UPS_KVA_EACH] kVA, UL 1778, with lithium (LFP) battery [BATTERY_KWH] kWh, UL 1973 / UL 9540 | [SCOPE_PWR_UPS] | NFPA 855 package where ≥ 20 kWh: [NFPA855_PACKAGE] |
-| Step-down transformers 480→208Y/120 V (BEN 20/40) | [SCOPE_PWR_TRANSFORMERS] | |
+| Step-down transformers 480→208Y/120 V (BEN 150/40) | [SCOPE_PWR_TRANSFORMERS] | |
 | Rack PDUs (A/B per rack, metered), whips, receptacles | [SCOPE_PWR_PDU] | |
 | Power meters per power path; E9 reconciliation | [SCOPE_PWR_METERS] | |
 | Grounding and bonding inside the Unit; two 2/0 AWG bonding lugs at diagonal corners | [SCOPE_PWR_BONDING] | Site electrode per Section 3.7 |
@@ -151,7 +151,7 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | Scope item | Included / Excluded | Notes |
 | --- | --- | --- |
 | VEWFD aspirating smoke detection plus spot detectors; UL 864 releasing panel; outdoor horn/strobe | [SCOPE_FS_DETECTION] | |
-| Clean agent system (FK-5-1-12 class) with 10-minute hold, pre-discharge delay, abort station, door fan test (Q-09) | [SCOPE_FS_SUPPRESSION] | BEN 10/20/40; BEN Micro: aerosol unit, detection and extinguisher |
+| Clean agent system (FK-5-1-12 class) with 10-minute hold, pre-discharge delay, abort station, door fan test (Q-09) | [SCOPE_FS_SUPPRESSION] | BEN 30/150/500; BEN 5: aerosol unit, detection and extinguisher |
 | EPO at exit door; HVAC shutdown on second-stage alarm | [SCOPE_FS_EPO] | Hardwired, never on the controls bus |
 | Fire marshal plan review and permit by licensed fire protection contractor | [SCOPE_FS_PERMIT] | |
 | Connection to central station / Customer monitoring | [SCOPE_FS_MONITORING] | Site-dependent |
@@ -199,7 +199,7 @@ Unless marked Included in Section 3, the following are excluded from the price a
 
 ## 5. Schedule and milestones
 
-5.1 **Baseline schedule.** Durations follow `docs/PROCESS_FLOW.md` Section 3 for the Tier (typical order-to-service: BEN Micro 10–12 weeks, BEN 10 about 20 weeks, BEN 20 about 27 weeks, BEN 40 32–36 weeks). Long-lead items drive the critical path: UPS 8–16 weeks, switchgear 10–20 weeks, in-row/CDU 8–24 weeks, transformer 10–16 weeks.
+5.1 **Baseline schedule.** Durations follow `docs/PROCESS_FLOW.md` Section 3 for the Tier (typical order-to-service: BEN 5 10–12 weeks, BEN 30 about 20 weeks, BEN 150 about 27 weeks, BEN 500 32–36 weeks). Long-lead items drive the critical path: UPS 8–16 weeks, switchgear 10–20 weeks, in-row/CDU 8–24 weeks, transformer 10–16 weeks.
 
 | Stage | Hold / Witness | Owner | Baseline date | Re-baselined date (latest Change Order) |
 | --- | --- | --- | --- | --- |
@@ -318,7 +318,7 @@ Payment terms [PAYMENT_TERMS_DAYS] days. Milestones delayed by Customer-Caused D
 | Step | Name | What is done | Pass criteria | FAT | SAT | Experiment |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Pre-power visual checklist | Operator confirms each checklist item: unit level and tied down, CSC plate legible; grounding electrode conductor landed and tested; feeder terminated with torque marks, breaker open and locked; no shipping damage to cooling units, condensate drains connected; fire suppression and EPO hardwired and tagged, not on controls bus; racks anchored, blanking panels fitted, containment doors latch; controls LAN has no route to the internet; uplinks labelled both ends | Every item confirmed "yes" by the operator and the Customer witness; any "no" fails the step | Yes (factory equivalents for pad and feeder) | Yes | — |
-| 2 | Pod discovery, attestation and firmware versions | The BEN Controller discovers all BEN Pods on the mesh | Pod count equals [POD_COUNT] (two per rack + room + outdoor; Micro 3); every Pod attested; every Pod reports the same signed firmware version [FIRMWARE_VERSION]; every Pod `status` heartbeat < 60 s old; logical node ids [NODE_COUNT] | Yes | Yes | E12 (part) |
+| 2 | Pod discovery, attestation and firmware versions | The BEN Controller discovers all BEN Pods on the mesh | Pod count equals [POD_COUNT] (two per rack + room + outdoor; BEN 5 3); every Pod attested; every Pod reports the same signed firmware version [FIRMWARE_VERSION]; every Pod `status` heartbeat < 60 s old; logical node ids [NODE_COUNT] | Yes | Yes | E12 (part) |
 | 3 | Sensor sanity at idle | 20 % load for 5 minutes; read all inlet probes, RH, tare dP | All rack inlet probes within 2.0 K of each other; RH between 20 % and 80 %; dP tare acknowledged and residual ≤ 0.5 Pa | Yes | Yes | E1, E2 |
 | 4 | I/O point-to-point | Each relay on each node set 1 then 0 and read back; door and leak contacts read 0, forced 1, released 0 | 100 % of points read back as set; 0 failed points | Yes | Yes | — |
 | 5 | Power chain: meter vs PDU sum | 60 % load for 5 minutes; utility meter reconciled to PDU sum after subtracting metered cooling, house load and UPS losses | Disagreement ≤ 3.0 %; PUE recorded | Yes | Yes | E9 |

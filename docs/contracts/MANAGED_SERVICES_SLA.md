@@ -221,7 +221,7 @@ Credits are capped at 100 % of the monthly fee in total, are Customer's sole rem
 | Item | Rate | Basis |
 | --- | --- | --- |
 | **Managed Services fee** | **[SLA_RATE_PER_KW_MONTH] per kW-month x [IT_KW] kW = [SLA_MONTHLY_FEE] per month** | Design IT kW in the Configuration, not metered load; standard rate basis in `docs/investors/VC_PROPOSITION.md` ($45/kW-month reference) |
-| Minimum monthly fee | [SLA_MINIMUM_MONTHLY_FEE] | BEN Micro and small BEN 10 Units |
+| Minimum monthly fee | [SLA_MINIMUM_MONTHLY_FEE] | BEN 5 and small BEN 30 Units |
 | 24x7 human triage of all severities (option) | + [OPTION_24X7_UPLIFT_PCT] % | |
 | All-inclusive lifecycle parts (option) | + [LIFECYCLE_UPLIFT_PCT] % | Covers Section 4.2 major components |
 | IT hands-and-eyes (option) | [OPTION_HANDS_EYES_FEE] per month plus [RATE_FIELD_TECH] per hour | |

@@ -7,9 +7,9 @@
 | Field | Value |
 | --- | --- |
 | Change Order number | 001 (sequential per SOW) |
-| SOW | SOW-BEN20-20261108-4842D366 under MSA MSA-ACMECLINIC-2026 |
-| Unit serial | BEN-BEN20-4842D366 |
-| Tier / Configuration | ben20 / SAI-BEN20-20261108-4842D366-cfg-v1.0 |
+| SOW | SOW-BEN150-20261108-4842D366 under MSA MSA-ACMECLINIC-2026 |
+| Unit serial | BEN-BEN150-4842D366 |
+| Tier / Configuration | ben150 / SAI-BEN150-20261108-4842D366-cfg-v1.0 |
 | Customer | Acme Clinic |
 | Requested by | [CO_REQUESTED_BY] (Customer / Schreiber AI / AHJ requirement / supplier allocation or tariff under MSA 6.6) |
 | Request date | [CO_REQUEST_DATE] |
@@ -91,7 +91,7 @@ If none: "No change to the acceptance criteria in SOW Section 8."
 
 ## 7. Terms
 
-7.1 This Change Order amends SOW SOW-BEN20-20261108-4842D366 as stated above and in no other respect. The MSA, the SOW as amended, and prior Change Orders remain in force.
+7.1 This Change Order amends SOW SOW-BEN150-20261108-4842D366 as stated above and in no other respect. The MSA, the SOW as amended, and prior Change Orders remain in force.
 
 7.2 The price and schedule in this Change Order are firm once signed by both Parties and are not subject to further adjustment except by another Change Order.
 

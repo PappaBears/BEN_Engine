@@ -7,7 +7,7 @@
 ## Names
 - Company: **Schreiber AI** (two words, capital S, capital AI). Monogram: **SAI**.
 - Product: **BEN Engine** (BEN capitalised, Engine title case). Expansion: *Business Edge Node*.
-- Tiers: **BEN Micro, BEN 10, BEN 20, BEN 40**. Modules: Power, Cooling, Compute, Controls.
+- Tiers: **BEN 5, BEN 30, BEN 150, BEN 500**. Modules: Power, Cooling, Compute, Controls.
 - Software: **BEN Controls** (gateway + nodes + dashboard + twin).
 
 ## Colour (from `brand.json`)

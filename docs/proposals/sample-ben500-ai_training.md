@@ -1,29 +1,29 @@
-# Northwind Partners — BEN Engine proposal SAI-BEN40-20261108-8DBFA6B3
+# Northwind Partners — BEN Engine proposal SAI-BEN500-20261108-8DBFA6B3
 
-*BEN 40 · AI training pod · Northwind Partners for Helix Labs · Phoenix, AZ · 2026-11-08 · valid until 2027-01-07*
+*BEN 500 · AI training pod · Northwind Partners for Helix Labs · Phoenix, AZ · 2026-11-08 · valid until 2027-01-07*
 
 ## 1. Cover
 
 | Item | Value |
 |---|---|
-| Proposal | BEN Engine BEN 40 for Northwind Partners for Helix Labs |
+| Proposal | BEN Engine BEN 500 for Northwind Partners for Helix Labs |
 | Prepared by | Northwind Partners (engineering by Schreiber AI) |
 | Customer | Northwind Partners for Helix Labs |
 | Site | Phoenix, AZ |
-| Tier | BEN 40 — 40 ft high-cube ISO container |
+| Tier | BEN 500 — 40 ft high-cube ISO container |
 | Mission profile | AI training pod (ai_training) |
 | Climate package | Hot / arid |
 | Purchase option | White-label |
 | Date | 2026-11-08 |
 | Valid until | 2027-01-07 (60 days) |
-| Proposal ID | SAI-BEN40-20261108-8DBFA6B3 |
+| Proposal ID | SAI-BEN500-20261108-8DBFA6B3 |
 | Configuration | 500 kW IT in 9 rack(s), Direct liquid cooling + CDU + dry cooler, N+1, 10 min UPS |
 
 AI infrastructure that arrives finished. This proposal is generated from configuration version 3f252cc4; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
 
 ## 2. Executive summary
 
-Northwind Partners for Helix Labs needs 500 kW of IT capacity for a AI training pod workload at Phoenix, AZ. We propose one BEN 40: a 40 ft high-cube ISO container fitted out as a complete data center with 9 rack(s), Direct liquid cooling + CDU + dry cooler with N+1 redundancy, a 2 x 605 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
+Northwind Partners for Helix Labs needs 500 kW of IT capacity for a AI training pod workload at Phoenix, AZ. We propose one BEN 500: a 40 ft high-cube ISO container fitted out as a complete data center with 9 rack(s), Direct liquid cooling + CDU + dry cooler with N+1 redundancy, a 2 x 605 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
 
 The unit arrives finished and factory-tested. It needs a pad, a 1000 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
@@ -85,7 +85,7 @@ Top 15 lines of the 101-line bill of materials for this option (sell price at 28
 |---|---|---|---|---|---|---|
 | CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Supermicro SYS-821GE-TNHR | 36 ea | $11,795,000 | confirmed | 10 |
 | CLG-CDU | Row CDU 450-750 kW liquid-to-liquid (DLC) | Vertiv / CoolIT XDU450 / CHx750 | 3 ea | $625,000 | estimate | 16 |
-| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | Schneider Electric GVSUPS150KHS (configure-to-order) | 5 ea | $472,222 | estimate | 14 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | Schneider Electric GVSUPS150KHS (configure-to-order) | 5 ea | $472,222 | estimate | 14 |
 | PWR-BATT-LI | Galaxy Lithium-ion battery cabinet UL, 16 x 2.04 kWh modules (32.6 kWh) | Schneider Electric LIBSESMG16UL | 3 ea | $230,075 | confirmed | 10 |
 | CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 9 ea | $224,988 | confirmed | 3 |
 | CLG-DRYCOOLER | Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol | Guntner / Alfa Laval GFD / Solar G | 575 kW | $87,847 | estimate | 14 |
@@ -138,7 +138,7 @@ Recurring fees are invoiced annually in advance from turnover. Prices are in USD
 
 ## 7. Schedule
 
-Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 40 (reference order-to-service 32-36 weeks) and the longest lead time in this bill of materials (16 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
+Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 500 (reference order-to-service 32-36 weeks) and the longest lead time in this bill of materials (16 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
 
 | Week | Milestone | Owner | Hold / witness point | Path |
 |---|---|---|---|---|
@@ -160,14 +160,14 @@ Long-lead items (ordered at engineering release):
 | Code | Item | Vendor | Qty | Lead time (weeks) |
 |---|---|---|---|---|
 | CLG-CDU | Row CDU 450-750 kW liquid-to-liquid (DLC) | Vertiv / CoolIT sales | 3 ea | 16 |
-| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | AVENDOR | 5 ea | 14 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | AVENDOR | 5 ea | 14 |
 | CLG-DRYCOOLER | Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol | Guntner / Alfa Laval rep | 575 kW | 14 |
 | CLG-MANIFOLD | Rack coolant manifold pair + QD hose kit (DLC) | CoolIT / Staubli | 9 per rack | 12 |
 | CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Uvation | 36 ea | 10 |
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 40, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
+Issue-for-construction drawing set for the BEN 500, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
 
 | Sheet | Title | Scale |
 |---|---|---|
@@ -206,7 +206,7 @@ Climate add-ons:
 |---|---|
 | Climate | hot_arid |
 | Config values | 46 °C / −5 °C, 1000 W/m², C2, 47 m/s |
-| Compliance / design add-ons | DX derate 0.835 → one extra cooling unit (config adds it automatically); condenser/dry-cooler rated to 50 °C ambient (verify vendor curve); sand/dust: MERV 13 pre-filters with hoods, NEMA 3R louvres with sand traps; solar: white cool-roof coating (SRI ≥ 80), optional shade canopy (reduces envelope_gain_kw ~1.5 kW on BEN 20) |
+| Compliance / design add-ons | DX derate 0.835 → one extra cooling unit (config adds it automatically); condenser/dry-cooler rated to 50 °C ambient (verify vendor curve); sand/dust: MERV 13 pre-filters with hoods, NEMA 4X / IP66 louvres with sand traps; solar: white cool-roof coating (SRI ≥ 80), optional shade canopy (reduces envelope_gain_kw ~1.5 kW on BEN 150) |
 | Verification | E8 outdoor derate test; filter dP trend |
 
 Baseline matrix lines that apply to every unit:
@@ -271,11 +271,11 @@ Permits and who pulls them:
 
 | Permit | Typical need | Who pulls |
 |---|---|---|
-| Zoning / land use | Yes for 10/20/40 (accessory structure); often no for Micro | Customer |
-| Building permit (structure, foundation, anchorage) | Yes for 10/20/40 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
+| Zoning / land use | Yes for 30/150/500 (accessory structure); often no for BEN 5 | Customer |
+| Building permit (structure, foundation, anchorage) | Yes for 30/150/500 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
 | Electrical permit | Yes | Licensed electrical sub (ours for the unit, customer's for the feeder) |
 | Mechanical / refrigeration permit | Yes where DX or glycol piping is installed on site | Licensed HVAC sub |
-| Fire alarm / suppression permit and plan review | Yes for 10/20/40 | Licensed fire protection contractor |
+| Fire alarm / suppression permit and plan review | Yes for 30/150/500 | Licensed fire protection contractor |
 | Generator: air permit / registration, fuel tank permit | If generator selected | Customer (we provide engine certification and tank data) |
 | Utility interconnection (solar/export only) | off_grid with PV paralleling | Customer with our documents |
 | Stormwater / grading | Site dependent | Customer civil |
@@ -355,7 +355,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-BEN40-20261108-8DBFA6B3) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-BEN500-20261108-8DBFA6B3) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
@@ -366,4 +366,4 @@ By signing, the customer accepts this proposal (SAI-BEN40-20261108-8DBFA6B3) and
 | Partner, Northwind Partners |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-BEN40-20261108-8DBFA6B3. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-BEN500-20261108-8DBFA6B3. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

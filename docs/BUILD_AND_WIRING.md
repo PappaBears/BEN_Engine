@@ -12,7 +12,7 @@ All loads come from `software/ben_engine/config.py` → `Config.derived()`:
 - `service_amps_calc` = total_kva / (√3 × V_LL) / 0.8 (the 0.8 applies the 125 % continuous-load rule of NEC 210.19/215.2 to the whole load, conservatively).
 - `service_breaker_a` = next standard frame ≥ `service_amps_calc` (NEC 240.6 standard ratings).
 - UPS feeder = `ups_kva_each` / (√3 × V_LL) × 1.25.
-- Rack whip = `per_rack_kw` / (√3 × V) × 1.25 at the PDU voltage (208Y/120 or 415Y/240 from the PDU transformer; BEN Micro at 208/240 V 1φ).
+- Rack whip = `per_rack_kw` / (√3 × V) × 1.25 at the PDU voltage (208Y/120 or 415Y/240 from the PDU transformer; BEN 5 at 208/240 V 1φ).
 
 Conductors: copper, 90 °C insulation (THHN/THWN-2 or XHHW-2), **ampacity taken from NEC 310.16 at the 75 °C column** because terminations on breakers and lugs are rated 75 °C (110.14(C)). Ambient correction (310.15(B)) applies for conductors run through the hot aisle: at 40 °C ambient the 75 °C column is multiplied by 0.88 — the table below already selects a size that still passes after that correction where the run is in the hot aisle (marked †).
 
@@ -20,27 +20,27 @@ Conductors: copper, 90 °C insulation (THHN/THWN-2 or XHHW-2), **ampacity taken 
 
 | Tier / circuit | Load basis (config) | Calculated A | Breaker frame (A) | Conductor (Cu, 75 °C col.) | 310.16 ampacity | EGC (250.122) | Neutral |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| **BEN Micro** service feeder, 240 V 1φ | 9.4 kVA | 49 | 50 | 8 AWG | 50 | 10 AWG | 8 AWG (full, 1φ) |
-| BEN Micro UPS input/output, 240 V 1φ | 7 kVA | 29 → ×1.25 = 36 | 50 (to match feeder) | 8 AWG | 50 | 10 AWG | 8 AWG |
-| BEN Micro rack whip, 240 V 1φ | 6 kW | 25 → 31 | 30 | 10 AWG | 35 | 10 AWG | 10 AWG |
-| **BEN 10** service feeder, 208Y/120 V | 42.6 kVA | 148 | 150 | 1/0 AWG | 150 | 6 AWG | 1/0 AWG |
-| BEN 10 UPS input, 208 V | 36 kVA | 100 → 125 | 150 | 1/0 AWG | 150 | 6 AWG | 1/0 |
-| BEN 10 UPS output to PDU | 36 kVA | 100 → 125 | 125 | 1 AWG | 130 | 6 AWG | 1 AWG |
-| BEN 10 rack whip, 208Y/120 V 3φ | 15 kW | 42 → 52 | 60 | 6 AWG† | 65 | 10 AWG | 6 AWG |
-| **BEN 20** service feeder, 480Y/277 V | 135.2 kVA | 203 | 225 | 4/0 AWG | 230 | 4 AWG | 4/0 (full; non-linear loads) |
-| BEN 20 UPS input, 480 V | 116 kVA | 140 → 175 | 200 | 3/0 AWG | 200 | 6 AWG | 3/0 |
-| BEN 20 UPS output to PDU transformer primary, 480 V | 116 kVA | 140 → 175 | 200 | 3/0 AWG | 200 | 6 AWG | — (3-wire delta primary) |
-| BEN 20 PDU transformer secondary 208Y/120 V (two 75 kVA) | 75 kVA each | 208 → 260 | 250 | 250 kcmil | 255 | 4 AWG (per 250.30 SBJ 2 AWG) | 250 kcmil |
-| BEN 20 rack whip, 208Y/120 V 3φ | 19.2 kW | 53 → 67 | 70 | 4 AWG† | 85 | 8 AWG | 4 AWG |
-| BEN 20 rack whip, 415Y/240 V 3φ (option) | 19.2 kW | 27 → 33 | 40 | 8 AWG† | 50 | 10 AWG | 8 AWG |
-| BEN 20 in-row DX unit, 480 V 3φ (each ≈ 9.4 kW) | 30 kW/3.2 COP | 11 → 14 (MCA per nameplate governs) | 20 | 12 AWG | 25 | 12 AWG | — |
-| **BEN 20 max** (150 kW, DLC) service feeder | 210.9 kVA | 317 | 400 | 600 kcmil or 2 × 3/0 parallel | 420 / 400 | 3 AWG | 600 kcmil |
-| **BEN 40** service feeder (default 192 kW), 480Y/277 V | 223.5 kVA | 336 | 400 | 600 kcmil (or 2 × 3/0) | 420 | 3 AWG | 600 kcmil |
-| BEN 40 UPS input, 480 V | 232 kVA | 279 → 349 | 400 | 600 kcmil | 420 | 3 AWG | 600 kcmil |
-| BEN 40 CDU, 480 V 3φ | 16 kW elec. | 19 → 24 | 30 | 10 AWG | 35 | 10 AWG | — |
-| BEN 40 dry cooler fan bank, 480 V 3φ | per vendor MCA | — | per MCA/MOCP | — | — | — | — |
-| **BEN 40 max** (500 kW) service feeder | 581 kVA | 874 | 1000 | 3 × 400 kcmil per phase, parallel | 1005 | 2/0 AWG (per raceway if parallel: 2/0 in each) | 3 × 400 kcmil |
-| BEN 40 max UPS input | 605 kVA | 728 → 910 | 1000 | 3 × 400 kcmil | 1005 | 2/0 | 3 × 400 kcmil |
+| **BEN 5** service feeder, 240 V 1φ | 9.4 kVA | 49 | 50 | 8 AWG | 50 | 10 AWG | 8 AWG (full, 1φ) |
+| BEN 5 UPS input/output, 240 V 1φ | 7 kVA | 29 → ×1.25 = 36 | 50 (to match feeder) | 8 AWG | 50 | 10 AWG | 8 AWG |
+| BEN 5 rack whip, 240 V 1φ | 6 kW | 25 → 31 | 30 | 10 AWG | 35 | 10 AWG | 10 AWG |
+| **BEN 30** service feeder, 208Y/120 V | 42.6 kVA | 148 | 150 | 1/0 AWG | 150 | 6 AWG | 1/0 AWG |
+| BEN 30 UPS input, 208 V | 36 kVA | 100 → 125 | 150 | 1/0 AWG | 150 | 6 AWG | 1/0 |
+| BEN 30 UPS output to PDU | 36 kVA | 100 → 125 | 125 | 1 AWG | 130 | 6 AWG | 1 AWG |
+| BEN 30 rack whip, 208Y/120 V 3φ | 15 kW | 42 → 52 | 60 | 6 AWG† | 65 | 10 AWG | 6 AWG |
+| **BEN 150** service feeder, 480Y/277 V | 135.2 kVA | 203 | 225 | 4/0 AWG | 230 | 4 AWG | 4/0 (full; non-linear loads) |
+| BEN 150 UPS input, 480 V | 116 kVA | 140 → 175 | 200 | 3/0 AWG | 200 | 6 AWG | 3/0 |
+| BEN 150 UPS output to PDU transformer primary, 480 V | 116 kVA | 140 → 175 | 200 | 3/0 AWG | 200 | 6 AWG | — (3-wire delta primary) |
+| BEN 150 PDU transformer secondary 208Y/120 V (two 75 kVA) | 75 kVA each | 208 → 260 | 250 | 250 kcmil | 255 | 4 AWG (per 250.30 SBJ 2 AWG) | 250 kcmil |
+| BEN 150 rack whip, 208Y/120 V 3φ | 19.2 kW | 53 → 67 | 70 | 4 AWG† | 85 | 8 AWG | 4 AWG |
+| BEN 150 rack whip, 415Y/240 V 3φ (option) | 19.2 kW | 27 → 33 | 40 | 8 AWG† | 50 | 10 AWG | 8 AWG |
+| BEN 150 in-row DX unit, 480 V 3φ (each ≈ 9.4 kW) | 30 kW/3.2 COP | 11 → 14 (MCA per nameplate governs) | 20 | 12 AWG | 25 | 12 AWG | — |
+| **BEN 150 max** (150 kW, DLC) service feeder | 210.9 kVA | 317 | 400 | 600 kcmil or 2 × 3/0 parallel | 420 / 400 | 3 AWG | 600 kcmil |
+| **BEN 500** service feeder (default 192 kW), 480Y/277 V | 223.5 kVA | 336 | 400 | 600 kcmil (or 2 × 3/0) | 420 | 3 AWG | 600 kcmil |
+| BEN 500 UPS input, 480 V | 232 kVA | 279 → 349 | 400 | 600 kcmil | 420 | 3 AWG | 600 kcmil |
+| BEN 500 CDU, 480 V 3φ | 16 kW elec. | 19 → 24 | 30 | 10 AWG | 35 | 10 AWG | — |
+| BEN 500 dry cooler fan bank, 480 V 3φ | per vendor MCA | — | per MCA/MOCP | — | — | — | — |
+| **BEN 500 max** (500 kW) service feeder | 581 kVA | 874 | 1000 | 3 × 400 kcmil per phase, parallel | 1005 | 2/0 AWG (per raceway if parallel: 2/0 in each) | 3 × 400 kcmil |
+| BEN 500 max UPS input | 605 kVA | 728 → 910 | 1000 | 3 × 400 kcmil | 1005 | 2/0 | 3 × 400 kcmil |
 
 Notes: (1) Neutral is full-size on all IT circuits because IT loads are non-linear (NEC 310.15(E), neutral counts as a current-carrying conductor). (2) Parallel sets per 310.10(G): same length, material, size, insulation, termination; each raceway carries one of each phase + neutral + EGC. (3) Voltage drop: keep feeders ≤ 3 %; at these lengths (< 15 m inside the container) it is never limiting. (4) Cooling unit circuits are sized from the nameplate **MCA/MOCP**, not from the config COP estimate; the config number is the budget check. (5) Where the AHJ's edition differs, re-check 310.16 — the table has not changed in substance since 2017.
 
@@ -135,7 +135,7 @@ Every torqued termination is marked with torque-seal paint after tightening and 
 | **Life safety is hardwired**: fire panel releasing, HVAC shutdown on detection, EPO — on their own supervised circuits from the UL 864 panel; the PLC and the room Pod only read dry contacts | Never on MQTT or BEN Mesh; a software fault must not disable fire protection |
 | **Surge**: Type 2 SPD at the MDP, VAL-MS Type 2 at the controls panel feeder; data-line SPDs on any RS-485/Ethernet/24 VDC leaving the container (outdoor Pod E, dry cooler, generator) | Outdoor runs pick up induced surges |
 | **BEN Controller panel (UL 508A, Pro)**: built and labelled by the UL 508A shop; SCCR marked; PLC and I/O, two 24 V supplies, switch, SPD and edge computer on DIN rail; separate field terminal strips (DI, DO, RTD, AI, RS-485, 24 VDC); wire duct; every wire ferruled and numbered to the shop drawing; field crew lands only the feeder, the ground and the field strips | Panel-shop listing requires it; makes troubleshooting fast; nothing inside the panel is changed in the field |
-| **BEN Controls Lite cabinet (Micro / BEN 10 Lite)**: RevPi Connect 4 + DIO + AIO + QUINT4 + switch on one DIN rail in the IP65 cabinet; same field strips, same colours, same fusing; RevPi watchdog relay in the cooling-enable circuit | Listed components, no 508A panel; the same wiring discipline keeps it inspectable |
+| **BEN Controls Lite cabinet (BEN 5 / BEN 30 Lite)**: RevPi Connect 4 + DIO + AIO + QUINT4 + switch on one DIN rail in the IP65 cabinet; same field strips, same colours, same fusing; RevPi watchdog relay in the cooling-enable circuit | Listed components, no 508A panel; the same wiring discipline keeps it inspectable |
 
 ## 6. Sensor placement rules and the physics behind them
 
@@ -154,11 +154,11 @@ Every torqued termination is marked with torque-seal paint after tightening and 
 | **Power meter CTs on the unit's incoming feeder, inside the MDP, with the correct polarity (arrow toward load)** | PUE denominator; wrong polarity = negative kW and a failed E9 |
 | **BEN Pod placement**: one Pod W on the top rail of each rack face (cold face odd, hot face even), probe strings ≤ 3 m; the room Pod E beside the BEN Controller panel; the outdoor Pod E on the dry cooler / condenser pad | Short RTD leads; the Pod sits in free air above the rack, not inside the metal cabinet |
 | **Mesh placement rules**: Pod spacing ≤ 8 m line of sight inside the container (Thread at 2.4 GHz through racks: plan 4–6 m); at least two **router-eligible Pods** (Pod E, and any 24 VDC-powered Pod W) within range of every battery Pod; both border router RCPs on USB extensions ≥ 1 m apart and ≥ 0.5 m from the steel panel door; keep a Pod ≥ 0.3 m from a metal rack top or wall (antenna detuning) and never between two closed metal doors | **Metal rack shadowing**: a 48U steel rack attenuates 2.4 GHz by 15–25 dB; a Pod behind two racks from its parent loses its link margin. Routers above the rack line and a spacing rule keep every Pod with two parents so the mesh heals around a lost router (E13) |
-| **Pod W battery vs 24 VDC**: Pods on racks run on 2 × AA LiFeS2 (sleepy end device, 1 Hz telemetry with batched reports); where a 24 VDC drop is available (end-zone racks, Micro) power the Pod and make it a router | Battery Pods cannot route; wired Pods add mesh depth for free |
+| **Pod W battery vs 24 VDC**: Pods on racks run on 2 × AA LiFeS2 (sleepy end device, 1 Hz telemetry with batched reports); where a 24 VDC drop is available (end-zone racks, BEN 5) power the Pod and make it a router | Battery Pods cannot route; wired Pods add mesh depth for free |
 
 ## 7. Grounding and bonding of the container
 
-1. Main bonding bar (copper, 6 × 50 mm) in the electrical vestibule, bonded to the MDP ground bus with 2/0 AWG (BEN 10/20) or 250 kcmil (BEN 40).
+1. Main bonding bar (copper, 6 × 50 mm) in the electrical vestibule, bonded to the MDP ground bus with 2/0 AWG (BEN 30/20) or 250 kcmil (BEN 500).
 2. Container shell bonded to the bar at **two diagonally opposite corner castings** with 2/0 AWG and listed lugs on cleaned, welded bonding pads (paint removed to bright metal, anti-oxidant, pad painted after).
 3. Every rack bonded to a rack grounding busbar (telecom "TGB" style, 2 AWG), racks bonded with 6 AWG jumpers; cable trays bonded every 10 m and at every splice.
 4. PDU transformer secondaries are separately derived systems: system bonding jumper per 250.30, grounding electrode conductor to the main bonding bar.

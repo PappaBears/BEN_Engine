@@ -12,16 +12,21 @@ STR / ENV / FS / SITE / SVC lines are always included when at least one subsyste
 ``applies_to_cooling`` (list of cooling keys) so DX, RDHx and DLC lines do not all appear at once, and a CTL part
 carries ``applies_to_controls`` (``["lite"]``, ``["pro"]`` or both) so the BEN Controls Lite (Revolution Pi + Pods)
 and BEN Controls Pro (PLCnext + UL 508A panel + edge computer + Pods) lines follow ``Config.controls_tier_resolved()``
-(docs/CONTROLS_HARDWARE_DECISION.md §2a).
+(docs/CONTROLS_HARDWARE_DECISION.md §2a). A part may carry ``applies_to_hardening`` (``["H2"]``, ``["H3"]``,
+``["H2", "H3"]``) so the severe-environment and hardened/government add-ons follow ``Config.hardening``
+(docs/TIER_AND_ENCLOSURE_DECISION.md §3); lines without it apply at every level (H1 baseline is IP66 everywhere).
 
 Decision (recorded here and in purchasing/SOURCING_NOTES.md): FS lines are *not* excluded for
-BEN Micro. Instead the catalog carries Micro-specific FS parts (aerosol unit, E-stop) and the
-clean-agent system applies to container tiers only via ``applies_to_tiers``.
+BEN 5. Instead the catalog carries BEN 5-specific FS parts (aerosol unit, E-stop) and the
+clean-agent system applies to module and hall tiers only via ``applies_to_tiers``.
+
+Tier keys are the generation-2 power-based keys (ben5/ben30/ben150/ben500/ben2000); ``load_catalog`` canonicalises
+generation-1 keys (micro/ben10/ben20/ben40) through ``config.canonical_tier`` for catalogs that still carry them.
 
 CLI::
 
-    python -m ben_engine.bom --tier ben20 --csv purchasing/bom-ben20.csv --md docs/BOM-ben20.md
-    python -m ben_engine.bom --all          # writes all four presets + docs/BOM.md summary
+    python -m ben_engine.bom --tier ben150 --csv purchasing/bom-ben150.csv --md docs/BOM-ben150.md
+    python -m ben_engine.bom --all          # writes all five presets + docs/BOM.md summary
 """
 from __future__ import annotations
 
@@ -33,7 +38,7 @@ import operator
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .config import canonical_tier, Config, TIER_GEOMETRY
+from .config import canonical_tier, Config, TIER_GEOMETRY, TIER_ALIASES, HARDENING
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CATALOG_PATH = REPO_ROOT / "purchasing" / "parts_catalog.json"
@@ -112,6 +117,8 @@ def load_catalog(path: Path | str = CATALOG_PATH) -> List[Dict[str, Any]]:
         p["applies_to_tiers"] = sorted({canonical_tier(t) for t in p.get("applies_to_tiers", [])})
         if "applies_to_controls" in p and not p["applies_to_controls"]:
             del p["applies_to_controls"]
+        if "applies_to_hardening" in p and not p["applies_to_hardening"]:
+            del p["applies_to_hardening"]
     return cat
 
 
@@ -133,12 +140,28 @@ def rule_variables(cfg: Config) -> Dict[str, float]:
         "service_breaker_a": d["service_breaker_a"],
         "total_kw": d["total_kw"],
         "total_kva": d["total_kva"],
-        # BEN Pods: two per rack (cold face, hot face) + room + outdoor; BEN Micro 3. "nodes" kept as an alias.
+        # BEN Pods: two per rack (cold face, hot face) + room + outdoor per module; BEN 5 has 3. "nodes" kept as an alias.
         "pods": d["pods"],
         "nodes": d["pods"],
         "controls_pro": 1 if d["controls_tier_resolved"] == "pro" else 0,
         "tier_len_m": g["ext_l_m"],
         "generator": 1 if cfg.generator else 0,
+        # generation 2 (docs/TIER_AND_ENCLOSURE_DECISION.md): MV service, modules, rows and hardening
+        "transformers_total": d["transformers_total"],
+        "transformer_kva": d["transformer_kva"],
+        "generators_total": d["generators_total"],
+        "generator_kw_each": d["generator_kw_each"],
+        "modules": d["modules"],
+        "rows": d["rows"],
+        "racks_per_row": d["racks_per_row"],
+        "mv_service": 1 if d["mv_service"] else 0,
+        "hardening_H2": 1 if cfg.hardening == "H2" else 0,
+        "hardening_H3": 1 if cfg.hardening == "H3" else 0,
+        "hardening_H2_plus": 1 if cfg.hardening in ("H2", "H3") else 0,
+        "envelope_area_m2": d["envelope_area_m2"],
+        "wall_area_m2": round(2 * (g["ext_l_m"] * g["ext_h_m"] + g["ext_w_m"] * g["ext_h_m"]), 1),
+        "footprint_m2": round(g["ext_l_m"] * g["ext_w_m"], 1),
+        "int_volume_m3": round(g["int_l_m"] * g["int_w_m"] * g["int_h_m"], 1),
     }
 
 
@@ -163,6 +186,9 @@ def generate_bom(cfg: Config, catalog: List[Dict[str, Any]] | None = None) -> Li
             continue
         controls_filter = p.get("applies_to_controls")
         if controls_filter and controls_tier not in controls_filter:
+            continue
+        hardening_filter = p.get("applies_to_hardening")
+        if hardening_filter and cfg.hardening not in hardening_filter:
             continue
         prefix = p["code"].split("-", 1)[0]
         sub = subsystem_of(p["code"])
@@ -250,7 +276,7 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
         out.append(f"# {title}\n")
     if cfg is not None:
         d = cfg.derived()
-        out.append(f"**Configuration:** {d['tier_label']} · {cfg.profile} · {cfg.it_kw:.0f} kW IT in {cfg.racks} rack(s) · "
+        out.append(f"**Configuration:** {d['tier_label']} · {cfg.profile} · {d['hardening_label']} · {cfg.it_kw:.0f} kW IT in {cfg.racks} rack(s) · "
                    f"{d['cooling_label']} ({d['cooling_units_total']} units, {cfg.redundancy}) · {d['voltage']} · "
                    f"{d['service_breaker_a']} A service · UPS {d['ups_modules']} × {d['ups_kva_each']} kVA · "
                    f"battery {d['battery_kwh']} kWh · generator {'yes' if cfg.generator else 'no'} · controls: {d['controls_label']} "
@@ -284,7 +310,7 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
 def summary_markdown(presets: Dict[str, Config], boms: Dict[str, List[Dict[str, Any]]]) -> str:
     out = ["# BEN Engine — BOM summary (all presets)\n",
            "Generated by `python -m ben_engine.bom --all` from `purchasing/parts_catalog.json` and `ben_engine.config` presets "
-           "(profile `ai_inference`, climate `temperate`, all four subsystems, no generator). Per-tier detail: "
+           "(profile `ai_inference`, climate `temperate`, hardening H1, all four subsystems; generator only where the preset carries one — BEN 2000 always has N+1 generators). Per-tier detail: "
            + ", ".join(f"[{t}](BOM-{t}.md)" for t in boms) + ". CSVs in `purchasing/bom-<tier>.csv`.\n",
            "| Tier | IT kW | Racks | Lines | Total USD | Confirmed USD | Confirmed % | Confirmed % excl. compute | List USD | Estimate USD | Max lead (wk) |",
            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
@@ -318,11 +344,12 @@ def main(argv=None) -> int:
     from .config import PROFILE_DEFAULTS, CLIMATE_DESIGN
 
     ap = argparse.ArgumentParser(description="BEN Engine BOM generator")
-    ap.add_argument("--tier", default="ben20", choices=list(TIER_GEOMETRY))
+    ap.add_argument("--tier", default="ben150", choices=list(TIER_GEOMETRY) + list(TIER_ALIASES))
     ap.add_argument("--profile", default="ai_inference", choices=list(PROFILE_DEFAULTS))
     ap.add_argument("--climate", default="temperate", choices=list(CLIMATE_DESIGN))
     ap.add_argument("--subsystems", default="power,cooling,compute,controls", help="comma list")
     ap.add_argument("--generator", action="store_true")
+    ap.add_argument("--hardening", choices=list(HARDENING), help="enclosure hardening level (default: preset rule)")
     ap.add_argument("--csv", help="write CSV to this path")
     ap.add_argument("--md", help="write Markdown to this path")
     ap.add_argument("--json", action="store_true", help="print rows + totals as JSON")
@@ -336,6 +363,8 @@ def main(argv=None) -> int:
             cfg = Config.preset(tier, a.profile, a.climate)
             if a.generator:
                 cfg.generator = True
+            if a.hardening:
+                cfg.hardening = a.hardening
             rows = generate_bom(cfg, catalog)
             presets[tier], boms[tier] = cfg, rows
             to_csv(rows, REPO_ROOT / "purchasing" / f"bom-{tier}.csv")
@@ -344,14 +373,16 @@ def main(argv=None) -> int:
             t = totals(rows)
             print(f"{tier:6s} {t['items']:3d} lines  ${t['total_usd']:>12,.0f}  confirmed {t['confirmed_pct']:5.1f}%")
         (REPO_ROOT / "docs" / "BOM.md").write_text(summary_markdown(presets, boms), encoding="utf-8")
-        # purchasing/bom.csv = default preset (ben20) for the acceptance list
-        to_csv(boms["ben20"], REPO_ROOT / "purchasing" / "bom.csv")
+        # purchasing/bom.csv = default preset (ben150) for the acceptance list
+        to_csv(boms["ben150"], REPO_ROOT / "purchasing" / "bom.csv")
         return 0
 
-    cfg = Config.preset(a.tier, a.profile, a.climate)
+    cfg = Config.preset(canonical_tier(a.tier), a.profile, a.climate)
     cfg.subsystems = [s.strip() for s in a.subsystems.split(",") if s.strip()]
     if a.generator:
         cfg.generator = True
+    if a.hardening:
+        cfg.hardening = a.hardening
     rows = generate_bom(cfg, catalog)
     t = totals(rows)
     if a.csv:

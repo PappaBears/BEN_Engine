@@ -1,6 +1,6 @@
 # BEN Engine — Maintenance Schedule (outdoor units)
 
-**Owner:** Schreiber AI operations. **Applies to:** BEN Micro, BEN 10, BEN 20, BEN 40 in all climates. **Principle:** the box lives outdoors for 15 years; the equipment inside lives 10. Most failures start at the envelope (water, corrosion, seals) or in consumables (filters, batteries, capacitors). Remote checks catch trends; hands-on visits fix them.
+**Owner:** Schreiber AI operations. **Applies to:** BEN 5, BEN 30, BEN 150, BEN 500 in all climates. **Principle:** the box lives outdoors for 15 years; the equipment inside lives 10. Most failures start at the envelope (water, corrosion, seals) or in consumables (filters, batteries, capacitors). Remote checks catch trends; hands-on visits fix them.
 
 Who does what — **R** remote by Schreiber AI operations (dashboard, analysis tools); **L** local technician (customer's or Schreiber AI field tech, trained to `TURNOVER.md` T3/T5); **S** certified subcontractor (licensed electrician, EPA 608 HVAC tech, fire suppression contractor, generator vendor, battery vendor); **C** customer IT. Where "S" appears a record from the sub is mandatory.
 
@@ -97,7 +97,7 @@ Intervals are the default for `temperate`. Climate add-ons (section 5) shorten s
 | BEN Pod E (room / outdoor variant) | 0 / 1 / 1 / 1 | Wired RS-485 path and Thread router |
 | Pod W battery set (2 × AA LiFeS2) | 1 per Pod W | Replace at the predicted date |
 | Edge computer (OnLogic Karbon 400, imaged, TPM enrolled) — Pro; RevPi Connect 4 imaged — Lite | 0 / 1 / 1 / 1 | Single point of monitoring; PLC keeps the interlocks meanwhile |
-| MGM240P border router RCP (xG24 Explorer Kit) | 1 / 1 / 1 / 1 | Second radio already fitted on BEN 20/40 |
+| MGM240P border router RCP (xG24 Explorer Kit) | 1 / 1 / 1 / 1 | Second radio already fitted on BEN 150/40 |
 | Axioline F I/O module of each type (Pro) / RevPi DIO (Lite) | 1 each | PLC I/O failure |
 | Pt1000 probe string, SDP810 sensor, Setra 264 (Pro), rope leak sensor 5 m, door reed | 1 each | Consumable sensors |
 | QUINT4 24 VDC supply, interface relays, Class 2 fuses, panel fuses | 1 set | |

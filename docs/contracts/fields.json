@@ -821,8 +821,8 @@
    ]
   },
   {
-   "name": "CM_PRICE_BEN10",
-   "description": "CM build price per BEN 10",
+   "name": "CM_PRICE_BEN30",
+   "description": "CM build price per BEN 30",
    "type": "money",
    "default": null,
    "source": "cm_quote",
@@ -831,8 +831,8 @@
    ]
   },
   {
-   "name": "CM_PRICE_BEN20",
-   "description": "CM build price per BEN 20",
+   "name": "CM_PRICE_BEN150",
+   "description": "CM build price per BEN 150",
    "type": "money",
    "default": null,
    "source": "cm_quote",
@@ -841,8 +841,8 @@
    ]
   },
   {
-   "name": "CM_PRICE_BEN40",
-   "description": "CM build price per BEN 40",
+   "name": "CM_PRICE_BEN500",
+   "description": "CM build price per BEN 500",
    "type": "money",
    "default": null,
    "source": "cm_quote",
@@ -872,7 +872,7 @@
   },
   {
    "name": "CM_PRICE_MICRO",
-   "description": "CM build price per BEN Micro",
+   "description": "CM build price per BEN 5",
    "type": "money",
    "default": null,
    "source": "cm_quote",
@@ -4265,7 +4265,7 @@
   },
   {
    "name": "LICENSE_BEN10_ANNUAL",
-   "description": "Annual controls licence, BEN 10",
+   "description": "Annual controls licence, BEN 30",
    "type": "money",
    "default": "USD 4,800",
    "source": "pricing",
@@ -4275,7 +4275,7 @@
   },
   {
    "name": "LICENSE_BEN20_ANNUAL",
-   "description": "Annual controls licence, BEN 20",
+   "description": "Annual controls licence, BEN 150",
    "type": "money",
    "default": "USD 12,000",
    "source": "pricing",
@@ -4285,7 +4285,7 @@
   },
   {
    "name": "LICENSE_BEN40_ANNUAL",
-   "description": "Annual controls licence, BEN 40",
+   "description": "Annual controls licence, BEN 500",
    "type": "money",
    "default": "USD 30,000",
    "source": "pricing",
@@ -4336,7 +4336,7 @@
   },
   {
    "name": "LICENSE_MICRO_ANNUAL",
-   "description": "Annual controls licence, BEN Micro",
+   "description": "Annual controls licence, BEN 5",
    "type": "money",
    "default": "USD 1,200",
    "source": "pricing",
@@ -8460,7 +8460,7 @@
   },
   {
    "name": "TIER",
-   "description": "Tier from config.json: micro, ben10, ben20, ben40 (printed as BEN Micro / BEN 10 / BEN 20 / BEN 40)",
+   "description": "Tier from config.json: ben5, ben30, ben150, ben500 (printed as BEN 5 / BEN 30 / BEN 150 / BEN 500)",
    "type": "enum",
    "default": null,
    "source": "config",
@@ -9245,7 +9245,7 @@
   },
   {
    "name": "POD_COUNT",
-   "description": "BEN Pod count = racks*2 + 2 (cold face, hot face per rack + room + outdoor); BEN Micro 3",
+   "description": "BEN Pod count = racks*2 + 2 (cold face, hot face per rack + room + outdoor); BEN 5 3",
    "type": "integer",
    "default": null,
    "source": "derived",

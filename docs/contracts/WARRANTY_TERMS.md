@@ -30,7 +30,7 @@
 
 | Module / element | Schreiber AI workmanship warranty | OEM warranty (pass-through, Section 3) | Notes |
 | --- | --- | --- | --- |
-| Enclosure (ISO container or NEMA 3R cabinet) | 12 months integration; 36 months envelope (1.3); 60 months structural (1.4) | Container: [OEM_WARRANTY_CONTAINER_TERM] (one-trip; typically limited to structural defects and CSC-related items, [OEM_WARRANTY_CONTAINER_ID]) | CSC plate validity is not warranted after modification (PROJECT_NOTES D20); the CSC decision record states the transport status |
+| Enclosure (ISO container or NEMA 4X / IP66 cabinet) | 12 months integration; 36 months envelope (1.3); 60 months structural (1.4) | Container: [OEM_WARRANTY_CONTAINER_TERM] (one-trip; typically limited to structural defects and CSC-related items, [OEM_WARRANTY_CONTAINER_ID]) | CSC plate validity is not warranted after modification (PROJECT_NOTES D20); the CSC decision record states the transport status |
 | Envelope (insulation, liner, doors, coatings, seals) | 12 months; coating and weather-tightness 36 months | Door hardware per OEM; coating materials per manufacturer data sheet | Coating warranty requires annual survey and touch-up record (A1 form) |
 | Power module: panelboard/switchboard, breakers, SPD | 12 months installation, terminations and labels | [OEM_WARRANTY_SWITCHGEAR_TERM] (typically 12–18 months from shipment or 12 from energisation) [OEM_WARRANTY_SWITCHGEAR_ID] | Torque records on Q-07 are the baseline |
 | Power module: UPS | 12 months integration | [OEM_WARRANTY_UPS_TERM] (typically 12–24 months; OEM start-up may be required to activate) [OEM_WARRANTY_UPS_ID] | Capacitors and fans are wear items (3–7 years) |

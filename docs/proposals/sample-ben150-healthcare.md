@@ -1,29 +1,29 @@
-# Schreiber AI — BEN Engine proposal SAI-BEN20-20261108-4842D366
+# Schreiber AI — BEN Engine proposal SAI-BEN150-20261108-4842D366
 
-*BEN 20 · Healthcare (HIPAA) · Acme Clinic · Austin, TX · 2026-11-08 · valid until 2027-01-07*
+*BEN 150 · Healthcare (HIPAA) · Acme Clinic · Austin, TX · 2026-11-08 · valid until 2027-01-07*
 
 ## 1. Cover
 
 | Item | Value |
 |---|---|
-| Proposal | BEN Engine BEN 20 for Acme Clinic |
+| Proposal | BEN Engine BEN 150 for Acme Clinic |
 | Prepared by | Schreiber AI |
 | Customer | Acme Clinic |
 | Site | Austin, TX |
-| Tier | BEN 20 — 20 ft high-cube ISO container |
+| Tier | BEN 150 — 20 ft high-cube ISO container |
 | Mission profile | Healthcare (HIPAA) (healthcare) |
 | Climate package | Hot / humid |
 | Purchase option | Managed service |
 | Date | 2026-11-08 |
 | Valid until | 2027-01-07 (60 days) |
-| Proposal ID | SAI-BEN20-20261108-4842D366 |
+| Proposal ID | SAI-BEN150-20261108-4842D366 |
 | Configuration | 50 kW IT in 5 rack(s), Rear-door heat exchanger + dry cooler, 2N, 10 min UPS, generator |
 
 AI infrastructure that arrives finished. This proposal is generated from configuration version 7caf6cac; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
 
 ## 2. Executive summary
 
-Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Austin, TX. We propose one BEN 20: a 20 ft high-cube ISO container fitted out as a complete data center with 5 rack(s), Rear-door heat exchanger + dry cooler with 2N redundancy, a 2 x 61 kVA UPS giving 10 minutes of ride-through, a standby generator, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
+Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Austin, TX. We propose one BEN 150: a 20 ft high-cube ISO container fitted out as a complete data center with 5 rack(s), Rear-door heat exchanger + dry cooler with 2N redundancy, a 2 x 61 kVA UPS giving 10 minutes of ride-through, a standby generator, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
 
 The unit arrives finished and factory-tested. It needs a pad, a 100 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
@@ -88,13 +88,13 @@ Top 15 lines of the 103-line bill of materials for this option (sell price at 28
 | CLG-CDU-RDHX | Row CDU 70-100 kW liquid-to-liquid for RDHx loop | Vertiv / CoolIT XDU070 / CHx80 | 2 ea | $125,000 | estimate | 14 |
 | CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 5 ea | $124,993 | confirmed | 3 |
 | PWR-GEN-150 | SD150 150 kW diesel standby generator, L2 enclosure, sub-base tank | Generac Industrial SD0150 | 1 ea | $104,167 | estimate | 20 |
-| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | Schneider Electric GVSUPS150KHS (configure-to-order) | 1 ea | $94,444 | estimate | 14 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | Schneider Electric GVSUPS150KHS (configure-to-order) | 1 ea | $94,444 | estimate | 14 |
 | CMP-SW100G | Spectrum SN2700 32x100GbE QSFP28 switch, Cumulus Linux | NVIDIA Mellanox MSN2700-CS2RC | 2 ea | $29,425 | confirmed | 2 |
-| PWR-XFMR | Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben20) / 300 kVA (ben40), for rack PDUs | Square D / Eaton EX150T3H / EX300T3H | 2 ea | $26,389 | estimate | 8 |
+| PWR-XFMR | Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben150) / 300 kVA (ben500), for rack PDUs | Square D / Eaton EX150T3H / EX300T3H | 2 ea | $26,389 | estimate | 8 |
 | FS-CLEAN-AGENT | Pre-engineered FK-5-1-12 (Novec 1230) clean agent system, installed: cylinder, nozzles, releasing panel, detection, design & AHJ submittal | Fike / Kidde (via licensed fire contractor) ECS-500 / Fike CA | 34 m3 protected | $25,972 | estimate | 8 |
 | STR-RACK42 | NetShelter SX 42U 600x1070 mm enclosure with sides | APC by Schneider Electric AR3100 | 5 ea | $16,111 | confirmed | 1 |
 | PWR-PDU | NetShelter metered rack PDU 0U 5.0 kW 208 V 30 A, L6-30P, (36) C13 (6) C19 | APC by Schneider Electric AP8841 | 10 ea | $15,555 | confirmed | 1 |
-| PWR-ATS-400 | Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 3R | ASCO (Schneider) J03ATSB30400N5X | 1 ea | $15,361 | confirmed | 8 |
+| PWR-ATS-400 | Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 4X / IP66 | ASCO (Schneider) J03ATSB30400N5X | 1 ea | $15,361 | confirmed | 8 |
 | SVC-ELECTRICIAN | Licensed electrician (commercial journeyman, billed) | local electrical contractor ELEC-HR | 90 h | $13,750 | estimate | 1 |
 | CLG-PIPING | Glycol loop piping, valves, pumps skid, expansion tank, strainers (per m container length) | Victaulic / Grundfos FCW-LOOP | 7 per m | $11,667 | estimate | 6 |
 | FS-VESDA | VESDA-E VEU aspirating smoke detector, UL | Xtralis (Honeywell) VEU-A00-UL | 1 ea | $9,381 | confirmed | 4 |
@@ -137,7 +137,7 @@ Recurring fees are invoiced annually in advance from turnover. Prices are in USD
 
 ## 7. Schedule
 
-Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 20 (reference order-to-service about 27 weeks) and the longest lead time in this bill of materials (20 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
+Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 150 (reference order-to-service about 27 weeks) and the longest lead time in this bill of materials (20 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
 
 | Week | Milestone | Owner | Hold / witness point | Path |
 |---|---|---|---|---|
@@ -160,13 +160,13 @@ Long-lead items (ordered at engineering release):
 |---|---|---|---|---|
 | PWR-GEN-150 | SD150 150 kW diesel standby generator, L2 enclosure, sub-base tank | Generac industrial dealer | 1 ea | 20 |
 | CLG-CDU-RDHX | Row CDU 70-100 kW liquid-to-liquid for RDHx loop | Vertiv / CoolIT sales | 2 ea | 14 |
-| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | AVENDOR | 1 ea | 14 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | AVENDOR | 1 ea | 14 |
 | CLG-DRYCOOLER | Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol | Guntner / Alfa Laval rep | 58 kW | 14 |
 | CLG-RDHX | Active rear-door heat exchanger, 42/48U, up to 40 kW | nVent / Legrand distributor | 5 ea | 12 |
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 20, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
+Issue-for-construction drawing set for the BEN 150, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
 
 | Sheet | Title | Scale |
 |---|---|---|
@@ -267,11 +267,11 @@ Permits and who pulls them:
 
 | Permit | Typical need | Who pulls |
 |---|---|---|
-| Zoning / land use | Yes for 10/20/40 (accessory structure); often no for Micro | Customer |
-| Building permit (structure, foundation, anchorage) | Yes for 10/20/40 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
+| Zoning / land use | Yes for 30/150/500 (accessory structure); often no for BEN 5 | Customer |
+| Building permit (structure, foundation, anchorage) | Yes for 30/150/500 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
 | Electrical permit | Yes | Licensed electrical sub (ours for the unit, customer's for the feeder) |
 | Mechanical / refrigeration permit | Yes where DX or glycol piping is installed on site | Licensed HVAC sub |
-| Fire alarm / suppression permit and plan review | Yes for 10/20/40 | Licensed fire protection contractor |
+| Fire alarm / suppression permit and plan review | Yes for 30/150/500 | Licensed fire protection contractor |
 | Generator: air permit / registration, fuel tank permit | If generator selected | Customer (we provide engine certification and tank data) |
 | Utility interconnection (solar/export only) | off_grid with PV paralleling | Customer with our documents |
 | Stormwater / grading | Site dependent | Customer civil |
@@ -351,7 +351,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-BEN20-20261108-4842D366) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-BEN150-20261108-4842D366) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
@@ -361,4 +361,4 @@ By signing, the customer accepts this proposal (SAI-BEN20-20261108-4842D366) and
 | Schreiber AI — compliance |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-BEN20-20261108-4842D366. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-BEN150-20261108-4842D366. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

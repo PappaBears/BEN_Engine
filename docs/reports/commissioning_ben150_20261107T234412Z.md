@@ -1,4 +1,4 @@
-# BEN Engine commissioning report — BEN 20 — Demo site
+# BEN Engine commissioning report — BEN 150 — Demo site
 
 Schreiber AI · BEN Engine `ben_engine 0.1.0` · mode **sim** · started 2026-11-07T23:44:12+00:00 · overall **FAIL**
 
@@ -6,7 +6,7 @@ Schreiber AI · BEN Engine `ben_engine 0.1.0` · mode **sim** · started 2026-11
 
 | Item | Value |
 | --- | --- |
-| Tier | BEN 20 |
+| Tier | BEN 150 |
 | Enclosure | 20 ft high-cube ISO container |
 | Mission profile | AI inference edge |
 | IT load | 96.0 kW in 5 racks (19.2 kW/rack) |

@@ -121,7 +121,7 @@ The matrix states who owes whom what for each cause of delay, and which clause c
 | 3 | `INTEGRATOR_AGREEMENT.md` with Annex 1 (SOW changes) and Annex 2 (rates) | Discount tier set from committed volume (3.2); exclusivity only with minimum commitment (2.4) |
 | 4 | `SOFTWARE_LICENSE_BEN_CONTROLS.md` Type C master, with Brand File approval (8.3) and remote endpoint election (7.3) | Full source licence and own signing key optional (7.4) |
 | 5 | Certification roster: sales engineer, PM, 2 field technicians, commissioning lead, L1 support engineer | Section 4.1; certificates with expiry in the portal |
-| 6 | First Integrator Order; Schreiber AI witnesses all hold points of the first `[FIRST_UNITS_MANDATORY_WITNESS]` Units per Tier and every BEN 40 | Section 5.2 |
+| 6 | First Integrator Order; Schreiber AI witnesses all hold points of the first `[FIRST_UNITS_MANDATORY_WITNESS]` Units per Tier and every BEN 500 | Section 5.2 |
 | 7 | Integrator's End Customer contract template reviewed for the mandatory flow-down provisions | Section 6.2 |
 | 8 | Marketing materials and Brand File approved | Sections 8, 14 |
 

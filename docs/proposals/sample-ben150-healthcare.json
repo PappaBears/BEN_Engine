@@ -1,5 +1,5 @@
 {
-  "proposal_id": "SAI-BEN20-20261108-508EC188",
+  "proposal_id": "SAI-BEN150-20261108-508EC188",
   "date": "2026-11-08",
   "valid_until": "2027-01-07",
   "customer": "Acme Clinic",
@@ -7,7 +7,7 @@
   "option": "managed",
   "brand": "Schreiber AI",
   "config": {
-    "tier": "ben20",
+    "tier": "ben150",
     "profile": "healthcare",
     "it_kw": 50.0,
     "racks": 5,
@@ -27,7 +27,7 @@
     "site_name": "Austin, TX"
   },
   "derived": {
-    "tier_label": "BEN 20",
+    "tier_label": "BEN 150",
     "enclosure": "20 ft high-cube ISO container",
     "per_rack_kw": 10.0,
     "cooling_label": "Rear-door heat exchanger + dry cooler",
@@ -360,7 +360,7 @@
           "rows": [
             [
               "Proposal",
-              "BEN Engine BEN 20 for Acme Clinic"
+              "BEN Engine BEN 150 for Acme Clinic"
             ],
             [
               "Prepared by",
@@ -376,7 +376,7 @@
             ],
             [
               "Tier",
-              "BEN 20 \u2014 20 ft high-cube ISO container"
+              "BEN 150 \u2014 20 ft high-cube ISO container"
             ],
             [
               "Mission profile",
@@ -400,7 +400,7 @@
             ],
             [
               "Proposal ID",
-              "SAI-BEN20-20261108-508EC188"
+              "SAI-BEN150-20261108-508EC188"
             ],
             [
               "Configuration",
@@ -423,7 +423,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Austin, TX. We propose one BEN 20: a 20 ft high-cube ISO container fitted out as a complete data center with 5 rack(s), Rear-door heat exchanger + dry cooler with 2N redundancy, a 2 x 61 kVA UPS giving 10 minutes of ride-through, a standby generator, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
+          "text": "Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Austin, TX. We propose one BEN 150: a 20 ft high-cube ISO container fitted out as a complete data center with 5 rack(s), Rear-door heat exchanger + dry cooler with 2N redundancy, a 2 x 61 kVA UPS giving 10 minutes of ride-through, a standby generator, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
           "items": [],
           "headers": [],
           "rows": []
@@ -754,7 +754,7 @@
             ],
             [
               "PWR-XFMR",
-              "Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben20) / 300 kVA (ben40), for rack PDUs",
+              "Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben150) / 300 kVA (ben500), for rack PDUs",
               "Square D / Eaton EX150T3H / EX300T3H",
               "2 ea",
               "$26,389",
@@ -790,7 +790,7 @@
             ],
             [
               "PWR-ATS-400",
-              "Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 3R",
+              "Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 4X / IP66",
               "ASCO (Schneider) J03ATSB30400N5X",
               "1 ea",
               "$15,361",
@@ -1002,7 +1002,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 20 (reference order-to-service about 27 weeks) and the longest lead time in this bill of materials (20 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
+          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 150 (reference order-to-service about 27 weeks) and the longest lead time in this bill of materials (20 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
           "items": [],
           "headers": [],
           "rows": []
@@ -1169,7 +1169,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Issue-for-construction drawing set for the BEN 20, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
+          "text": "Issue-for-construction drawing set for the BEN 150, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
           "items": [],
           "headers": [],
           "rows": []
@@ -1615,7 +1615,7 @@
           "rows": [
             [
               "Zoning / land use",
-              "Yes for 10/20/40 (accessory structure); often no for Micro",
+              "Yes for 10/20/40 (accessory structure); often no for BEN 5",
               "Customer"
             ],
             [
@@ -1931,7 +1931,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "By signing, the customer accepts this proposal (SAI-BEN20-20261108-508EC188) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
+          "text": "By signing, the customer accepts this proposal (SAI-BEN150-20261108-508EC188) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
           "items": [],
           "headers": [],
           "rows": []

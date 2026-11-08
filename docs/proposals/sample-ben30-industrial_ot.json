@@ -1,5 +1,5 @@
 {
-  "proposal_id": "SAI-BEN10-20261108-5BDF00D1",
+  "proposal_id": "SAI-BEN30-20261108-5BDF00D1",
   "date": "2026-11-08",
   "valid_until": "2027-01-07",
   "customer": "Lakeshore Foundry",
@@ -7,7 +7,7 @@
   "option": "hardware_controls",
   "brand": "Schreiber AI",
   "config": {
-    "tier": "ben10",
+    "tier": "ben30",
     "profile": "industrial_ot",
     "it_kw": 13.0,
     "racks": 2,
@@ -27,7 +27,7 @@
     "site_name": "Duluth, MN"
   },
   "derived": {
-    "tier_label": "BEN 10",
+    "tier_label": "BEN 30",
     "enclosure": "10 ft high-cube ISO container",
     "per_rack_kw": 6.5,
     "cooling_label": "In-row DX cooling unit (300 mm, 20 kW)",
@@ -360,7 +360,7 @@
           "rows": [
             [
               "Proposal",
-              "BEN Engine BEN 10 for Lakeshore Foundry"
+              "BEN Engine BEN 30 for Lakeshore Foundry"
             ],
             [
               "Prepared by",
@@ -376,7 +376,7 @@
             ],
             [
               "Tier",
-              "BEN 10 \u2014 10 ft high-cube ISO container"
+              "BEN 30 \u2014 10 ft high-cube ISO container"
             ],
             [
               "Mission profile",
@@ -400,7 +400,7 @@
             ],
             [
               "Proposal ID",
-              "SAI-BEN10-20261108-5BDF00D1"
+              "SAI-BEN30-20261108-5BDF00D1"
             ],
             [
               "Configuration",
@@ -423,7 +423,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Lakeshore Foundry needs 13 kW of IT capacity for a Industrial OT analytics workload at Duluth, MN. We propose one BEN 10: a 10 ft high-cube ISO container fitted out as a complete data center with 2 rack(s), In-row DX cooling unit (300 mm, 20 kW) with N+1 redundancy, a 2 x 16 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
+          "text": "Lakeshore Foundry needs 13 kW of IT capacity for a Industrial OT analytics workload at Duluth, MN. We propose one BEN 30: a 10 ft high-cube ISO container fitted out as a complete data center with 2 rack(s), In-row DX cooling unit (300 mm, 20 kW) with N+1 redundancy, a 2 x 16 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
           "items": [],
           "headers": [],
           "rows": []
@@ -709,7 +709,7 @@
             ],
             [
               "PWR-UPS-RM20",
-              "Rack/tower online UPS 20 kVA 208 V, 10U, parallel-capable (BEN 10 R1, 3 x in parallel for N+1; 93PM tower does not fit the row)",
+              "Rack/tower online UPS 20 kVA 208 V, 10U, parallel-capable (BEN 30 R1, 3 x in parallel for N+1; 93PM tower does not fit the row)",
               "Vertiv GXT5-20KMVRT11UXLN",
               "2 ea",
               "$26,389",
@@ -1003,7 +1003,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 10 (reference order-to-service about 20 weeks) and the longest lead time in this bill of materials (10 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
+          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 30 (reference order-to-service about 20 weeks) and the longest lead time in this bill of materials (10 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
           "items": [],
           "headers": [],
           "rows": []
@@ -1170,7 +1170,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Issue-for-construction drawing set for the BEN 10, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
+          "text": "Issue-for-construction drawing set for the BEN 30, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
           "items": [],
           "headers": [],
           "rows": []
@@ -1595,7 +1595,7 @@
           "rows": [
             [
               "Zoning / land use",
-              "Yes for 10/20/40 (accessory structure); often no for Micro",
+              "Yes for 10/20/40 (accessory structure); often no for BEN 5",
               "Customer"
             ],
             [
@@ -1911,7 +1911,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "By signing, the customer accepts this proposal (SAI-BEN10-20261108-5BDF00D1) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
+          "text": "By signing, the customer accepts this proposal (SAI-BEN30-20261108-5BDF00D1) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.",
           "items": [],
           "headers": [],
           "rows": []

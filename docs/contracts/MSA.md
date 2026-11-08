@@ -11,7 +11,7 @@ This Master Services Agreement ("**Agreement**") is between **[SCHREIBER_ENTITY_
 
 ## Background
 
-A. Schreiber AI designs, builds (directly or through Contract Manufacturers), commissions and, where ordered, operates BEN Engine modular data centers in four tiers: BEN Micro, BEN 10, BEN 20 and BEN 40, each with selectable Power, Cooling, Compute and Controls modules and the BEN Controls software layer.
+A. Schreiber AI designs, builds (directly or through Contract Manufacturers), commissions and, where ordered, operates BEN Engine modular data centers in four tiers: BEN 5, BEN 30, BEN 150 and BEN 500, each with selectable Power, Cooling, Compute and Controls modules and the BEN Controls software layer.
 
 B. Customer wishes to purchase one or more Units and related Services from time to time by signing Statements of Work under this Agreement.
 
@@ -75,7 +75,7 @@ Capitalised terms have these meanings throughout this Agreement and every SOW.
 
 1.27 "**SOW**" or "**Statement of Work**" means a document in the form at `docs/contracts/SOW_TEMPLATE.md`, signed by both Parties, ordering one Unit (or one group of Units at one Site) and the Services for it.
 
-1.28 "**Tier**" means BEN Micro, BEN 10, BEN 20 or BEN 40.
+1.28 "**Tier**" means BEN 5, BEN 30, BEN 150 or BEN 500.
 
 1.29 "**Turnover Package**" means the document set listed in `docs/TURNOVER.md` Section 1 (items A1 to H4).
 
@@ -353,7 +353,7 @@ Capitalised terms have these meanings throughout this Agreement and every SOW.
 
 20.1 **Responsibility split.** `docs/SITE_REQUIREMENTS.md` Section 10 states who pulls each permit for the Unit; the signed Site Requirements control. Unless the SOW changes it: Customer obtains zoning/land use, building (structure, foundation and anchorage; Schreiber AI provides PE-stamped drawings and may act as agent if the SOW says so), generator air and fuel tank permits, stormwater/grading permits and utility interconnection; Schreiber AI's licensed subcontractors obtain the electrical permit for the Unit hook-up, the mechanical/refrigeration permit, and the fire alarm and suppression permit and plan review; Customer's electrical contractor obtains the permit for the site feeder and disconnect.
 
-20.2 **AHJ classification.** The Parties will present the Unit to the AHJ as described in `docs/COMPLIANCE.md` Section 6 (relocatable structure, Group U, not normally occupied, with PE-stamped anchorage; BEN Micro as equipment on a skid). If an AHJ requires a different classification, a field evaluation (NFPA 790/791), sprinklers or other items not in the compliance pack, the resulting work is a Change Order under Section 6.1 unless the SOW already prices it.
+20.2 **AHJ classification.** The Parties will present the Unit to the AHJ as described in `docs/COMPLIANCE.md` Section 6 (relocatable structure, Group U, not normally occupied, with PE-stamped anchorage; BEN 5 as equipment on a skid). If an AHJ requires a different classification, a field evaluation (NFPA 790/791), sprinklers or other items not in the compliance pack, the resulting work is a Change Order under Section 6.1 unless the SOW already prices it.
 
 20.3 **Laws.** Each Party complies with laws applicable to it, including export controls (the Unit and BEN Controls may be subject to the US Export Administration Regulations; Customer will not export or re-export without required licences), anti-corruption laws, and OSHA. Customer's workers follow the entry procedure in `docs/MAINTENANCE.md` Section 9 and the arc-flash labels.
 

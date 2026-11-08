@@ -46,7 +46,7 @@ predictability score = (95 % prediction-interval half-width) / (alarm threshold 
 | ≥ 1 | unpredictable: the interval already touches the alarm; act on the alarm, not the model |
 
 The score is produced by `calibration.predictability_score` and printed by the analysis CLI.
-Example from `python -m ben_engine.analysis --tier ben20 --load 1.0 --outdoor 35` (synthetic
+Example from `python -m ben_engine.analysis --tier ben150 --load 1.0 --outdoor 35` (synthetic
 telemetry from a perturbed twin, then fitted):
 
 ```
@@ -144,7 +144,7 @@ clips and radiation shields.
 A plan-view (looking down) model of the air inside the container:
 
 * **Flow**: D2Q9 lattice-Boltzmann BGK, full-way bounce-back walls, τ = 0.6, max lattice speed
-  0.08 (0.04 for Micro). Racks are *fan zones with a heat source* (velocity relaxed toward the
+  0.08 (0.04 for BEN 5). Racks are *fan zones with a heat source* (velocity relaxed toward the
   server-fan face velocity, front → back; heat injected so the air leaving the rack is
   `P_rack / (ṁ cp)` warmer). Cooling units are fan zones the other way (hot aisle → cold aisle);
   air passing through them is reset to the supply temperature.
@@ -168,13 +168,13 @@ A plan-view (looking down) model of the air inside the container:
 ### Running it
 
 ```
-python -m ben_engine.cfd --tier ben20 --png /tmp/x.png
-python -m ben_engine.cfd --tier ben20 --supply-ratio 0.9
-python -m ben_engine.cfd --tier ben20 --fail-unit 1 --png /tmp/fail.png
-python -m ben_engine.cfd --tier ben40 --json
+python -m ben_engine.cfd --tier ben150 --png /tmp/x.png
+python -m ben_engine.cfd --tier ben150 --supply-ratio 0.9
+python -m ben_engine.cfd --tier ben150 --fail-unit 1 --png /tmp/fail.png
+python -m ben_engine.cfd --tier ben500 --json
 ```
 
-Results actually obtained (BEN 20 preset, 5 × 19.2 kW racks, 232 × 90 cells at 25 mm,
+Results actually obtained (BEN 150 preset, 5 × 19.2 kW racks, 232 × 90 cells at 25 mm,
 runtime 14–16 s on the development container):
 
 | Scenario | Recirculation index per rack | Max inlet | Return |
@@ -191,7 +191,7 @@ relative information the twin needs.
 
 ### Honest limits (read before quoting a number)
 
-* **Reynolds number.** The lattice Reynolds number is ~70 for BEN 20 (34 for BEN 40); the real
+* **Reynolds number.** The lattice Reynolds number is ~70 for BEN 150 (34 for BEN 500); the real
   cold-aisle flow is ~10⁵. There is no turbulence model; the lattice viscosity acts as a crude,
   fixed eddy viscosity. Mixing rates and jet spreading are therefore qualitative.
 * **Two dimensions.** Over-rack and under-floor recirculation, stratification and the vertical
@@ -202,7 +202,7 @@ relative information the twin needs.
   fans is a modelling choice.
 * **DLC tiers**: the CDUs move no room air, so the residual 30 % air-side heat is handled by an
   assumed one in-row air unit per two racks plus one standby (`layout_notes` says so).
-* **Micro** has no aisle containment; doors are treated as open and the row is compressed to fit.
+* **BEN 5** has no aisle containment; doors are treated as open and the row is compressed to fit.
 * Density varies ±5 % in the lattice (weakly compressible scheme); the pressure proxy is a
   relative number.
 
@@ -244,7 +244,7 @@ m = run_cfd(cfg, supply_ratio=0.9); apply_to_params(m, params)              # al
 * `plain_summary(...)` and the CLI phrase the answers; `--jsonl file` fits real telemetry,
   otherwise a synthetic record is used and the CLI says so.
 
-Run: `python -m ben_engine.analysis --tier ben20 --load 1.0 --outdoor 35 [--jsonl data.jsonl] [--json]`
+Run: `python -m ben_engine.analysis --tier ben150 --load 1.0 --outdoor 35 [--jsonl data.jsonl] [--json]`
 (≈ 10 s with 30 Monte Carlo runs).
 
 ---
@@ -253,10 +253,10 @@ Run: `python -m ben_engine.analysis --tier ben20 --load 1.0 --outdoor 35 [--json
 
 ### Sweeps (`sweeps.py`)
 
-`python -m ben_engine.sweeps --tier ben20 --csv-dir out/` runs all six on fresh seeded twins in
+`python -m ben_engine.sweeps --tier ben150 --csv-dir out/` runs all six on fresh seeded twins in
 under a second. Each returns `SweepResult(name, started, rows, criteria, summary, extra)`; rows
 are flattened states with `sweep`, `phase`, `phase_t` columns; `to_csv(result, path)`. Results
-on the BEN 20 preset:
+on the BEN 150 preset:
 
 | Sweep | Result | Finding |
 | --- | --- | --- |
@@ -291,13 +291,13 @@ fleet's `discover()`.
 ### Commissioning (`commissioning.py`)
 
 ```
-python -m ben_engine.commissioning --sim --tier ben20 --yes --out report.md --operator "Name"
+python -m ben_engine.commissioning --sim --tier ben150 --yes --out report.md --operator "Name"
 python -m ben_engine.commissioning --live --url http://ben-controller.local:8000 --out report.md
 ```
 
 Ten steps, each with recorded values and PASS/FAIL, then a markdown report with a step table,
 detail tables, the sweep criteria, the SHA-256 of the exported CSV and a signature block. The
-simulation run for BEN 20 passes all ten steps in under a second and exports ~1 400 rows. The
+simulation run for BEN 150 passes all ten steps in under a second and exports ~1 400 rows. The
 `--live` entry currently only proves the gateway answers `/api/config` and `/api/state` and
 writes a report saying so; the live steps need a person at the panel and a load bank, and are
 driven from the dashboard's commissioning page.
@@ -313,7 +313,7 @@ battery has recharged.
 
 ## 6. Known limits — least accurate first
 
-1. **Thermal ride-through (2 minutes to 35 °C at full load, BEN 20).** The twin's air-side
+1. **Thermal ride-through (2 minutes to 35 °C at full load, BEN 150).** The twin's air-side
    thermal mass (60 kg effective per rack, 40 kg room air) is a design value, not a measurement;
    server mass, racks, floor and walls store far more heat than that. The real number is very
    likely longer, and the fit cannot tell: `rack_mass_kg` is only weakly identifiable from

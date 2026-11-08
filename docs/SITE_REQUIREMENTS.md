@@ -6,9 +6,9 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 ## 1. Unit summary (filled from the configuration)
 
-| Item | BEN Micro | BEN 10 | BEN 20 | BEN 40 |
+| Item | BEN 5 | BEN 30 | BEN 150 | BEN 500 |
 | --- | --- | --- | --- | --- |
-| Enclosure | Outdoor 24U NEMA 3R cabinet on skid | 10 ft high-cube ISO | 20 ft high-cube ISO | 40 ft high-cube ISO |
+| Enclosure | Outdoor 24U NEMA 4X / IP66 cabinet on skid | 10 ft high-cube ISO | 20 ft high-cube ISO | 40 ft high-cube ISO |
 | External L × W × H (m) | 1.20 × 1.00 × 1.80 | 2.991 × 2.438 × 2.896 | 6.058 × 2.438 × 2.896 | 12.192 × 2.438 × 2.896 |
 | Gross shipped mass, default preset *(config)* | 2.2 t | 4.6 t | 9.0 t | 14.7 t |
 | Gross mass, maximum configuration *(config)* | 2.2 t | 4.6 t | 10.5 t | 17.3 t |
@@ -21,7 +21,7 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 ## 2. Pad and foundation
 
-| Requirement | BEN Micro | BEN 10 | BEN 20 | BEN 40 | Who provides |
+| Requirement | BEN 5 | BEN 30 | BEN 150 | BEN 500 | Who provides |
 | --- | --- | --- | --- | --- | --- |
 | Pad plan size (unit + 1.0 m apron all round, + equipment yard) | 2.5 × 2.5 m | 5.0 × 4.5 m + condenser yard 3 × 3 m | 8.0 × 4.5 m + condenser/dry cooler yard 6 × 3 m | 14.5 × 4.5 m + dry cooler yard 12 × 4 m + generator pad per vendor | Customer civil (or Schreiber AI turnkey) |
 | Pad type and thickness | 150 mm reinforced slab, or 4 precast piers | 200 mm reinforced slab on 150 mm compacted base, **or** 4 reinforced concrete piers 600 × 600 mm at corner castings to frost depth | 200 mm slab or 4 piers (6 piers if mid-anchors required by wind calc) | 250 mm slab or 6–8 piers; check bearing: corner loads up to 45 kN each | PE-stamped drawing supplied by Schreiber AI per site soil (allowable bearing ≥ 100 kPa assumed; geotech if unknown) |
@@ -46,14 +46,14 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 | Item | Requirement |
 | --- | --- |
-| Delivery vehicle | Flatbed or step-deck; high-cube overall height on a standard trailer ≈ 4.4 m — the route must clear 4.5 m. Customer confirms gate width ≥ 3.5 m, turning radius for a 16 m (BEN 10/20) or 21 m (BEN 40) tractor-trailer, surface for 40 t axle loads |
-| Crane | Mobile crane sized for the gross mass at the required radius (BEN 20 at 9 t and 12 m radius ≈ 60–80 t crane; BEN 40 at 15–17 t ≈ 100–130 t crane). Firm, level outrigger ground; outrigger mats. Lift by all four top corner castings with spreader bar only |
-| Alternative | BEN Micro and BEN 10 can be set with a telehandler/forklift of adequate capacity using the forklift pockets (BEN 10) or skid (Micro) |
+| Delivery vehicle | Flatbed or step-deck; high-cube overall height on a standard trailer ≈ 4.4 m — the route must clear 4.5 m. Customer confirms gate width ≥ 3.5 m, turning radius for a 16 m (BEN 30/20) or 21 m (BEN 500) tractor-trailer, surface for 40 t axle loads |
+| Crane | Mobile crane sized for the gross mass at the required radius (BEN 150 at 9 t and 12 m radius ≈ 60–80 t crane; BEN 500 at 15–17 t ≈ 100–130 t crane). Firm, level outrigger ground; outrigger mats. Lift by all four top corner castings with spreader bar only |
+| Alternative | BEN 5 and BEN 30 can be set with a telehandler/forklift of adequate capacity using the forklift pockets (BEN 30) or skid (BEN 5) |
 | Who | Customer provides access and permission; Schreiber AI logistics books the crane unless the customer prefers their own rigger (then the lift plan is still reviewed by us, W17) |
 
 ## 5. Utility service
 
-| Item | BEN Micro | BEN 10 | BEN 20 | BEN 40 |
+| Item | BEN 5 | BEN 30 | BEN 150 | BEN 500 |
 | --- | --- | --- | --- | --- |
 | Voltage / phases | 208 or 240 V, 1φ, 3-wire + ground | 208Y/120 V, 3φ, 4-wire + ground | 480Y/277 V, 3φ, 4-wire + ground | 480Y/277 V, 3φ, 4-wire + ground |
 | Customer-provided disconnect within sight of the unit, rated *(config `service_breaker_a`)* | 50 A | 150 A | 225 A (default) to 400 A (max) | 400 A (default) to 1000 A (max) |
@@ -88,10 +88,10 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 | Item | Requirement |
 | --- | --- |
-| Condensate (DX units) | Gravity to a trapped drain or dry well; ≥ 25 mm line; heat-traced in `cold` climate. Volume at design humidity: up to 20 L/day (BEN 20, hot_humid) |
+| Condensate (DX units) | Gravity to a trapped drain or dry well; ≥ 25 mm line; heat-traced in `cold` climate. Volume at design humidity: up to 20 L/day (BEN 150, hot_humid) |
 | Make-up water (dry cooler with adiabatic pad, option) | Potable or softened water, 15–20 L/min at 2 bar during peak; backflow preventer per local plumbing code |
 | Glycol loop fill | Closed loop filled by Schreiber AI (propylene glycol 30–50 % by climate); no site water connection needed; drain containment 200 L drip tray |
-| Drain | Floor drain or dry well sized for a full-loop dump (BEN 40 CDU loop ≈ 400–600 L) |
+| Drain | Floor drain or dry well sized for a full-loop dump (BEN 500 CDU loop ≈ 400–600 L) |
 | Who | Customer plumbing contractor |
 
 ## 9. Noise
@@ -106,11 +106,11 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 | Permit | Typical need | Who pulls | Notes |
 | --- | --- | --- | --- |
-| Zoning / land use | Yes for 10/20/40 (accessory structure); often no for Micro | Customer | Setbacks, height, screening |
-| Building permit (structure, foundation, anchorage) | Yes for 10/20/40 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) | AHJ decides Group U vs other occupancy; see `COMPLIANCE.md` §6 |
+| Zoning / land use | Yes for 30/150/500 (accessory structure); often no for BEN 5 | Customer | Setbacks, height, screening |
+| Building permit (structure, foundation, anchorage) | Yes for 30/150/500 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) | AHJ decides Group U vs other occupancy; see `COMPLIANCE.md` §6 |
 | Electrical permit | Yes | Licensed electrical sub (ours for the unit, customer's for the feeder) | Two permits are common: one for the site feeder, one for the unit hook-up |
 | Mechanical / refrigeration permit | Yes where DX or glycol piping is installed on site | Licensed HVAC sub | Refrigerant quantity declared |
-| Fire alarm / suppression permit and plan review | Yes for 10/20/40 | Licensed fire protection contractor | Fire marshal plan review 4–8 weeks |
+| Fire alarm / suppression permit and plan review | Yes for 30/150/500 | Licensed fire protection contractor | Fire marshal plan review 4–8 weeks |
 | Generator: air permit / registration, fuel tank permit | If generator selected | Customer (we provide engine certification and tank data) | Emergency-engine rules; SPCC ≥ 1,320 gal |
 | Utility interconnection (solar/export only) | off_grid with PV paralleling | Customer with our documents | Art. 705 |
 | Stormwater / grading | Site dependent | Customer civil | |
@@ -141,7 +141,7 @@ Numbers marked *(config)* come from `software/ben_engine/config.py` for the tier
 
 | Item | Requirement |
 | --- | --- |
-| Route survey | Customer confirms bridges ≥ 4.5 m, no weight-restricted bridges below 40 t, gate and yard turning space; Schreiber AI logistics performs a desktop route survey and, for BEN 40, a physical survey |
+| Route survey | Customer confirms bridges ≥ 4.5 m, no weight-restricted bridges below 40 t, gate and yard turning space; Schreiber AI logistics performs a desktop route survey and, for BEN 500, a physical survey |
 | Permits | Over-height/over-dimension permits are obtained by the carrier; pilot cars where required |
 | Timing | Delivery window agreed 2 weeks ahead; crane and rigger booked by us; customer provides site contact and access |
 

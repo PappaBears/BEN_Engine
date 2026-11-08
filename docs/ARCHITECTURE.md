@@ -66,7 +66,7 @@ flowchart TB
   EDGE -. outbound-only support tunnel (optional) .-> SAI[Schreiber AI ops]
 ```
 
-Two controls tiers run this architecture (`docs/CONTROLS_HARDWARE_DECISION.md` §2a, `Config.controls_tier`): **BEN Controls Pro** (BEN 20/40, selectable on BEN 10) is the diagram above. **BEN Controls Lite** (BEN Micro, default on BEN 10) replaces the PLC + edge computer pair with one DIN-rail **Revolution Pi RevPi Connect 4** with RevPi DIO/AIO modules: it runs `ben_engine`, the broker, the border router and the interlock logic in software behind a hardware watchdog relay. Same Pods, same mesh, same protocol, same dashboard; life safety is hardwired in both.
+Two controls tiers run this architecture (`docs/CONTROLS_HARDWARE_DECISION.md` §2a, `Config.controls_tier`): **BEN Controls Pro** (BEN 150/40, selectable on BEN 30) is the diagram above. **BEN Controls Lite** (BEN 5, default on BEN 30) replaces the PLC + edge computer pair with one DIN-rail **Revolution Pi RevPi Connect 4** with RevPi DIO/AIO modules: it runs `ben_engine`, the broker, the border router and the interlock logic in software behind a hardware watchdog relay. Same Pods, same mesh, same protocol, same dashboard; life safety is hardwired in both.
 
 ## Components and contracts
 | Component | Owns | Interface | Persistence |

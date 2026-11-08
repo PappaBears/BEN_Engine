@@ -33,10 +33,10 @@ every downstream deliverable consistently.
 
 | Tier | Enclosure (off the shelf) | IT load | Racks | Cooling | Power | Controls (default) |
 | --- | --- | --- | --- | --- | --- | --- |
-| **BEN Micro** | NEMA 3R / IP55 outdoor 24U cabinet with integral air conditioner, on a skid | 3–8 kW | 1 | Cabinet DX air conditioner | 208/240 V 1φ, 30–50 A; 3–6 kVA UPS | BEN Controls Lite: Revolution Pi RevPi Connect 4 + 3 BEN Pods |
-| **BEN 10** | 10 ft high-cube ISO container | 10–30 kW | 1–2 | In-row DX, hot-aisle containment, economizer | 208 V 3φ 100 A; 20–30 kVA UPS | Lite (Pro selectable; Pro default for healthcare, public sector, AI training) |
-| **BEN 20** | 20 ft high-cube ISO container | 50–150 kW | 4–6 | In-row DX or rear-door heat exchangers + dry cooler; DLC option | 480 V 3φ 400 A; 150 kVA modular UPS | BEN Controls Pro: PLCnext AXC F 2152 + Axioline I/O in a UL 508A panel, OnLogic Karbon 400 edge computer, 2 Pods per rack + 2 |
-| **BEN 40** | 40 ft high-cube ISO container | 150–500 kW | 8–12 | Direct liquid cooling with CDU + external dry cooler; RDHx | 480 V 3φ 800–1200 A; modular UPS, generator ready | BEN Controls Pro |
+| **BEN 5** | NEMA 4X / IP66 / IP55 outdoor 24U cabinet with integral air conditioner, on a skid | 3–8 kW | 1 | Cabinet DX air conditioner | 208/240 V 1φ, 30–50 A; 3–6 kVA UPS | BEN Controls Lite: Revolution Pi RevPi Connect 4 + 3 BEN Pods |
+| **BEN 30** | 10 ft high-cube ISO container | 10–30 kW | 1–2 | In-row DX, hot-aisle containment, economizer | 208 V 3φ 100 A; 20–30 kVA UPS | Lite (Pro selectable; Pro default for healthcare, public sector, AI training) |
+| **BEN 150** | 20 ft high-cube ISO container | 50–150 kW | 4–6 | In-row DX or rear-door heat exchangers + dry cooler; DLC option | 480 V 3φ 400 A; 150 kVA modular UPS | BEN Controls Pro: PLCnext AXC F 2152 + Axioline I/O in a UL 508A panel, OnLogic Karbon 400 edge computer, 2 Pods per rack + 2 |
+| **BEN 500** | 40 ft high-cube ISO container | 150–500 kW | 8–12 | Direct liquid cooling with CDU + external dry cooler; RDHx | 480 V 3φ 800–1200 A; modular UPS, generator ready | BEN Controls Pro |
 
 Controls hardware is the industrial platform in `docs/CONTROLS_HARDWARE_DECISION.md`: both tiers run the same software, the same BEN Pods on the BEN Mesh (Thread, Silicon Labs MGM240P with Secure Vault High) and the same protocol; life safety is hardwired in both.
 

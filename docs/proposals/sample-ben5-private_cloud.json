@@ -7,7 +7,7 @@
   "option": "hardware_only",
   "brand": "Schreiber AI",
   "config": {
-    "tier": "micro",
+    "tier": "ben5",
     "profile": "private_cloud",
     "it_kw": 5.0,
     "racks": 1,
@@ -27,8 +27,8 @@
     "site_name": "Boise, ID"
   },
   "derived": {
-    "tier_label": "BEN Micro",
-    "enclosure": "Outdoor 24U NEMA 3R cabinet on skid",
+    "tier_label": "BEN 5",
+    "enclosure": "Outdoor 24U NEMA 4X / IP66 cabinet on skid",
     "per_rack_kw": 5.0,
     "cooling_label": "Cabinet DX air conditioner",
     "cooling_units_n": 1,
@@ -319,7 +319,7 @@
     },
     {
       "code": "STR-CAB24U",
-      "name": "Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN Micro)",
+      "name": "Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN 5)",
       "lead_time_weeks": 6,
       "qty": 1,
       "unit": "ea",
@@ -358,7 +358,7 @@
           "rows": [
             [
               "Proposal",
-              "BEN Engine BEN Micro for Riverside Dental Group"
+              "BEN Engine BEN 5 for Riverside Dental Group"
             ],
             [
               "Prepared by",
@@ -374,7 +374,7 @@
             ],
             [
               "Tier",
-              "BEN Micro \u2014 Outdoor 24U NEMA 3R cabinet on skid"
+              "BEN 5 \u2014 Outdoor 24U NEMA 4X / IP66 cabinet on skid"
             ],
             [
               "Mission profile",
@@ -421,7 +421,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Riverside Dental Group needs 5 kW of IT capacity for a Private cloud / ERP workload at Boise, ID. We propose one BEN Micro: a Outdoor 24U NEMA 3R cabinet on skid fitted out as a complete data center with 1 rack(s), Cabinet DX air conditioner with N+1 redundancy, a 2 x 6 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
+          "text": "Riverside Dental Group needs 5 kW of IT capacity for a Private cloud / ERP workload at Boise, ID. We propose one BEN 5: a Outdoor 24U NEMA 4X / IP66 cabinet on skid fitted out as a complete data center with 1 rack(s), Cabinet DX air conditioner with N+1 redundancy, a 2 x 6 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).",
           "items": [],
           "headers": [],
           "rows": []
@@ -514,7 +514,7 @@
           "rows": [
             [
               "Enclosure",
-              "Outdoor 24U NEMA 3R cabinet on skid",
+              "Outdoor 24U NEMA 4X / IP66 cabinet on skid",
               "External 1.2 x 1.0 x 1.8 m; interior 1.0 x 0.8 x 1.4 m"
             ],
             [
@@ -707,7 +707,7 @@
             ],
             [
               "STR-CAB24U",
-              "Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN Micro)",
+              "Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN 5)",
               "Great Lakes Data Racks GL24-NEMA4-AC2200",
               "1 ea",
               "$18,351",
@@ -1001,7 +1001,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN Micro (reference order-to-service 10-12 weeks) and the longest lead time in this bill of materials (8 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
+          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 5 (reference order-to-service 10-12 weeks) and the longest lead time in this bill of materials (8 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
           "items": [],
           "headers": [],
           "rows": []
@@ -1139,7 +1139,7 @@
             ],
             [
               "STR-CAB24U",
-              "Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN Micro)",
+              "Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN 5)",
               "CDW",
               "1 ea",
               "6"
@@ -1168,7 +1168,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Issue-for-construction drawing set for the BEN Micro, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
+          "text": "Issue-for-construction drawing set for the BEN 5, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A \u2014 Drawn: BEN Engine generator; Checked: blank (requires a checker before release).",
           "items": [],
           "headers": [],
           "rows": []
@@ -1633,7 +1633,7 @@
           "rows": [
             [
               "Zoning / land use",
-              "Yes for 10/20/40 (accessory structure); often no for Micro",
+              "Yes for 10/20/40 (accessory structure); often no for BEN 5",
               "Customer"
             ],
             [

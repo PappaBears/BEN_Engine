@@ -1,12 +1,12 @@
 # FAQ
 
-**What is BEN Engine?** A family of modular data centers (BEN Micro, 10, 20, 40) built in off-the-shelf outdoor cabinets and ISO high-cube containers, with Schreiber AI's controls layer: a BEN Controller (PLC + industrial edge computer, or a Revolution Pi on the Lite tier), BEN Pods on the BEN Mesh, dashboard, digital twin, calibration, a commissioning script and the BEN Care digital care layer. One configuration model drives the drawings, bill of materials, compliance pack, assembly instructions, proposal and the twin.
+**What is BEN Engine?** A family of modular data centers (BEN 5, 10, 20, 40) built in off-the-shelf outdoor cabinets and ISO high-cube containers, with Schreiber AI's controls layer: a BEN Controller (PLC + industrial edge computer, or a Revolution Pi on the Lite tier), BEN Pods on the BEN Mesh, dashboard, digital twin, calibration, a commissioning script and the BEN Care digital care layer. One configuration model drives the drawings, bill of materials, compliance pack, assembly instructions, proposal and the twin.
 
 **Can I try it without hardware?** Yes. `bash scripts/run_dashboard.sh` starts the dashboard in simulation mode with the twin, virtual Pods for I/O tests, sweeps, CFD, calibration and CSV export. Everything shown is labelled simulation.
 
 **What runs on a real unit?** The same `ben_engine.api` on an industrial edge computer (OnLogic Karbon 400 with TPM 2.0; on BEN Controls Lite, a Revolution Pi RevPi Connect 4) reading BEN Pods over MQTT on a Thread/IPv6 mesh, a Phoenix Contact PLCnext PLC over Modbus TCP/OPC UA for the interlocks, and third-party equipment over Modbus/SNMP. The edge image is in `firmware/ben-edge` and is marked implemented, unverified on hardware. Two controls tiers, Lite and Pro, are described in `docs/CONTROLS_HARDWARE_DECISION.md` §2a.
 
-**What is a BEN Pod and why a mesh?** Our own sensor board: a Silicon Labs MGM240P Thread module with Secure Vault High (hardware root of trust), four Pt1000 inputs, humidity, pressure, contacts and a leak-rope input, in a rack-rail enclosure. Two Pods per rack plus a room and an outdoor Pod; no sensor cabling to pull, the mesh heals itself, every Pod attests with its own certificate, and the same Pod serves a Micro cabinet, a dry cooler on the roof and a generator on the pad.
+**What is a BEN Pod and why a mesh?** Our own sensor board: a Silicon Labs MGM240P Thread module with Secure Vault High (hardware root of trust), four Pt1000 inputs, humidity, pressure, contacts and a leak-rope input, in a rack-rail enclosure. Two Pods per rack plus a room and an outdoor Pod; no sensor cabling to pull, the mesh heals itself, every Pod attests with its own certificate, and the same Pod serves a BEN 5 cabinet, a dry cooler on the roof and a generator on the pad.
 
 **What is BEN Care?** The digital care layer on top: minutes-to-limit alarms from a twin fitted to the unit's own data, proof of redundancy every month, drift-triggered calibration, a live risk scorecard, fleet learning and the same signed commissioning script from factory to lifetime (`docs/BEN_CARE.md`).
 
@@ -20,11 +20,11 @@
 
 **Were any emails sent?** No. 15 RFQs were created as Gmail drafts addressed to Ben@SchreiberAI.com and as files in `purchasing/email_queue/`. Ben forwards them.
 
-**Why rear-door heat exchangers on BEN 20 instead of in-row DX?** The drawing generator's interference check showed five racks plus 600 mm in-row units do not fit a 20 ft row at 96 kW. The configuration model now rejects rows that do not fit and the preset falls back through 300 mm in-row, rear-door, then liquid.
+**Why rear-door heat exchangers on BEN 150 instead of in-row DX?** The drawing generator's interference check showed five racks plus 600 mm in-row units do not fit a 20 ft row at 96 kW. The configuration model now rejects rows that do not fit and the preset falls back through 300 mm in-row, rear-door, then liquid.
 
 **Why not R-410A or R-454B?** The AIM Act 700-GWP limit for new IT-room cooling applies from 2027-01-01, and A2L refrigerant charge limits inside a 32 m³ container are below what a 20–30 kW DX unit holds. In-row DX is specified with R-513A or R-515B (A1, GWP under 700).
 
-**What about lithium batteries?** UL 9540 listed cabinets; Micro/10/20 presets stay under the 20 kWh NFPA 855 threshold by default; BEN 40 carries the full NFPA 855 package.
+**What about lithium batteries?** UL 9540 listed cabinets; BEN 5/30/150 presets stay under the 20 kWh NFPA 855 threshold by default; BEN 500 carries the full NFPA 855 package.
 
 **Can a customer run the commissioning themselves?** Yes. `python -m ben_engine.commissioning --sim` rehearses it; `--live --url` targets a unit's edge computer. The report carries the SHA-256 of the exported data and a signature block.
 

@@ -1,16 +1,16 @@
 # Schreiber AI — BEN Engine proposal SAI-MICRO-20261108-B68A69F9
 
-*BEN Micro · Private cloud / ERP · Riverside Dental Group · Boise, ID · 2026-11-08 · valid until 2027-01-07*
+*BEN 5 · Private cloud / ERP · Riverside Dental Group · Boise, ID · 2026-11-08 · valid until 2027-01-07*
 
 ## 1. Cover
 
 | Item | Value |
 |---|---|
-| Proposal | BEN Engine BEN Micro for Riverside Dental Group |
+| Proposal | BEN Engine BEN 5 for Riverside Dental Group |
 | Prepared by | Schreiber AI |
 | Customer | Riverside Dental Group |
 | Site | Boise, ID |
-| Tier | BEN Micro — Outdoor 24U NEMA 3R cabinet on skid |
+| Tier | BEN 5 — Outdoor 24U NEMA 4X / IP66 cabinet on skid |
 | Mission profile | Private cloud / ERP (private_cloud) |
 | Climate package | Temperate |
 | Purchase option | Hardware only |
@@ -23,7 +23,7 @@ AI infrastructure that arrives finished. This proposal is generated from configu
 
 ## 2. Executive summary
 
-Riverside Dental Group needs 5 kW of IT capacity for a Private cloud / ERP workload at Boise, ID. We propose one BEN Micro: a Outdoor 24U NEMA 3R cabinet on skid fitted out as a complete data center with 1 rack(s), Cabinet DX air conditioner with N+1 redundancy, a 2 x 6 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
+Riverside Dental Group needs 5 kW of IT capacity for a Private cloud / ERP workload at Boise, ID. We propose one BEN 5: a Outdoor 24U NEMA 4X / IP66 cabinet on skid fitted out as a complete data center with 1 rack(s), Cabinet DX air conditioner with N+1 redundancy, a 2 x 6 kVA UPS giving 10 minutes of ride-through, clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).
 
 The unit arrives finished and factory-tested. It needs a pad, a 50 A 208/240 V 1ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
@@ -49,7 +49,7 @@ What this means for you: the environmental class sets the alarm limits your IT w
 
 | Item | Value | Basis |
 |---|---|---|
-| Enclosure | Outdoor 24U NEMA 3R cabinet on skid | External 1.2 x 1.0 x 1.8 m; interior 1.0 x 0.8 x 1.4 m |
+| Enclosure | Outdoor 24U NEMA 4X / IP66 cabinet on skid | External 1.2 x 1.0 x 1.8 m; interior 1.0 x 0.8 x 1.4 m |
 | IT load | 5 kW in 1 rack(s) of 24 U | 5.0 kW per rack; tier range 2–5 kW |
 | Cooling | 2 x Cabinet DX air conditioner | 1 required at 5.8 kW each (derate 1.0), N+1 |
 | Row fit | fits | single row 1900 mm vs interior 1000 mm |
@@ -86,7 +86,7 @@ Top 15 lines of the 41-line bill of materials for this option (sell price at 28%
 | CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 2 ea | $49,997 | confirmed | 3 |
 | PWR-UPS-SRT6K | Smart-UPS SRT 6 kVA RM 208 V online double-conversion | APC by Schneider Electric SRT6KRMXLT | 2 ea | $26,900 | confirmed | 2 |
 | CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit 5.8 kW, 400/480 V 3-ph | Rittal SK 3189.940 | 2 ea | $25,618 | confirmed | 8 |
-| STR-CAB24U | Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN Micro) | Great Lakes Data Racks GL24-NEMA4-AC2200 | 1 ea | $18,351 | confirmed | 6 |
+| STR-CAB24U | Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN 5) | Great Lakes Data Racks GL24-NEMA4-AC2200 | 1 ea | $18,351 | confirmed | 6 |
 | SVC-ELECTRICIAN | Licensed electrician (commercial journeyman, billed) | local electrical contractor ELEC-HR | 53 h | $8,097 | estimate | 1 |
 | PWR-UPS-SRT6K-XBP | Smart-UPS SRT 192 V external battery pack (for 10 min at 6 kW) | APC by Schneider Electric SRT192RMBP | 2 ea | $6,667 | estimate | 2 |
 | SITE-FIBER | Fiber drop, handhole, 24-strand SM to demarc | local ISP / contractor FIBER-DROP | 1 lot | $6,250 | estimate | 8 |
@@ -138,7 +138,7 @@ Recurring fees are invoiced annually in advance from turnover. Prices are in USD
 
 ## 7. Schedule
 
-Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN Micro (reference order-to-service 10-12 weeks) and the longest lead time in this bill of materials (8 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
+Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 5 (reference order-to-service 10-12 weeks) and the longest lead time in this bill of materials (8 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
 
 | Week | Milestone | Owner | Hold / witness point | Path |
 |---|---|---|---|---|
@@ -161,13 +161,13 @@ Long-lead items (ordered at engineering release):
 |---|---|---|---|---|
 | CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit 5.8 kW, 400/480 V 3-ph | DigiKey (UK listing) | 2 ea | 8 |
 | SITE-FIBER | Fiber drop, handhole, 24-strand SM to demarc | local | 1 lot | 8 |
-| STR-CAB24U | Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN Micro) | CDW | 1 ea | 6 |
+| STR-CAB24U | Outdoor NEMA 4 24U cabinet, 12 in plinth, integral 2200 BTU AC (shell for BEN 5) | CDW | 1 ea | 6 |
 | SITE-PERMIT | Building/electrical/fire permits, plan review, inspections | local | 1 lot | 6 |
 | SITE-ELEC | Utility service interconnect: meter base, trench, conduit, utility fees, per ampere | local | 50 A | 6 |
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN Micro, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
+Issue-for-construction drawing set for the BEN 5, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUE FOR CONSTRUCTION Rev A — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
 
 | Sheet | Title | Scale |
 |---|---|---|
@@ -270,11 +270,11 @@ Permits and who pulls them:
 
 | Permit | Typical need | Who pulls |
 |---|---|---|
-| Zoning / land use | Yes for 10/20/40 (accessory structure); often no for Micro | Customer |
-| Building permit (structure, foundation, anchorage) | Yes for 10/20/40 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
+| Zoning / land use | Yes for 30/150/500 (accessory structure); often no for BEN 5 | Customer |
+| Building permit (structure, foundation, anchorage) | Yes for 30/150/500 | Customer's contractor or Schreiber AI as agent (we provide PE drawings) |
 | Electrical permit | Yes | Licensed electrical sub (ours for the unit, customer's for the feeder) |
 | Mechanical / refrigeration permit | Yes where DX or glycol piping is installed on site | Licensed HVAC sub |
-| Fire alarm / suppression permit and plan review | Yes for 10/20/40 | Licensed fire protection contractor |
+| Fire alarm / suppression permit and plan review | Yes for 30/150/500 | Licensed fire protection contractor |
 | Generator: air permit / registration, fuel tank permit | If generator selected | Customer (we provide engine certification and tank data) |
 | Utility interconnection (solar/export only) | off_grid with PV paralleling | Customer with our documents |
 | Stormwater / grading | Site dependent | Customer civil |

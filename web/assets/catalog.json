@@ -17,7 +17,8 @@
    "it_kw_max": 5,
    "default_cooling": "cabinet_dx",
    "voltage": "208/240 V 1ph",
-   "tare_kg": 320
+   "tare_kg": 320,
+   "rows": 1
   },
   "ben30": {
    "label": "BEN 30",
@@ -36,7 +37,8 @@
    "it_kw_max": 30,
    "default_cooling": "inrow_dx_300",
    "voltage": "208 V 3ph",
-   "tare_kg": 1300
+   "tare_kg": 1300,
+   "rows": 1
   },
   "ben150": {
    "label": "BEN 150",
@@ -55,7 +57,8 @@
    "it_kw_max": 150,
    "default_cooling": "rdhx_drycooler",
    "voltage": "480 V 3ph",
-   "tare_kg": 2400
+   "tare_kg": 2400,
+   "rows": 1
   },
   "ben500": {
    "label": "BEN 500",
@@ -74,7 +77,8 @@
    "it_kw_max": 500,
    "default_cooling": "dlc_cdu",
    "voltage": "480 V 3ph",
-   "tare_kg": 3900
+   "tare_kg": 3900,
+   "rows": 1
   },
   "ben2000": {
    "label": "BEN 2000",
@@ -95,6 +99,57 @@
    "default_cooling": "dlc_cdu",
    "voltage": "12.47 kV MV service \u2192 480 V 3ph",
    "tare_kg": 60000
+  }
+ },
+ "tier_aliases": {
+  "micro": "ben5",
+  "ben10": "ben30",
+  "ben20": "ben150",
+  "ben40": "ben500"
+ },
+ "hardening": {
+  "H1": {
+   "label": "H1 Standard",
+   "rating": "NEMA 4X / IP66",
+   "coating": "ISO 12944 C3",
+   "wind_ms_min": 47,
+   "mass_kg_m2": 0.0,
+   "features": [
+    "hose-tested gasketed penetrations (UL 50E type 4X)",
+    "compression-gasket doors, three-point latches",
+    "positive-pressure interior",
+    "door contacts"
+   ]
+  },
+  "H2": {
+   "label": "H2 Severe environment",
+   "rating": "NEMA 4X / IP66 + flood plinth 600 mm",
+   "coating": "ISO 12944 C5-M",
+   "wind_ms_min": 67,
+   "mass_kg_m2": 6.0,
+   "features": [
+    "sand/dust ePM1 filtration with weather hoods",
+    "hurricane-rated door hardware",
+    "roof snow guards",
+    "stainless fasteners, sacrificial anodes",
+    "intrusion detection and lighting"
+   ]
+  },
+  "H3": {
+   "label": "H3 Hardened / government",
+   "rating": "NEMA 4X / IP66 + ballistic (UL 752) + forced-entry (ASTM F3038) + HEMP shielding option (MIL-STD-188-125-1)",
+   "coating": "ISO 12944 C5-M",
+   "wind_ms_min": 67,
+   "mass_kg_m2": 48.0,
+   "features": [
+    "ballistic wall panels UL 752 level selectable",
+    "IK10 impact doors, forced-entry rated",
+    "80 dB shielded enclosure with filtered penetrations (option)",
+    "TEMPEST-ready separation",
+    "secure vestibule / mantrap",
+    "two-factor access, tamper detection, audit trail in BEN Care",
+    "CMMC / NIST 800-171 controls pack"
+   ]
   }
  },
  "cooling": {

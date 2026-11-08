@@ -18,10 +18,10 @@ Small and mid-size businesses are adopting AI faster than their infrastructure c
 
 | Tier | Enclosure | IT load | Who buys it |
 | --- | --- | --- | --- |
-| BEN Micro | NEMA 3R outdoor 24U cabinet | 2–6 kW | Clinics, retailers, farms, branch offices, "AI for everyone" |
-| BEN 10 | 10 ft high-cube ISO container | 10–30 kW | SMB private cloud + inference |
-| BEN 20 | 20 ft high-cube | 50–150 kW | Mid-market, industrial sites, regional AI |
-| BEN 40 | 40 ft high-cube, direct liquid cooling | 150–500 kW | Training pods, white-label partners, public sector |
+| BEN 5 | NEMA 4X / IP66 outdoor 24U cabinet | 2–6 kW | Clinics, retailers, farms, branch offices, "AI for everyone" |
+| BEN 30 | 10 ft high-cube ISO container | 10–30 kW | SMB private cloud + inference |
+| BEN 150 | 20 ft high-cube | 50–150 kW | Mid-market, industrial sites, regional AI |
+| BEN 500 | 40 ft high-cube, direct liquid cooling | 150–500 kW | Training pods, white-label partners, public sector |
 
 Four ways to buy: **hardware only**, **hardware + BEN Controls**, **white-label** (partner's brand on the box and dashboard), **managed** (Schreiber AI watches and maintains). Modules (power, cooling, compute, controls) can be bought separately.
 
@@ -36,7 +36,7 @@ Four ways to buy: **hardware only**, **hardware + BEN Controls**, **white-label*
 | CFD | 2-D lattice-Boltzmann airflow for layout and recirculation | `software/ben_engine/cfd.py` |
 | Commissioning script | FAT/SAT with signed report; customer or Schreiber AI can run it | `software/ben_engine/commissioning.py` |
 | Dashboard | 3-D twin, walkthrough, sweeps, I/O test, CSV, calibration | `dashboard/` |
-| Controls platform | **BEN Controls Pro**: Phoenix Contact PLCnext PLC + Axioline I/O in a UL 508A panel, OnLogic industrial edge computer with TPM; **BEN Controls Lite**: Revolution Pi for the Micro; both with **BEN Pods on BEN Mesh** (our own Thread/IPv6 sensor Pod on Silicon Labs MGM240P with Secure Vault High), MQTT/Modbus, signed firmware, attestation | `docs/CONTROLS_HARDWARE_DECISION.md`, `firmware/`, `purchasing/` |
+| Controls platform | **BEN Controls Pro**: Phoenix Contact PLCnext PLC + Axioline I/O in a UL 508A panel, OnLogic industrial edge computer with TPM; **BEN Controls Lite**: Revolution Pi for the BEN 5; both with **BEN Pods on BEN Mesh** (our own Thread/IPv6 sensor Pod on Silicon Labs MGM240P with Secure Vault High), MQTT/Modbus, signed firmware, attestation | `docs/CONTROLS_HARDWARE_DECISION.md`, `firmware/`, `purchasing/` |
 | STE assembly instructions | Workers with minimal experience build it; licensed trades at hold points | `design/assembly/` |
 | Compliance pack per profile | NEC, NFPA, UL 9540, ASHRAE, A2L refrigerant limits, IEC 62443, HIPAA, CMMC | `docs/COMPLIANCE.md` |
 
@@ -44,7 +44,7 @@ A competitor can buy the same container and the same UPS. They cannot buy the sy
 
 ### BEN Care and BEN Mesh: what nobody else does
 
-Most data center monitoring tells you a temperature. **BEN Care** tells you how long you have, how sure we are, and proves the box still works every month: every alarm carries minutes-to-limit with a confidence interval from a physics twin fitted to that unit's own commissioning data; failover and ride-through sweeps run automatically at low load, are hash-signed and feed the warranty and the SLA; calibration is requested when uncertainty grows, not by calendar; the risk register the customer saw before the price becomes a live scorecard with the evidence behind each line; fitted parameters from every unit improve the priors for the next. Underneath it, **BEN Mesh** removes the most error-prone part of a controls install, 80-plus shielded sensor runs, with our own **BEN Pod**: a Thread/IPv6 sensor node on Silicon Labs' MGM240P with a hardware root of trust (Secure Vault High, PSA Level 3), a per-device certificate injected in our factory cell, signed firmware and attestation at every join, on a self-healing mesh that moves with the container and serves the Micro cabinet, the dry cooler and the generator with the same part. The control layer stays conservative and listed (PLCnext in a UL 508A panel, hardwired life safety); the part we build is the part a plant director, an insurer and an AHJ cannot buy from anyone else. Costed in the BOM at about +0.3 to +0.9 % of a unit; the same commissioning script is the FAT, the SAT, the monthly check and the warranty baseline.
+Most data center monitoring tells you a temperature. **BEN Care** tells you how long you have, how sure we are, and proves the box still works every month: every alarm carries minutes-to-limit with a confidence interval from a physics twin fitted to that unit's own commissioning data; failover and ride-through sweeps run automatically at low load, are hash-signed and feed the warranty and the SLA; calibration is requested when uncertainty grows, not by calendar; the risk register the customer saw before the price becomes a live scorecard with the evidence behind each line; fitted parameters from every unit improve the priors for the next. Underneath it, **BEN Mesh** removes the most error-prone part of a controls install, 80-plus shielded sensor runs, with our own **BEN Pod**: a Thread/IPv6 sensor node on Silicon Labs' MGM240P with a hardware root of trust (Secure Vault High, PSA Level 3), a per-device certificate injected in our factory cell, signed firmware and attestation at every join, on a self-healing mesh that moves with the container and serves the BEN 5 cabinet, the dry cooler and the generator with the same part. The control layer stays conservative and listed (PLCnext in a UL 508A panel, hardwired life safety); the part we build is the part a plant director, an insurer and an AHJ cannot buy from anyone else. Costed in the BOM at about +0.3 to +0.9 % of a unit; the same commissioning script is the FAT, the SAT, the monthly check and the warranty baseline.
 
 ## 5. Market
 
@@ -62,10 +62,10 @@ Unit economics are derived from the bill of materials in `docs/BOM.md`. The tabl
 <!-- UNIT_ECONOMICS_TABLE -->
 | Tier (preset) | IT kW | BOM cost (all modules) | Sell price (28 % GM) | Infrastructure-only sell price (no compute) | Gross profit | Confirmed / list / estimate share of cost | Controls licence /yr | Managed service /yr | Price per kW IT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| BEN Micro | 5 | $135,082 | $187,614 | $135,811 | $52,532 | 69 % / 0 % / 31 % | $1,200 | $2,700 | $37,523 |
-| BEN 10 | 30 | $659,524 | $916,006 | $278,290 | $256,482 | 81 % / 0 % / 19 % | $4,800 | $16,200 | $30,534 |
-| BEN 20 | 96 | $1,872,923 | $2,601,282 | $614,136 | $728,359 | 79 % / 0 % / 21 % | $12,000 | $51,840 | $27,097 |
-| BEN 40 | 192 | $4,428,311 | $6,150,432 | $1,277,687 | $1,722,121 | 83 % / 0 % / 17 % | $30,000 | $103,680 | $32,033 |
+| BEN 5 | 5 | $135,082 | $187,614 | $135,811 | $52,532 | 69 % / 0 % / 31 % | $1,200 | $2,700 | $37,523 |
+| BEN 30 | 30 | $659,524 | $916,006 | $278,290 | $256,482 | 81 % / 0 % / 19 % | $4,800 | $16,200 | $30,534 |
+| BEN 150 | 96 | $1,872,923 | $2,601,282 | $614,136 | $728,359 | 79 % / 0 % / 21 % | $12,000 | $51,840 | $27,097 |
+| BEN 500 | 192 | $4,428,311 | $6,150,432 | $1,277,687 | $1,722,121 | 83 % / 0 % / 17 % | $30,000 | $103,680 | $32,033 |
 
 Assumptions: hardware gross margin 28%; managed service $45/kW-month; controls licence per tier as shown. BOM cost excludes site civil and utility service (SITE- lines are shown separately in `docs/BOM.md`). Compute is the reference GPU/CPU node set from the catalog and dominates the all-modules price (one 8-GPU server is ~$82–236 k); most SMB customers will size their own compute or start with the infrastructure-only price and grow.
 
@@ -81,7 +81,7 @@ Units are built by qualified third-party contract manufacturers (container modif
 
 ## 7. Go-to-market
 
-1. **Lighthouse units.** First BEN Micro and BEN 20 built for Schreiber AI's own and friendly customers; every one produces the commissioning data that proves the twin.
+1. **Lighthouse units.** First BEN 5 and BEN 150 built for Schreiber AI's own and friendly customers; every one produces the commissioning data that proves the twin.
 2. **Integrators and MEP firms** as white-label channel: they bring sites and licensed trades, we bring the system.
 3. **Profile-led marketing**: the product page leads with mission profiles and risks, which qualifies buyers before a sales call.
 
@@ -89,7 +89,7 @@ Units are built by qualified third-party contract manufacturers (container modif
 
 | Use | Why |
 | --- | --- |
-| Two lighthouse builds (Micro, 20) | Convert "verified in simulation" into "verified on hardware"; UL 508A listing of the BEN Controller panel through the panel partner; CSC re-cert procedure |
+| Two lighthouse builds (BEN 5, BEN 150) | Convert "verified in simulation" into "verified on hardware"; UL 508A listing of the BEN Controller panel through the panel partner; CSC re-cert procedure |
 | Certification and compliance | NRTL listings, PE stamps per state, FCC Part 15 B SDoC for the BEN Pod (radio covered by the MGM240P modular grant), SOC 2 for the managed service |
 | Controls hardware | BEN Pod PCBA production run (MGM240P), secure provisioning cell (PKI, Secure Vault certificate injection), first PLCnext panels and edge computers, RevPi Lite kits |
 | Team | Controls engineer, field commissioning lead, sourcing/quality lead |

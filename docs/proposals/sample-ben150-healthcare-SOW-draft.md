@@ -4,10 +4,10 @@
 > Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOW_TEMPLATE.md` · Template rev da41cc2
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. The configuration block in Section 2 is pasted verbatim from the frozen `config.json`. Delete this box before signature.
 
-**SOW ID:** SOW-BEN20-20261108-4842D366
+**SOW ID:** SOW-BEN150-20261108-4842D366
 **Under MSA:** MSA-ACMECLINIC-2026 dated [EFFECTIVE_DATE] between Schreiber AI ("Schreiber AI") and Acme Clinic ("Customer")
-**Proposal:** SAI-BEN20-20261108-4842D366 dated 2026-11-08
-**Unit serial (assigned at H4):** BEN-BEN20-4842D366
+**Proposal:** SAI-BEN150-20261108-4842D366 dated 2026-11-08
+**Unit serial (assigned at H4):** BEN-BEN150-4842D366
 **Site:** Austin, TX, Austin, TX
 **SOW date:** 2026-11-08
 
@@ -17,7 +17,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 | Item | Selection |
 | --- | --- |
-| Tier | ben20 (BEN Micro / BEN 10 / BEN 20 / BEN 40) |
+| Tier | ben150 (BEN 5 / BEN 30 / BEN 150 / BEN 500) |
 | Delivery model | Managed service (hardware only / hardware + BEN Controls / white-label / managed) |
 | Modules ordered | power, cooling, compute, controls (any of: power, cooling, compute, controls) |
 | White-label | false (yes / no); brand to apply: Schreiber AI |
@@ -30,11 +30,11 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 ## 2. Configuration
 
-2.1 **Frozen configuration.** The Configuration below is identified as SAI-BEN20-20261108-4842D366-cfg-v1.0 and conforms to `spec/ben-config.schema.json`. It is frozen at Hold Point H4. Before H4 the values are the Proposal values and may be adjusted by agreement without a Change Order; after H4 every change is a Change Order.
+2.1 **Frozen configuration.** The Configuration below is identified as SAI-BEN150-20261108-4842D366-cfg-v1.0 and conforms to `spec/ben-config.schema.json`. It is frozen at Hold Point H4. Before H4 the values are the Proposal values and may be adjusted by agreement without a Change Order; after H4 every change is a Change Order.
 
 ```json
 {
-  "tier": "ben20",
+  "tier": "ben150",
   "profile": "healthcare",
   "it_kw": 50.0,
   "racks": 5,
@@ -60,7 +60,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 | Field | Value |
 | --- | --- |
-| `tier` | ben20 |
+| `tier` | ben150 |
 | `profile` (mission profile) | healthcare (ai_inference / ai_training / private_cloud / disaster_recovery / industrial_ot / healthcare / public_sector / off_grid) |
 | `it_kw` (design IT load) | 50 kW |
 | `racks` | 5 |
@@ -95,7 +95,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 | `docs/CYBERSECURITY.md` | da41cc2 |
 | `design/assembly/QC_FORMS.md` (Q-01 to Q-12) | da41cc2 |
 | `spec/PROTOCOL.md`, `spec/INTERFACES.md` | da41cc2 |
-| Issue-for-construction drawing set `design/drawings/ben20/` | issued at H4, index IFC Rev A (da41cc2) |
+| Issue-for-construction drawing set `design/drawings/ben150/` | issued at H4, index IFC Rev A (da41cc2) |
 
 ## 3. Scope by module
 
@@ -105,10 +105,10 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 
 | Scope item | Included / Excluded | Notes |
 | --- | --- | --- |
-| One-trip high-cube ISO container (ben20) or NEMA 3R outdoor cabinet on skid (BEN Micro), received and inspected (Q-01, W6) | Included | |
-| Structural modification by AWS D1.1 certified welder to IFC drawings; CWI inspection (H7, Q-02) | Included | Not applicable to BEN Micro |
+| One-trip high-cube ISO container (ben150) or NEMA 4X / IP66 outdoor cabinet on skid (BEN 5), received and inspected (Q-01, W6) | Included | |
+| Structural modification by AWS D1.1 certified welder to IFC drawings; CWI inspection (H7, Q-02) | Included | Not applicable to BEN 5 |
 | Envelope: 100 mm PIR/spray-foam insulation, vapour barrier, non-combustible liner, personnel doors with panic hardware, coating system to ISO 9223 class C4, seals, drains (W8, Q-03) | Included | |
-| Electrical vestibule 1.1 m (BEN 20/40); second egress door (BEN 40 at ≥ 1000 A) | Included | |
+| Electrical vestibule 1.1 m (BEN 150/40); second egress door (BEN 500 at ≥ 1000 A) | Included | |
 | Floor channels, anchor clips, torque record (Q-04) | Included | |
 | Lighting, emergency lighting (90-minute self-contained), signage (arc-flash, NFPA 704, refrigerant, agent, entry procedure) | Included | |
 | Door access control (badge reader, camera on controls LAN) | Included | |
@@ -121,7 +121,7 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | --- | --- | --- |
 | Main panelboard/switchboard rated 100 A, SCCR 65 kA, SPD | Included | |
 | UPS 2 x 61 kVA, UL 1778, with lithium (LFP) battery 9.3 kWh, UL 1973 / UL 9540 | Included | NFPA 855 package where ≥ 20 kWh: false |
-| Step-down transformers 480→208Y/120 V (BEN 20/40) | Included | |
+| Step-down transformers 480→208Y/120 V (BEN 150/40) | Included | |
 | Rack PDUs (A/B per rack, metered), whips, receptacles | Included | |
 | Power meters per power path; E9 reconciliation | Included | |
 | Grounding and bonding inside the Unit; two 2/0 AWG bonding lugs at diagonal corners | Included | Site electrode per Section 3.7 |
@@ -171,7 +171,7 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | Scope item | Included / Excluded | Notes |
 | --- | --- | --- |
 | VEWFD aspirating smoke detection plus spot detectors; UL 864 releasing panel; outdoor horn/strobe | Included | |
-| Clean agent system (FK-5-1-12 class) with 10-minute hold, pre-discharge delay, abort station, door fan test (Q-09) | Included | BEN 10/20/40; BEN Micro: aerosol unit, detection and extinguisher |
+| Clean agent system (FK-5-1-12 class) with 10-minute hold, pre-discharge delay, abort station, door fan test (Q-09) | Included | BEN 30/150/500; BEN 5: aerosol unit, detection and extinguisher |
 | EPO at exit door; HVAC shutdown on second-stage alarm | Included | Hardwired, never on the controls bus |
 | Fire marshal plan review and permit by licensed fire protection contractor | Included (submittal support; Customer pulls permit) | |
 | Connection to central station / Customer monitoring | Included | Site-dependent |
@@ -219,7 +219,7 @@ Unless marked Included in Section 3, the following are excluded from the price a
 
 ## 5. Schedule and milestones
 
-5.1 **Baseline schedule.** Durations follow `docs/PROCESS_FLOW.md` Section 3 for the Tier (typical order-to-service: BEN Micro 10–12 weeks, BEN 10 about 20 weeks, BEN 20 about 27 weeks, BEN 40 32–36 weeks). Long-lead items drive the critical path: UPS 8–16 weeks, switchgear 10–20 weeks, in-row/CDU 8–24 weeks, transformer 10–16 weeks.
+5.1 **Baseline schedule.** Durations follow `docs/PROCESS_FLOW.md` Section 3 for the Tier (typical order-to-service: BEN 5 10–12 weeks, BEN 30 about 20 weeks, BEN 150 about 27 weeks, BEN 500 32–36 weeks). Long-lead items drive the critical path: UPS 8–16 weeks, switchgear 10–20 weeks, in-row/CDU 8–24 weeks, transformer 10–16 weeks.
 
 | Stage | Hold / Witness | Owner | Baseline date | Re-baselined date (latest Change Order) |
 | --- | --- | --- | --- | --- |
@@ -338,7 +338,7 @@ Payment terms 30 days. Milestones delayed by Customer-Caused Delay are invoiced 
 | Step | Name | What is done | Pass criteria | FAT | SAT | Experiment |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Pre-power visual checklist | Operator confirms each checklist item: unit level and tied down, CSC plate legible; grounding electrode conductor landed and tested; feeder terminated with torque marks, breaker open and locked; no shipping damage to cooling units, condensate drains connected; fire suppression and EPO hardwired and tagged, not on controls bus; racks anchored, blanking panels fitted, containment doors latch; controls LAN has no route to the internet; uplinks labelled both ends | Every item confirmed "yes" by the operator and the Customer witness; any "no" fails the step | Yes (factory equivalents for pad and feeder) | Yes | — |
-| 2 | Pod discovery, attestation and firmware versions | The BEN Controller discovers all BEN Pods on the mesh | Pod count equals 12 (two per rack + room + outdoor; Micro 3); every Pod attested; every Pod reports the same signed firmware version [FIRMWARE_VERSION]; every Pod `status` heartbeat < 60 s old; logical node ids 4 | Yes | Yes | E12 (part) |
+| 2 | Pod discovery, attestation and firmware versions | The BEN Controller discovers all BEN Pods on the mesh | Pod count equals 12 (two per rack + room + outdoor; BEN 5 3); every Pod attested; every Pod reports the same signed firmware version [FIRMWARE_VERSION]; every Pod `status` heartbeat < 60 s old; logical node ids 4 | Yes | Yes | E12 (part) |
 | 3 | Sensor sanity at idle | 20 % load for 5 minutes; read all inlet probes, RH, tare dP | All rack inlet probes within 2.0 K of each other; RH between 20 % and 80 %; dP tare acknowledged and residual ≤ 0.5 Pa | Yes | Yes | E1, E2 |
 | 4 | I/O point-to-point | Each relay on each node set 1 then 0 and read back; door and leak contacts read 0, forced 1, released 0 | 100 % of points read back as set; 0 failed points | Yes | Yes | — |
 | 5 | Power chain: meter vs PDU sum | 60 % load for 5 minutes; utility meter reconciled to PDU sum after subtracting metered cooling, house load and UPS losses | Disagreement ≤ 3.0 %; PUE recorded | Yes | Yes | E9 |
@@ -397,8 +397,8 @@ Running totals: price [CO_PRICE_TOTAL_DELTA]; schedule [CO_SCHEDULE_TOTAL_DELTA_
 | Annex | Content |
 | --- | --- |
 | A | Signed Site Requirements (`docs/SITE_REQUIREMENTS.md`) |
-| B | Proposal SAI-BEN20-20261108-4842D366 with risk register extract and signed risk acknowledgement |
-| C | Frozen `config.json` (SAI-BEN20-20261108-4842D366-cfg-v1.0) and derived sizing printout |
+| B | Proposal SAI-BEN150-20261108-4842D366 with risk register extract and signed risk acknowledgement |
+| C | Frozen `config.json` (SAI-BEN150-20261108-4842D366-cfg-v1.0) and derived sizing printout |
 | D | Issue-for-construction drawing index (issued at H4) |
 | E | Managed Services SLA with Unit-specific values (if ordered) |
 | F | Software Licence order form (licence type, fees, escrow election) |

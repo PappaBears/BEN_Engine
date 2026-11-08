@@ -28,7 +28,7 @@ This is the moat. A competitor can buy the same container and UPS. They cannot b
 
 The dashboard that ships in every unit runs in simulation mode: 3-D twin, walkthrough, automated sweeps, fault injection, calibration, CFD, CSV export.
 
-Live demo plan: bash scripts/run_dashboard.sh, open localhost:8080, change tier to BEN 40, inject a cooling failure, watch the standby unit start, run the failover sweep, download the CSV. Recovery plan if the demo fails: the screenshots in docs/media/screens and the sample commissioning report. Caveat to say out loud: the twin's thermal time constants are design values, so the two-minute number is a lower bound until measured on hardware.
+Live demo plan: bash scripts/run_dashboard.sh, open localhost:8080, change tier to BEN 500, inject a cooling failure, watch the standby unit start, run the failover sweep, download the CSV. Recovery plan if the demo fails: the screenshots in docs/media/screens and the sample commissioning report. Caveat to say out loud: the twin's thermal time constants are design values, so the two-minute number is a lower bound until measured on hardware.
 
 ## 6. Compliance is the product
 
