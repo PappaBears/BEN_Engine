@@ -20,9 +20,13 @@
         "ben30",
         "ben150",
         "ben500",
-        "ben2000"
+        "ben2000",
+        "micro",
+        "ben10",
+        "ben20",
+        "ben40"
       ],
-      "description": "Enclosure tier"
+      "description": "Tier by nominal maximum IT kW (ben5/ben30/ben150/ben500/ben2000); generation-1 keys micro/ben10/ben20/ben40 are accepted as aliases"
     },
     "profile": {
       "enum": [
@@ -39,12 +43,20 @@
     "it_kw": {
       "type": "number",
       "minimum": 2,
-      "maximum": 500
+      "maximum": 2000
     },
     "racks": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 12
+      "maximum": 48
+    },
+    "hardening": {
+      "enum": [
+        "H1",
+        "H2",
+        "H3"
+      ],
+      "description": "Enclosure hardening level: H1 standard IP66, H2 severe environment, H3 hardened/government"
     },
     "cooling": {
       "enum": [
@@ -116,28 +128,49 @@
     "ben5": {
       "it_kw_min": 2,
       "it_kw_max": 5,
-      "max_racks": 1
+      "max_racks": 1,
+      "kind": "cabinet",
+      "modules": 1,
+      "rows": 1
     },
     "ben30": {
       "it_kw_min": 10,
       "it_kw_max": 30,
-      "max_racks": 2
+      "max_racks": 2,
+      "kind": "module",
+      "modules": 1,
+      "rows": 1
     },
     "ben150": {
       "it_kw_min": 50,
       "it_kw_max": 150,
-      "max_racks": 6
+      "max_racks": 6,
+      "kind": "module",
+      "modules": 1,
+      "rows": 1
     },
     "ben500": {
       "it_kw_min": 150,
       "it_kw_max": 500,
-      "max_racks": 12
+      "max_racks": 12,
+      "kind": "module",
+      "modules": 1,
+      "rows": 1
     },
     "ben2000": {
       "it_kw_min": 800,
       "it_kw_max": 2000,
-      "max_racks": 48
+      "max_racks": 48,
+      "kind": "hall",
+      "modules": 3,
+      "rows": 4
     }
+  },
+  "x-tier-aliases": {
+    "micro": "ben5",
+    "ben10": "ben30",
+    "ben20": "ben150",
+    "ben40": "ben500"
   },
   "x-cooling-limits": {
     "cabinet_dx": {

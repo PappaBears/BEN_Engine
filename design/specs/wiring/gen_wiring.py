@@ -146,7 +146,7 @@ def amps(kw: float, v_ll: int, three_phase: bool, pf=0.95) -> float:
 
 
 # ================================================================ 1. controls network (Pro and Lite)
-def _right_zones(c, edge_box, wan_from):
+def _right_zones(c, mgmt_pts, wan_pts, mgmt_label_pos=0.55, wan_label_pos=0.15):
     """Zones 2, 3, 4 on the right-hand side; identical on both controls sheets."""
     c.parts.append(f'<rect x="1090" y="110" width="470" height="330" rx="14" fill="none" stroke="{GREEN}" stroke-width="1.5" stroke-dasharray="6 6"/>')
     c.text(1106, 136, "ZONE 2 — MANAGEMENT VLAN 30  (10.30.0.0/24)", 15, GREEN, weight=700)
@@ -157,17 +157,16 @@ def _right_zones(c, edge_box, wan_from):
     c.box(1120, 170, 200, 100, "PANEL HMI / DASHBOARD", ["7 in panel or screen at the door", "HTTPS :8000 · WSS :9001"], GREEN, name_size=13, sub_size=11)
     c.box(1340, 170, 200, 100, "ENGINEERING LAPTOP", ["SSH keys only", "MQTT TLS :8884"], GREEN, name_size=14, sub_size=11)
     c.box(1120, 310, 420, 100, "MANAGEMENT PORT (edge computer NIC 2)", ["separate NIC, separate cable · only ports marked MGMT", "edge API reachable; PLC, Pods, meters are NOT reachable from here"], GREEN, name_size=13, sub_size=11)
-    ex, ey = edge_box[0] + edge_box[2], edge_box[1] + 40
-    c.wire([(ex, ey), (1075, ey), (1075, 360), (1120, 360)], GREEN, width=2.5, label="NIC 2 · VLAN 30 only", label_pos=0.55)
+    c.wire(mgmt_pts, GREEN, width=2.5, label="NIC 2 · VLAN 30 only", label_pos=mgmt_label_pos)
     c.wire([(1220, 310), (1220, 270)], GREEN, width=2); c.wire([(1440, 310), (1440, 270)], GREEN, width=2)
     c.box(1120, 520, 420, 120, "CUSTOMER SWITCH / FIREWALL / WAN", ["their servers, their fiber, their rules", "NO cable to the controls switch. NO controller interface here.", "shared with BEN only: power, cooling, the room"], MUTED, name_size=14, sub_size=11)
     c.text(1120, 660, "✕  no link on purpose", 14, LIFE, weight=700)
     c.box(1120, 750, 420, 130, "WIREGUARD wg0 → support.schreiberai.com", ["edge computer initiates · nothing listens on WAN", "customer runs: ben-vpn-support.sh up / down · auto-off 48 h", "inbound over tunnel: SSH + API only"], POWER, name_size=14, sub_size=11, dashed=True)
-    c.wire([wan_from, (1075, wan_from[1]), (1075, 815), (1120, 815)], POWER, width=2, dashed=True, label="optional WAN NIC (USB)", label_pos=0.15)
+    c.wire(wan_pts, POWER, width=2, dashed=True, label="optional WAN NIC (USB)", label_pos=wan_label_pos)
 
 
 def controls_network():
-    c = Canvas(1600, 1100, "BEN Engine — Controls Network One-Line — BEN Controls Pro — Schreiber AI — IFC Rev B",
+    c = Canvas(1600, 1140, "BEN Engine — Controls Network One-Line — BEN Controls Pro — Schreiber AI — IFC Rev B",
                "IEC 62443 zones: Z1 control (PLC, Axioline I/O, transmitters) · Z1.5 data (edge computer) · Z1T Thread mesh (Pods, DTLS/mTLS) · Z2 management · customer IT isolated · life safety hardwired (sheet 05)")
     # zone frames
     c.parts.append(f'<rect x="40" y="110" width="700" height="530" rx="14" fill="none" stroke="{SIGNAL}" stroke-width="1.5" stroke-dasharray="6 6"/>')
@@ -187,7 +186,7 @@ def controls_network():
     c.wire([(560, 265), (560, 295)], SIGNAL, 2.5)
     rtu = c.box(400, 430, 320, 60, "MODBUS RTU (RS-485, PLC master)", ["power meters · UPS · cooling unit controllers · Pod E slaves"], POWER, fill=SLATE, name_size=13, sub_size=11, dashed=True)
     c.wire([(370, 380), (385, 380), (385, 460), (400, 460)], POWER, 2.5, dashed=True)
-    c.label(300, 420, "RS-485 2-wire + shield · 120 Ω ends · 19200 8E1", POWER, 10)
+    c.label(560, 508, "RS-485 2-wire + shield · 120 Ω ends · 19200 8E1", POWER, 10)
     # transmitters row
     tx = [("Pt1000 STRINGS", ["supply · return · outdoor", "3-wire → RTD4"], SIGNAL), ("SETRA 264 / DWYER MS2", ["aisle ΔP ±125 Pa", "4–20 mA → AI4"], SIGNAL),
           ("VAISALA HMD60", ["RH / T", "4–20 mA → AI4"], SIGNAL), ("RLE SEAHAWK LD2100", ["leak zones (rope)", "zone relays → DI16"], LIFE),
@@ -200,35 +199,35 @@ def controls_network():
 
     # --- zone 1.5: edge computer, RCPs
     edge = c.box(790, 165, 250, 150, "EDGE COMPUTER", ["OnLogic Karbon 400 (alt. SIMATIC IPC227G)", "NIC 1 = 10.20.0.1 · TPM 2.0 + LUKS", "Mosquitto mTLS 8883 · chrony · OTBR", "ben_engine.api · twin · SQLite · PLC bridge"], GREEN, name_size=15, sub_size=11)
-    c.wire([(720, 215), (790, 215)], SIGNAL, 3, label="NIC 1 · VLAN 20", label_pos=0.5, label_dy=-8, label_size=10)
-    c.wire([(370, 245), (385, 245), (385, 280), (760, 280), (760, 250), (790, 250)], GREEN, 2, dashed=True, label="Modbus TCP 502 / OPC UA 4840 (edge polls, 1 Hz)", label_pos=0.6, label_dy=14, label_size=10)
+    c.wire([(720, 215), (790, 215)], SIGNAL, 3, label="NIC 1", label_pos=0.5, label_dy=-8, label_size=10)
+    c.wire([(370, 245), (385, 245), (385, 280), (760, 280), (760, 250), (790, 250)], GREEN, 2, dashed=True, label="Modbus TCP 502", label_pos=0.22, label_dy=-6, label_size=10)
     rcp1 = c.box(790, 360, 115, 70, "RCP 1", ["MGM240P · USB", "OTBR wpan0"], SIGNAL, fill=SLATE, name_size=13, sub_size=10, rx=6)
     rcp2 = c.box(925, 360, 115, 70, "RCP 2", ["MGM240P · USB", "wpan1 (BEN 20/40)"], SIGNAL, fill=SLATE, name_size=13, sub_size=10, rx=6)
     c.wire([(847, 315), (847, 360)], SIGNAL, 2); c.wire([(982, 315), (982, 360)], SIGNAL, 2)
-    c.note(790, 455, 250, ["edge → PLC writes only 3 registers:", "watchdog · setpoint trim · test request", "edge never commands a valve or a unit", "nftables: drop in / out / forward"], GREEN, "Advisory only")
+    c.note(790, 460, 250, ["edge → PLC writes only 3 registers:", "watchdog · setpoint trim · test request", "(Modbus TCP 502 or OPC UA 4840)", "edge never commands a valve or a unit", "nftables: drop in / out / forward"], GREEN, "Advisory only")
 
-    # --- zone 1T: Pods
-    c.wire([(847, 430), (847, 650), (120, 650)], SIGNAL, 2, dashed=True)
-    c.wire([(982, 430), (982, 650)], SIGNAL, 2, dashed=True)
-    c.label(560, 643, "Thread 802.15.4 mesh · self-healing · Pods route for each other", SIGNAL, 10)
+    # --- zone 1T: Pods (mesh bus inside the zone frame, below its title)
+    BUS = 718
+    c.wire([(847, 430), (847, 445), (778, 445), (778, BUS), (120, BUS)], SIGNAL, 2, dashed=True)
+    c.wire([(982, 430), (982, 445), (1052, 445), (1052, BUS), (778, BUS)], SIGNAL, 2, dashed=True)
+    c.label(560, BUS - 7, "Thread 802.15.4 mesh · self-healing · Pods route for each other", SIGNAL, 10)
     pods = [("BEN POD W", ["rack 1 rails ×2", "Pt1000 ×4 · RH · ΔP", "2×AA or 24 V"]), ("BEN POD W", ["rack 2 rails ×2", "sleepy end device", "attested · cert_id"]),
             ("BEN POD W", ["rack N …", "router-eligible on 24 V", "lqi · parent in status"]), ("BEN POD W-X", ["dry cooler / generator", "IP65 · −40…70 °C", "outdoor Pt1000"]),
             ("BEN POD W", ["door frames", "door · leak rope", "DI2 = EPO aux (monitor)"]), ("BEN POD E", ["mechanical panel / CDU", "PoE + Ethernet backup", "RS-485 slave to PLC · 2 relays"])]
     for i, (nm, sub) in enumerate(pods):
         x = 60 + i * 166
-        c.box(x, 735, 150, 110, nm, sub, SIGNAL, name_size=14, sub_size=10)
-        c.wire([(x + 75, 735), (x + 75, 650)], SIGNAL, 2, dashed=True)
-    c.text(56, 870, "two Pods per rack + two per unit · MQTT publish only to fd00:ben::1 · SNTP from the edge · Pod E additionally: Cat6 to the switch (PoE) and RS-485 to the PLC", 11, MUTED)
-    c.wire([(1060, 790), (1075, 790), (1075, 650), (982, 650)], SIGNAL, 2, dashed=True)
+        c.box(x, 740, 150, 100, nm, sub, SIGNAL, name_size=14, sub_size=10)
+        c.wire([(x + 75, 740), (x + 75, BUS)], SIGNAL, 2, dashed=True)
+    c.text(56, 868, "two Pods per rack + two per unit · MQTT publish only to fd00:ben::1 · SNTP from the edge · Pod E additionally: Cat6 to the switch (PoE) and RS-485 to the PLC", 11, MUTED)
 
-    _right_zones(c, edge, (1040, 300))
+    _right_zones(c, [(1040, 205), (1078, 205), (1078, 360), (1120, 360)], [(1040, 300), (1068, 300), (1068, 815), (1120, 815)])
     c.legend(60, 920, [(SIGNAL, False, "Ethernet / Modbus TCP / SNMP — controls VLAN 20"), (SIGNAL, True, "Thread 2.4 GHz mesh (DTLS / mTLS)"), (POWER, True, "RS-485 Modbus RTU · optional outbound VPN"), (GREEN, False, "Edge host / management VLAN 30 — TLS only"), (LIFE, False, "Leak / door / EPO / fire — monitor only")])
     c.save("01_controls_network_one_line.svg")
 
 
 def controls_network_lite():
-    c = Canvas(1600, 1100, "BEN Engine — Controls Network One-Line — BEN Controls Lite (BEN Micro / BEN 10) — Schreiber AI — IFC Rev B",
-               "Same zones, same protocol, no PLC: RevPi Connect 4 runs the edge software AND the interlock service behind a hardware watchdog relay · Pods on the same BEN Mesh")
+    c = Canvas(1600, 1140, "BEN Engine — Controls Network One-Line — BEN Controls Lite — Schreiber AI — IFC Rev B",
+               "BEN Micro / BEN 10 · same zones, same protocol, no PLC: RevPi Connect 4 runs the edge software AND the interlock service behind a hardware watchdog relay · Pods on the same BEN Mesh")
     c.parts.append(f'<rect x="40" y="110" width="1020" height="530" rx="14" fill="none" stroke="{SIGNAL}" stroke-width="1.5" stroke-dasharray="6 6"/>')
     c.text(56, 136, "ZONE 1 + 1.5 — CONTROL AND DATA ON ONE INDUSTRIAL CONTROLLER  (VLAN 20, 10.20.0.0/24 · no default route, no WAN)", 15, SIGNAL, weight=700)
     c.parts.append(f'<rect x="40" y="670" width="1020" height="230" rx="14" fill="none" stroke="{SIGNAL}" stroke-width="1.5" stroke-dasharray="6 6"/>')
@@ -238,12 +237,13 @@ def controls_network_lite():
     dio = c.box(60, 345, 160, 100, "REVPI DIO", ["16 DI / 16 DO 24 V", "PiBridge", "O_14 → KW1"], SIGNAL, name_size=14, sub_size=10)
     aio = c.box(240, 345, 160, 100, "REVPI AIO", ["4 × 4–20 mA", "2 × RTD Pt1000", "PiBridge"], SIGNAL, name_size=14, sub_size=10)
     c.wire([(140, 315), (140, 345)], SIGNAL, 3); c.wire([(320, 315), (320, 345)], SIGNAL, 3)
-    kw1 = c.box(60, 470, 160, 70, "KW1 WATCHDOG RELAY", ["NO in the cooling-enable chain", "NC → beacon"], GREEN, fill=SLATE, name_size=11, sub_size=10, rx=6)
+    kw1 = c.box(60, 470, 120, 70, "KW1 WDT RELAY", ["NO in enable chain", "NC → beacon"], GREEN, fill=SLATE, name_size=11, sub_size=9, rx=6)
     c.wire([(140, 445), (140, 470)], GREEN, 2.5, label="O_14", label_pos=0.5, label_dy=4, label_size=10)
     sw = c.box(440, 165, 300, 90, "SWITCH (5–8 port)", ["Phoenix FL SWITCH 2005 / Moxa EDS-2005", "controls segment only · PoE injector for Pod E"], SIGNAL, name_size=14, sub_size=11)
     c.wire([(400, 215), (440, 215)], SIGNAL, 3, label="NIC 1", label_pos=0.5, label_dy=-8, label_size=10)
     rcp = c.box(790, 165, 150, 90, "RCP", ["MGM240P · USB", "OTBR wpan0"], SIGNAL, fill=SLATE, name_size=14, sub_size=10, rx=6)
-    c.wire([(400, 190), (420, 190), (420, 150), (865, 150), (865, 165)], SIGNAL, 2, label="USB", label_pos=0.5, label_dy=-6, label_size=10)
+    c.wire([(400, 180), (425, 180), (425, 158), (865, 158), (865, 165)], SIGNAL, 2)
+    c.text(950, 162, "USB", 10, SIGNAL, weight=600, font=MONO)
     tcp = c.box(440, 290, 300, 100, "MODBUS TCP / SNMP (VLAN 20)", ["rack PDU (SNMP v3) · UPS NMC", "cooling unit controller (Micro: 1–2 units)", "polled by ben_engine.api"], SIGNAL, name_size=13, sub_size=11)
     c.wire([(590, 255), (590, 290)], SIGNAL, 2.5)
     rtu = c.box(440, 420, 300, 60, "MODBUS RTU (RS-485 on RevPi COM)", ["power meter · UPS · cooling controller · Pod E slave"], POWER, fill=SLATE, name_size=13, sub_size=11, dashed=True)
@@ -252,24 +252,25 @@ def controls_network_lite():
     c.wire([(740, 215), (770, 215), (770, 340), (790, 340)], SIGNAL, 2, dashed=True)
     tx = [("Pt1000 ×2", ["supply · return", "→ AIO RTD"], SIGNAL), ("SETRA 264 ΔP", ["4–20 mA → AIO"], SIGNAL), ("VAISALA HMD60", ["RH 4–20 mA → AIO"], SIGNAL),
           ("SEAHAWK / LEAK ROPE", ["zone relay → DIO"], LIFE), ("DOORS · EPO · FIRE AUX", ["dry contacts → DIO", "MONITOR ONLY"], LIFE), ("COOLING UNITS 1–2", ["run / fault → DIO", "enable ← DO via KW1"], GREEN), ("ATS · GEN · UPS", ["contacts → DIO"], SIGNAL)]
+    targets = [310, 320, 330, 188, 197, 206, 215]          # AIO bottom (Pt1000/ΔP/RH) · DIO bottom right of KW1 (contacts)
     for i, (nm, sub, col) in enumerate(tx):
         x = 55 + i * 143
         c.box(x, 565, 134, 65, nm, sub, col, fill=SLATE, name_size=10, sub_size=10, rx=6)
-        tgt = (140 if col != SIGNAL or "COOLING" in nm or "ATS" in nm else 320)
-        c.wire([(x + 67, 565), (x + 67, 552), (tgt + (i - 3) * 6, 552), (tgt + (i - 3) * 6, 445)], col, 1.8)
-    c.wire([(1000, 550), (1000, 650)], SIGNAL, 0.1)   # spacer (keeps bbox) — invisible
-    c.note(790, 420, 250, ["interlock service stalls → restart 10 s", "→ HW watchdog reboot 60 s → outputs 0", "→ KW1 opens → units on local control"], GREEN, "Failsafe (no PLC)")
+        yy = 546 + i * 2
+        c.wire([(x + 67, 565), (x + 67, yy), (targets[i], yy), (targets[i], 445)], col, 1.6)
+    c.note(790, 420, 250, ["interlock service stalls → restart 10 s", "→ HW watchdog reboot 60 s → outputs off", "→ KW1 opens → units on local control"], GREEN, "Failsafe (no PLC)")
 
-    c.wire([(865, 255), (865, 650), (120, 650)], SIGNAL, 2, dashed=True)
-    c.label(500, 643, "Thread mesh · 3 Pods on Micro, 2 per rack + 2 on BEN 10", SIGNAL, 10)
+    BUS = 718
+    c.wire([(865, 255), (865, 275), (1050, 275), (1050, BUS), (120, BUS)], SIGNAL, 2, dashed=True)
+    c.label(500, BUS - 7, "Thread mesh · 3 Pods on Micro, 2 per rack + 2 on BEN 10", SIGNAL, 10)
     pods = [("BEN POD W", ["cabinet inlet / outlet", "Pt1000 ×4 · RH · ΔP"]), ("BEN POD W", ["door · leak rope", "DI2 = EPO aux (monitor)"]), ("BEN POD W-X", ["outdoor condenser", "IP65"]), ("BEN POD E (option)", ["PoE to switch · RS-485 to RevPi", "2 relays (beacon, lights)"])]
     for i, (nm, sub) in enumerate(pods):
         x = 60 + i * 250
-        c.box(x, 735, 230, 100, nm, sub, SIGNAL, name_size=14, sub_size=11)
-        c.wire([(x + 115, 735), (x + 115, 650)], SIGNAL, 2, dashed=True)
-    c.text(56, 870, "same Pods, same firmware, same join procedure and certificates as Pro · MQTT publish only to fd00:ben::1", 11, MUTED)
+        c.box(x, 740, 230, 100, nm, sub, SIGNAL, name_size=14, sub_size=11)
+        c.wire([(x + 115, 740), (x + 115, BUS)], SIGNAL, 2, dashed=True)
+    c.text(56, 868, "same Pods, same firmware, same join procedure and certificates as Pro · MQTT publish only to fd00:ben::1", 11, MUTED)
 
-    _right_zones(c, rpi, (400, 230))
+    _right_zones(c, [(330, 165), (330, 96), (1078, 96), (1078, 360), (1120, 360)], [(365, 165), (365, 104), (1068, 104), (1068, 815), (1120, 815)], mgmt_label_pos=0.45, wan_label_pos=0.62)
     c.legend(60, 920, [(SIGNAL, False, "Ethernet / Modbus TCP / SNMP — controls segment"), (SIGNAL, True, "Thread 2.4 GHz mesh (DTLS / mTLS)"), (POWER, True, "RS-485 Modbus RTU · optional outbound VPN"), (GREEN, False, "Management — TLS only · watchdog / enable chain"), (LIFE, False, "Leak / door / EPO / fire — monitor only")])
     c.save("01b_controls_network_one_line_lite.svg")
 
@@ -297,14 +298,14 @@ def controller_pod_wiring():
         ("PSU 1 QUINT4 10 A", ["24 VDC", "92 % eff."], POWER, 118), ("PSU 2 QUINT4 10 A", ["from house ckt", "redundant"], POWER, 118),
         ("ORING QUINT4", ["N+1 · OK contact", "→ DI PSU_RED_OK"], POWER, 118), ("UPS 24 VDC", ["QUINT4-UPS 3.4 Ah", "ON_BATTERY → DI"], POWER, 118)])
     rowB = din_row(320, "ROW B — PLC + AXIOLINE F I/O (local bus)", [
-        ("AXC F 2152", ["PLCnext · 10.20.0.10", "ETH1 → switch"], SIGNAL, 138), ("DI16 #1", ["cool run/fault", "X10"], SIGNAL, 68), ("DI16 #2", ["leak · valve LS", "doors · EPO · fire"], SIGNAL, 68),
-        ("DOR LC/1", ["ENABLE CHAIN", "relay out"], GREEN, 68), ("DO8", ["unit enables", "valves · beacon"], SIGNAL, 68), ("RTD4 ×n", ["Pt1000 3-wire", "X50"], SIGNAL, 68), ("AI4 I", ["4–20 mA", "X60"], SIGNAL, 68), ("RS UNI", ["RS-485", "X80"], POWER, 68)], h=90)
+        ("AXC F 2152", ["PLCnext · 10.20.0.10", "ETH1 → switch"], SIGNAL, 138), ("DI16 #1", ["cool run", "fault · X10"], SIGNAL, 68), ("DI16 #2", ["leak · valves", "doors · EPO"], SIGNAL, 68),
+        ("DOR LC/1", ["ENABLE", "CHAIN"], GREEN, 68), ("DO8", ["enables", "valves"], SIGNAL, 68), ("RTD4 ×n", ["Pt1000", "X50"], SIGNAL, 68), ("AI4 I", ["4–20 mA", "X60"], SIGNAL, 68), ("RS UNI", ["RS-485", "X80"], POWER, 68)], h=90)
     rowC = din_row(455, "ROW C — EDGE COMPUTER, SWITCH, BORDER ROUTER RCPs", [
         ("ONLOGIC KARBON 400", ["NIC1 10.20.0.1 · NIC2 10.30.0.1", "TPM 2.0 · LUKS · 24 VDC"], GREEN, 230), ("FL SWITCH 2008 / EDS", ["VLAN 20 · PoE ports", "24 VDC"], SIGNAL, 230),
         ("RCP 1", ["MGM240P USB", "N-type → roof"], SIGNAL, 108), ("RCP 2", ["MGM240P USB", "BEN 20/40"], SIGNAL, 108)], h=80)
     rowD = din_row(575, "ROW D — DOOR: HMI, SELECTOR, RESETS, BEACON", [
         ("HMI 7 in", ["PLCnext web panel", "VLAN 30"], GREEN, 150), ("SELECTOR OFF / AUTO / MAN", ["→ DI hmi_off · hmi_manual", "edge cannot change mode"], SIGNAL, 210),
-        ("RESET LATCHED", ["momentary → DI"], SIGNAL, 150), ("RESET LEAK", ["momentary → DI"], SIGNAL, 100), ("BEACON", ["red · DO + KW NC"], LIFE, 80)], h=60)
+        ("RESET LATCHED", ["momentary → DI"], SIGNAL, 150), ("RESET LEAK", ["momentary → DI"], SIGNAL, 100), ("BEACON", ["red · DO + NC"], LIFE, 80)], h=70)
     # field terminal groups
     c.text(PX + 16, 672, "ROW E — FIELD TERMINALS (PT 2,5 push-in, knife-disconnect on every input, shield bar, PE bar)", 12, MUTED, weight=700, font=MONO)
     groups = [("X10 COOLING DI", ["run n · fault n", "per unit (dry)"], SIGNAL), ("X20 LEAK / VALVES", ["SeaHawk zone n", "valve closed LS n"], LIFE),
@@ -314,31 +315,29 @@ def controller_pod_wiring():
     gb = []
     for i, (nm, sub, col) in enumerate(groups):
         r, k = divmod(i, 4)
-        gb.append(c.box(PX + 16 + k * 180, 685 + r * 95, 172, 82, nm, sub, col, fill=SLATE, name_size=11, sub_size=10, rx=6))
-    # field devices
-    c.text(PX + 16, 905, "FIELD DEVICES (outside the panel; shields landed at the panel end only)", 12, MUTED, weight=700, font=MONO)
-    devs = [("COOLING UNITS 1..N", ["run / fault aux contacts", "remote enable input ← X70 chain"], SIGNAL), ("ISOLATION VALVES + SEAHAWK LD2100", ["valve actuators 24 V ← X70", "zone relays + limit switches → X20"], LIFE),
-            ("RELEASING PANEL / EPO LOOP AUX", ["Form C aux contacts → X30", "READ ONLY — can never open the loop"], LIFE), ("ATS · GENERATOR · UPS", ["dry contacts → X40", "Modbus RTU → X80"], SIGNAL),
-            ("Pt1000 STRINGS", ["supply / return / outdoor", "→ X50 (3-wire)"], SIGNAL), ("SETRA 264 · HMD60 · kW TRANSDUCER", ["4–20 mA loops → X60", "loop-powered 24 V"], SIGNAL),
+        gb.append(c.box(PX + 16 + k * 180, 685 + r * 204, 172, 82, nm, sub, col, fill=SLATE, name_size=11, sub_size=10, rx=6))
+    devs = [("COOLING UNITS 1..N", ["run / fault aux contacts", "remote enable input ← X70 chain"], SIGNAL), ("ISO VALVES + SEAHAWK LD2100", ["valve actuators 24 V ← X70", "zone relays + limit switches → X20"], LIFE),
+            ("FIRE PANEL / EPO LOOP AUX", ["Form C aux contacts → X30", "READ ONLY — can never open the loop"], LIFE), ("ATS · GENERATOR · UPS", ["dry contacts → X40", "Modbus RTU → X80"], SIGNAL),
+            ("Pt1000 STRINGS", ["supply / return / outdoor", "→ X50 (3-wire)"], SIGNAL), ("SETRA 264 · HMD60 · kW XDCR", ["4–20 mA loops → X60", "loop-powered 24 V"], SIGNAL),
             ("ENABLE CHAIN", ["DOR relay NO in series with every", "unit enable · opens on PLC STOP"], GREEN), ("METERS · UPS · COOLING · POD E", ["RS-485 daisy chain ← X80", "19200 8E1 · 120 Ω both ends"], POWER)]
     for i, (nm, sub, col) in enumerate(devs):
         r, k = divmod(i, 4)
-        b = c.box(PX + 16 + k * 180, 920 + r * 95, 172, 82, nm, sub, col, fill=SLATE, name_size=10, sub_size=9, rx=6)
+        b = c.box(PX + 16 + k * 180, 787 + r * 204, 172, 82, nm, sub, col, fill=SLATE, name_size=10, sub_size=9, rx=6)
         g = gb[i]
-        # route: group bottom -> device top (same column, rows 0/1 offset)
-        gx = g[0] + g[2] / 2 + (0 if r == 0 else 40); dy = 685 + 2 * 95 - 13
-        c.wire([(gx, g[1] + g[3]), (gx, dy + (6 if r else 0)), (b[0] + b[2] / 2, dy + (6 if r else 0)), (b[0] + b[2] / 2, b[1])], col, 1.6)
-    c.text(PX + 16, 1120, "EPO / fire wires READ the hardwired loop. They can never open it.  (sheet 05)", 12, LIFE, weight=700)
-    c.note(PX + 16, 1135, 350, ["24 VDC Class 2 everywhere outside the mains section", "18 AWG MTW signal · 16 AWG 24 V · 12 AWG mains · ferrules", "SCCR 10 kA @ 120/240 V (SB4) · Class CC fuse if upstream > 10 kA", "heat ≈ 110 W typ → filter fan 100 m³/h"], MUTED, "Panel rules")
-    c.note(PX + 386, 1135, 370, ["1. Mount PSU/ORING, then PLC rack, then edge + switch.", "2. Land PE and shield bars; bond to the container grid.", "3. Pull field cables to X10..X80; leave knife disconnects OPEN.", "4. Power up, load PLC project, record PLC_PROJECT_CRC.", "5. Close disconnects one group at a time, watch the dashboard."], GREEN, "Assembly order (one action per step)")
+        for dx in (-30, 0, 30):      # three field conductors per group, straight down into the device box
+            c.wire([(g[0] + g[2] / 2 + dx, g[1] + g[3]), (b[0] + b[2] / 2 + dx, b[1])], col, 1.6)
+    c.text(PX + 16, 1085, "field devices are OUTSIDE the panel · shields landed at the panel end only · knife-disconnects on every group", 10, MUTED, font=MONO)
+    c.text(PX + 16, 1108, "EPO / fire wires READ the hardwired loop. They can never open it.  (sheet 05)", 12, LIFE, weight=700)
+    c.note(PX + 16, 1122, 320, ["24 VDC Class 2 outside the mains section", "18 AWG signal · 16 AWG 24 V · 12 AWG mains", "SCCR 10 kA @ 120/240 V (UL 508A SB4)", "heat ≈ 110 W typ → filter fan 100 m³/h"], MUTED, "Panel rules")
+    c.note(PX + 346, 1122, 410, ["1. PSU/ORING first, then PLC rack, then edge + switch.", "2. Land PE + shield bars; bond to the container grid.", "3. Pull field cables to X10..X80; disconnects OPEN.", "4. Power up; load PLC project; record PLC_PROJECT_CRC.", "5. Close disconnects one group at a time; watch dashboard."], GREEN, "Assembly order (one action per step)")
 
     # ------------------------------------------------------------- Pod E
-    nx, ny, nw, nh = 1180, 150, 200, 640
+    nx, ny, nw, nh = 1130, 150, 300, 640
     c.parts.append(f'<rect x="{nx}" y="{ny}" width="{nw}" height="{nh}" rx="16" fill="{PANEL}" stroke="{SIGNAL}" stroke-width="3"/>')
     c.text(nx + nw / 2, ny + 30, "BEN POD E", 22, TEXT, anchor="middle", weight=800)
-    c.text(nx + nw / 2, ny + 52, "MGM240P · Thread + Eth + RS-485", 11, MUTED, anchor="middle")
+    c.text(nx + nw / 2, ny + 52, "MGM240P · Thread / Eth / 485", 11, MUTED, anchor="middle")
     for i, (nm, col) in enumerate([("PWR", GREEN), ("LINK", POWER), ("IDENT", SIGNAL), ("RLY", LIFE)]):
-        c.dot(nx + 40 + i * 40, ny + 80, col, 6); c.text(nx + 40 + i * 40, ny + 98, nm, 10, MUTED, anchor="middle")
+        c.dot(nx + nw / 2 - 48 + i * 32, ny + 80, col, 6); c.text(nx + nw / 2 - 48 + i * 32, ny + 98, nm, 9, MUTED, anchor="middle")
     c.lines(nx + nw / 2, ny + 300, ["pins (logical → MGM240P)", "RLY1 32→PB0 · RLY2 33→PB1", "LEAK 36→PC0 · DOOR 39→PC1", "PULSE 34→PC2 · DI2 35→PC3", "IDENT 2→PD2 · LINK 3→PD3", "RTD CS PA0 · DRDY PA4", "I²C PC4/PC5 · DIP PA5..PA8", "SWD locked (Secure Vault)"], 10, MUTED, anchor="middle", font=MONO)
 
     def terminal(side, y, label, pins, color, step=20):
@@ -353,7 +352,7 @@ def controller_pod_wiring():
             c.text(x + 40, py + 4, p, 10, TEXT, anchor="middle", font=MONO)
             ys.append(py)
         return ys
-    LX, LW = 830, 240; LR = LX + LW   # left field boxes 830..1070 ; terminals at 1170..1250
+    LX, LW = 830, 240; LR = LX + LW   # left field boxes 830..1070 ; terminals at 1120..1200
     # X3 RTD
     y3 = terminal("L", 170, "X3 RTD", ["RTD1 +", "RTD1 −", "RTD1 S", "RTD2 +", "RTD2 −", "RTD2 S", "RTD3 +", "RTD3 −", "RTD3 S", "RTD4 +", "RTD4 −", "RTD4 S"], SIGNAL, step=18)
     c.box(LX, 165, LW, 230, "Pt1000 PROBES ×4 → T_in_1..2, T_out_1..2", ["class A, 3-wire, 2 m PTFE leads", "+ / − excitation, S = sense (lead comp.)", "ADS124S08 24-bit, 500 µA IDAC, ratiometric", "T_in at rack face 1/3 + 2/3 height", "T_out at rack rear · ±0.15 °C k=2", "shield → Pod shield pin only"], SIGNAL, name_size=11, sub_size=10)
@@ -375,7 +374,7 @@ def controller_pod_wiring():
         c.wire([(LR, 700 + k * 20), (nx - 10, y8[k])], SIGNAL, 1.6)
     c.text(LX, 765, "P1 (+, red tube) → cold aisle tap · P2 (−, blue) → hot aisle tap · SDP810 on board", 10, MUTED)
     # right side terminals
-    RX = 1470
+    RX = 1455
     y1 = terminal("R", 170, "X1 RJ45", ["PoE+DATA"], SIGNAL)
     c.lines(RX, 180, ["PoE switch port", "802.3af class 0", "Cat6 ≤ 90 m", "W5500 MAC/PHY", "path = eth"], 10, SIGNAL)
     c.wire([(nx + nw + 10, y1[0]), (RX - 8, y1[0])], SIGNAL, 2.5)
@@ -391,20 +390,20 @@ def controller_pod_wiring():
     for k in range(3):
         c.wire([(nx + nw + 10, y7[k]), (RX - 8, y7[k])], POWER, 1.6)
     c.text(RX, 600, "NOT in the cooling-", 10, GREEN, weight=700); c.text(RX, 614, "enable chain: that is", 10, GREEN, weight=700); c.text(RX, 628, "the controller's relay", 10, GREEN, weight=700)
-    c.note(LX, 800, 560, ["Relay contacts are Class 1: #14 Cu THHN in their own conduit; everything else Class 2.", "Shields land at the Pod end only. Bond the DIN rail (Pod E) / rack rail (Pod W).", "Plug X3..X8 LAST, after the edge shows the Pod attested and online.", "Label: unit · node id · serial · EUI-64 · cert_id (from the provisioning record)."], MUTED, "Pod wiring rules")
+    c.note(LX, 800, 730, ["Relay contacts are Class 1: #14 Cu THHN in their own conduit; everything else Class 2.", "Shields land at the Pod end only. Bond the DIN rail (Pod E) / rack rail (Pod W).", "Plug X3..X8 LAST, after the edge shows the Pod attested and online.", "Label: unit · node id · serial · EUI-64 · cert_id (from the provisioning record)."], MUTED, "Pod wiring rules")
 
     # ------------------------------------------------------------- Pod W deltas
     wx, wy = 830, 930
     c.parts.append(f'<rect x="{wx}" y="{wy}" width="730" height="300" rx="16" fill="{PANEL}" stroke="{SIGNAL}" stroke-width="3"/>')
     c.text(wx + 20, wy + 34, "BEN POD W (wireless) — same board family, what changes", 18, TEXT, weight=800)
-    c.lines(wx + 20, wy + 66, ["SAME:  X3 RTD ×4 · X4 DI1/DI2/LEAK · X8 pulse · P1/P2 ΔP tubing · SHT45 on board · LEDs IDENT/LINK",
-                                "NOT FITTED:  X1 RJ45/PoE · X5 4–20 mA · X6 relays · X7 RS-485   (no wired path: Thread only)",
-                                "POWER:  BT1 = 2 × AA LiFeS2 (Energizer L91), ≈ 1.4 y at 1 Hz, ≈ 4 y at 0.2 Hz (calculated)  OR  X2 24 VDC → router-eligible",
-                                "MOUNT:  clip-on rack rail 95 × 60 × 28 mm (2 per rack: front top + rear bottom)  ·  W-X: IP65 115 × 90 × 55 mm, U.FL ext. antenna, −40…70 °C",
-                                "RADIO:  Thread sleepy end device, 1 s poll on battery · 'Contains FCC ID / IC' per MGM240P datasheet · ch 25 default",
-                                "JOIN:  label QR = serial · EUI-64 · PSKd → ben-add-pod.sh → 10 min joiner window → DTLS → mTLS → attest (cert_id)"], 11, MUTED, lh=22)
-    c.text(wx + 20, wy + 218, "Probe routing on a rack: T_in_1 at 1/3 height, T_in_2 at 2/3 height on the front rail; T_out_1/2 same heights on the rear rail; leads tie-wrapped, no sharp bends.", 11, TEXT)
-    c.text(wx + 20, wy + 240, "Battery change: `battery_pct` < 20 % alarm → swap cells → Pod re-attaches and re-attests within 60 s; buffer lost (RAM), identity kept.", 11, TEXT)
+    c.lines(wx + 20, wy + 64, ["SAME:  X3 RTD ×4 · X4 DI1 / DI2 / LEAK · X8 pulse · P1/P2 ΔP tubing · SHT45 on board · LEDs IDENT / LINK",
+                                "NOT FITTED:  X1 RJ45/PoE · X5 4–20 mA · X6 relays · X7 RS-485  (no wired path: Thread only, no outputs)",
+                                "POWER:  BT1 = 2 × AA LiFeS2 (L91) ≈ 1.4 y at 1 Hz, ≈ 4 y at 0.2 Hz (calculated)  OR  X2 24 VDC → router-eligible",
+                                "MOUNT:  clip-on rack rail 95 × 60 × 28 mm, 2 per rack (front top, rear bottom)  ·  W-X: IP65 115 × 90 × 55 mm, U.FL antenna",
+                                "RADIO:  Thread sleepy end device, 1 s poll on battery · label 'Contains FCC ID / IC' per MGM240P datasheet · ch 25",
+                                "JOIN:  label QR = serial · EUI-64 · PSKd → ben-add-pod.sh → 10 min joiner window → DTLS → mTLS → attest (cert_id)",
+                                "PROBES:  T_in_1 at 1/3, T_in_2 at 2/3 rack height on the front rail; T_out_1/2 same heights on the rear rail",
+                                "BATTERY:  battery_pct < 20 % alarm → swap cells → re-attach + re-attest within 60 s; buffer lost, identity kept"], 11, MUTED, lh=22)
     c.text(wx + 20, wy + 262, "Nothing on a Pod W can switch anything: no outputs. Life safety: DI2 reads an aux contact only.", 11, LIFE, weight=700)
 
     # ground + legend
