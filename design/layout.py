@@ -30,7 +30,7 @@ from typing import List, Dict, Any, Optional
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(_HERE), "software"))
-from ben_engine.config import Config, TIER_GEOMETRY, COOLING_LIBRARY, CLIMATE_DESIGN, HARDENING  # noqa: E402
+from ben_engine.config import Config, TIER_GEOMETRY, COOLING_LIBRARY, CLIMATE_DESIGN, HARDENING, TIER_ALIASES, canonical_tier  # noqa: E402
 
 # ------------------------------------------------------------------ component library (mm)
 # All footprints are catalogue-typical for the class of equipment; see DESIGN_BASIS.md §9.
@@ -236,8 +236,8 @@ def _air_units(lay: Layout, kw_air: float, redundancy: str, unit_key: str):
 
 
 # ------------------------------------------------------------------ resolver
-def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate") -> Layout:
-    cfg = Config.preset(tier, profile, climate)
+def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None) -> Layout:
+    cfg = Config.preset(canonical_tier(tier), profile, climate, hardening)
     d = cfg.derived()
     g = d["geometry"]
     lay = Layout(tier, cfg, d,

@@ -3,8 +3,11 @@
 Reads the configuration for each tier preset through design/layout.py and writes, per tier:
     design/drawings/<tier>/A-001 ... C-001 as .svg and .png, plus INDEX.md
 and design/drawings/INTERFERENCE_CHECKS.md (all tiers) which DESIGN_BASIS.md embeds.
+Tiers: ben5 (NEMA 4X / IP66 cabinet), ben30 / ben150 / ben500 (ISO-frame modules sealed to IP66) and ben2000 (the hall:
+A-000 site plan, per-module A-001-Mn / A-002-Mn sheets, MV one-line; generators in gen_hall.py). Every A-003 carries the
+IP66 penetration detail and the hardening add-ons (H1/H2/H3, docs/TIER_AND_ENCLOSURE_DECISION.md §3).
 
-Run:  python design/drawings/gen_drawings.py [--tier ben20] [--dpi 110]
+Run:  python design/drawings/gen_drawings.py [--tier ben150] [--dpi 110]
 """
 from __future__ import annotations
 
@@ -19,13 +22,18 @@ sys.path.insert(0, HERE)
 
 import layout as L  # noqa: E402
 import ctq as C  # noqa: E402
+import gen_hall as GH  # noqa: E402
 from drawkit import (Sheet, View, INK, MUTED, LIGHT, PAPER, CTQ_C, CTP_C, RED, GREEN, PURPLE, FILL, EDGE,  # noqa: E402
                      sym_box, sym_valve, sym_pump, sym_instr, sym_hx, sym_tank, sym_breaker)
 
-DATE = "2026-11-07"
-SHEETS = [("A-001", "General arrangement"), ("A-002", "Interior layout plan"), ("A-003", "Envelope section"),
+DATE = "2026-11-08"
+SHEETS = [("A-001", "General arrangement"), ("A-002", "Interior layout plan"), ("A-003", "Envelope section and hardening"),
           ("S-001", "Floor framing and anchoring"), ("E-001", "Power one-line"), ("M-001", "Cooling P&ID"),
           ("C-001", "Controls layout")]
+
+
+def sheets_for(lay):
+    return GH.hall_sheets(lay) if lay.is_hall else SHEETS
 RX = 500.0          # right column x
 RW = 326.0          # right column width
 TOP = 578.0
@@ -46,11 +54,11 @@ def pick_scale(*constraints):
 
 def config_line(lay):
     cfg, d = lay.cfg, lay.d
-    return f"{cfg.tier} | {cfg.profile} | {cfg.it_kw:.0f} kW IT | {cfg.racks} racks | cooling {lay.notes.get('cooling_resolved', cfg.cooling)} | {cfg.redundancy} | {cfg.climate}"
+    return f"{cfg.tier} | {cfg.profile} | {cfg.it_kw:.0f} kW IT | {cfg.racks} racks | cooling {lay.notes.get('cooling_resolved', cfg.cooling)} | {cfg.redundancy} | {cfg.climate} | {cfg.hardening}"
 
 
 def new_sheet(lay, no, title, scale_text, n):
-    return Sheet(no, title, lay.d["tier_label"], scale_text, n, len(SHEETS), config_line(lay), DATE)
+    return Sheet(no, title, lay.d["tier_label"], scale_text, n, len(sheets_for(lay)), config_line(lay), DATE)
 
 
 def deviation_note(sh, lay, x, y):
@@ -148,7 +156,7 @@ def sheet_a001(lay: L.Layout, out):
         ve.rect(ew * 0.75, 1200, ew * 0.75 + 150, 1350, fc=FILL["fire"], ec=RED, lw=0.6)
         ve.text(ew * 0.75 + 170, 1270, "EPO (ext)", h=1.6, va="center", c=RED)
     else:
-        ve.rect(60, 150, ew - 60, eh - 100, lw=0.6); ve.text(ew / 2, eh / 2, "DOOR\nIP55", h=2.2, ha="center", va="center", c=MUTED)
+        ve.rect(60, 150, ew - 60, eh - 100, lw=0.6); ve.text(ew / 2, eh / 2, "DOOR\nNEMA 4X / IP66\ncompression gasket\n3-point latch", h=1.8, ha="center", va="center", c=MUTED)
     ve.dim_v(0, eh, ew, 8, label=f"{eh:.0f}", side="right")
     ve.dim_h(0, ew, 0, -8, label=f"{ew:.0f}")
     # ----- side elevation A (rack-wall side)
@@ -176,7 +184,7 @@ def sheet_a001(lay: L.Layout, out):
         if svc:
             va.rect(el, svc.z0, el + 400, svc.z1, fc=FILL["power"], ec=EDGE["power"], lw=0.6)
             va.text(el + 200, (svc.z0 + svc.z1) / 2, "SVC", h=1.8, ha="center", va="center", bold=True, rot=90)
-            va.leader(el + 400, svc.z1 - 100, 6, 6, f"Service section NEMA 3R, {lay.d['service_breaker_a']} A", h=1.9)
+            va.leader(el + 400, svc.z1 - 100, 6, 6, f"Service section NEMA 4X, {lay.d['service_breaker_a']} A", h=1.9)
     else:
         for it in lay.items:
             if it.mount == "ext" and it.kind == "cooling" and it.y0 < 0:
@@ -208,7 +216,7 @@ def sheet_a001(lay: L.Layout, out):
                 vb.rect(X0, it.z0, X0 + it.w, it.z1, fc=FILL["cooling"], ec=EDGE["cooling"], lw=0.6)
                 vb.text(X0 + it.w / 2, (it.z0 + it.z1) / 2, it.tag, h=2.0, ha="center", va="center", bold=True)
         vb.rect(el * 0.1, eh * 0.75, el * 0.9, eh * 0.9, fc="#0B1018", ec="#0B1018")
-        vb.text(el / 2, eh * 0.825, "SCHREIBER AI | BEN MICRO", h=2.4, ha="center", va="center", c="#66E3FF", bold=True)
+        vb.text(el / 2, eh * 0.825, f"SCHREIBER AI | {lay.d['tier_label'].upper()}", h=2.4, ha="center", va="center", c="#66E3FF", bold=True)
     vb.dim_h(0, el, 0, -8, label=f"{el:.0f}")
     sh.north_arrow(ox_end + ew / s / 2, oy - (eh - ew) / s - 30)
     sh.text(ox_end - 10, oy - (eh - ew) / s - 50, "Dimensions in mm. Ext dims per ISO 668 (containers).", h=2.0, c=MUTED)
@@ -224,12 +232,13 @@ def sheet_a001(lay: L.Layout, out):
                 ["GROSS (config)", f"{d['gross_kg']}"],
                 ["Per corner post (gross / 4, static)", f"{d['gross_kg'] / 4:.0f}"],
                 ["Longitudinal CoG from door end (layout)", f"{cgx:.0f} mm  ({cgx / el * 100:.0f} % of L)"],
-                ["Max gross ISO 668 (container) / forklift (micro)", "30480" if lay.is_container else "2500"]]
+                ["Max gross ISO 668 (module) / forklift (BEN 5)", "30480" if lay.is_container else "2500"]]
         y = sh.table(x, y, ["WEIGHT TABLE", "kg"], rows, [RW * 0.72, RW * 0.28], title="WEIGHTS")
         y -= 8
         notes = [
             "All dimensions in millimetres unless noted. Do not scale from this drawing; use figured dimensions.",
-            "Enclosure: " + d["enclosure"] + ". Corrosion class " + d["climate"]["corrosion"] + " (ISO 9223): exterior coating C4-M min, C5 for coastal.",
+            "Enclosure: " + d["enclosure"] + f". Envelope {d['hardening_rating']}; coating {d['hardening_coating']} (site class {d['climate']['corrosion']}, ISO 9223). Hardening {d['hardening_label']}: add-ons on A-003.",
+            "Every penetration is a gasketed transit frame or a sleeved and gasketed entry, hose-tested per UL 50E type 4X (CTQ-A4 WITNESS); doors have compression gaskets and three-point latches (CTQ-C3); interior at +10 Pa.",
             "Every cutout in the container shell is reinforced with a welded 50x50x5 frame (CTP-A1, HOLD POINT, certified welder). Cutouts within 300 mm of a corner post are not permitted.",
             "After modification the container is re-inspected and re-plated (CSC, CTP-A2) before road or sea transport.",
             "Roof penetrations (RP) are line-set curbs 300x200, 300 mm inboard of the top side rail, sealed with EPDM boot and butyl; see A-003 detail.",
@@ -402,13 +411,13 @@ def sheet_a002(lay: L.Layout, out):
 
 # ====================================================================== A-003
 def sheet_a003(lay: L.Layout, out):
-    sh = new_sheet(lay, "A-003", "Envelope section", "1:10 / 1:2", 3)
+    sh = new_sheet(lay, "A-003", "Envelope section and hardening", "1:15 / 1:2" if lay.is_container else "1:5 / 1:2", 3)
     ew, eh, W, H = lay.ext_w, lay.ext_h, lay.W, lay.H
-    s = 10 if lay.is_container else 5
-    ox, y_top = 40.0, TOP - 14
+    s = 15 if lay.is_container else 5
+    ox, y_top = (40.0 if lay.is_container else 100.0), TOP - 14
     oy = y_top - eh / s - 14
     v = View(sh, s, ox, oy)
-    sh.view_title(ox, y_top + 6, "CROSS SECTION THROUGH ROW (looking toward blind end)", f"1:{s}")
+    sh.view_title(40.0, y_top + 6, "CROSS SECTION THROUGH ROW (looking toward blind end)", f"1:{s}")
     wall = (ew - W) / 2
     if lay.is_container:
         floor_struct = 198; floor_bu = 100; roof_bu = eh - floor_struct - floor_bu - H
@@ -481,12 +490,15 @@ def sheet_a003(lay: L.Layout, out):
         v.dim_h(ew - wall, ew, 0, -8, label=f"{wall:.0f}")
         v.dim_h(0, ew, 0, -18, label=f"{ew:.0f}")
         v.bubble(60, z0 + 1500, -14, 6, "CTQ-C1"); v.bubble(136, z0 + 2000, -14, 10, "CTQ-C2"); v.bubble(ew - 60, z0 + 300, 14, -8, "CTQ-C4")
-        # details in a row below the section
-        dy = oy - 34
+        # details in two rows below the section
+        dy = oy - 30
         detail_wall(sh, ox, dy, lay)
         detail_floor(sh, ox + 95, dy, lay, k=2.5)
         detail_door_seal(sh, ox + 240, dy)
         detail_curb(sh, ox + 335, dy, k=2.5)
+        dy2 = dy - 118
+        detail_ip66(sh, ox, dy2)
+        detail_hardening(sh, ox + 150, dy2, lay)
     else:
         # cabinet: double skin with 40 PIR, rack inside, cabinet AC on side
         v.rect(0, 0, ew, eh, lw=1.0)
@@ -502,10 +514,14 @@ def sheet_a003(lay: L.Layout, out):
         v.rect(-50, -150, ew + 50, 0, fc="#E8EDF3", lw=0.6); v.text(ew / 2, -75, "SKID (fork pockets)", h=1.8, ha="center", va="center")
         v.dim_v(0, eh, ew, 8, label=f"{eh:.0f}", side="right"); v.dim_h(0, ew, 0, -8, label=f"{ew:.0f}")
         v.dim_h(100, ew - 100, eh, 8, label=f"{ew - 200:.0f} INT (config {W:.0f})")
-        v.leader(60, eh / 2, -14, 10, "Double skin + 40 PIR, IP55 gasket", h=1.8)
-        v.bubble(ew - 100, eh / 2, 14, 8, "CTQ-C1")
+        v.leader(60, eh / 2, -14, 10, "Double skin + 40 PIR, NEMA 4X / IP66 compression gasket", h=1.8)
+        v.bubble(ew - 100, eh / 2, 14, 8, "CTQ-C1"); v.bubble(ew - 60, eh * 0.75, 14, 6, "CTQ-C3")
+        if lay.cfg.hardening in ("H2", "H3"):
+            v.rect(-100, -750, ew + 100, -150, fc="#C9D3E0", ec=INK, lw=0.6); v.text(ew / 2, -450, "FLOOD PLINTH 600 (H2/H3) UNDER THE SKID", h=1.6, ha="center", va="center")
         detail_wall(sh, ox + ew / s + 70, TOP - 20, lay)
         detail_door_seal(sh, ox + ew / s + 180, TOP - 20)
+        detail_ip66(sh, ox + ew / s + 70, TOP - 160)
+        detail_hardening(sh, ox + ew / s + 70, TOP - 300, lay)
 
     def extra(sh, x, y):
         clim = lay.d["climate"]
@@ -514,7 +530,8 @@ def sheet_a003(lay: L.Layout, out):
             tin, rh = 22, 50
             tdp = 11.1
             tsi = tin - U * 0.13 * (tin - clim["t_min_c"])
-            rows = [["Wall / roof insulation", "100 mm PIR, lambda 0.022 W/mK, foil faced, joints taped"],
+            rows = [["Envelope rating", f"{lay.d['hardening_rating']}; coating {lay.d['hardening_coating']}"],
+                    ["Wall / roof insulation", "100 mm PIR, lambda 0.022 W/mK, foil faced, joints taped"],
                     ["R-value (centre of panel)", f"{R:.1f} m2K/W; U = {U:.2f} W/m2K (config uses effective R 3.5 incl. bridging)"],
                     ["Floor build-up", "80 mm PIR + 18 mm plywood + 2 mm anti-static vinyl = 100 mm; C100 channels under row"],
                     ["Design conditions", f"Outdoor {clim['t_design_c']} C / {clim['t_min_c']} C ({clim['label']}); indoor 22 C, 50 % RH, dew point {tdp} C"],
@@ -523,7 +540,7 @@ def sheet_a003(lay: L.Layout, out):
                     ["Vapour control", "Liner (0.7 mm steel, sealed joints) is the warm-side vapour barrier. All penetrations sealed with butyl + EPDM boots"],
                     ["Envelope gain at design", f"{lay.d['envelope_gain_kw']} kW (config rule)"]]
         else:
-            rows = [["Cabinet wall", "Double-skin steel, 40 mm PIR, IP55 gasket"],
+            rows = [["Cabinet wall", "Double-skin aluminium / steel, 40 mm PIR, NEMA 4X / IP66 compression gasket, 3-point latch (STR-CAB24U)"],
                     ["Design conditions", f"Outdoor {clim['t_design_c']} C / {clim['t_min_c']} C; indoor 18-27 C"],
                     ["Condensation", "Cabinet DX runs in dehumidify mode below 15 C dew point; heater strip 100 W for t_min < 0 C"]]
         y = sh.table(x, y, ["THERMAL ENVELOPE", "VALUE / NOTE"], rows, [RW * 0.3, RW * 0.7], title="THERMAL AND MOISTURE NOTES", h=1.9)
@@ -531,7 +548,9 @@ def sheet_a003(lay: L.Layout, out):
         notes = ["Insulation is fixed with adhesive and 4 mechanical pins/m2; no gap > 3 mm, joints staggered and taped.",
                  "Liner panels overlap 25 mm with sealant bead; interior finish white (reflectance >= 0.8) for lighting.",
                  "Floor drain and condensate drains fall 1:100 to the exterior trap; trap primed before shipping.",
-                 "Doors: original ISO door gaskets retained; add secondary 20 mm EPDM bulb seal on the inner frame; 25 mm PIR + liner on door inner faces.",
+                 "Doors: original ISO door gaskets retained; add the compression gasket kit (ENV-DOORGASKET-4X: 20 mm EPDM sponge D-seal, three-point compression latch, drip edge); 25 mm PIR + liner on door inner faces; compression check CTQ-C3.",
+                 "IP66 (UL 50E type 4X): every penetration through a gasketed transit frame (ENV-SEAL-KIT) or a sleeved pipe entry with EPDM boot; hose test on every one (CTQ-A4 WITNESS, Detail 5); make-up fan holds +10 Pa (ENV-PRESSURE-FAN).",
+                 f"Hardening {lay.d['hardening_label']} (Detail 6): H2 adds flood plinth 600, C5-M coating, ePM1 intake filters + hoods, hurricane door hardware, snow guards, stainless fasteners, anodes; H3 adds UL 752 ballistic panels (CTQ-H2), ASTM F3038 doors, IK10 hatches, HEMP shield option with filtered penetrations (CTQ-H3), mantrap, two-factor access.",
                  "Fire: PIR class B-s2,d0 minimum (EN 13501-1) or FM 4880 approved; liner joints sealed to maintain the clean-agent hold time (CTP-F1)."]
         return sh.notes(x, y, "ENVELOPE NOTES", notes, h=2.0, lead=3.1)
     right_column(sh, lay, "A-003", extra)
@@ -605,6 +624,91 @@ def detail_curb(sh, x, ytop, k=2):
     v.leader(150, 122, 16, 12, "Welded curb 50x50x5, 150 high (CTP-A1 HOLD)", h=1.8, c=CTP_C)
     v.leader(210, 70, 14, 0, "EPDM boot + butyl, clamp band", h=1.8)
     v.leader(130, 60, -20, -20, "S suction / L liquid, insulated", h=1.8)
+
+
+def detail_ip66(sh, x, ytop):
+    """Detail 5: gasketed cable transit frame in the wall + hose-test note (UL 50E type 4X / IEC 60529 IPX6)."""
+    sh.view_title(x, ytop, "DETAIL 5 — IP66 PENETRATION + HOSE TEST", "1:2")
+    v = View(sh, 2, x + 10, ytop - 108)
+    v.rect(0, 0, 36, 200, fc="#E8EDF3", ec=INK, lw=0.7)                 # outer skin
+    v.rect(36, 0, 136, 200, fc="#FFF4D6", ec=MUTED, lw=0.3, hatch="...")  # PIR
+    v.rect(136, 0, 137, 200, fc=INK, ec=INK)                             # liner
+    v.rect(-6, 60, 160, 66, fc="#C9D3E0", ec=INK, lw=0.6); v.rect(-6, 134, 160, 140, fc="#C9D3E0", ec=INK, lw=0.6)   # frame flanges
+    v.rect(-6, 60, 0, 140, fc="#C9D3E0", ec=INK, lw=0.6); v.rect(154, 60, 160, 140, fc="#C9D3E0", ec=INK, lw=0.6)
+    for k in range(3):                                                    # compression modules around cables
+        y0 = 70 + k * 22
+        v.rect(0, y0, 154, y0 + 18, fc="#8FA3BA", ec=INK, lw=0.4)
+        v.circle(77, y0 + 9, 6, fc=PAPER, ec=INK, lw=0.4)
+    v.rect(0, 136, 154, 140, fc=INK, ec=INK)                              # compression wedge
+    v.rect(-12, 54, -6, 146, fc="#2E4461", ec=INK, lw=0.5)                # exterior gasket
+    v.leader(-9, 100, -6, 14, "EPDM gasket 4 mm under the flange,\nstainless bolts @ 100", h=1.6)
+    v.leader(77, 79, 24, -12, "Compression modules (Roxtec CF /\nComSeal class) IP66/67, UL 50E 4X\n(ENV-SEAL-KIT)", h=1.6)
+    v.leader(77, 138, 24, 14, "Wedge compressed to the mark;\nspare modules for future cables", h=1.6)
+    v.leader(136, 30, 14, -6, "Liner sealed to the frame (PU bead)", h=1.6)
+    v.text(-12, -14, "HOSE TEST (CTQ-A4 WITNESS): 25 mm nozzle, 240 L/min at 3-3.5 m,", h=1.6, c=CTQ_C)
+    v.text(-12, -22, "every penetration and door seam; no water inside.", h=1.6, c=CTQ_C)
+
+
+def detail_hardening(sh, x, ytop, lay):
+    """Detail 6: hardening add-ons per level — H2 flood plinth and C5-M coating, H3 ballistic panel and shielded penetration."""
+    hz = lay.cfg.hardening
+    sh.view_title(x, ytop, f"DETAIL 6 — HARDENING ADD-ONS H2 / H3 (this unit: {hz})", "1:10 / 1:2")
+    # H2: flood plinth under the skid / module rail, 1:10
+    v = View(sh, 10, x + 8, ytop - 94)
+    v.rect(0, -150, 700, 0, fc="#D9E1EA", ec=INK, lw=0.6, hatch="//"); v.text(350, -75, "PAD / SLAB", h=1.4, ha="center", va="center", bg=PAPER)
+    v.rect(60, 0, 140, 600, fc="#C9D3E0", ec=INK, lw=0.6); v.rect(560, 0, 640, 600, fc="#C9D3E0", ec=INK, lw=0.6)
+    v.line(60, 0, 640, 600, c=INK, lw=0.5); v.line(60, 600, 640, 0, c=INK, lw=0.5)
+    v.rect(0, 600, 700, 660, fc="#A8B4C4", ec=INK, lw=0.6)
+    v.rect(0, 660, 700, 850, fc="#E8EDF3", ec=INK, lw=0.7); v.text(350, 755, "SKID / MODULE RAIL", h=1.4, ha="center", va="center", c=MUTED)
+    v.rect(90, -120, 110, 40, fc=INK, ec=INK); v.rect(590, -120, 610, 40, fc=INK, ec=INK)
+    v.dim_v(0, 600, 700, 6, label="600", side="right", h=1.6)
+    v.leader(350, 630, 8, 14, "H2: flood plinth 600, HDG frame + bracing,\nanodes (STR-FLOOD-PLINTH, STR-ANODES)", h=1.5, c=CTP_C)
+    v.leader(100, -100, 10, -8, "M16 anchors through plinth feet;\nstainless A4 fasteners (H2)", h=1.5)
+    sh.text(x, ytop - 112, "H2 also: C5-M coating 320 um, ePM1 intake filters + hoods, hurricane hardware, snow guards, intrusion detection.", h=1.5, c=MUTED)
+    sh.text(x, ytop - 115.5, "H3 also: ASTM F3038 doors, IK10 hatches, tamper seals, mantrap, two-factor access, shield test by test house.", h=1.5, c=MUTED)
+    # H3: ballistic panel + shielded penetration, 1:2
+    vb = View(sh, 2, x + 128, ytop - 108)
+    vb.rect(0, 0, 36, 200, fc="#E8EDF3", ec=INK, lw=0.7); vb.rect(36, 0, 136, 200, fc="#FFF4D6", ec=MUTED, lw=0.3, hatch="...")
+    vb.rect(136, 0, 137, 200, fc=INK, ec=INK)
+    vb.rect(137, 0, 139, 200, fc="#4A4A4A", ec="#4A4A4A")                 # 2 mm steel shield liner
+    vb.rect(139, 0, 151, 200, fc="#8B5A2B", ec=INK, lw=0.4)               # 12 mm ballistic panel
+    vb.rect(151, 0, 153, 200, fc="#C9D3E0", ec=INK, lw=0.3)               # batten / finish
+    vb.rect(-10, 80, 170, 86, fc="#C9D3E0", ec=INK, lw=0.5); vb.rect(-10, 114, 170, 120, fc="#C9D3E0", ec=INK, lw=0.5)
+    vb.rect(0, 86, 150, 114, fc="#8FA3BA", ec=INK, lw=0.4)
+    vb.rect(137, 70, 175, 80, fc="#4A4A4A", ec="#4A4A4A"); vb.rect(137, 120, 175, 130, fc="#4A4A4A", ec="#4A4A4A")
+    vb.rect(160, 86, 175, 114, fc="#2E4461", ec=INK, lw=0.5)
+    vb.leader(145, 40, 16, -8, "H3: UL 752 ballistic panel 12 mm\n(Level 3; 4-8 selectable), battened,\nseams lapped 50 (CTQ-H2 HOLD)", h=1.5, c=CTP_C)
+    vb.leader(138, 175, 16, 6, "H3 option: HEMP shield liner 2 mm steel,\nwelded, 80 dB (ENV-HEMP-SHIELD, CTQ-H3)", h=1.5)
+    vb.leader(167, 100, 12, 8, "Filtered penetration: HEMP power-line\nfilter / waveguide-below-cutoff for pipes,\nfibre-only data (ENV-HEMP-PENETRATIONS)", h=1.5)
+    vb.leader(75, 100, -10, -12, "IP66 frame as Detail 5,\ninside the shield boundary", h=1.5)
+    if hz == "H1":
+        sh.text(x, ytop - 119.5, "This unit is H1 Standard: Detail 6 shows the add-ons available at H2 / H3; none are fitted.", h=1.6, c=RED)
+
+
+def detail_panel_joint(sh, x, ytop):
+    """Hall: section seam — splice plates, two-stage gasket, cover flashing, bonding jumper (CTP-J1)."""
+    sh.view_title(x, ytop, "DETAIL 7 — SECTION SEAM", "1:3")
+    v = View(sh, 3, x + 6, ytop - 90)
+    for X0 in (0, 170):                                                   # two panel edges (100 PIR sandwich with steel skins)
+        v.rect(X0, 0, X0 + 130, 200, fc="#FFF4D6", ec=MUTED, lw=0.3, hatch="...")
+        v.rect(X0, 0, X0 + 130, 2, fc=INK, ec=INK); v.rect(X0, 198, X0 + 130, 200, fc=INK, ec=INK)
+        v.rect(X0 + (120 if X0 == 0 else 0), 0, X0 + (130 if X0 == 0 else 10), 200, fc="#C9D3E0", ec=INK, lw=0.6)   # edge frames
+    v.rect(130, 60, 170, 140, fc="#2E4461", ec=INK, lw=0.5)               # primary EPDM gasket (compressed)
+    v.rect(130, 20, 170, 40, fc="#5C7391", ec=INK, lw=0.4)                # secondary butyl
+    v.rect(110, 90, 190, 110, fc=INK, ec=INK)                             # splice plate + bolt
+    v.rect(-10, 198, 310, 206, fc="#A8B4C4", ec=INK, lw=0.6)              # exterior cover flashing
+    v.line(125, 10, 175, 10, c=GREEN, lw=1.2)                             # bonding jumper
+    v.leader(150, 100, 20, -24, "Splice plate 10 mm, M20 8.8 @ 600, 410 N·m (CTP-J1)", h=1.6, c=CTP_C)
+    v.leader(150, 130, 24, 10, "Primary EPDM gasket 40 mm, compressed 30-50 %", h=1.6)
+    v.leader(150, 30, 24, -8, "Secondary butyl tape; interior liner trim sealed", h=1.6)
+    v.leader(150, 202, 24, 14, "Exterior cover flashing, riveted @ 300, sealant both edges; roof seam flashing lapped 150", h=1.6)
+    v.leader(150, 10, -20, -12, "Bonding jumper 16 mm2 at every joint, <= 0.1 ohm", h=1.6, c=GREEN)
+    v.dim_h(130, 170, 0, -8, label="40 GAP")
+
+
+DETAILS = {"wall": detail_wall, "floor": detail_floor, "door_seal": detail_door_seal, "curb": detail_curb, "ip66": detail_ip66,
+           "hardening": detail_hardening, "panel_joint": detail_panel_joint}
+HALL_CTX = GH.Ctx(new_sheet, right_column, DETAILS)
 
 
 # ====================================================================== S-001
@@ -738,7 +842,7 @@ def sheet_s001(lay: L.Layout, out):
                  "Every torqued bolt gets a paint stripe across nut and base after the witness check (Q-04).",
                  "Container corner posts carry 86.4 t each (ISO 1496 stacking test, 9-high); no load is applied to the posts by this design other than lifting and tie-down.",
                  "Cutouts weaken the corrugated shell shear panel: keep the sum of cutout widths in any 1 m of wall below 400 mm, or add a diagonal stiffener (engineer of record).",
-                 "Micro: skid has 4 anchors to pad and fork pockets both directions; lift with forks only from the long side with the cabinet empty of IT.",
+                 "BEN 5: skid has 4 anchors to pad and fork pockets both directions; lift with forks only from the long side with the cabinet empty of IT. H2/H3: 600 mm flood plinth between pad and skid / module rails (A-003 Detail 6).",
                  ]
         return sh.notes(x, y, "STRUCTURAL NOTES", notes, h=2.0, lead=3.1)
     right_column(sh, lay, "S-001", extra)
@@ -779,7 +883,7 @@ def sheet_e001(lay: L.Layout, out):
     sh.text(x_main + 6, y - 18, "Utility meter + P_utility pulse (meter1)", h=1.9, va="center", c=MUTED)
     sh.line(x_main, y - 22, x_main, y - 30, lw=1.0)
     # service section
-    sym_box(sh, x_main - 28, y - 70, 56, 40, "SVC — SERVICE SECTION", [f"Main CB {d['service_breaker_a']} A, {V} V", "NEMA 3R, exterior end wall", "Type 1 SPD 100 kA", "Ground bar / GES bond"], kind="power")
+    sym_box(sh, x_main - 28, y - 70, 56, 40, "SVC — SERVICE SECTION", [f"Main CB {d['service_breaker_a']} A, {V} V", "NEMA 4X, exterior end wall", "Type 1 SPD 100 kA", "Ground bar / GES bond"], kind="power")
     sh.text(x_main + 32, y - 44, f"CTP-E1 HOLD: licensed electrician", h=1.8, c=CTP_C)
     sh.line(x_main, y - 70, x_main, y - 84, lw=1.0)
     # ATS
@@ -870,7 +974,7 @@ def sheet_e001(lay: L.Layout, out):
                 ["IT distribution", f"{v_pdu} V; {cfg.racks} racks x 2 PDU x {pdu_a} A; {d['per_rack_kw']} kW/rack"],
                 ["Mechanical panel", f"{pnlm_a} A main; {len(cus)} x cooling unit {cool_a} A" + (f"; {len(pumps)} x pump/CDU" if pumps else "") + ("; dry cooler" if dc else "")],
                 ["Generator (optional)", f"{gen_kva} kVA, ATS {d['service_breaker_a']} A 4P"],
-                ["EPO", "Mushroom button at door (int) and on SVC (ext): shunt-trip UPS output + PNL-M main; hard-wired, monitored by a controller dry-contact input"],
+                ["EPO", "Mushroom button at door (int) and on SVC (ext, NEMA 4X): shunt-trip UPS output + PNL-M main; hard-wired, monitored by a controller dry-contact input"],
                 ["PUE estimate", f"{d['pue_estimate']}"]]
         y = sh.table(x, y, ["ITEM", "VALUE"], rows, [RW * 0.26, RW * 0.74], title="ELECTRICAL SCHEDULE (preliminary)", h=1.9)
         y -= 6
@@ -1160,12 +1264,14 @@ GENERATORS = {"A-001": sheet_a001, "A-002": sheet_a002, "A-003": sheet_a003, "S-
 
 
 def write_index(lay, out):
+    sheets = sheets_for(lay)
     lines = [f"# {lay.d['tier_label']} — Issue-for-construction drawing set", "",
              f"Generated {DATE} by `design/drawings/gen_drawings.py` from `Config.preset('{lay.tier}')`.",
-             f"Configuration: {config_line(lay)}", "", "| Sheet | Title | Scale | Files |", "|---|---|---|---|"]
-    scales = {"A-001": "see sheet", "A-002": "see sheet", "A-003": "1:10 / 1:2", "S-001": "see sheet / 1:5", "E-001": "NTS", "M-001": "NTS", "C-001": "see sheet"}
-    for i, (no, title) in enumerate(SHEETS, 1):
-        lines.append(f"| {no} | {title} (sheet {i}/{len(SHEETS)}) | {scales[no]} | [{no}.svg]({no}.svg), [{no}.png]({no}.png) |")
+             f"Configuration: {config_line(lay)}", f"Enclosure: {lay.d['enclosure']} — {lay.d['hardening_rating']} ({lay.d['hardening_label']}).", "",
+             "| Sheet | Title | Scale | Files |", "|---|---|---|---|"]
+    scales = {"A-000": "see sheet", "A-001": "see sheet", "A-002": "see sheet", "A-003": "see sheet / 1:2", "S-001": "see sheet / 1:5", "E-001": "NTS", "M-001": "NTS", "C-001": "see sheet"}
+    for i, (no, title) in enumerate(sheets, 1):
+        lines.append(f"| {no} | {title} (sheet {i}/{len(sheets)}) | {scales.get(no, '1:50')} | [{no}.svg]({no}.svg), [{no}.png]({no}.png) |")
     lines += ["", "Status: **ISSUE FOR CONSTRUCTION Rev A** — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).", ""]
     if lay.deviations:
         lines += ["## Configuration deviations applied on this set", ""] + [f"- {dv}" for dv in lay.deviations] + [""]
@@ -1174,22 +1280,46 @@ def write_index(lay, out):
         f.write("\n".join(lines))
 
 
+def hall_generators(lay):
+    """Sheet number -> callable(lay, out) for the hall, numbered in sheets_for order."""
+    gens = {}
+    for n, (no, _title) in enumerate(sheets_for(lay), 1):
+        if no == "A-000":
+            gens[no] = lambda lay, out: GH.sheet_a000(lay, out, HALL_CTX)
+        elif no == "A-001":
+            gens[no] = lambda lay, out, n=n: GH.sheet_a001(lay, out, HALL_CTX, n)
+        elif no.startswith("A-001-M"):
+            gens[no] = lambda lay, out, n=n, m=int(no[-1]) - 1: GH.sheet_a001_module(lay, out, HALL_CTX, m, n)
+        elif no == "A-002":
+            gens[no] = lambda lay, out, n=n: GH.sheet_a002(lay, out, HALL_CTX, n)
+        elif no.startswith("A-002-M"):
+            gens[no] = lambda lay, out, n=n, m=int(no[-1]) - 1: GH.sheet_a002_module(lay, out, HALL_CTX, m, n)
+        else:
+            fn = {"A-003": GH.sheet_a003, "S-001": GH.sheet_s001, "E-001": GH.sheet_e001, "M-001": GH.sheet_m001, "C-001": GH.sheet_c001}[no]
+            gens[no] = lambda lay, out, n=n, fn=fn: fn(lay, out, HALL_CTX, n)
+    return gens
+
+
+ALL_SHEET_NOS = list(GENERATORS) + ["A-000"] + [f"A-001-M{k}" for k in (1, 2, 3)] + [f"A-002-M{k}" for k in (1, 2, 3)]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tier", choices=list(L.TIER_GEOMETRY), action="append")
-    ap.add_argument("--sheet", choices=list(GENERATORS), action="append")
+    ap.add_argument("--tier", choices=list(L.TIER_GEOMETRY) + list(L.TIER_ALIASES), action="append")
+    ap.add_argument("--sheet", choices=ALL_SHEET_NOS, action="append")
     ap.add_argument("--dpi", type=int, default=110)
     a = ap.parse_args(argv)
-    tiers = a.tier or list(L.TIER_GEOMETRY)
-    sheets = a.sheet or list(GENERATORS)
+    tiers = [L.canonical_tier(t) for t in a.tier] if a.tier else list(L.TIER_GEOMETRY)
     lays = []
     for t in tiers:
         lay = L.resolve(t)
         lays.append(lay)
         out = os.path.join(HERE, t)
         os.makedirs(out, exist_ok=True)
+        gens = hall_generators(lay) if lay.is_hall else GENERATORS
+        sheets = [s_ for s_ in (a.sheet or list(gens)) if s_ in gens]
         for no in sheets:
-            GENERATORS[no](lay, out)
+            gens[no](lay, out)
             print(f"  wrote {out}/{no}.svg/.png")
         write_index(lay, out)
     if not a.tier:
