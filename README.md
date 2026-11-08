@@ -35,7 +35,7 @@
 | Product page with mission profile picker, risks before price, configurator | `web/` | verified (rendered desktop + 390 px) |
 | Investor proposition and decks with speaker notes | `docs/investors/`, `docs/presentation/` | written; numbers from the BOM |
 
-The honest ledger, including what is least accurate, is `docs/VALIDATION.md`.
+The honest ledger, including the complete least-accurate list (the capability table above is its short form), is `docs/VALIDATION.md`. The internal audit of that ledger and its corrective-action log are in `docs/audit/`.
 
 ## Quickstart
 

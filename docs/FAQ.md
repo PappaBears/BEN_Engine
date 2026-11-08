@@ -42,6 +42,6 @@
 
 **Who owns the data?** The customer. The edge computer's SQLite database is the system of record; export is one click.
 
-**What is least accurate?** In order: thermal ride-through minutes and recovery times, envelope UA, CFD absolute temperatures, calibration placement corrections (literature values), estimate-status prices (CDU, RDHx, dry coolers, generators, site civil), and every hardware-layer behaviour until a lighthouse unit exists.
+**What is least accurate?** This is the short form of `docs/VALIDATION.md` §7, which is the complete list. In order: thermal ride-through minutes and recovery times, envelope UA, CFD absolute temperatures, calibration placement corrections (literature values), estimate-status prices (CDU, RDHx, dry coolers, generators, site civil), and every hardware-layer behaviour until a lighthouse unit exists.
 
 **What is the licence of this repository?** Unresolved; the owner has not chosen one. Do not assume open-source terms.
