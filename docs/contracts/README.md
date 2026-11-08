@@ -190,3 +190,7 @@ Validation rule for the generator: after substitution, `grep -c '\[[A-Z][A-Z0-9_
 
 ---
 Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Index maintained at `docs/contracts/README.md` · TEMPLATE SET — not legal advice — have counsel review before use.
+
+
+## Ready set (pre-filled)
+`python scripts/prepare_paperwork.py` fills Schreiber AI's side and every policy number into the templates and writes `docs/contracts/ready/`: one mutual NDA per counterparty in `purchasing/counterparties.json` (seeded from the 21 RFQs plus an integrator and a customer placeholder) and the master MSA, Integrator, Contract Manufacturing, Supplier Terms, SLA, Software Licence and Warranty documents. `ready/INDEX.md` lists the signing sequence and the fields still open per document. NDA goes out with the RFQ reply, before any drawing or BOM leaves Schreiber AI.

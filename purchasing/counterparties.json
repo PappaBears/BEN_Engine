@@ -1,0 +1,241 @@
+[
+ {
+  "name": "Container dealers: Cascade Containers / ContainerOne / Midstate",
+  "role": "supplier",
+  "rfq": "01",
+  "purpose": "RFQ: one-trip 10/20/40 ft high-cube ISO containers, 10-unit run (BEN Engine)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Great Lakes Case & Cabinet / DDB Unlimited",
+  "role": "supplier",
+  "rfq": "02",
+  "purpose": "RFQ: outdoor NEMA 4X 24U cabinet, ~6 kW IT heat load, 10 units (BEN 5)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Rittal North America / Pfannenberg USA",
+  "role": "supplier",
+  "rfq": "03",
+  "purpose": "RFQ: 5.8 kW enclosure cooling units (Blue e+ SK 3189.940 / DTS 6x2E), 30 units",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Schneider Electric (APC) partner",
+  "role": "supplier",
+  "rfq": "04",
+  "purpose": "RFQ: InRow DX ACRD301S + condensers, NetShelter SX racks, AP8841 PDUs, EPO (BEN 30 / BEN 150)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Vertiv",
+  "role": "supplier",
+  "rfq": "05",
+  "purpose": "RFQ: Liebert CRV in-row (alternate), CoolLoop RDHx, XDU450 CDU (BEN 150 / BEN 500)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "CoolIT Systems / Motivair",
+  "role": "supplier",
+  "rfq": "06",
+  "purpose": "RFQ: CHx750 row CDU, rack manifolds and QD hose kits for 48U GPU racks (BEN 500)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Güntner US / Alfa Laval",
+  "role": "supplier",
+  "rfq": "07",
+  "purpose": "RFQ: outdoor dry coolers 120 kW and 230 kW, glycol, EC fans, adiabatic-ready (BEN 150 / BEN 500)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Eaton",
+  "role": "supplier",
+  "rfq": "08",
+  "purpose": "RFQ: 93PM 50 kW UPS, 208 V, internal batteries, N+1 pair (BEN 30)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Schneider Electric (Galaxy VS, lithium)",
+  "role": "supplier",
+  "rfq": "09",
+  "purpose": "RFQ: Galaxy VS 100 kW 480 V UPS + Galaxy Lithium-ion battery cabinets (BEN 150 / BEN 500)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "ASCO Power / Generac Industrial dealer",
+  "role": "supplier",
+  "rfq": "10",
+  "purpose": "RFQ: Series 300 ATS (200 A / 400 A, NEMA 4X, SE-rated) and SD150 / SD250 diesel gensets (generator option)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Fike / Kidde Fire Systems distributor",
+  "role": "supplier",
+  "rfq": "11",
+  "purpose": "RFQ: pre-engineered FK-5-1-12 (Novec 1230) clean agent systems for 10/20/40 ft containers (design-build)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Supermicro authorised reseller",
+  "role": "supplier",
+  "rfq": "12",
+  "purpose": "RFQ: SYS-821GE-TNHR (8x H100) and SYS-421GE-TNRT (8x L40S) reference compute, 100GbE switching",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Silicon Labs / authorised distributor",
+  "role": "supplier",
+  "rfq": "13",
+  "purpose": "RFQ: Silicon Labs MGM240P modules (1,000 pcs), xG24 RCP boards, Custom Part Manufacturing Service for certificate injection, Secure Vault documentation",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "JLCPCB / PCBWay or contract electronics manufacturer",
+  "role": "supplier",
+  "rfq": "14",
+  "purpose": "RFQ: BEN Pod PCB fabrication + SMT assembly (MGM240P, 4-layer, RTD front end, PoE PD, RS-485), 500 pcs",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Local site civil and electrical contractor",
+  "role": "site contractor",
+  "rfq": "15",
+  "purpose": "RFQ: site civil & electrical package per BEN unit (pad, service, grounding, fiber), regional pricing",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms)",
+   "site subcontract (counsel)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Contract manufacturer (container modification / skid builder)",
+  "role": "contract manufacturer",
+  "rfq": "16",
+  "purpose": "RFI: contract manufacturing / integration of BEN Engine containerized edge data centers (BEN 5 / 30 / 150 / 500)",
+  "agreements": [
+   "CMA",
+   "SUPPLIER-TERMS (quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Phoenix Contact USA and UL 508A panel shop",
+  "role": "supplier",
+  "rfq": "17",
+  "purpose": "RFQ: PLCnext AXC F 2152, Axioline F I/O, QUINT4 power, FL SWITCH 2008, surge protection — 10-unit run, plus a UL 508A panel partner (BEN Controller)",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "OnLogic",
+  "role": "supplier",
+  "rfq": "18",
+  "purpose": "RFQ: OnLogic Karbon 400 (K410) edge computers with TPM 2.0, 10 + 2 units; Karbon 300 option for BEN Controls Lite",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Modular building manufacturer (BEN 2000)",
+  "role": "contract manufacturer (modular building)",
+  "rfq": "19",
+  "purpose": "RFQ: prefabricated wide-body data hall modules (3) + power module for a 2 MW single center (BEN 2000)",
+  "agreements": [
+   "CMA",
+   "SUPPLIER-TERMS (quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "MV / critical power package vendor (Eaton, Schneider, ABB, Vertiv, Generac, Caterpillar dealer)",
+  "role": "supplier",
+  "rfq": "20",
+  "purpose": "RFQ: 12.47 kV service package for a 2 MW center: MV switchgear, 2 x 2,500 kVA pad-mount transformers, 4,000 A 480 V switchgear, 2 MW UPS strings, 3 x 1,250 kW generators",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "Hardening vendors (ballistic, forced-entry, HEMP shielding, coatings)",
+  "role": "supplier",
+  "rfq": "21",
+  "purpose": "RFQ: enclosure hardening packages for modular data centers: UL 752 ballistic panels, ASTM F3038 forced-entry doors, HEMP shielding (MIL-STD-188-125-1), flood plinths, C5-M coatings",
+  "agreements": [
+   "SUPPLIER-TERMS (PO terms + quality requirements)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "[Integrator / white-label partner]",
+  "role": "integrator",
+  "rfq": "",
+  "purpose": "Evaluation of BEN Engine for resale, installation or white-label under the Integrator Agreement",
+  "agreements": [
+   "INTEGRATOR",
+   "SOFTWARE-LICENSE",
+   "SLA (wholesale)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ },
+ {
+  "name": "[Customer]",
+  "role": "customer",
+  "rfq": "",
+  "purpose": "Evaluation of a BEN Engine proposal, site requirements and configuration data",
+  "agreements": [
+   "MSA",
+   "SOW per unit",
+   "SOFTWARE-LICENSE",
+   "WARRANTY",
+   "SLA (managed)"
+  ],
+  "governing_state": "[GOVERNING_STATE]"
+ }
+]

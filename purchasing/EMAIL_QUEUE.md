@@ -30,3 +30,5 @@ One file per supplier question. Each is addressed **To: Ben@SchreiberAI.com** so
 Gmail drafts: created in the schreibears@gmail.com account for 01–12, 15, 16 (2026-11-07/08) and for the controls-platform set 13, 14, 17, 18 and the generation-2 set 19, 20, 21 (2026-11-08); the old Olimex draft was deleted. All addressed to Ben@SchreiberAI.com, nothing sent; each draft names the supplier to forward to and the source file.
 
 Controls platform change 2026-11-08 (docs/CONTROLS_HARDWARE_DECISION.md): email 13 was replaced, 14 rewritten, 17 and 18 added. The Gmail draft for the old file 13 (hobby MCU boards) was deleted by the lead; new drafts for 13, 14, 17 and 18 are to be created by the lead from these files.
+
+NDAs: a pre-filled mutual NDA exists for every counterparty in `docs/contracts/ready/` (index: `docs/contracts/ready/INDEX.md`); send it with the RFQ reply before sharing drawings or the BOM.
