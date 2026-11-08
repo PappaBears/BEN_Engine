@@ -171,3 +171,10 @@ for a listed PLC, a UL 508A panel, an industrial edge computer and a secure mesh
 UL 508A panel build, Vaisala HMW90, Pt1000 OEM strings, BEN Pod PCBA at volume, the Pod enclosure. Emails 13 (Silicon Labs
 distributor: 1,000 MGM240P, RCP boards, Custom Part Manufacturing Service for certificate injection), 14 (Pod PCBA), 17 (Phoenix
 Contact + UL 508A panel partner) and 18 (OnLogic) cover them.
+
+## 10. Generation 2: renamed tiers, BEN 2000 and hardening (2026-11-08)
+- Tier keys and names follow IT power: BEN 5 / 30 / 150 / 500 / 2000. Every `applies_to_tiers` entry was migrated; the BOM loader also accepts the old keys as aliases.
+- BEN 2000 is a prefabricated hall, not a container: 113 catalog lines apply, dominated by the MV service package (transformers, switchgear), two 2 MW UPS strings, three 1,250 kW generators, CDU rows, adiabatic dry coolers and the three wide-body modules plus power module. Most of these are quote-only; they are estimates with a stated basis and RFQs 19 and 20 request firm quotes. Confirmed share of the BEN 2000 BOM is 72.7 % by value, carried mostly by compute listings.
+- Hardening levels add catalog lines with `applies_to_hardening` (H2: 9 lines, H3: 19 lines): flood plinth, C5-M coating per m², filtration hoods, hurricane hardware, ballistic panels per m², forced-entry doors, HEMP shielding per m² with filtered penetrations, mantrap vestibule, access controller. All estimates; RFQ 21.
+- BEN 5 enclosure is now a NEMA 4X / IP66 outdoor cabinet; IP66 sealing kits and hose-test labour are separate lines on the module tiers.
+- Lead times: generators and MV transformers carry 48–52 weeks and sit on the BEN 2000 critical path; the proposal schedule shows this honestly (about 71 weeks to turnover at today's catalog leads versus the 52-week target in the process flow). Shortening it needs early transformer orders or utility-provided transformers.

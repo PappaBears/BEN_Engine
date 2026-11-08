@@ -53,7 +53,7 @@ def main():
         # wind on long side of a 40 ft HC: A = 12.192 x 2.896, Cf ~ 1.3, lever 1.45 m vs restoring W/2 x 2.438 m
         F = qz * 1.3 * 12.192 * 2.896
         Mo = F * 1.448
-        Mr = lays["ben40"].d["gross_kg"] * 9.81 / 1000 * 1.219
+        Mr = lays["ben500"].d["gross_kg"] * 9.81 / 1000 * 1.219
         A(f"| {c['label']} | {c['t_design_c']} | {c['t_min_c']} | {c['solar_w_m2']} | {c['corrosion']} | {c['wind_ms']} | {qz:.2f} | F {F:.0f} kN, Mo {Mo:.0f} kNm vs Mr {Mr:.0f} kNm → {'tie-downs required' if Mo > Mr * 0.67 else 'stable, tie-downs still required'} | site SDS; Detail B option ≥ 0.5 g | roof 300 kg/m² rating; site ground snow |")
     A("")
     A("All tiers are anchored at the four bottom corner castings (twist-locks, SITE-002) regardless of the overturning result; BEN Micro is anchored with 4 × M16 wedge anchors (S-001 Detail A). Seismic: the container shell is a rigid box; interior racks are the governing non-structural component (ASCE 7 Ch. 13, Ip = 1.5 for a facility that must stay operational). Detail B on S-001 gives the top-of-rack strut option; the engineer of record confirms per site SDS.")
@@ -109,7 +109,7 @@ def main():
         drawn = lay.notes.get("cooling_resolved", lay.cfg.cooling)
         units = []
         n_air = lay.notes.get("n_air", 0)
-        if lay.tier == "micro":
+        if lay.tier == "ben5":
             units.append(f"{d['cooling_units_total']} × cabinet DX 5.8 kW")
         if n_air:
             units.append(f"{n_air} × in-row 300 / 20 kW")

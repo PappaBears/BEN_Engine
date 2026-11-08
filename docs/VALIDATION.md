@@ -8,7 +8,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 | Check | Command | Observed |
 | --- | --- | --- |
-| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **113 passed** in 8.7 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, bom, selector parity, api, proposal, package, export) |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **172 passed** in 16.6 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2) |
 | Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
 | Build contract | `build_control.py run` (skill helper) | python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500 all **pass** (report under `.schreiber-ai/`, git-ignored) |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |
@@ -28,7 +28,7 @@ Calibration budgets computed (k = 2): DS18B20 ±0.17 K, SHT45 T ±0.14 K, SHT45 
 
 ## 3. Dashboard (Playwright, Chromium, software WebGL)
 
-`bash tests/e2e/run_e2e.sh` (2026-11-08): **22/22 checks passed, exit 0**, about 13 minutes under software WebGL. Checks: server up with modules; WebSocket live; BEN 150 scene 5 racks / 27 sensors; selector to BEN 500 rebuilds twin and scene (10 racks); invalid configuration shows inline error and disables Apply; BEN 5 renders one cabinet; walkthrough eye height 1.70 m stays inside; cooling fault via UI raises alarm, click selects the unit in 3-D, clear via UI; sweep run and CSV download (105 lines); every panel renders; calibration demo points give gain/offset/U95; guided tour 24 frames with captions; **proposal panel generates a proposal from the current configuration and the HTML is served**; 390 px layout stacks with no horizontal scroll; 0 uncaught page errors.
+`bash tests/e2e/run_e2e.sh` (2026-11-08, generation 2): **25/25 checks passed, exit 0**. Checks include five presets with the hardening select, BEN 500 switch, BEN 5 cabinet, BEN 2000 hall (48 racks in 4 rows, 2 transformers, 3 generators, 7 dry coolers, 8 fan walls, H3 plinth and vestibule), cooling fault and alarm, sweep CSV download, every panel, calibration, guided tour frames, hover tooltips with BOM part and live values, proposal generation, 390 px layout, 0 uncaught errors.
 
 Screenshots inspected by eye: `docs/media/screens/desktop-exterior-iso.png`, `interior-walkthrough.png`, `alarms.png`, `sweeps.png`, `selector-ben5.png`, `selector-ben500.png`, `narrow-390.png`, `live-hot-aisle.png`, `proposal-panel.png`, `web-hero.png`, `web-configure.png`, `web-narrow.png`, `proposal-1.png`, `proposal-2.png`. Fixes made from looking are listed in `docs/PROJECT_NOTES.md`.
 
@@ -38,7 +38,7 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 
 | Deliverable | Command | Observed |
 | --- | --- | --- |
-| Drawings | `python design/drawings/gen_drawings.py` | 28 sheets (SVG+PNG), 4 INDEX.md, INTERFERENCE_CHECKS.md; red deviation notes: none after the configuration changes; remaining FAILs are informative (NEC 110.26 condition 2 not required, two-row layouts rejected by design) plus BEN 500 rack-top clearance 290 vs 300 mm (resolution printed on sheet) |
+| Drawings | `python design/drawings/gen_drawings.py` | 5 tiers; BEN 2000 adds A-000 site plan and per-module A-001/A-002 sheets (41 sheets total, SVG+PNG), INDEX.md per tier, INTERFERENCE_CHECKS.md (BEN 2000 rows: no FAIL); red deviation notes: none after the configuration changes; remaining FAILs are informative (NEC 110.26 condition 2 not required, two-row layouts rejected by design) plus BEN 500 rack-top clearance 290 vs 300 mm (resolution printed on sheet) |
 | Renders | `python design/renders/gen_renders.py` | 32 stage PNGs + 4 contact sheets; labelled concept renders |
 | Assembly | `python design/assembly/gen_assembly.py` | 4 STE documents; 0 instructions over 20 words; banned-word check passes; all item codes reconciled with the catalog |
 | SQAM | `python design/gen_sqam.py` | 405 lines; CTQ/CTP register per tier (BEN 5 27, BEN 30 38, BEN 150 38, BEN 500 39 items) |
@@ -49,15 +49,12 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 | Decks | `build_presentation.py` | 12 + 12 slides with notes; visual review of the HTML decks **not performed** |
 | Demo GIF | `make_demo_gif.py` | 24 real tour frames, 6 s, 4.5 MB |
 
-## 4a. Generation-2 refactor (2026-11-08): names, BEN 2000, hardening
-
-| Item | Status | Evidence |
-| --- | --- | --- |
-| Tier keys renamed to `ben5/ben30/ben150/ben500` with alias map for `micro/ben10/ben20/ben40` | **verified** (`python -m ben_engine.config --tier ben150 --hardening H3` prints BEN 150, H3 Hardened / government) | `software/ben_engine/config.py` |
-| BEN 2000 sizing (`--tier ben2000`): 1,600 kW IT in 48 racks, 12.47 kV MV service, 2 transformers, 2 UPS strings of 1,937 kVA, 3 generators, 7 cooling units, PUE 1.134, gross 109 t, 102 Pods | **verified in config only**; twin, CFD per module, sweeps, drawings (site plan A-000 + per-module sheets), BOM (`docs/BOM-ben2000.md`), proposal and dashboard scene for BEN 2000: **pending** the core and catalog agents — the lead updates this row | `python -m ben_engine.config --tier ben2000` |
-| Hardening H1/H2/H3 in the config (rating, coating, wind, envelope mass adder, recommendation by profile/climate) | **verified in config**; catalog cost lines `applies_to_hardening`, compliance pack rows, maintenance add-ons and proposal text: **pending** | `config.py` HARDENING table |
-| Documents renamed and extended (compliance §14/§15, process flow §5 with Gantt, site requirements BEN 2000 column, maintenance §4a/§5a, tests E14–E16, contracts, decks, risk register R27–R33) | **verified** by grep: no generation-1 tier names and no rain-only 3R enclosure rating remain outside the decision records and `PROJECT_NOTES.md` | grep for the retired names and the retired rating over `docs`, `README.md`, `web/index.html`, `web/kit` returns nothing |
-| Envelope hose test E14, joint seal test E15, transfer test E16 | **documented only**; no hardware | `docs/TEST_GUIDE.md` |
+## 4a. Generation 2 (power-based tiers, BEN 2000, hardening) — observed 2026-11-08
+- Configuration model: aliases micro/ben10/ben20/ben40 resolve; all 5 tiers × 8 profiles × 4 climates produce valid presets (test_config_gen2, 20 tests).
+- BEN 2000 preset (ai_training, hot_arid, 1,600 kW, 27 racks, N+1, H2): 12.47 kV service, 2 × 2,500 kVA transformers, 2 × 1,937 kVA UPS strings, 296 kWh LFP, 3 × 1,250 kW generators, 7 CDUs, PUE 1.134, gross mass about 95 t. Twin, sweeps (6/6), commissioning (10/10, 102 Pods) and CFD (3.7 s) run for the hall.
+- Hardening: H1/H2/H3 selectable in the website and dashboard; H2/H3 catalog lines (9/19) priced as estimates; envelope mass adder applied; compliance and maintenance rows written.
+- Unit economics (28 % margin): BEN 2000 sell price about $56.1 M all modules, $16.4 M infrastructure-only (about $10,200 per kW IT), against $10,000–13,000 per kW for a traditional 1–5 MW build (cited).
+- Not verified: any BEN 2000 physical value (module mass, water use, utility lead time, noise), prefabricated-module pricing, MV equipment lead times (48–52 weeks carried; proposal shows ~71 weeks to turnover versus the 52-week target), hardening vendor pricing, ballistic/shielding integration with the IP66 envelope.
 
 ## 5. Implemented, unverified
 

@@ -12,10 +12,11 @@ The design basis covers the enclosure, the interior layout, the envelope, the st
 
 | Tier | Tare kg | Payload kg (config) | Gross kg | Per corner post kN (static) | Row strip UDL kN/m² | Rack foot point load kN |
 |---|---|---|---|---|---|---|
-| BEN Micro | 320 | 767 | 1087 | 2.7 | — | 0.98 |
-| BEN 10 | 1300 | 3084 | 4384 | 10.8 | 8.8 | 2.21 |
-| BEN 20 | 2400 | 5942 | 8342 | 20.5 | 6.9 | 2.21 |
-| BEN 40 | 3900 | 10784 | 14684 | 36.0 | 7.0 | 2.45 |
+| BEN 5 | 320 | 767 | 1087 | 2.7 | — | 0.98 |
+| BEN 30 | 1300 | 3084 | 4384 | 10.8 | 8.8 | 2.21 |
+| BEN 150 | 2400 | 5942 | 8342 | 20.5 | 6.9 | 2.21 |
+| BEN 500 | 3900 | 10784 | 14684 | 36.0 | 7.0 | 2.45 |
+| BEN 2000 | 60000 | 49070 | 109070 | 267.5 | — | 2.45 |
 
 Live load inside the unit: 2.5 kN/m² on the aisle (one technician with a rack lifter and a 100 kg module) **(assumption)**. Container floors are rated for a 5460 kg forklift axle test (ISO 1496-1) and about 20 kN/m² uniform payload; rack point loads are spread by the C100 floor channels on the cross members (S-001).
 
@@ -56,7 +57,7 @@ All tiers are anchored at the four bottom corner castings (twist-locks, SITE-002
 | Coastal | -5 | 21.3 | 10.2 | 4 | 20 mm closed-cell on exposed steel |
 | High altitude | -30 | 20.6 | 9.5 | -12 | 20 mm closed-cell on steel; heated door gasket |
 
-Envelope heat gain at design (config rule, kW): BEN Micro 0.11, BEN 10 0.58, BEN 20 1.12, BEN 40 2.21 — small against the IT load but it sets the no-load cooling floor and the condensation risk at the hot plenum wall. Fire: PIR class B-s2,d0 (EN 13501-1) or FM 4880 approved; the liner protects the foam.
+Envelope heat gain at design (config rule, kW): BEN 5 0.11, BEN 30 0.58, BEN 150 1.12, BEN 500 2.21, BEN 2000 27.14 — small against the IT load but it sets the no-load cooling floor and the condensation risk at the hot plenum wall. Fire: PIR class B-s2,d0 (EN 13501-1) or FM 4880 approved; the liner protects the foam.
 
 ## 5. Acoustics
 
@@ -64,7 +65,7 @@ Source levels **(assumptions from vendor-typical data)**: in-row DX unit 65 dB(A
 
 ## 6. Egress, working space and lighting
 
-- Single row along the rack wall; the cold aisle is the egress path to the cargo doors. Drawn clear width BEN 10 930 mm, BEN 20 930 mm, BEN 40 930 mm (≥ 900 mm egress, ≥ 914 mm NEC 110.26 condition 1). Cargo doors open outward 270° and are fitted with inside panic releases **(add to BOM: FS-050)**. Dead-end length equals the container length; under NFPA 75 a single exit is acceptable for a room this size with occupancy limited to service staff.
+- Single row along the rack wall; the cold aisle is the egress path to the cargo doors. Drawn clear width BEN 30 930 mm, BEN 150 930 mm, BEN 500 930 mm (≥ 900 mm egress, ≥ 914 mm NEC 110.26 condition 1). Cargo doors open outward 270° and are fitted with inside panic releases **(add to BOM: FS-050)**. Dead-end length equals the container length; under NFPA 75 a single exit is acceptable for a room this size with occupancy limited to service staff.
 - NEC 110.26 condition 2 (1067 mm) is not met and is not required: the surface opposite the row is the insulated liner with no exposed grounded conductive parts at working height; the opposing-wall items (EPO, FRP) are ≤ 100 mm deep and above/below the 914 mm zone or within 600 mm of the door. If a customer places grounded equipment on the aisle wall, condition 2 applies and fails — this is a design constraint written on A-002.
 - Working space width 762 mm is satisfied by the continuous aisle; height 2.0 m is satisfied (tray underside 2250 mm).
 - Lighting: LED 4000 K luminaires over the aisle at the ceiling, 500 lx at 1 m AFF on the rack faces, emergency light at the door (90 min). Lights on PNL-M with a controller relay output (relay2) for remote control.
@@ -73,10 +74,11 @@ Source levels **(assumptions from vendor-typical data)**: in-row DX unit 65 dB(A
 
 | Tier | IT kW | Racks | kW/rack | Voltage | Service A (calc / breaker) | UPS | Battery kWh | Cooling (config → drawn) | Units drawn | Airflow cfm | PUE est. | Config row_length_mm / fits |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| BEN Micro | 5 | 1 | 5.0 | 208/240 V 1ph | 41 / 50 | 2 × 6 kVA | 0.9 | cabinet_dx → cabinet_dx | 2 × cabinet DX 5.8 kW | 625 | 1.535 | 1900 / True |
-| BEN 10 | 30 | 2 | 15.0 | 208 V 3ph | 149 / 150 | 2 × 36 kVA | 5.6 | inrow_dx_300 → inrow_dx_300 | 3 × in-row 300 / 20 kW | 3750 | 1.389 | 2600 / True |
-| BEN 20 | 96 | 5 | 19.2 | 480 V 3ph | 175 / 200 | 2 × 116 kVA | 17.8 | rdhx_drycooler → rdhx_drycooler | 5 × RDHx + 2 row CDU + dry cooler | 3840 | 1.18 | 3500 / True |
-| BEN 40 | 192 | 10 | 19.2 | 480 V 3ph | 336 / 400 | 2 × 232 kVA | 35.6 | dlc_cdu → dlc_cdu | 4 × in-row 300 / 20 kW; 2 × CDU + dry cooler | 7680 | 1.136 | 7700 / True |
+| BEN 5 | 5 | 1 | 5.0 | 208/240 V 1ph | 41 / 50 | 2 × 6 kVA | 0.9 | cabinet_dx → cabinet_dx | 2 × cabinet DX 5.8 kW | 625 | 1.535 | 1900 / True |
+| BEN 30 | 30 | 2 | 15.0 | 208 V 3ph | 149 / 150 | 2 × 36 kVA | 5.6 | inrow_dx_300 → inrow_dx_300 | 3 × in-row 300 / 20 kW | 3750 | 1.389 | 2600 / True |
+| BEN 150 | 96 | 5 | 19.2 | 480 V 3ph | 175 / 200 | 2 × 116 kVA | 17.8 | rdhx_drycooler → rdhx_drycooler | 5 × RDHx + 2 row CDU + dry cooler | 3840 | 1.18 | 3500 / True |
+| BEN 500 | 192 | 10 | 19.2 | 480 V 3ph | 336 / 400 | 2 × 232 kVA | 35.6 | dlc_cdu → dlc_cdu | 4 × in-row 300 / 20 kW; 2 × CDU + dry cooler | 7680 | 1.136 | 7700 / True |
+| BEN 2000 | 1600 | 48 | 33.33 | 12.47 kV MV service → 480 V 3ph | 2795 / 3000 | 2 × 1937 kVA | 296.3 | dlc_cdu → dlc_cdu | 7 × CDU + dry cooler | 64000 | 1.134 | 8900 / True |
 
 Rules: UPS carries IT only with 15 % headroom; service sized at 80 % continuous; cooling N units at 1.05 × IT with 1.5 %/K DX derate above 35 °C; DLC removes 75 % of rack heat at the cold plate, the rest is air **(assumption)**; airflow 125 cfm/kW air-cooled, 40 cfm/kW liquid. Controls (docs/CONTROLS_HARDWARE_DECISION.md): BEN Controls Pro (PLCnext AXC F 2152 + Axioline F I/O in a UL 508A panel, OnLogic Karbon 400 edge computer) on BEN 20/40, BEN Controls Lite (Revolution Pi RevPi Connect 4 + DIO/AIO) on BEN Micro, selectable on BEN 10; BEN Pods on BEN Mesh (Thread, MGM240P): two per rack (cold and hot face) + room + outdoor, Micro 3; logical node ids one per two racks; three inlet probes per rack (0.4 / 1.2 / 1.8 m; 0.3 / 0.7 / 1.1 m in the Micro), one outlet probe, supply/return probes, RH, dP across the containment, leak rope, door contact, utility pulse — identical to `Twin.sensors()` and `spec/PROTOCOL.md`.
 
@@ -86,70 +88,91 @@ The layout engine places the row and checks it against the enclosure. The table 
 
 | Tier | ID | Sheet | Check | Numbers | Limit | Result | Resolution |
 |---|---|---|---|---|---|---|---|
-| BEN Micro | I-M1 | A-002 | Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and controls shelf (1U) | 24U - 15U | >= 6 | **OK*** | 9U for IT at 5 kW: 2 x 2U servers + 1U switch + 1U patch fits; was 12U rule |
-| BEN Micro | I-M2 | A-001 | Cabinet DX units fit on cabinet exterior long face | 1 x 400 + 2 x 100 gap vs ext 1200 | <= 1200 | **OK** |  |
-| BEN Micro | I-M3 | A-003 | Rack depth + front/rear air gap vs cabinet interior width | 600 + 100 + 100 vs 800 | <= 800 | **OK** |  |
-| BEN Micro | I-M4 | S-001 | Skid + cabinet gross mass vs 2.5 t forklift / tail-lift | gross 1087 kg | <= 2500 | **OK** |  |
-| BEN 10 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
-| BEN 10 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 2600 vs 2700 | <= 2700 | **OK** |  |
-| BEN 10 | I-C2 | A-002 | Row length with layout footprints (inrow_dx_300: 2 racks, 3 cooling units, power cabinets) vs usable length | 2100 vs 2200 | <= 2200 | **OK** |  |
-| BEN 10 | I-C21 | A-002 | Row length with catalog UPS (0 x 93PM 50 kW tower @495 in the row; 3 x PWR-UPS-RM20 rack-mount alternative) vs usable length | 2100 vs 2200 | <= 2200 | **OK** |  |
-| BEN 10 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 200 - 1070 = 930 | >= 900 | **OK** |  |
-| BEN 10 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK42: 600 x 1070 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1070 = 930 | >= 914 | **OK** |  |
-| BEN 10 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
-| BEN 10 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
-| BEN 10 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 2700 - 500 - 2100 = 100 | >= 0 | **OK** |  |
-| BEN 10 | I-C8 | A-002 | Two-row layout (2 x rack depth + 1000 cold aisle) vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; single row chosen |
-| BEN 10 | I-C9 | A-002 | Rack 1070 + aisle 1000 + cooling unit 1070 across the width vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; cooling units are in-row, not across the width |
-| BEN 10 | I-C10 | A-002 | Rack working space width (762 min) vs rack width | 762 vs 600 rack + aisle continuous | >= 762 | **OK*** | Aisle is continuous along the row; width requirement met by the open aisle |
-| BEN 10 | I-C11 | A-003 | Overhead tray underside (over the aisle) vs rack top, cables drop to rack top entry | 2250 - 2000 = 250 | >= 0 | **OK*** | Trays run over the aisle, not over racks; head clearance under tray 2250 >= 2100 |
-| BEN 10 | I-C12 | A-003 | Tray top vs ceiling liner (clearance >= 100 for installation) | 2490 - 2350 = 140 | >= 100 | **OK** |  |
-| BEN 10 | I-C13 | A-002 | Door swing: ISO cargo doors swing outward; interior door zone needed | 0 vs 0 | >= 0 | **OK*** | Cargo doors open outward 270 deg; no interior swing |
-| BEN 10 | I-C14 | A-003 | Rack height vs interior height (>= 300 for top cable entry and lights over the row) | 2490 - 2000 = 490 | >= 300 | **OK** |  |
-| BEN 10 | I-C15 | S-001 | Gross mass vs ISO 668 max gross for the container size (30480 kg) | 4384 vs 30480 | <= 30480 | **OK** |  |
-| BEN 10 | I-C16 | S-001 | Row strip floor load (payload over row footprint) vs ISO 1496-1 uniform payload rating (~20 kN/m2) | 8.8 kN/m2 vs 20 | <= 20 | **OK*** | Rack feet are point loads: C100 floor channels on cross-members spread them; verify in structural calc |
-| BEN 10 | I-C17 | A-002 | Rack 1 U available for IT after 3 rack-mount UPS (10U each) + battery (6U) | 42 - 36 | >= 6 | **OK*** | IT in rack 1 limited to 6U; rack 2 carries the balance. Alternative: BEN 10 preset at 20 kW (2 modules) |
-| BEN 10 | I-C20 | A-001 | Roof penetrations min 300 mm from side top rail | line-set curbs at y=300 interior = 419 from ext side face | >= 300 | **OK*** | Line-set roof curbs 300 mm inboard of top side rail, between corrugation roof bows; see A-001 |
-| BEN 20 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
-| BEN 20 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 3500 vs 5750 | <= 5750 | **OK** |  |
-| BEN 20 | I-C2 | A-002 | Row length with layout footprints (rdhx_drycooler: 5 racks, 4 cooling units, power cabinets) vs usable length | 4800 vs 5250 | <= 5250 | **OK** |  |
-| BEN 20 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 0 x Li cab @600, catalog qty rules) vs usable length | 4200 vs 5250 | <= 5250 | **OK** |  |
-| BEN 20 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 0 - 1270 = 930 | >= 900 | **OK** |  |
-| BEN 20 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK42: 600 x 1070 deep + RDHx) vs 900 egress / 914 NEC | 2200 - 0 - 1070 = 930 | >= 914 | **OK** |  |
-| BEN 20 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
-| BEN 20 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
-| BEN 20 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 5750 - 500 - 4800 = 450 | >= 0 | **OK** |  |
-| BEN 20 | I-C8 | A-002 | Two-row layout (2 x rack depth + 1000 cold aisle) vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; single row chosen |
-| BEN 20 | I-C9 | A-002 | Rack 1070 + aisle 1000 + cooling unit 1070 across the width vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; cooling units are in-row, not across the width |
-| BEN 20 | I-C10 | A-002 | Rack working space width (762 min) vs rack width | 762 vs 600 rack + aisle continuous | >= 762 | **OK*** | Aisle is continuous along the row; width requirement met by the open aisle |
-| BEN 20 | I-C11 | A-003 | Overhead tray underside (over the aisle) vs rack top, cables drop to rack top entry | 2250 - 2000 = 250 | >= 0 | **OK*** | Trays run over the aisle, not over racks; head clearance under tray 2250 >= 2100 |
-| BEN 20 | I-C12 | A-003 | Tray top vs ceiling liner (clearance >= 100 for installation) | 2490 - 2350 = 140 | >= 100 | **OK** |  |
-| BEN 20 | I-C13 | A-002 | Door swing: ISO cargo doors swing outward; interior door zone needed | 0 vs 0 | >= 0 | **OK*** | Cargo doors open outward 270 deg; no interior swing |
-| BEN 20 | I-C14 | A-003 | Rack height vs interior height (>= 300 for top cable entry and lights over the row) | 2490 - 2000 = 490 | >= 300 | **OK** |  |
-| BEN 20 | I-C15 | S-001 | Gross mass vs ISO 668 max gross for the container size (30480 kg) | 8342 vs 30480 | <= 30480 | **OK** |  |
-| BEN 20 | I-C16 | S-001 | Row strip floor load (payload over row footprint) vs ISO 1496-1 uniform payload rating (~20 kN/m2) | 6.9 kN/m2 vs 20 | <= 20 | **OK*** | Rack feet are point loads: C100 floor channels on cross-members spread them; verify in structural calc |
-| BEN 20 | I-C18 | M-001 | RDHx doors per rack vs config cooling_units_total | 5 doors vs 4 config units | >= 4 | **OK*** | RDHx is one door per rack (catalog CLG-RDHX qty = racks); config counts 35 kW units for capacity only |
-| BEN 20 | I-C20 | A-001 | Roof penetrations min 300 mm from side top rail | line-set curbs at y=300 interior = 419 from ext side face | >= 300 | **OK*** | Line-set roof curbs 300 mm inboard of top side rail, between corrugation roof bows; see A-001 |
-| BEN 40 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
-| BEN 40 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 7700 vs 11850 | <= 11850 | **OK** |  |
-| BEN 40 | I-C2 | A-002 | Row length with layout footprints (dlc_cdu: 10 racks, 2 cooling units, power cabinets) vs usable length | 10400 vs 11350 | <= 11350 | **OK** |  |
-| BEN 40 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 2 x Li cab @600, catalog qty rules) vs usable length | 9600 vs 11350 | <= 11350 | **OK** |  |
-| BEN 40 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 200 - 1070 = 930 | >= 900 | **OK** |  |
-| BEN 40 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK48: 600 x 1070 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1070 = 930 | >= 914 | **OK** |  |
-| BEN 40 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
-| BEN 40 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
-| BEN 40 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 11850 - 500 - 10400 = 950 | >= 0 | **OK** |  |
-| BEN 40 | I-C8 | A-002 | Two-row layout (2 x rack depth + 1000 cold aisle) vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; single row chosen |
-| BEN 40 | I-C9 | A-002 | Rack 1070 + aisle 1000 + cooling unit 1070 across the width vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; cooling units are in-row, not across the width |
-| BEN 40 | I-C10 | A-002 | Rack working space width (762 min) vs rack width | 762 vs 600 rack + aisle continuous | >= 762 | **OK*** | Aisle is continuous along the row; width requirement met by the open aisle |
-| BEN 40 | I-C11 | A-003 | Overhead tray underside (over the aisle) vs rack top, cables drop to rack top entry | 2250 - 2200 = 50 | >= 0 | **OK*** | Trays run over the aisle, not over racks; head clearance under tray 2250 >= 2100 |
-| BEN 40 | I-C12 | A-003 | Tray top vs ceiling liner (clearance >= 100 for installation) | 2490 - 2350 = 140 | >= 100 | **OK** |  |
-| BEN 40 | I-C13 | A-002 | Door swing: ISO cargo doors swing outward; interior door zone needed | 0 vs 0 | >= 0 | **OK*** | Cargo doors open outward 270 deg; no interior swing |
-| BEN 40 | I-C14 | A-003 | Rack height vs interior height (>= 300 for top cable entry and lights over the row) | 2490 - 2200 = 290 | >= 300 | **FAIL** | Short by 10 mm: lights move over the aisle; top cable entry needs >= 250. Alternative: 47U racks (2150) |
-| BEN 40 | I-C15 | S-001 | Gross mass vs ISO 668 max gross for the container size (30480 kg) | 14684 vs 30480 | <= 30480 | **OK** |  |
-| BEN 40 | I-C16 | S-001 | Row strip floor load (payload over row footprint) vs ISO 1496-1 uniform payload rating (~20 kN/m2) | 7.0 kN/m2 vs 20 | <= 20 | **OK*** | Rack feet are point loads: C100 floor channels on cross-members spread them; verify in structural calc |
-| BEN 40 | I-C19 | M-001 | Residual air load (25 % IT) vs in-row 300 capacity x units (N) | 50.4 kW vs 4 x 20 kW | >= 50.4 | **OK** |  |
-| BEN 40 | I-C20 | A-001 | Roof penetrations min 300 mm from side top rail | line-set curbs at y=300 interior = 419 from ext side face | >= 300 | **OK*** | Line-set roof curbs 300 mm inboard of top side rail, between corrugation roof bows; see A-001 |
+| BEN 5 | I-M1 | A-002 | Rack units available for IT after UPS (2 x 4U), battery packs (2 x 3U) and controls shelf (1U) | 24U - 15U | >= 6 | **OK*** | 9U for IT at 5 kW: 2 x 2U servers + 1U switch + 1U patch fits; was 12U rule |
+| BEN 5 | I-M2 | A-001 | Cabinet DX units fit on cabinet exterior long face | 1 x 400 + 2 x 100 gap vs ext 1200 | <= 1200 | **OK** |  |
+| BEN 5 | I-M3 | A-003 | Rack depth + front/rear air gap vs cabinet interior width | 600 + 100 + 100 vs 800 | <= 800 | **OK** |  |
+| BEN 5 | I-M4 | S-001 | Skid + cabinet gross mass vs 2.5 t forklift / tail-lift | gross 1087 kg | <= 2500 | **OK** |  |
+| BEN 30 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
+| BEN 30 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 2600 vs 2700 | <= 2700 | **OK** |  |
+| BEN 30 | I-C2 | A-002 | Row length with layout footprints (inrow_dx_300: 2 racks, 3 cooling units, power cabinets) vs usable length | 2100 vs 2200 | <= 2200 | **OK** |  |
+| BEN 30 | I-C21 | A-002 | Row length with catalog UPS (0 x 93PM 50 kW tower @495 in the row; 3 x PWR-UPS-RM20 rack-mount alternative) vs usable length | 2100 vs 2200 | <= 2200 | **OK** |  |
+| BEN 30 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 200 - 1070 = 930 | >= 900 | **OK** |  |
+| BEN 30 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK42: 600 x 1070 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1070 = 930 | >= 914 | **OK** |  |
+| BEN 30 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
+| BEN 30 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
+| BEN 30 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 2700 - 500 - 2100 = 100 | >= 0 | **OK** |  |
+| BEN 30 | I-C8 | A-002 | Two-row layout (2 x rack depth + 1000 cold aisle) vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; single row chosen |
+| BEN 30 | I-C9 | A-002 | Rack 1070 + aisle 1000 + cooling unit 1070 across the width vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; cooling units are in-row, not across the width |
+| BEN 30 | I-C10 | A-002 | Rack working space width (762 min) vs rack width | 762 vs 600 rack + aisle continuous | >= 762 | **OK*** | Aisle is continuous along the row; width requirement met by the open aisle |
+| BEN 30 | I-C11 | A-003 | Overhead tray underside (over the aisle) vs rack top, cables drop to rack top entry | 2250 - 2000 = 250 | >= 0 | **OK*** | Trays run over the aisle, not over racks; head clearance under tray 2250 >= 2100 |
+| BEN 30 | I-C12 | A-003 | Tray top vs ceiling liner (clearance >= 100 for installation) | 2490 - 2350 = 140 | >= 100 | **OK** |  |
+| BEN 30 | I-C13 | A-002 | Door swing: ISO cargo doors swing outward; interior door zone needed | 0 vs 0 | >= 0 | **OK*** | Cargo doors open outward 270 deg; no interior swing |
+| BEN 30 | I-C14 | A-003 | Rack height vs interior height (>= 300 for top cable entry and lights over the row) | 2490 - 2000 = 490 | >= 300 | **OK** |  |
+| BEN 30 | I-C15 | S-001 | Gross mass vs ISO 668 max gross for the container size (30480 kg) | 4384 vs 30480 | <= 30480 | **OK** |  |
+| BEN 30 | I-C16 | S-001 | Row strip floor load (payload over row footprint) vs ISO 1496-1 uniform payload rating (~20 kN/m2) | 8.8 kN/m2 vs 20 | <= 20 | **OK*** | Rack feet are point loads: C100 floor channels on cross-members spread them; verify in structural calc |
+| BEN 30 | I-C17 | A-002 | Rack 1 U available for IT after 3 rack-mount UPS (10U each) + battery (6U) | 42 - 36 | >= 6 | **OK*** | IT in rack 1 limited to 6U; rack 2 carries the balance. Alternative: BEN 30 preset at 20 kW (2 modules) |
+| BEN 30 | I-C20 | A-001 | Roof penetrations min 300 mm from side top rail | line-set curbs at y=300 interior = 419 from ext side face | >= 300 | **OK*** | Line-set roof curbs 300 mm inboard of top side rail, between corrugation roof bows; see A-001 |
+| BEN 150 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
+| BEN 150 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 3500 vs 5750 | <= 5750 | **OK** |  |
+| BEN 150 | I-C2 | A-002 | Row length with layout footprints (rdhx_drycooler: 5 racks, 4 cooling units, power cabinets) vs usable length | 4800 vs 5250 | <= 5250 | **OK** |  |
+| BEN 150 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 0 x Li cab @600, catalog qty rules) vs usable length | 4200 vs 5250 | <= 5250 | **OK** |  |
+| BEN 150 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 0 - 1270 = 930 | >= 900 | **OK** |  |
+| BEN 150 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK42: 600 x 1070 deep + RDHx) vs 900 egress / 914 NEC | 2200 - 0 - 1070 = 930 | >= 914 | **OK** |  |
+| BEN 150 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
+| BEN 150 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
+| BEN 150 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 5750 - 500 - 4800 = 450 | >= 0 | **OK** |  |
+| BEN 150 | I-C8 | A-002 | Two-row layout (2 x rack depth + 1000 cold aisle) vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; single row chosen |
+| BEN 150 | I-C9 | A-002 | Rack 1070 + aisle 1000 + cooling unit 1070 across the width vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; cooling units are in-row, not across the width |
+| BEN 150 | I-C10 | A-002 | Rack working space width (762 min) vs rack width | 762 vs 600 rack + aisle continuous | >= 762 | **OK*** | Aisle is continuous along the row; width requirement met by the open aisle |
+| BEN 150 | I-C11 | A-003 | Overhead tray underside (over the aisle) vs rack top, cables drop to rack top entry | 2250 - 2000 = 250 | >= 0 | **OK*** | Trays run over the aisle, not over racks; head clearance under tray 2250 >= 2100 |
+| BEN 150 | I-C12 | A-003 | Tray top vs ceiling liner (clearance >= 100 for installation) | 2490 - 2350 = 140 | >= 100 | **OK** |  |
+| BEN 150 | I-C13 | A-002 | Door swing: ISO cargo doors swing outward; interior door zone needed | 0 vs 0 | >= 0 | **OK*** | Cargo doors open outward 270 deg; no interior swing |
+| BEN 150 | I-C14 | A-003 | Rack height vs interior height (>= 300 for top cable entry and lights over the row) | 2490 - 2000 = 490 | >= 300 | **OK** |  |
+| BEN 150 | I-C15 | S-001 | Gross mass vs ISO 668 max gross for the container size (30480 kg) | 8342 vs 30480 | <= 30480 | **OK** |  |
+| BEN 150 | I-C16 | S-001 | Row strip floor load (payload over row footprint) vs ISO 1496-1 uniform payload rating (~20 kN/m2) | 6.9 kN/m2 vs 20 | <= 20 | **OK*** | Rack feet are point loads: C100 floor channels on cross-members spread them; verify in structural calc |
+| BEN 150 | I-C18 | M-001 | RDHx doors per rack vs config cooling_units_total | 5 doors vs 4 config units | >= 4 | **OK*** | RDHx is one door per rack (catalog CLG-RDHX qty = racks); config counts 35 kW units for capacity only |
+| BEN 150 | I-C20 | A-001 | Roof penetrations min 300 mm from side top rail | line-set curbs at y=300 interior = 419 from ext side face | >= 300 | **OK*** | Line-set roof curbs 300 mm inboard of top side rail, between corrugation roof bows; see A-001 |
+| BEN 500 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
+| BEN 500 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 7700 vs 11850 | <= 11850 | **OK** |  |
+| BEN 500 | I-C2 | A-002 | Row length with layout footprints (dlc_cdu: 10 racks, 2 cooling units, power cabinets) vs usable length | 10400 vs 11350 | <= 11350 | **OK** |  |
+| BEN 500 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 2 x Li cab @600, catalog qty rules) vs usable length | 9600 vs 11350 | <= 11350 | **OK** |  |
+| BEN 500 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 200 - 1070 = 930 | >= 900 | **OK** |  |
+| BEN 500 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK48: 600 x 1070 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1070 = 930 | >= 914 | **OK** |  |
+| BEN 500 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
+| BEN 500 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
+| BEN 500 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 11850 - 500 - 10400 = 950 | >= 0 | **OK** |  |
+| BEN 500 | I-C8 | A-002 | Two-row layout (2 x rack depth + 1000 cold aisle) vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; single row chosen |
+| BEN 500 | I-C9 | A-002 | Rack 1070 + aisle 1000 + cooling unit 1070 across the width vs interior width | 3140 vs 2200 | <= 2200 | **FAIL** | Not used; cooling units are in-row, not across the width |
+| BEN 500 | I-C10 | A-002 | Rack working space width (762 min) vs rack width | 762 vs 600 rack + aisle continuous | >= 762 | **OK*** | Aisle is continuous along the row; width requirement met by the open aisle |
+| BEN 500 | I-C11 | A-003 | Overhead tray underside (over the aisle) vs rack top, cables drop to rack top entry | 2250 - 2200 = 50 | >= 0 | **OK*** | Trays run over the aisle, not over racks; head clearance under tray 2250 >= 2100 |
+| BEN 500 | I-C12 | A-003 | Tray top vs ceiling liner (clearance >= 100 for installation) | 2490 - 2350 = 140 | >= 100 | **OK** |  |
+| BEN 500 | I-C13 | A-002 | Door swing: ISO cargo doors swing outward; interior door zone needed | 0 vs 0 | >= 0 | **OK*** | Cargo doors open outward 270 deg; no interior swing |
+| BEN 500 | I-C14 | A-003 | Rack height vs interior height (>= 300 for top cable entry and lights over the row) | 2490 - 2200 = 290 | >= 300 | **FAIL** | Short by 10 mm: lights move over the aisle; top cable entry needs >= 250. Alternative: 47U racks (2150) |
+| BEN 500 | I-C15 | S-001 | Gross mass vs ISO 668 max gross for the container size (30480 kg) | 14684 vs 30480 | <= 30480 | **OK** |  |
+| BEN 500 | I-C16 | S-001 | Row strip floor load (payload over row footprint) vs ISO 1496-1 uniform payload rating (~20 kN/m2) | 7.0 kN/m2 vs 20 | <= 20 | **OK*** | Rack feet are point loads: C100 floor channels on cross-members spread them; verify in structural calc |
+| BEN 500 | I-C19 | M-001 | Residual air load (25 % IT) vs in-row 300 capacity x units (N) | 50.4 kW vs 4 x 20 kW | >= 50.4 | **OK** |  |
+| BEN 500 | I-C20 | A-001 | Roof penetrations min 300 mm from side top rail | line-set curbs at y=300 interior = 419 from ext side face | >= 300 | **OK*** | Line-set roof curbs 300 mm inboard of top side rail, between corrugation roof bows; see A-001 |
+| BEN 2000 | I-H0 | A-001 | Hall external width vs 3 road sections of 3,660 mm joined side by side | 3 x 3660 = 10980 vs ext 11000 | <= 11000 | **OK** |  |
+| BEN 2000 | I-H1 | A-002 | Width stack (4 rows, cold 1100 / hot 900 aisles, racks 1070 deep, fan wall 1000) vs interior width | 10380 vs 10400 | <= 10400 | **OK** |  |
+| BEN 2000 | I-H2 | A-002 | Config row_length_mm (racks + CDUs + 500 end zone) vs interior length, config rule | 8900 vs 35800 | <= 35800 | **OK** |  |
+| BEN 2000 | I-H3 | A-002 | Row footprint (12 racks x 600 + 2 CDU ends) vs IT-zone length (bays 2-3) | 8400 vs 22800 | <= 22800 | **OK*** | Rows centred; 14400 mm spare split to the two row-end service zones (staging, spares). Hall holds 48 racks at up to 80 kW DLC = 3,840 kW; preset 1600 kW |
+| BEN 2000 | I-H4 | A-002 | Cold aisle width vs NEC 110.26 condition 2 (1067, equipment on both sides) and 900 egress | 1100 vs 1067 | >= 1067 | **OK** |  |
+| BEN 2000 | I-H5 | A-002 | Contained hot aisle width vs 900 egress (doors at both ends) | 900 vs 900 | >= 900 | **OK** |  |
+| BEN 2000 | I-H6 | A-002 | Fan-wall discharge aisle (cold aisle 3 in front of the fan wall) vs 1067 | 1100 vs 1067 | >= 1067 | **OK** |  |
+| BEN 2000 | I-H7 | E-001 | 480 V switchgear 4,000 A working space, NEC 110.26(A)(1) condition 3 (grounded/live both sides) at 480 V: drawn 1500 vs 1,200 min; two entrances >= 610 x 2,000 (110.26(C)(2), >= 1,200 A and > 1.8 m wide) | 1500 vs 1200 | >= 1200 | **OK*** | 1,500 drawn: 1,200 cond. 3 minimum + 300 for drawout breaker lift truck; rear access 1,000; two exits from the switchgear room |
+| BEN 2000 | I-H8 | A-000 | Power module depth stack (switchgear + working space + UPS row + 1,200 aisle + battery rooms) vs 3 sections (11.0 m) | 9400 vs 10980 | <= 10980 | **OK** |  |
+| BEN 2000 | I-H9 | A-000 | Two 4,000 A lineups side by side + 1,200 between + ends vs power module length | 11600 vs 12200 | <= 12200 | **OK** |  |
+| BEN 2000 | I-H10 | M-001 | CDU capacity on the common secondary header vs IT x 1.05 + one 300 kW spare (row 4 alone has 1 CDU = 300 kW < row load 400 kW, so per-row CDUs would not carry N) | 7 x 300 = 2100 vs 1980 | >= 1980 | **OK*** | CDUs feed one ring-main secondary header so N+1 is system-wide ([2, 2, 2, 1] per row); per-row isolation valves, header sized DN150 |
+| BEN 2000 | I-H11 | M-001 | Residual air (25 % of IT) vs fan-wall units N (one per module) | 420 vs 600 | >= 420 | **OK** |  |
+| BEN 2000 | I-H12 | A-003 | Overhead stack: rack 2,200 + manifold + busway (top) vs interior height - 300 for lights and sprinkler/clean-agent nozzles | 2950 vs 3300 | <= 3300 | **OK** |  |
+| BEN 2000 | I-H13 | A-003 | Road section travel height (4,200 + 600 lowboy deck) vs 4,880 (16 ft) permit route limit | 4200 + 600 = 4800 vs 4880 | <= 4880 | **OK*** | Lowboy / drop-deck trailer, route survey and superload permits (SITE-FREIGHT-WB); 3.66 m width needs escorts |
+| BEN 2000 | I-H14 | E-001 | Lithium battery energy per room vs NFPA 855 600 kWh group limit (UL 9540A large-scale test above it), 2-hour separation between rooms | 296 kWh per room vs 600 | <= 600 | **OK** |  |
+| BEN 2000 | I-H15 | A-000 | Generator enclosure to hall / power module clearance vs 3,000 (NFPA 37 1.5 m min to combustible walls; 3 m for service and radiator discharge) | 3000 vs 3000 | >= 3000 | **OK** |  |
+| BEN 2000 | I-H16 | A-000 | FR3 ester pad-mount transformer to power module clearance vs 900 (FM 5-4 / IEEE C57.12 less-flammable liquid, non-combustible wall) | 3000 vs 900 | >= 900 | **OK** |  |
+| BEN 2000 | I-H17 | A-000 | Setback / fire lane around the hall vs 6,000 (IFC 503 fire apparatus access 6.1 m) | 6100 vs 6100 | >= 6100 | **OK*** | Fire lane is the 6 m crane lane on the south side plus the 6 m yard; AHJ confirms the access route |
+| BEN 2000 | I-H18 | S-001 | Rack footprint load (1,000 kg on 0.6 x 1.07 m) vs 200 mm slab-on-grade design 20 kN/m2 | 15.3 kN/m2 vs 20 | <= 20 | **OK** |  |
+| BEN 2000 | I-H19 | S-001 | Road section lift mass (tare per section + 800 kg fit-out) vs 100 t AT crane at 20 m radius (~25 t) | 7467 vs 25000 | <= 25000 | **OK** |  |
+| BEN 2000 | I-H20 | A-001 | Hall gross mass (config) vs slab + grade beams design 1,200 t | 109070 vs 1200000 | <= 1.2e+06 | **OK** |  |
 
 ## Deviations applied
 
@@ -185,6 +208,19 @@ The layout engine places the row and checks it against the enclosure. The table 
 | controller_lite | 300 × 180 × 200 | 8 | BEN Controls Lite cabinet (RevPi, DIN rail) |
 | cylinder | 400 × 400 × 1400 | 90 | Clean-agent cylinder |
 | cabdx | 400 × 250 × 1500 | 60 | Cabinet DX air conditioner 5.8 kW |
+| fanwall | 3000 × 1000 × 3000 | 1400 | Fan-wall air handler 200 kW class, 200.0 kW |
+| ups_vl | 1200 × 1000 × 2000 | 1100 | Galaxy VL 500 kW UPS frame |
+| lv_swgr | 4800 × 1600 × 2300 | 4500 | 480 V switchgear 4,000 A UL 1558 (6 sections) |
+| batt_room | 3200 × 3300 × 3600 | 6000 | Lithium battery room (NFPA 855, 2-hour separation) |
+| mv_swgr | 2600 × 1900 × 2000 | 2500 | 15 kV pad-mounted switchgear 4-way |
+| mv_xfmr | 2600 × 2400 × 2300 | 7500 | Pad-mount transformer 2,500 kVA 12.47 kV-480Y |
+| genset | 12000 × 3200 × 4000 | 22000 | Diesel generator 1,250 kW, L2 enclosure, sub-base tank |
+| gen_swgr | 4000 × 1600 × 2300 | 3500 | Generator paralleling switchgear 4,000 A |
+| fuel_tank | 9000 × 3000 × 2800 | 12000 | Bulk diesel tank 10,000 gal UL 2085 |
+| adiabatic | 6000 × 2500 × 2800 | 3200 | Adiabatic dry cooler 400 kW class, EC fans, 400.0 kW |
+| pump_skid | 4000 × 2000 × 2000 | 2500 | Primary pump skid N+1 with expansion / treatment |
+| mantrap | 3000 × 2400 × 2400 | 900 | Service vestibule with mantrap option |
+| cyl_bank | 1200 × 500 × 1600 | 350 | Clean-agent cylinder bank (per module zone) |
 
 These footprints are the basis of every interference result. When purchasing selects real parts (`purchasing/bom.csv`), update `LIB` in `design/layout.py` and regenerate; any check that flips to FAIL is a design change.
 

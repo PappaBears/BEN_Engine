@@ -20,10 +20,13 @@ One file per supplier question. Each is addressed **To: Ben@SchreiberAI.com** so
 | 14 | [14-jlcpcb-node-carrier-pcb.md](email_queue/14-jlcpcb-node-carrier-pcb.md) | jlcpcb / pcbway / CM | RFQ: BEN Pod PCB fabrication + SMT assembly (MGM240P, 4-layer, RTD front end, PoE PD, RS-485), 500 pcs | Make item: Pod PCBA at $88 is an estimate (rewritten 2026-11-08 for the Pod). |
 | 15 | [15-local-site-civil-electrical.md](email_queue/15-local-site-civil-electrical.md) | local site civil electrical | RFQ: site civil & electrical package per BEN unit (pad, service, grounding, fiber), regional pricing | SITE- lines are regional estimates; utility lead time is the critical path. |
 
-Gmail drafts: created in the schreibears@gmail.com account for 01–12, 15, 16 (2026-11-07/08) and for the controls-platform set 13, 14, 17, 18 (2026-11-08); the old Olimex draft was deleted. All addressed to Ben@SchreiberAI.com, nothing sent; each draft names the supplier to forward to and the source file.
+Gmail drafts: created in the schreibears@gmail.com account for 01–12, 15, 16 (2026-11-07/08) and for the controls-platform set 13, 14, 17, 18 and the generation-2 set 19, 20, 21 (2026-11-08); the old Olimex draft was deleted. All addressed to Ben@SchreiberAI.com, nothing sent; each draft names the supplier to forward to and the source file.
 
 | 16 | Contract manufacturer RFI (shortlist in docs/MANUFACTURING_STRATEGY.md §3.1) | `16-contract-manufacturer-rfi.md` | queued |
 | 17 | [17-phoenix-contact-plcnext-io-panel.md](email_queue/17-phoenix-contact-plcnext-io-panel.md) | Phoenix Contact + UL 508A panel shop | RFQ: AXC F 2152, Axioline F I/O, QUINT4, FL SWITCH 2008, SPD, 10-unit run + UL 508A panel partner | BEN Controls Pro panel content; PLC stock constrained; panel build is an estimate. |
 | 18 | [18-onlogic-karbon-edge-computer.md](email_queue/18-onlogic-karbon-edge-computer.md) | OnLogic | RFQ: Karbon 400 (K410) edge computers with TPM 2.0, 10 + 2; Karbon 300 option | No public price (configure-to-order); TPM key enrolment and imaging services. |
 
 Controls platform change 2026-11-08 (docs/CONTROLS_HARDWARE_DECISION.md): email 13 was replaced, 14 rewritten, 17 and 18 added. The Gmail draft for the old file 13 (hobby MCU boards) was deleted by the lead; new drafts for 13, 14, 17 and 18 are to be created by the lead from these files.
+| 19 | Modular building manufacturers: BEN 2000 hall modules + power module (shortlist in docs/MANUFACTURING_STRATEGY.md §3.2) | `19-modular-building-manufacturer-ben2000.md` | queued |
+| 20 | MV service package for BEN 2000: MV switchgear, transformers, 4,000 A switchgear, 2 MW UPS strings, generators | `20-mv-switchgear-transformers-2mw-ups.md` | queued |
+| 21 | Hardening vendors: UL 752 ballistic, ASTM F3038 doors, HEMP shielding, flood plinth, C5-M coating | `21-hardening-ballistic-emp-vendors.md` | queued |

@@ -20,6 +20,9 @@ The full acceptance list in `docs/BRIEF.md` §5 (22 deliverables after the mid-s
 ## Constraints
 No hardware here; EFR32 / Gecko SDK toolchain not available (network policy); vendor sites not reachable by curl, only through web search/fetch. No money spent; no emails sent (drafts only).
 
+## Generation 2 (2026-11-08)
+Tiers renamed by IT power (BEN 5/30/150/500) with aliases; BEN 2000 prefabricated 2 MW center added; enclosures IP66 with hardening H1–H3; controls on an industrial platform (BEN Controls Lite/Pro, BEN Pod on BEN Mesh). 172 Python tests, 25/25 browser checks, 21 RFQ drafts queued.
+
 ## Latest checkpoint
 `main` on github.com/PappaBears/BEN_Engine; see `git log`. Restore: clone the tag/commit and run the Quickstart commands in README.md.
 

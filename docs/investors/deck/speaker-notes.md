@@ -10,7 +10,7 @@ Open with the outcome, not the technology. The claim to make: a customer picks a
 
 SMBs face a cloud bill that grows with success, colocation priced for hyperscalers, or a server closet nobody commissioned.
 
-All three numbers are cited in docs/investors/MARKET_SOURCES.md with ranges. Say the ranges out loud; investors respect ranges more than point estimates. Transition: the product family. The 2 MW segment number is a placeholder until docs/BOM-ben2000.md exists; say 'see BOM' rather than quoting a figure.
+All three numbers are cited in docs/investors/MARKET_SOURCES.md with ranges. Say the ranges out loud; investors respect ranges more than point estimates. Transition: the product family. The 2 MW segment number is a placeholder until docs/BOM-ben2000.md exists; say 'BEN 2000: about $10,200 per kW infrastructure-only vs $10,000–13,000 per kW traditional (BOM-based)' rather than quoting a figure.
 
 ## 3. The product family
 
