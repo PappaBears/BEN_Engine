@@ -12,28 +12,28 @@ The first pass used a Raspberry Pi 5 gateway and ESP32 hobby boards as sensor no
 | --- | --- | --- | --- |
 | **Control** (deterministic, interlocks, sequencing) | Cooling unit start/stop and failover, leak isolation valves, door and EPO monitoring, generator/ATS supervision, mechanical panel I/O | **PLC: Phoenix Contact PLCnext AXC F 2152** (alternates: Beckhoff CX9240, WAGO PFC200) with **Axioline F remote I/O** in a UL 508A listed panel | IEC 61131-3, IEC 62443-4-1 (PLCnext development process certified), UL 508 listed controller, UL 508A panel |
 | **Data and digital twin** (history, twin, dashboard, proposal, analytics) | Runs `ben_engine` (API, twin, sweeps, commissioning, export), MQTT broker, time series store, border router for the mesh | **Industrial edge computer: OnLogic Karbon 400 series** (Intel Atom x6425E, −40…70 °C, TPM 2.0, DIN rail, dual LAN, UL 62368-1, optional Class I Div 2); alternate **Siemens SIMATIC IPC227G** | UL 62368-1, IEC 62443-3-3 zone host, TPM 2.0 measured boot, full-disk encryption |
-| **Sensing** (dense, placement-flexible, secure) | Rack inlet/outlet temperature at three heights, humidity, differential pressure, leak, door, vibration, outdoor equipment, Micro cabinets, fleet | **Wired:** industrial transmitters on the PLC I/O (Pt1000 RTD strings, Setra 264 / Dwyer MS2 ΔP transmitters, Vaisala HMD humidity, RLE SeaHawk leak controller). **Wireless: BEN Pod** on the **BEN Mesh** (our own design, below) | UL 61010-1 for transmitters, FCC Part 15 modular approval for the Pod radio |
+| **Sensing** (dense, placement-flexible, secure) | Rack inlet/outlet temperature at three heights, humidity, differential pressure, leak, door, vibration, outdoor equipment, BEN 5 cabinets, fleet | **Wired:** industrial transmitters on the PLC I/O (Pt1000 RTD strings, Setra 264 / Dwyer MS2 ΔP transmitters, Vaisala HMD humidity, RLE SeaHawk leak controller). **Wireless: BEN Pod** on the **BEN Mesh** (our own design, below) | UL 61010-1 for transmitters, FCC Part 15 modular approval for the Pod radio |
 
 Life safety (smoke detection, clean-agent release, EPO) stays hardwired and is only *monitored* by the PLC through dry contacts. That rule does not change.
 
 ### 2a. Two controls tiers (operator amendment, 2026-11-08)
 
-Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`; `auto` resolves to Lite for BEN Micro, Pro for BEN 20/40, and for BEN 10 Lite unless the profile is healthcare, public sector or AI training (then Pro). `Config.derived()["controls_tier_resolved"]` carries the result; `applies_to_controls` on every CTL catalog line filters the BOM; the proposal and the product page name the tier.
+Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`; `auto` resolves to Lite for BEN 5, Pro for BEN 150/500, and for BEN 30 Lite unless the profile is healthcare, public sector or AI training (then Pro). `Config.derived()["controls_tier_resolved"]` carries the result; `applies_to_controls` on every CTL catalog line filters the BOM; the proposal and the product page name the tier.
 
-| | **BEN Controls Lite** (BEN Micro; selectable on BEN 10) | **BEN Controls Pro** (BEN 20/40; selectable on BEN 10) |
+| | **BEN Controls Lite** (BEN 5; selectable on BEN 30) | **BEN Controls Pro** (BEN 150/500; selectable on BEN 30) |
 | --- | --- | --- |
 | Controller | **Revolution Pi RevPi Connect 4** (KUNBUS; industrial, UL/CE listed, DIN rail, Compute Module 4 based) with **RevPi DIO** and **RevPi AIO** modules; alternate RevPi Connect S | **Phoenix Contact PLCnext AXC F 2152** with **Axioline F** I/O (DI8/DO8, RTD4, AI4) in a **UL 508A** listed panel |
 | Edge computer | The same RevPi runs `ben_engine`, the broker and the Thread border router | **OnLogic Karbon 400** (TPM 2.0, measured boot) on the panel DIN rail |
 | Interlocks | In software on the RevPi behind its **hardware watchdog relay**; no PLC | Deterministic PLC logic; PLC watchdog relay; edge computer loss changes nothing in the interlocks |
-| Sensing | Same **BEN Pods on BEN Mesh** (MGM240P, Secure Vault High), 3 Pods on Micro, 2 per rack + 2 on BEN 10 | Same Pods, 2 per rack + 2, plus wired industrial transmitters on the PLC (Pt1000 supply/return, Setra 264, Vaisala HMW90, RLE LD2100) |
+| Sensing | Same **BEN Pods on BEN Mesh** (MGM240P, Secure Vault High), 3 Pods on BEN 5, 2 per rack + 2 on BEN 30 | Same Pods, 2 per rack + 2, plus wired industrial transmitters on the PLC (Pt1000 supply/return, Setra 264, Vaisala HMW90, RLE LD2100) |
 | Panel | DIN-rail cabinet of listed components (no 508A label; stated in the proposal) | UL 508A panel by the panel partner, SCCR label (CTQ-K6) |
 | Software, protocol, dashboard, BEN Care | Identical | Identical |
 | Life safety | Hardwired, monitored by dry contacts | Hardwired, monitored by dry contacts |
-| Controls cost per unit (preset BOM) | Micro ≈ $4.3k, BEN 10 ≈ $4.8k | BEN 20 ≈ $16.5k, BEN 40 ≈ $20.0k |
+| Controls cost per unit (preset BOM) | BEN 5 ≈ $4.3k, BEN 30 ≈ $4.8k | BEN 150 ≈ $16.5k, BEN 500 ≈ $20.0k |
 
 ## 3. BEN Mesh and BEN Pod (what we build ourselves)
 
-**Why a mesh at all.** Wiring 6 probes per rack × 12 racks plus outdoor equipment is 80+ runs of shielded cable, terminations and labels; it is the most error-prone, least repeatable part of a controls install, and it is the part that cannot move when the container moves. A secure, self-healing, IP-native mesh removes it, and it is the same hardware for the Micro cabinet, the dry cooler on the roof, the generator on the pad and the fleet.
+**Why a mesh at all.** Wiring 6 probes per rack × 12 racks plus outdoor equipment is 80+ runs of shielded cable, terminations and labels; it is the most error-prone, least repeatable part of a controls install, and it is the part that cannot move when the container moves. A secure, self-healing, IP-native mesh removes it, and it is the same hardware for the BEN 5 cabinet, the dry cooler on the roof, the generator on the pad and the fleet.
 
 **Radio and silicon: Thread (IEEE 802.15.4, 2.4 GHz) on Silicon Labs EFR32MG24, as the pre-certified MGM240P module.**
 - Thread is IPv6 end to end (6LoWPAN), so the BEN protocol (`spec/PROTOCOL.md`: MQTT/JSON, mutual TLS) runs unchanged from Pod to broker. No proprietary gateway translation, no cloud.
@@ -49,7 +49,7 @@ Controls scale with the box. `Config.controls_tier` is `"auto" | "lite" | "pro"`
 - DIN-rail and rack-rail enclosure, IP40 indoor / IP65 outdoor variant, −40…70 °C.
 - Firmware: the existing `bencore` library (calibration, telemetry JSON, commands, ring buffer, failsafe, alarms) is unchanged; the HAL targets Silicon Labs Gecko SDK / OpenThread instead of ESP-IDF. Native host tests remain the acceptance for the core.
 
-**Border router.** OpenThread Border Router on the edge computer with an MGM240P radio co-processor (RCP) on USB/UART; two RCPs for redundancy on BEN 20/40.
+**Border router.** OpenThread Border Router on the edge computer with an MGM240P radio co-processor (RCP) on USB/UART; two RCPs for redundancy on BEN 150/500.
 
 ## 4. BEN Care — the digital care layer, and what nobody else does
 

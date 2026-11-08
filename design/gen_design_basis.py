@@ -26,7 +26,7 @@ def main():
     A("")
     A("## 1. Scope and codes")
     A("")
-    A("The design basis covers the enclosure, the interior layout, the envelope, the structure, power, cooling, controls and life safety of the four tiers. "
+    A("The design basis covers the enclosure, the interior layout, the envelope, the structure, power, cooling, controls and life safety of the five tiers. "
       "Codes and standards referenced: ISO 668 / ISO 1496-1 / CSC (containers), ASCE 7-22 (wind, seismic, snow), AISC 360 (steel), NEC 2023 (NFPA 70) incl. 110.26, 250, 645, 706; NFPA 75 / 76, NFPA 2001 (clean agent), IFC 1207 (batteries), UL 9540 / 9540A, UL 60335-2-40 (A2L refrigerant), ASHRAE TC 9.9 thermal guidelines (A1–A3), ASHRAE 90.4, EN 13501-1 (PIR reaction to fire), ISO 9223 (corrosion), IEC 60529 (IP rating). The compliance matrix `docs/COMPLIANCE.md` maps each to a feature and a verification.")
     A("")
     # ------------------------------------------------------------------ loads
@@ -56,7 +56,7 @@ def main():
         Mr = lays["ben500"].d["gross_kg"] * 9.81 / 1000 * 1.219
         A(f"| {c['label']} | {c['t_design_c']} | {c['t_min_c']} | {c['solar_w_m2']} | {c['corrosion']} | {c['wind_ms']} | {qz:.2f} | F {F:.0f} kN, Mo {Mo:.0f} kNm vs Mr {Mr:.0f} kNm → {'tie-downs required' if Mo > Mr * 0.67 else 'stable, tie-downs still required'} | site SDS; Detail B option ≥ 0.5 g | roof 300 kg/m² rating; site ground snow |")
     A("")
-    A("All tiers are anchored at the four bottom corner castings (twist-locks, SITE-002) regardless of the overturning result; BEN Micro is anchored with 4 × M16 wedge anchors (S-001 Detail A). Seismic: the container shell is a rigid box; interior racks are the governing non-structural component (ASCE 7 Ch. 13, Ip = 1.5 for a facility that must stay operational). Detail B on S-001 gives the top-of-rack strut option; the engineer of record confirms per site SDS.")
+    A("All tiers are anchored at the four bottom corner castings (twist-locks, SITE-002) regardless of the overturning result; BEN 5 is anchored with 4 × M16 wedge anchors (S-001 Detail A). Seismic: the container shell is a rigid box; interior racks are the governing non-structural component (ASCE 7 Ch. 13, Ip = 1.5 for a facility that must stay operational). Detail B on S-001 gives the top-of-rack strut option; the engineer of record confirms per site SDS.")
     A("")
     # ------------------------------------------------------------------ structure
     A("## 3. Container structural notes")
@@ -119,7 +119,7 @@ def main():
             units.append(f"{lay.notes.get('n_cdu')} × CDU + dry cooler")
         A(f"| {d['tier_label']} | {lay.cfg.it_kw:.0f} | {lay.cfg.racks} | {d['per_rack_kw']} | {d['voltage']} | {d['service_amps_calc']} / {d['service_breaker_a']} | {d['ups_modules']} × {d['ups_kva_each']} kVA | {d['battery_kwh']} | {lay.cfg.cooling} → {drawn} | {'; '.join(units)} | {d['airflow_cfm']} | {d['pue_estimate']} | {d['row_length_mm']} / {d['row_fits']} |")
     A("")
-    A("Rules: UPS carries IT only with 15 % headroom; service sized at 80 % continuous; cooling N units at 1.05 × IT with 1.5 %/K DX derate above 35 °C; DLC removes 75 % of rack heat at the cold plate, the rest is air **(assumption)**; airflow 125 cfm/kW air-cooled, 40 cfm/kW liquid. Controls (docs/CONTROLS_HARDWARE_DECISION.md): BEN Controls Pro (PLCnext AXC F 2152 + Axioline F I/O in a UL 508A panel, OnLogic Karbon 400 edge computer) on BEN 20/40, BEN Controls Lite (Revolution Pi RevPi Connect 4 + DIO/AIO) on BEN Micro, selectable on BEN 10; BEN Pods on BEN Mesh (Thread, MGM240P): two per rack (cold and hot face) + room + outdoor, Micro 3; logical node ids one per two racks; three inlet probes per rack (0.4 / 1.2 / 1.8 m; 0.3 / 0.7 / 1.1 m in the Micro), one outlet probe, supply/return probes, RH, dP across the containment, leak rope, door contact, utility pulse — identical to `Twin.sensors()` and `spec/PROTOCOL.md`.")
+    A("Rules: UPS carries IT only with 15 % headroom; service sized at 80 % continuous; cooling N units at 1.05 × IT with 1.5 %/K DX derate above 35 °C; DLC removes 75 % of rack heat at the cold plate, the rest is air **(assumption)**; airflow 125 cfm/kW air-cooled, 40 cfm/kW liquid. Controls (docs/CONTROLS_HARDWARE_DECISION.md): BEN Controls Pro (PLCnext AXC F 2152 + Axioline F I/O in a UL 508A panel, OnLogic Karbon 400 edge computer) on BEN 150/500, BEN Controls Lite (Revolution Pi RevPi Connect 4 + DIO/AIO) on BEN 5, selectable on BEN 30; BEN Pods on BEN Mesh (Thread, MGM240P): two per rack (cold and hot face) + room + outdoor, BEN 5 3; logical node ids one per two racks; three inlet probes per rack (0.4 / 1.2 / 1.8 m; 0.3 / 0.7 / 1.1 m in the BEN 5), one outlet probe, supply/return probes, RH, dP across the containment, leak rope, door contact, utility pulse — identical to `Twin.sensors()` and `spec/PROTOCOL.md`.")
     A("")
     # ------------------------------------------------------------------ interference
     A("## 8. Interference checks (generated)")
@@ -142,12 +142,12 @@ def main():
     A("### Summary of what the checks found (after the 2026-11-08 configuration update)")
     A("")
     A("1. **Two-row layouts do not fit any container tier** (2 × 1070 + 1000 = 3140 > 2200). All tiers use a single row against one wall; the aisle is 930 mm.")
-    A("2. **Presets now fit as given.** `config.derived()['row_fits']` is true for every preset and the layout engine agrees: BEN 10 (3 × 300 mm in-row 20 kW, 100 mm spare), BEN 20 (5 RDHx racks + 2 row CDUs, 450 mm spare), BEN 40 (10 racks + 2 CDUs + 4 residual-air in-row units + UPS + 2 battery cabinets, 950 mm spare). No cooling fallback is applied on this set.")
-    A("3. **Interior height** 2490 (config) vs 2488 computed: within the 10 mm tolerance. BEN 40 48U racks (2200) leave 290 mm to the ceiling, 10 mm short of the 300 mm rule → lights over the aisle; alternative 47U racks.")
-    A("4. **As-purchased footprints (new checks I-C21 / I-C22).** The catalog quantity rules do not fit the rows: BEN 10 `PWR-UPS-93PM50` towers (2 × 495 mm) → row 3090 > 2200; BEN 20 `PWR-UPS-GVS100` × 4 + `PWR-BATT-LI` × 2 → 7484 > 5250; BEN 40 × 6 + × 4 → 13926 > 11350. Drawings use rack-mount 20 kVA modules in R1 (BEN 10, new catalog item `PWR-UPS-RM20`) and one modular UPS frame per unit (BEN 20/40). `STR-RACK48` is 1200 deep → BEN 40 aisle 800 mm (< 900 egress); drawings use a 1070-deep 48U rack. These are purchasing / configuration decisions, listed in `design/assembly/ITEM_CODES_USED.md`.")
+    A("2. **Presets now fit as given.** `config.derived()['row_fits']` is true for every preset and the layout engine agrees: BEN 30 (3 × 300 mm in-row 20 kW, 100 mm spare), BEN 150 (5 RDHx racks + 2 row CDUs, 450 mm spare), BEN 500 (10 racks + 2 CDUs + 4 residual-air in-row units + UPS + 2 battery cabinets, 950 mm spare). No cooling fallback is applied on this set.")
+    A("3. **Interior height** 2490 (config) vs 2488 computed: within the 10 mm tolerance. BEN 500 48U racks (2200) leave 290 mm to the ceiling, 10 mm short of the 300 mm rule → lights over the aisle; alternative 47U racks.")
+    A("4. **As-purchased footprints (new checks I-C21 / I-C22).** The catalog quantity rules do not fit the rows: BEN 30 `PWR-UPS-93PM50` towers (2 × 495 mm) → row 3090 > 2200; BEN 150 `PWR-UPS-GVS100` × 4 + `PWR-BATT-LI` × 2 → 7484 > 5250; BEN 500 × 6 + × 4 → 13926 > 11350. Drawings use rack-mount 20 kVA modules in R1 (BEN 30, new catalog item `PWR-UPS-RM20`) and one modular UPS frame per unit (BEN 150/500). `STR-RACK48` is 1200 deep → BEN 500 aisle 800 mm (< 900 egress); drawings use a 1070-deep 48U rack. These are purchasing / configuration decisions, listed in `design/assembly/ITEM_CODES_USED.md`.")
     A("5. **NEC 110.26 condition 2** (1067 mm) fails on every container tier; condition 1 (914 mm) passes with 16 mm margin. Constraint on what may be mounted on the aisle wall (§6).")
-    A("6. **Door zone.** BEN 10 has 100 mm between the cargo doors and the first cooling unit; BEN 10 R1 keeps only 6U for IT after three 10U UPS modules and a 6U battery (alternative: 20 kW preset).")
-    A("7. **Micro.** 5 kW, 2 cabinet AC units (one per long face), 9U left for IT after 2 × (4U UPS + 3U battery pack) + 1U controls shelf (RevPi); gross 1087 kg, 2.5 t forklift.")
+    A("6. **Door zone.** BEN 30 has 100 mm between the cargo doors and the first cooling unit; BEN 30 R1 keeps only 6U for IT after three 10U UPS modules and a 6U battery (alternative: 20 kW preset).")
+    A("7. **BEN 5.** 5 kW, 2 cabinet AC units (one per long face), 9U left for IT after 2 × (4U UPS + 3U battery pack) + 1U controls shelf (RevPi); gross 1087 kg, 2.5 t forklift.")
     A("")
     A("## 9. Component footprints used (catalogue-typical, mm)")
     A("")
@@ -162,7 +162,7 @@ def main():
     A("")
     A("- Masses: the configuration payload rule is coarse (fixed kg per rack / unit); the layout item sum differs from it by up to 15 %. Rigging uses the larger.")
     A("- Breaker, conductor, transformer and line-set sizes on E-001 / M-001 are rule-of-thumb and preliminary.")
-    A("- The RDHx design for BEN 20 assumes 35 kW per door at 18 °C supply water and a residual room load handled by the dry cooler loop; no residual air unit is drawn. A CFD / twin run should confirm the room stays within ASHRAE A2 without an air unit.")
+    A("- The RDHx design for BEN 150 assumes 35 kW per door at 18 °C supply water and a residual room load handled by the dry cooler loop; no residual air unit is drawn. A CFD / twin run should confirm the room stays within ASHRAE A2 without an air unit.")
     A("- Thermal bridge temperatures in §4 are a one-dimensional estimate; the floor cross-member bridge is the likely first condensation point in the `cold` package.")
     A("- Acoustic levels are vendor-typical, not measured.")
     A("- The interference engine checks footprints and a handful of clearances; it does not check door swings of equipment (UPS front doors need ~700 mm, satisfied by the aisle), service pull-out of CDU pumps, or overhead hoist paths.")

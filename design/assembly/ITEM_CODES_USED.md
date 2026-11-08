@@ -129,8 +129,8 @@ Generated 2026-11-07 by `design/assembly/gen_assembly.py`. Every code in the ass
 
 ## Catalog items the drawings assume but the catalog sizes differently
 
-- `PWR-UPS-93PM50` (BEN 10): two 50 kW towers (495 mm wide each) do not fit the 10 ft row; the drawings and instructions use `PWR-UPS-RM20` x 3 + `PWR-UPS-RM20-XBP` (new). Purchasing decides which stays.
-- `PWR-UPS-GVS100` / `PWR-BATT-LI` (BEN 20/40): qty rules `ceil(ups_kva_each/100)*ups_modules` give 4 / 6 UPS frames and 2 / 4 battery cabinets; the rows do not hold them (check I-C21). Drawings use one modular frame with N+1 modules (+ 2 battery cabinets for BEN 40). Recommend qty rule `ceil(ups_kva_each*1.0/100)+1` frames per unit, not per module.
-- `STR-RACK48` is 600 x 1200 deep: the BEN 40 aisle drops to 800 mm (< 900 egress, check I-C22). Drawings use a 1070-deep 48U enclosure; change the catalog part or use 42U 1070 racks.
-- `CLG-INROW` is the 300 mm / 20 kW-class unit (`inrow_dx_300`); the catalog note says the 600 mm / 30 kW unit is to be quoted separately. BEN 40 residual air also uses `CLG-INROW` (4 units) + `CLG-COND`, which the catalog currently limits to ben10/ben20 (`applies_to_tiers`).
+- `PWR-UPS-93PM50` (BEN 30): two 50 kW towers (495 mm wide each) do not fit the 10 ft row; the drawings and instructions use `PWR-UPS-RM20` x 3 + `PWR-UPS-RM20-XBP` (new). Purchasing decides which stays.
+- `PWR-UPS-GVS100` / `PWR-BATT-LI` (BEN 150/500): qty rules `ceil(ups_kva_each/100)*ups_modules` give 4 / 6 UPS frames and 2 / 4 battery cabinets; the rows do not hold them (check I-C21). Drawings use one modular frame with N+1 modules (+ 2 battery cabinets for BEN 500). Recommend qty rule `ceil(ups_kva_each*1.0/100)+1` frames per unit, not per module.
+- `STR-RACK48` is 600 x 1200 deep: the BEN 500 aisle drops to 800 mm (< 900 egress, check I-C22). Drawings use a 1070-deep 48U enclosure; change the catalog part or use 42U 1070 racks.
+- `CLG-INROW` is the 300 mm / 20 kW-class unit (`inrow_dx_300`); the catalog note says the 600 mm / 30 kW unit is to be quoted separately. BEN 500 residual air also uses `CLG-INROW` (4 units) + `CLG-COND`, which the catalog currently limits to ben10/ben20 (`applies_to_tiers`).
 - `FS-PANIC` (new) is required by the egress note in DESIGN_BASIS §6.

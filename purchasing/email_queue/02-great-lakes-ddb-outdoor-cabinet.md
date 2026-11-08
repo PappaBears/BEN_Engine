@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: outdoor NEMA 4 24U cabinet, ~6 kW IT heat load, 10 units (BEN Micro)
+Subject: RFQ: outdoor NEMA 4X 24U cabinet, ~6 kW IT heat load, 10 units (BEN 5)
 Supplier: great lakes ddb outdoor cabinet
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07
@@ -11,7 +11,7 @@ Hello,
 I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
-An outdoor NEMA 3R/4 24U 19 in cabinet on a skid for a 5 kW IT load, with 2 x 6 kW-class (N+1) side-mount air conditioners rated for 46 C ambient, dual 208/240 V 1-ph feeds, bottom cable entry, door contact and leak sensor provisions. The Great Lakes 24U NEMA 4 with a 2,200 BTU AC (CDW $13,212.99 on 2026-11-07) is our placeholder; the integral AC is far too small, so we need a configured quote.
+An outdoor NEMA 4X / IP66 24U 19 in cabinet on a skid for a 5 kW IT load, with 2 x 6 kW-class (N+1) side-mount air conditioners rated for 46 C ambient, dual 208/240 V 1-ph feeds, bottom cable entry, door contact and leak sensor provisions. The Great Lakes 24U NEMA 4 with a 2,200 BTU AC (CDW $13,212.99 on 2026-11-07) is our placeholder; the integral AC is far too small, so we need a configured quote.
 
 **Quantities**
 - 10 cabinets, first 2 within 8 weeks

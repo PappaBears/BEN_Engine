@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: Galaxy VS 100 kW 480 V UPS + Galaxy Lithium-ion battery cabinets (BEN 20 / BEN 40)
+Subject: RFQ: Galaxy VS 100 kW 480 V UPS + Galaxy Lithium-ion battery cabinets (BEN 150 / BEN 500)
 Supplier: schneider galaxy vs lithium
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07
@@ -18,7 +18,7 @@ Galaxy VS 100 kW 480 V frames (GVSUPS100KGS or internal-battery variant) and Gal
 - LIBSESMG16UL: 20
 
 **Questions**
-1. Project price for the quantities below and the 150 kW frame as an alternative for BEN 40 (3 x 100 kW is our placeholder).
+1. Project price for the quantities below and the 150 kW frame as an alternative for BEN 500 (3 x 100 kW is our placeholder).
 2. Smallest lithium-ion cabinet / module count that gives 10 min at 96 kW and 192 kW respectively; can one cabinet be shared by two frames in N+1?
 3. UL 9540 / 9540A documentation and the fire-code separation needed inside a container (NFPA 855).
 4. Operating temperature window and derating for a 24-27 C equipment room inside an outdoor container.

@@ -34,11 +34,13 @@ Subsystem = Literal["power", "cooling", "compute", "controls"]
 # ---------------------------------------------------------------- tier geometry
 # External ISO dimensions (ISO 668 high cube), internal usable after insulation + liner.
 TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
-    # Names follow nominal maximum IT power (docs/TIER_AND_ENCLOSURE_DECISION.md). Enclosures are element-proof
+    # Names follow nominal maximum IT power (docs/TIER_AND_ENCLOSURE_DECISION.md). The CORE product is BEN 5–500: all-in-one
+    # boxes (power + cooling + compute + controls in one enclosure). BEN 2000 is a capability example, not the lead product.
+    # Enclosures are element-proof
     # (NEMA 4X / IP66) at hardening level H1; H2/H3 add severe-environment and hardened/government packages.
     "ben5": {
         "label": "BEN 5", "enclosure": "Outdoor 24U NEMA 4X / IP66 cabinet on skid",
-        "kind": "cabinet", "modules": 1,
+        "kind": "cabinet", "modules": 1, "positioning": "core",
         "ext_l_m": 1.20, "ext_w_m": 1.00, "ext_h_m": 1.80,
         "int_l_m": 1.00, "int_w_m": 0.80, "int_h_m": 1.40,
         "max_racks": 1, "rack_u": 24, "it_kw_min": 2, "it_kw_max": 5,
@@ -46,7 +48,7 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
     },
     "ben30": {
         "label": "BEN 30", "enclosure": "10 ft high-cube ISO-frame module, sealed to IP66",
-        "kind": "module", "modules": 1,
+        "kind": "module", "modules": 1, "positioning": "core",
         "ext_l_m": 2.991, "ext_w_m": 2.438, "ext_h_m": 2.896,
         "int_l_m": 2.70, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 2, "rack_u": 42, "it_kw_min": 10, "it_kw_max": 30,
@@ -54,7 +56,7 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
     },
     "ben150": {
         "label": "BEN 150", "enclosure": "20 ft high-cube ISO-frame module, sealed to IP66",
-        "kind": "module", "modules": 1,
+        "kind": "module", "modules": 1, "positioning": "core",
         "ext_l_m": 6.058, "ext_w_m": 2.438, "ext_h_m": 2.896,
         "int_l_m": 5.75, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 6, "rack_u": 42, "it_kw_min": 50, "it_kw_max": 150,
@@ -62,7 +64,7 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
     },
     "ben500": {
         "label": "BEN 500", "enclosure": "40 ft high-cube ISO-frame module, sealed to IP66",
-        "kind": "module", "modules": 1,
+        "kind": "module", "modules": 1, "positioning": "core",
         "ext_l_m": 12.192, "ext_w_m": 2.438, "ext_h_m": 2.896,
         "int_l_m": 11.85, "int_w_m": 2.20, "int_h_m": 2.49,
         "max_racks": 12, "rack_u": 48, "it_kw_min": 150, "it_kw_max": 500,
@@ -72,7 +74,7 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
         # Single 2 MW center: three site-joined wide-body modules (12.2 x 3.66 x 4.2 m each) form the IT hall,
         # plus a separate power module and a plant yard. Interior dims are the joined hall.
         "label": "BEN 2000", "enclosure": "Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) + power module + plant yard, IP66 envelope",
-        "kind": "hall", "modules": 3,
+        "kind": "hall", "modules": 3, "positioning": "capability",
         "ext_l_m": 36.6, "ext_w_m": 11.0, "ext_h_m": 4.2,
         "int_l_m": 35.8, "int_w_m": 10.4, "int_h_m": 3.6,
         "max_racks": 48, "rack_u": 48, "it_kw_min": 800, "it_kw_max": 2000,

@@ -78,7 +78,7 @@ Torque wrench ID: ________ Calibration due: ________ (must be within 12 months)
 | 5 | **WITNESS** Through-bolts M12 torqued [CTP-S1] | 85 N·m +/-10 %, every bolt paint-marked | Count: ____ / ____ | | |
 | 6 | **WITNESS** Rack hold-down bolts M12 [CTP-S2] | 85 N·m, 4 per rack | Count: ____ / ____ | | |
 | 7 | Equipment skid bolts (UPS, battery, CDU, cooling units) M12 [CTP-S3] | 85 N·m, 4 per cabinet | Count: ____ / ____ | | |
-| 8 | Micro: skid anchors M16 [CTP-S1 micro] | 210 N·m, 4 | | | |
+| 8 | BEN 5: skid anchors M16 [CTP-S1 micro] | 210 N·m, 4 | | | |
 | 9 | Tray underside height | 2250 +/-10 mm | | | |
 | 10 | Tray ground bonding at every joint | <= 0.1 ohm | | | |
 
@@ -98,7 +98,7 @@ Inspector (WITNESS): ____________________ Date: ________
 | 7 | Rack ground bond to tray bar, each rack | <= 0.1 ohm | | | |
 | 8 | Containment panels sealed to liner; brush strips at cable openings | Yes | | | |
 | 9 | Containment dP at full fan speed, all doors closed [CTQ-B5] | >= 5 Pa | | | |
-| 10 | RDHx doors fitted and hoses capped (BEN 20) | Yes / N/A | | | |
+| 10 | RDHx doors fitted and hoses capped (BEN 150) | Yes / N/A | | | |
 
 Inspector (WITNESS item 5): ____________________ Date: ________
 
@@ -175,7 +175,7 @@ Installer certificate number: ________ Expiry: ________
 | 5 | **HOLD** Life-safety hard-wired; nodes monitor dry contacts only [CTP-K1] | Yes | | | |
 | 6 | Room integrity (door fan) test: hold time [CTP-F1] | >= 10 min | | | |
 | 7 | Functional test with solenoid disconnected; actuator fitted last | Yes | | | |
-| 8 | Micro: aerosol unit mounted, actuator independent, label on door | Yes / N/A | | | |
+| 8 | BEN 5: aerosol unit mounted, actuator independent, label on door | Yes / N/A | | | |
 
 Installer (HOLD): ____________________ Date: ________
 

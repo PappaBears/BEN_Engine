@@ -1,6 +1,6 @@
 # BEN Engine — OpenThread Border Router on the edge computer (Schreiber AI)
 # Image: openthread/border-router (pinned digest recorded at commissioning in the turnover package).
-# One service per RCP; the second is started only when RCP2 is set (BEN 20/40 redundancy: both RCPs join
+# One service per RCP; the second is started only when RCP2 is set (BEN 150/500 redundancy: both RCPs join
 # the same Thread network as border routers; Pods pick either; the broker address fd00:ben::1 is on the
 # host, so a failed RCP changes nothing for the Pods beyond a re-attach).
 services:

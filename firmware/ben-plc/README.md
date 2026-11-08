@@ -6,7 +6,7 @@ PLCnext Engineer 2024.x. **Status: structured text written, NOT compiled** (no P
 build host); the I/O names, task configuration and Modbus server are described here and must be created in
 the Engineer project at first build.
 
-**On BEN Controls Lite (BEN Micro / BEN 10 option) there is no PLC.** The *same* interlock state machine
+**On BEN Controls Lite (BEN 5 / BEN 30 option) there is no PLC.** The *same* interlock state machine
 runs as a Python service on the RevPi: `software/ben_engine/interlocks.py` (class `Interlocks`) driven by
 `firmware/ben-edge/lite/ben_interlocks_service.py`, with a hardware watchdog relay in the cooling-enable
 chain. That Python class is the **executable reference** for `BenInterlocks.st`: the unit tests in

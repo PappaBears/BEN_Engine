@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: Liebert CRV in-row (alternate), CoolLoop RDHx, XDU450 CDU (BEN 20 / BEN 40)
+Subject: RFQ: Liebert CRV in-row (alternate), CoolLoop RDHx, XDU450 CDU (BEN 150 / BEN 500)
 Supplier: vertiv thermal crv rdhx xdu
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07
@@ -11,7 +11,7 @@ Hello,
 I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
-Vertiv thermal equipment as the alternate to APC for in-row DX (CR035RA), rear-door heat exchangers (CoolLoop RDHx ~35-40 kW/door) for BEN 20, and row CDUs (Liebert XDU450 / CoolChip) for BEN 40 direct liquid cooling. No public pricing exists for these, so the BOM carries engineering estimates (RDHx $18k/door, XDU450 $150k).
+Vertiv thermal equipment as the alternate to APC for in-row DX (CR035RA), rear-door heat exchangers (CoolLoop RDHx ~35-40 kW/door) for BEN 150, and row CDUs (Liebert XDU450 / CoolChip) for BEN 500 direct liquid cooling. No public pricing exists for these, so the BOM carries engineering estimates (RDHx $18k/door, XDU450 $150k).
 
 **Quantities**
 - CR035RA alternate: 36

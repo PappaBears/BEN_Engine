@@ -7,7 +7,7 @@
 #   sudo UNIT=ben20-0007 PODS=12 PLC_IP=10.20.0.10 ./install.sh
 #   options: ENABLE_WAN=0|1 (default 0)  SUPPORT_VPN=0|1 (default 0)  BACKUP_DEV=/dev/sdb1 or NAS=//nas/ben
 #            CTRL_IF=enp1s0 (controls VLAN trunk)  MGMT_IF=enp2s0 (management, separate NIC on the Karbon)
-#            RCP_DEVS="/dev/ttyACM0 /dev/ttyACM1" (MGM240P radio co-processors; two on BEN 20/40)
+#            RCP_DEVS="/dev/ttyACM0 /dev/ttyACM1" (MGM240P radio co-processors; two on BEN 150/500)
 #            LUKS=1 (default 1: enrol the TPM 2.0 for unattended unlock of the data volume)
 set -euo pipefail
 [ "$(id -u)" = 0 ] || { echo "run as root"; exit 1; }

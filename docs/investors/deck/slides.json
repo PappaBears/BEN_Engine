@@ -81,7 +81,7 @@
    "bullets": [
     "A2L refrigerants are unusable inside a container at these charges: in-row DX specified with R-513A/R-515B (A1, GWP < 700) ahead of the AIM Act 2027 rule",
     "NFPA 855 / UL 9540 triggers at 20 kWh lithium: BEN 5/30/150 stay under it by default; BEN 500 carries the full package",
-    "NEC 110.26 at 480 V drives an electrical vestibule on BEN 150/40",
+    "NEC 110.26 at 480 V drives an electrical vestibule on BEN 150/500",
     "IEC 62443 zones; life safety hardwired and never on the controls network",
     "BEN 2000 is a building: IBC permit, MV service, NFPA 855 battery rooms, NFPA 110 Level 1, SPCC; hardening adds UL 50E / UL 752 / ASTM F3038 / MIL-STD-188-125-1 rows"
    ],

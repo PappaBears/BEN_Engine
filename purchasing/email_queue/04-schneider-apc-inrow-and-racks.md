@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: InRow DX ACRD301S + condensers, NetShelter SX racks, AP8841 PDUs, EPO (BEN 10 / BEN 20)
+Subject: RFQ: InRow DX ACRD301S + condensers, NetShelter SX racks, AP8841 PDUs, EPO (BEN 30 / BEN 150)
 Supplier: schneider apc inrow and racks
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07

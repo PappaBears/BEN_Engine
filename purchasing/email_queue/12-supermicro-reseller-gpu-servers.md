@@ -11,10 +11,10 @@ Hello,
 I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
-Reference compute for customer configurations: Supermicro 8U 8x H100 SXM5 (SYS-821GE-TNHR, liquid-cooled variant preferred for BEN 40) and 4U 8x L40S (SYS-421GE-TNRT) servers, plus NVIDIA SN2700 / SN3700 100GbE switches. Prices seen 2026-11-07: Uvation $235,900 (H100 system), AVADirect configured $82,329 (L40S system), NetworkTigers $10,592.99 (SN2700 Cumulus).
+Reference compute for customer configurations: Supermicro 8U 8x H100 SXM5 (SYS-821GE-TNHR, liquid-cooled variant preferred for BEN 500) and 4U 8x L40S (SYS-421GE-TNRT) servers, plus NVIDIA SN2700 / SN3700 100GbE switches. Prices seen 2026-11-07: Uvation $235,900 (H100 system), AVADirect configured $82,329 (L40S system), NetworkTigers $10,592.99 (SN2700 Cumulus).
 
 **Quantities**
-- H100 systems: up to 28 (2 x BEN 40)
+- H100 systems: up to 28 (2 x BEN 500)
 - L40S systems: 106
 - SN2700: 18
 

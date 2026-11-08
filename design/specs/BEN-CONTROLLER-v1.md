@@ -1,7 +1,7 @@
 # BEN Controller v1 — specification sheet (UL 508A controls panel)
 
 **Schreiber AI · BEN Engine controls module · IFC Rev B · 2026-11-08** · replaces the BEN Gateway v1 sheet per `docs/CONTROLS_HARDWARE_DECISION.md`.
-One per BEN unit. **BEN Controls Pro** (§ A) for BEN 20/40 and optional on BEN 10; **BEN Controls Lite** (§ B) for BEN Micro and standard on BEN 10. Both run the same `ben_engine` software and the same BEN Pods; both are built as a listed industrial control panel. Status: specified, software written (`firmware/ben-edge`, `firmware/ben-plc`), **no panel built yet**.
+One per BEN unit. **BEN Controls Pro** (§ A) for BEN 150/500 and optional on BEN 30; **BEN Controls Lite** (§ B) for BEN 5 and standard on BEN 30. Both run the same `ben_engine` software and the same BEN Pods; both are built as a listed industrial control panel. Status: specified, software written (`firmware/ben-edge`, `firmware/ben-plc`), **no panel built yet**.
 
 ---
 
@@ -27,7 +27,7 @@ One per BEN unit. **BEN Controls Pro** (§ A) for BEN 20/40 and optional on BEN 
 | 1–4 | Analog input 4 (current) | **AXL F AI4 I 1H** | Setra 264 / Dwyer MS2 ΔP, Vaisala HMD/HMW RH, IT kW transducer, CDU pressures (4–20 mA) |
 | 1 | Serial | **AXL F RS UNI 1H** | RS-485 Modbus RTU to cooling units / meters / UPS (and Pod E slaves) |
 | 1 | **Edge computer** | **OnLogic Karbon 400** (K401 config: Atom x6425E, 16 GB, 256 GB NVMe industrial, TPM 2.0, 2 × GbE, 2 × COM, DIN-rail kit) (Siemens SIMATIC IPC227G) | `ben_engine` API/twin/history, Mosquitto mTLS, OTBR, chrony, PLC bridge, backups; UL 62368-1 |
-| 2 | **Border router RCP** | **MGM240P dev module on USB** (Silicon Labs BRD4186C-based RCP or Schreiber AI BEN-RCP-1 USB stick) | OpenThread RCP, one per OTBR; redundant pair on BEN 20/40 (1 on BEN 10) |
+| 2 | **Border router RCP** | **MGM240P dev module on USB** (Silicon Labs BRD4186C-based RCP or Schreiber AI BEN-RCP-1 USB stick) | OpenThread RCP, one per OTBR; redundant pair on BEN 150/500 (1 on BEN 30) |
 | 1 | **Managed Ethernet switch** | **Phoenix Contact FL SWITCH 2008 / 2016 PN** (Moxa EDS-2010-ML / EDS-408A) | VLAN 20 (controls) + VLAN 30 (management) + PoE ports for Pod E where fitted (FL SWITCH 2008 PoE variant or Moxa EDS-P506E); IGMP snooping; port security |
 | 1 | **24 VDC PSU, primary** | **Phoenix Contact QUINT4-PS/1AC/24DC/10** (10 A) | control power; UL 508 listed, SEMI F47 |
 | 1 | **24 VDC PSU, secondary** | QUINT4-PS/1AC/24DC/10 | fed from the other controls circuit (UPS-backed) |
@@ -65,20 +65,20 @@ customer IT                       NO port on the controls switch is in the custo
 
 ### Pro reliability and failure behaviour
 
-PLCnext AXC F 2152 published MTBF ≈ 700 000 h (vendor); Karbon 400 MTBF ≈ 300 000 h (vendor); QUINT4 PSU > 1 000 000 h. Design assumptions: **PLC alone keeps the interlocks running** without the edge; **the edge alone keeps history and dashboard** without the PLC (telemetry from Pods continues; `plcN` goes stale, dashboard shows "controller comms lost"); **both lost** → enable chain opens, every cooling unit on local control, Pods buffer 1 h. A cold-spare edge image (NVMe clone + LUKS recovery) and a spare PLC with the project on SD ship with every BEN 20/40; restore < 30 min.
+PLCnext AXC F 2152 published MTBF ≈ 700 000 h (vendor); Karbon 400 MTBF ≈ 300 000 h (vendor); QUINT4 PSU > 1 000 000 h. Design assumptions: **PLC alone keeps the interlocks running** without the edge; **the edge alone keeps history and dashboard** without the PLC (telemetry from Pods continues; `plcN` goes stale, dashboard shows "controller comms lost"); **both lost** → enable chain opens, every cooling unit on local control, Pods buffer 1 h. A cold-spare edge image (NVMe clone + LUKS recovery) and a spare PLC with the project on SD ship with every BEN 150/500; restore < 30 min.
 
 ---
 
 ## B. BEN Controls Lite panel — BEN-CTRL-LITE-V1
 
-For **BEN Micro** (standard) and **BEN 10** (standard; Pro selectable). Same software, same Pods, same acceptance tests; no PLC — the interlocks run on the RevPi behind a hardware watchdog relay (`firmware/ben-edge/lite`, `firmware/ben-plc/README.md`).
+For **BEN 5** (standard) and **BEN 30** (standard; Pro selectable). Same software, same Pods, same acceptance tests; no PLC — the interlocks run on the RevPi behind a hardware watchdog relay (`firmware/ben-edge/lite`, `firmware/ben-plc/README.md`).
 
 | | |
 | --- | --- |
-| **Listing** | **UL 508A** panel (smaller shop build) or, for BEN Micro, a UL 508A-listed pre-assembled enclosure kit; NEMA 12 / IP54 |
+| **Listing** | **UL 508A** panel (smaller shop build) or, for BEN 5, a UL 508A-listed pre-assembled enclosure kit; NEMA 12 / IP54 |
 | **Enclosure** | **Rittal AX 1050 / Hoffman equivalent**, **500 W × 500 H × 210 D mm**, wall-mount; antenna bulkhead (1) |
 | **Controller + edge** | **KUNBUS Revolution Pi RevPi Connect 4** (8 GB RAM, 32 GB eMMC, 2 × GbE, RTC, hardware watchdog, UL/CE, −25…+55 °C) — alternate RevPi Connect S; runs `ben_engine`, Mosquitto, OTBR (native agent), interlock service |
-| **I/O** | **RevPi DIO** (16 DI / 16 DO 24 V, PiBridge) × 1 (× 2 on BEN 10) · **RevPi AIO** (4 AI 4–20 mA, 2 AO, 2 RTD) × 1 |
+| **I/O** | **RevPi DIO** (16 DI / 16 DO 24 V, PiBridge) × 1 (× 2 on BEN 30) · **RevPi AIO** (4 AI 4–20 mA, 2 AO, 2 RTD) × 1 |
 | **Watchdog relay** | **KW1**: Phoenix Contact PLC-RSC-24DC/21 (DIN relay module) driven by DIO O_14; NO contact in series in the cooling-enable chain; NC contact → beacon |
 | **Border router RCP** | 1 × MGM240P RCP on USB |
 | **Switch** | **Phoenix Contact FL SWITCH 2005 / Moxa EDS-2005-EL** (5-port, unmanaged VLAN-less → two physical segments: the RevPi's two NICs separate controls and management; PoE injector for a Pod E if fitted) |

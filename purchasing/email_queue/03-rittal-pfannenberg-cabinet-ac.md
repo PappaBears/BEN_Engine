@@ -14,12 +14,12 @@ I am writing from Schreiber AI. We design and build BEN Engine, a family of modu
 Wall/side-mount enclosure cooling units, ~5.8 kW at L35/L35, 400-480 V 3-ph or 230 V 1-ph, for an outdoor 24U cabinet. Online listings on 2026-11-07 showed DigiKey $9,222.32 (1 pc) and Electrika trade GBP 5,869.14; we need a project price.
 
 **Quantities**
-- 20 units (10 Micro x 2, N+1), plus 2 spares
+- 20 units (10 BEN 5 x 2, N+1), plus 2 spares
 
 **Questions**
-1. Project price at 20 units (2 per Micro unit) and what the de-rate is at 46 C ambient.
+1. Project price at 20 units (2 per BEN 5 unit) and what the de-rate is at 46 C ambient.
 2. Can the unit be mounted on a 24U (~1.2 m tall) cabinet side? Minimum cabinet height/width and cut-out drawing.
-3. Is there a 208-240 V 1-ph variant with the same capacity? Our Micro service is 1-phase.
+3. Is there a 208-240 V 1-ph variant with the same capacity? Our BEN 5 service is 1-phase.
 4. Modbus (RTU/TCP) or SNMP register map / MIB so our gateway can poll the unit; please include alarm bits and any writeable set-points. (Blue e+ IoT interface / Pfannenberg PIC).
 5. Condensate management for outdoor use and the UL 484 / UL 60335-2-40 status.
 6. Unit price at the quantities above, and price breaks at 10 / 25 / 50 units.

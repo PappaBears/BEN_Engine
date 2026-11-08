@@ -84,7 +84,7 @@ Rates: Pod telemetry 1 Hz (0.2–10 Hz), Pod status 10 s retained, PLC poll 1 Hz
 | **Edge computer lost** (Karbon off / API dead / Lite: `ben-api` or broker crashed) | PLC: `EDGE_LOST` after 30 s; interlocks, sequencing, leak isolation, enable chain **unchanged**; trim → 0; tests refused. Pods buffer; dashboard dark; history gap back-filled on restore. No field alarm (beacon off). | Interlock service is a separate unit and continues; `EDGE_LOST` set the same way; Pods buffer; dashboard dark until restart (systemd restarts the API within 3 s). |
 | **Controller lost** (PLC STOP / power; Lite: interlock service stalled) | Enable-chain relay drops (DOR output de-energised) → every cooling unit on its own controller; valves hold; CDU own leak logic; edge raises `critical` "controller comms lost"; `plcN` stale; Pods and history continue. | `WatchdogSec` restart in 10 s; if the loop is truly dead, hardware watchdog reboots the RevPi in 60 s and piControl zeroes outputs → KW1 opens → units on local control. History pauses during the reboot (Pods buffer). |
 | **Both lost** | Units on local control; Pods buffer 1 h; life safety unaffected (hardwired). | Same (single box). |
-| **Border router RCP lost** | BEN 20/40: Pods re-attach via RCP2 within 60 s; BEN 10: Pods buffer until the RCP is back; Pod E falls to Ethernet (`path:"eth"`) or RS-485 to the PLC. | Pods buffer; Pod E falls to Ethernet/RS-485. |
+| **Border router RCP lost** | BEN 150/500: Pods re-attach via RCP2 within 60 s; BEN 30: Pods buffer until the RCP is back; Pod E falls to Ethernet (`path:"eth"`) or RS-485 to the PLC. | Pods buffer; Pod E falls to Ethernet/RS-485. |
 | **Switch lost** | PLC and edge keep running; edge loses meters/UPS/PDU polls (equipment "stale"); Pods unaffected (Thread); PLC keeps RTU devices. | Same. |
 | **24 VDC PSU 1 lost** | Redundancy module → `PSU_REDUNDANCY_OK` = 0, alarm, no functional change. | Supercap ride-through 30 s then orderly shutdown; alarm. |
 
@@ -125,7 +125,7 @@ Alarm inhibit, UPS shutdown, breaker trip and generator start are **not** contro
 6. **Failover sweep:** `TEST_REQUEST` = 1 in AUTO: lead unit stops, standby starts within the start window, `COOL_FAILOVER_CNT` increments, report signed and stored.
 7. **Leak test:** short a SeaHawk zone: isolation valve closes (limit switch within 30 s), `LEAK_ISOLATION_ACTIVE`, latched until HMI RESET; block the valve: `ISO_VALVE_FAULT` and `CDU_PUMP_STOP`.
 8. Press the EPO test station with the panel in test mode: controller `EPO_LOOP_OK` = 0 and Pod DI2 report within 1 s; **nothing on the bus changed the EPO state** (by construction).
-9. Pull RCP1 (BEN 20/40): Pods re-attach via RCP2 within 60 s; `seq` has no gaps after replay.
+9. Pull RCP1 (BEN 150/500): Pods re-attach via RCP2 within 60 s; `seq` has no gaps after replay.
 10. Calibration: `set_cal` on each analog channel, `tare` on `dP_aisle`; `get_cal` echoes `cal_id`; power-cycle the Pod; `get_cal` still echoes it. PLC-side: RTD channel against a reference bath at two points, recorded in `GVL_Cal`.
 11. Nightly backup produces a file with a valid sha256 and passes `PRAGMA integrity_check`; Pro: `clevis luks list` shows the TPM pin and a reboot unlocks unattended.
 12. Lite only: `kill -STOP` the interlock service: restart within 10 s, O_14/KW1 state logged; hardware watchdog reboot test with units on local control throughout.

@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: outdoor dry coolers 120 kW and 230 kW, glycol, EC fans, adiabatic-ready (BEN 20 / BEN 40)
+Subject: RFQ: outdoor dry coolers 120 kW and 230 kW, glycol, EC fans, adiabatic-ready (BEN 150 / BEN 500)
 Supplier: guntner alfa laval dry cooler
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07
@@ -11,11 +11,11 @@ Hello,
 I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
-Outdoor V-type dry coolers for the RDHx / CDU primary loops: ~120 kW for BEN 20 and ~230 kW for BEN 40, PG25, 46 C design ambient, approach <= 7 K, EC fans, low-noise option, Modbus control. BOM carries $110/kW as an estimate.
+Outdoor V-type dry coolers for the RDHx / CDU primary loops: ~120 kW for BEN 150 and ~230 kW for BEN 500, PG25, 46 C design ambient, approach <= 7 K, EC fans, low-noise option, Modbus control. BOM carries $110/kW as an estimate.
 
 **Quantities**
-- BEN 20 duty (~120 kW): 6
-- BEN 40 duty (~230 kW): 2
+- BEN 150 duty (~120 kW): 6
+- BEN 500 duty (~230 kW): 2
 
 **Questions**
 1. Selection and pricing at the two duties, with and without adiabatic pre-cooling, for 46 C and 35 C design ambients.

@@ -1,5 +1,5 @@
 {
-  "_comment": "BEN Controls Lite — PiCtory I/O names -> interlock roles. Edit at panel build; the service never hardcodes a terminal. Example for BEN Micro: 2 cooling units, 1 leak zone, 1 door. DIO module 1 = position 32 (I_1..I_16, O_1..O_16), AIO module = position 33.",
+  "_comment": "BEN Controls Lite — PiCtory I/O names -> interlock roles. Edit at panel build; the service never hardcodes a terminal. Example for BEN 5: 2 cooling units, 1 leak zone, 1 door. DIO module 1 = position 32 (I_1..I_16, O_1..O_16), AIO module = position 33.",
   "plant": {"n_cooling": 2, "unit_kw": 15.0, "n_leak_zones": 1, "n_doors": 1, "redundancy": "N+1", "supply_setpoint_c": 20.0, "it_kw_fs": 40.0},
   "di": {
     "cool1_run": "I_1", "cool1_fault": "I_2", "cool2_run": "I_3", "cool2_fault": "I_4",

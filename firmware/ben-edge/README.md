@@ -3,7 +3,7 @@
 **Status: implemented, syntax-checked (`bash -n`), unverified on hardware.** Written for **Ubuntu Server
 22.04/24.04 LTS or Debian 12 on x86-64** — the **OnLogic Karbon 400** (Intel Atom x6425E, TPM 2.0, −40…70 °C,
 DIN rail, dual LAN; alternate Siemens SIMATIC IPC227G). Treat the first install as a commissioning step with
-the `CONTROLS_SPEC.md` acceptance checks. **BEN Controls Lite** (RevPi, BEN Micro / BEN 10) uses the
+the `CONTROLS_SPEC.md` acceptance checks. **BEN Controls Lite** (RevPi, BEN 5 / BEN 30) uses the
 same files through `lite/install.sh` — see `lite/README.md`.
 
 The edge computer is the *data* half of the **BEN Controller**: the MQTT broker the Pods talk to (mutual
@@ -21,7 +21,7 @@ writes exactly three advisory registers.
 | `lite/install.sh` | — | Lite installer for the RevPi (no TPM/docker; native `otbr-agent`; interlock service; watchdog relay) |
 | `mosquitto/ben.conf` | `/etc/mosquitto/conf.d/ben.conf` | Four listeners: **8883 mTLS on `fd00:ben::1` (Pods over Thread)**, 8883 mTLS on 10.20.0.1 (Pod E / bridge), 8884 TLS+password on 10.30.0.1 (API, laptop), 9001 WSS |
 | `mosquitto/ben_acl.template` | `/etc/mosquitto/ben_acl` | Per-Pod ACL keyed on the **certificate CN** `pod-<unit>-<podN>`: write own `telemetry/status/ack`, read own `cmd` |
-| `otbr/docker-compose.yml`, `otbr/otbr.env` | `/etc/ben/` | OpenThread Border Router container(s); one per MGM240P RCP on USB (`/dev/ttyACM0`, `/dev/ttyACM1` for the redundant RCP on BEN 20/40) |
+| `otbr/docker-compose.yml`, `otbr/otbr.env` | `/etc/ben/` | OpenThread Border Router container(s); one per MGM240P RCP on USB (`/dev/ttyACM0`, `/dev/ttyACM1` for the redundant RCP on BEN 150/500) |
 | `otbr/ben-thread-form.sh` | `/usr/local/sbin/` | Forms the unit's Thread network once (channel 25, OMR prefix `fd00:ben::/64`), records the sealed dataset, starts the Commissioner |
 | `otbr/radvd.conf` | `/etc/radvd.conf` | Advertises the Pod E prefix and the mesh route on the controls VLAN, **no default route** |
 | `otbr/device-ca-chain.example.crt` | `/etc/ben/pki/device-ca-chain.crt` | Placeholder for the Schreiber AI Device CA chain (real one exported from the provisioning HSM) |
@@ -60,7 +60,7 @@ device certificate and appears as a retained `status` with `attested:true` after
 
 ```
 enp1s0          10.20.0.1/24 + fd00:ben:1::1/64   controls VLAN 20: PLC 10.20.0.10, Pod E, Modbus-TCP meters, PDUs (SNMP), cooling, UPS
-wpan0 (RCP)     fd00:ben::1/64                    Thread mesh: BEN Pods (own zone; DTLS join, mTLS MQTT). wpan1 = second RCP (BEN 20/40)
+wpan0 (RCP)     fd00:ben::1/64                    Thread mesh: BEN Pods (own zone; DTLS join, mTLS MQTT). wpan1 = second RCP (BEN 150/500)
 enp2s0          10.30.0.1/24                      management VLAN 30: dashboard, engineering laptop, API :8000, MQTT TLS :8884, WSS :9001
 (customer IT)   —                                 separate VLAN/switch; the edge computer has NO interface on it
 wan0 / wg0      optional                          outbound only; nothing listens on WAN. VPN is customer-switched.
@@ -97,4 +97,4 @@ unit data; `/etc/ben` (certs, env) is on the data volume via bind mount in produ
 7. `clevis luks list -d /dev/nvme0n1p3` shows the tpm2 pin; reboot unlocks without a prompt; `tpm2_pcrread sha256:7` recorded in the turnover package.
 8. Pull the USB stick, trigger `systemctl start ben-backup` — log says `BACKUP SKIPPED`; replace it, run again — `BACKUP OK`.
 9. Stop `ben-plc-bridge` for 35 s: PLC register `EDGE_LOST` (40005) goes 1, cooling keeps sequencing on the PLC, dashboard shows "edge advisory lost"; restart → 0.
-10. Power the primary RCP off (BEN 20/40): Pods re-attach through the second border router within 60 s; no telemetry gap beyond the ring-buffer replay (`replay:true`).
+10. Power the primary RCP off (BEN 150/500): Pods re-attach through the second border router within 60 s; no telemetry gap beyond the ring-buffer replay (`replay:true`).

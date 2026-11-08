@@ -1,6 +1,6 @@
 # BEN Controls Lite — RevPi install variant
 
-**For BEN Micro (standard) and BEN 10 (option).** Controller = **KUNBUS Revolution Pi RevPi Connect 4**
+**For BEN 5 (standard) and BEN 30 (option).** Controller = **KUNBUS Revolution Pi RevPi Connect 4**
 (Connect S for the smallest panels): industrial DIN-rail, UL/CE, Compute Module based, −25…+55 °C, 24 VDC,
 2 × Ethernet, with **RevPi DIO** (16 DI / 16 DO, 24 V) and **RevPi AIO** (4 AI 4–20 mA, 2 RTD, 2 AO) modules on
 PiBridge. It runs the same `ben_engine` edge software as the Karbon 400 (broker, API, twin, history, OTBR,

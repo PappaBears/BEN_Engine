@@ -1,5 +1,5 @@
 # BEN Engine edge computer — OpenThread Border Router (docker compose, one container per MGM240P RCP).
-# wpan0 (and wpan1 on BEN 20/40 for the redundant RCP) carries the Thread mesh prefix fd00:ben::/64.
+# wpan0 (and wpan1 on BEN 150/500 for the redundant RCP) carries the Thread mesh prefix fd00:ben::/64.
 [Unit]
 Description=BEN Engine OpenThread Border Router (OTBR + MGM240P RCP) — Schreiber AI
 After=docker.service network-online.target ben-firewall.service

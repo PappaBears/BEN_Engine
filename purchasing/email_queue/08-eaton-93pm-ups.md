@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: 93PM 50 kW UPS, 208 V, internal batteries, N+1 pair (BEN 10)
+Subject: RFQ: 93PM 50 kW UPS, 208 V, internal batteries, N+1 pair (BEN 30)
 Supplier: eaton 93pm ups
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07
@@ -11,7 +11,7 @@ Hello,
 I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
-Two Eaton 93PM 50 kW UPS frames per BEN 10 unit (N+1), 208 V in/out, internal battery strings for 10 minutes at 30 kW, maintenance bypass, network card. Online on 2026-11-07: AVENDOR sale $58,272.99 (tower, internal batteries), 480 V frame $51,788.99 at 0 stock, SHI MSRP $87-93k.
+Two Eaton 93PM 50 kW UPS frames per BEN 30 unit (N+1), 208 V in/out, internal battery strings for 10 minutes at 30 kW, maintenance bypass, network card. Online on 2026-11-07: AVENDOR sale $58,272.99 (tower, internal batteries), 480 V frame $51,788.99 at 0 stock, SHI MSRP $87-93k.
 
 **Quantities**
 - 93PM 50 kW: 4 (2 x BEN10) + 1 spare power module

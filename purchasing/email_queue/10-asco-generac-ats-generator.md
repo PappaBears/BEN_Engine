@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: Series 300 ATS (200 A / 400 A, NEMA 3R, SE-rated) and SD150 / SD250 diesel gensets (generator option)
+Subject: RFQ: Series 300 ATS (200 A / 400 A, NEMA 4X, SE-rated) and SD150 / SD250 diesel gensets (generator option)
 Supplier: asco generac ats generator
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07
@@ -11,7 +11,7 @@ Hello,
 I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
-Optional backup power package: ASCO Series 300 ATS 200 A 208 V and 400 A 480 V (service-entrance rated, NEMA 3R) and Generac SD150 / SD250 diesel generators with L2 enclosure and 24 h sub-base tank. Norwall listed the 400 A SE NEMA 3R at $11,060 on 2026-11-07; generator pricing is dealer-only and our BOM estimates $75k / $110k.
+Optional backup power package: ASCO Series 300 ATS 200 A 208 V and 400 A 480 V (service-entrance rated, NEMA 4X) and Generac SD150 / SD250 diesel generators with L2 enclosure and 24 h sub-base tank. Norwall listed the 400 A SE NEMA 3R at $11,060 on 2026-11-07; generator pricing is dealer-only and our BOM estimates $75k / $110k.
 
 **Quantities**
 - ATS 400 A: 4
@@ -21,7 +21,7 @@ Optional backup power package: ASCO Series 300 ATS 200 A 208 V and 400 A 480 V (
 
 **Questions**
 1. Dealer pricing and lead time for the ATS and generator sizes below; EPA Tier 4 / stationary emergency certification.
-2. Generator sizing check for 128 kW (BEN 20) and 212 kW (BEN 40) with UPS step loads and VFD cooling loads; recommended alternator oversize.
+2. Generator sizing check for 128 kW (BEN 150) and 212 kW (BEN 500) with UPS step loads and VFD cooling loads; recommended alternator oversize.
 3. Start-up, load bank test and first-year maintenance pricing.
 4. Modbus (RTU/TCP) or SNMP register map / MIB so our gateway can poll the unit; please include alarm bits and any writeable set-points. (ASCO 5-series controller / Generac PowerManager).
 5. Unit price at the quantities above, and price breaks at 10 / 25 / 50 units.

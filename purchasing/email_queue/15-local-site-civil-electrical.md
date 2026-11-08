@@ -17,7 +17,7 @@ A repeatable site package per delivered unit: 6 in reinforced concrete pad (94 t
 - Pilot sites: 3 in 2027 H1; 10 units in the first run
 
 **Questions**
-1. Unit pricing for each element in your region, and a lump-sum per tier (Micro / 10 ft / 20 ft / 40 ft).
+1. Unit pricing for each element in your region, and a lump-sum per tier (BEN 5 / 30 / 150 / 500).
 2. Typical utility lead time for a new 400 A 480 V service in your territory (this is our critical path).
 3. Crane/tilt-bed availability and cost to set a 40 ft HC at ~12 t gross.
 4. Licensed electrician and certified welder billing rates for change work ($110/h and $135/h assumed).

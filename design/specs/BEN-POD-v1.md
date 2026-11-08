@@ -1,7 +1,7 @@
 # BEN Pod v1 — specification sheet
 
 **Schreiber AI · BEN Engine sensing module · IFC Rev B · 2026-11-08** · replaces the BEN Node v1 sheet (hobby carrier) per `docs/CONTROLS_HARDWARE_DECISION.md`.
-Wireless/wired sensing node on the **BEN Mesh** (Thread, IEEE 802.15.4, 2.4 GHz) for every BEN tier and both controls tiers (Lite and Pro). Two per rack plus two per unit (mechanical panel, outdoor equipment); three on a BEN Micro. Status: design complete, firmware core unit-tested on host (37/37), EFR32 build and PCB **not built yet** (`firmware/README.md`).
+Wireless/wired sensing node on the **BEN Mesh** (Thread, IEEE 802.15.4, 2.4 GHz) for every BEN tier and both controls tiers (Lite and Pro). Two per rack plus two per unit (mechanical panel, outdoor equipment); three on a BEN 5. Status: design complete, firmware core unit-tested on host (37/37), EFR32 build and PCB **not built yet** (`firmware/README.md`).
 
 | | |
 | --- | --- |
@@ -17,7 +17,7 @@ Wireless/wired sensing node on the **BEN Mesh** (Thread, IEEE 802.15.4, 2.4 GHz)
 
 | | **Pod E** (wired) | **Pod W** (wireless) |
 | --- | --- | --- |
-| Where | mechanical panel, CDU, PDU zone, anywhere with a switch port or 24 V | rack rails (2 per rack), door frames, outdoor equipment, Micro cabinet |
+| Where | mechanical panel, CDU, PDU zone, anywhere with a switch port or 24 V | rack rails (2 per rack), door frames, outdoor equipment, BEN 5 cabinet |
 | Power | **PoE IEEE 802.3af class 0** (Si3402 PD, isolated) **or** 24 VDC (18–30 V) terminal, 1 A fuse, reverse-protected | **2 × AA LiFeS2 (Energizer L91)** 3.0 V **or** 24 VDC terminal (then router-eligible) |
 | Consumption | 1.1 W typ / 3.6 W max (relays + Ethernet) — **calculated, not measured** | battery: 1 Hz sample, 1 s poll, telemetry 1 Hz → ≈ 2.9 mA avg → **≈ 1.4 y**; at 0.2 Hz telemetry **≈ 4 y** (calculated at 20 °C; derate 30 % at −20 °C) |
 | Network paths | Thread (primary) · **Ethernet 10/100 (W5500 SPI MAC+PHY)** as backup for telemetry · **RS-485 Modbus RTU slave** to the PLC/RevPi for interlock use | Thread only |
@@ -80,7 +80,7 @@ Telemetry at 1 Hz (0.2–10 Hz configurable); status every 10 s (retained) with 
 | --- | --- |
 | Operating temperature | **−40…+70 °C** (MGM240P −40…+105 °C; SHT45/SDP810 −40…+85 °C; relays −40…+85 °C; LiFeS2 cells −40…+60 °C; all capacitors polymer/ceramic — no electrolytics) |
 | Humidity | 5–95 %RH non-condensing (IP65 variant: condensing allowed, conformal coating) |
-| Ingress | IP40 indoor; **IP65** outdoor variant (dry cooler, generator pad, Micro outdoors) |
+| Ingress | IP40 indoor; **IP65** outdoor variant (dry cooler, generator pad, BEN 5 outdoors) |
 | Vibration | ISTA 3A transport in the container; no moving parts |
 | Enclosures | DIN EN 60715 TH35 (Pod E), rack-rail clip (Pod W), wall/pole IP65 (Pod W-X); UL 94 V-0 |
 | Compliance targets | FCC Part 15 B Class A (unintentional) with MGM240P modular approval (intentional); ISED ICES-003; EN 61326-1 (EMC industrial); UL 61010-1 / EN 61010-1 (measurement equipment safety); UL 62368-1 for the PoE PD section; RoHS/REACH; relay circuits ≤ 250 VAC Class 1 wiring in separate conduit |

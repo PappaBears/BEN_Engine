@@ -1,5 +1,5 @@
 To: Ben@SchreiberAI.com
-Subject: RFQ: CHx750 row CDU, rack manifolds and QD hose kits for 48U GPU racks (BEN 40)
+Subject: RFQ: CHx750 row CDU, rack manifolds and QD hose kits for 48U GPU racks (BEN 500)
 Supplier: coolit motivair cdu manifolds
 Status: QUEUED — not sent (operator forwards)
 Prepared: 2026-11-07

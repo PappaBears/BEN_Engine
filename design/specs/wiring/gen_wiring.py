@@ -202,7 +202,7 @@ def controls_network():
     c.wire([(720, 215), (790, 215)], SIGNAL, 3, label="NIC 1", label_pos=0.5, label_dy=-8, label_size=10)
     c.wire([(370, 245), (385, 245), (385, 280), (760, 280), (760, 250), (790, 250)], GREEN, 2, dashed=True, label="Modbus TCP 502", label_pos=0.22, label_dy=-6, label_size=10)
     rcp1 = c.box(790, 360, 115, 70, "RCP 1", ["MGM240P · USB", "OTBR wpan0"], SIGNAL, fill=SLATE, name_size=13, sub_size=10, rx=6)
-    rcp2 = c.box(925, 360, 115, 70, "RCP 2", ["MGM240P · USB", "wpan1 (BEN 20/40)"], SIGNAL, fill=SLATE, name_size=13, sub_size=10, rx=6)
+    rcp2 = c.box(925, 360, 115, 70, "RCP 2", ["MGM240P · USB", "wpan1 (BEN 150/500)"], SIGNAL, fill=SLATE, name_size=13, sub_size=10, rx=6)
     c.wire([(847, 315), (847, 360)], SIGNAL, 2); c.wire([(982, 315), (982, 360)], SIGNAL, 2)
     c.note(790, 460, 250, ["edge → PLC writes only 3 registers:", "watchdog · setpoint trim · test request", "(Modbus TCP 502 or OPC UA 4840)", "edge never commands a valve or a unit", "nftables: drop in / out / forward"], GREEN, "Advisory only")
 
@@ -227,7 +227,7 @@ def controls_network():
 
 def controls_network_lite():
     c = Canvas(1600, 1140, "BEN Engine — Controls Network One-Line — BEN Controls Lite — Schreiber AI — IFC Rev B",
-               "BEN Micro / BEN 10 · same zones, same protocol, no PLC: RevPi Connect 4 runs the edge software AND the interlock service behind a hardware watchdog relay · Pods on the same BEN Mesh")
+               "BEN 5 / BEN 30 · same zones, same protocol, no PLC: RevPi Connect 4 runs the edge software AND the interlock service behind a hardware watchdog relay · Pods on the same BEN Mesh")
     c.parts.append(f'<rect x="40" y="110" width="1020" height="530" rx="14" fill="none" stroke="{SIGNAL}" stroke-width="1.5" stroke-dasharray="6 6"/>')
     c.text(56, 136, "ZONE 1 + 1.5 — CONTROL AND DATA ON ONE INDUSTRIAL CONTROLLER  (VLAN 20, 10.20.0.0/24 · no default route, no WAN)", 15, SIGNAL, weight=700)
     c.parts.append(f'<rect x="40" y="670" width="1020" height="230" rx="14" fill="none" stroke="{SIGNAL}" stroke-width="1.5" stroke-dasharray="6 6"/>')
@@ -244,7 +244,7 @@ def controls_network_lite():
     rcp = c.box(790, 165, 150, 90, "RCP", ["MGM240P · USB", "OTBR wpan0"], SIGNAL, fill=SLATE, name_size=14, sub_size=10, rx=6)
     c.wire([(400, 180), (425, 180), (425, 158), (865, 158), (865, 165)], SIGNAL, 2)
     c.text(950, 162, "USB", 10, SIGNAL, weight=600, font=MONO)
-    tcp = c.box(440, 290, 300, 100, "MODBUS TCP / SNMP (VLAN 20)", ["rack PDU (SNMP v3) · UPS NMC", "cooling unit controller (Micro: 1–2 units)", "polled by ben_engine.api"], SIGNAL, name_size=13, sub_size=11)
+    tcp = c.box(440, 290, 300, 100, "MODBUS TCP / SNMP (VLAN 20)", ["rack PDU (SNMP v3) · UPS NMC", "cooling unit controller (BEN 5: 1–2 units)", "polled by ben_engine.api"], SIGNAL, name_size=13, sub_size=11)
     c.wire([(590, 255), (590, 290)], SIGNAL, 2.5)
     rtu = c.box(440, 420, 300, 60, "MODBUS RTU (RS-485 on RevPi COM)", ["power meter · UPS · cooling controller · Pod E slave"], POWER, fill=SLATE, name_size=13, sub_size=11, dashed=True)
     c.wire([(400, 290), (420, 290), (420, 450), (440, 450)], POWER, 2.5, dashed=True)
@@ -262,7 +262,7 @@ def controls_network_lite():
 
     BUS = 718
     c.wire([(865, 255), (865, 275), (1050, 275), (1050, BUS), (120, BUS)], SIGNAL, 2, dashed=True)
-    c.label(500, BUS - 7, "Thread mesh · 3 Pods on Micro, 2 per rack + 2 on BEN 10", SIGNAL, 10)
+    c.label(500, BUS - 7, "Thread mesh · 3 Pods on BEN 5, 2 per rack + 2 on BEN 30", SIGNAL, 10)
     pods = [("BEN POD W", ["cabinet inlet / outlet", "Pt1000 ×4 · RH · ΔP"]), ("BEN POD W", ["door · leak rope", "DI2 = EPO aux (monitor)"]), ("BEN POD W-X", ["outdoor condenser", "IP65"]), ("BEN POD E (option)", ["PoE to switch · RS-485 to RevPi", "2 relays (beacon, lights)"])]
     for i, (nm, sub) in enumerate(pods):
         x = 60 + i * 250
@@ -302,7 +302,7 @@ def controller_pod_wiring():
         ("DOR LC/1", ["ENABLE", "CHAIN"], GREEN, 68), ("DO8", ["enables", "valves"], SIGNAL, 68), ("RTD4 ×n", ["Pt1000", "X50"], SIGNAL, 68), ("AI4 I", ["4–20 mA", "X60"], SIGNAL, 68), ("RS UNI", ["RS-485", "X80"], POWER, 68)], h=90)
     rowC = din_row(455, "ROW C — EDGE COMPUTER, SWITCH, BORDER ROUTER RCPs", [
         ("ONLOGIC KARBON 400", ["NIC1 10.20.0.1 · NIC2 10.30.0.1", "TPM 2.0 · LUKS · 24 VDC"], GREEN, 230), ("FL SWITCH 2008 / EDS", ["VLAN 20 · PoE ports", "24 VDC"], SIGNAL, 230),
-        ("RCP 1", ["MGM240P USB", "N-type → roof"], SIGNAL, 108), ("RCP 2", ["MGM240P USB", "BEN 20/40"], SIGNAL, 108)], h=80)
+        ("RCP 1", ["MGM240P USB", "N-type → roof"], SIGNAL, 108), ("RCP 2", ["MGM240P USB", "BEN 150/500"], SIGNAL, 108)], h=80)
     rowD = din_row(575, "ROW D — DOOR: HMI, SELECTOR, RESETS, BEACON", [
         ("HMI 7 in", ["PLCnext web panel", "VLAN 30"], GREEN, 150), ("SELECTOR OFF / AUTO / MAN", ["→ DI hmi_off · hmi_manual", "edge cannot change mode"], SIGNAL, 210),
         ("RESET LATCHED", ["momentary → DI"], SIGNAL, 150), ("RESET LEAK", ["momentary → DI"], SIGNAL, 100), ("BEACON", ["red · DO + NC"], LIFE, 80)], h=70)
@@ -505,7 +505,7 @@ def power_one_line(tier: str):
 def cooling_air():
     cfg = Config.preset("ben20"); d = cfg.derived()
     c = Canvas(1600, 990, "BEN Engine — Cooling One-Line (Air: in-row DX + condensers) — Schreiber AI — IFC Rev A",
-               f"BEN 10 / BEN 20 default · example BEN 20: {cfg.it_kw:.0f} kW IT, {d['cooling_units_total']} × {d['cooling_unit_kw_derated']} kW in-row DX ({cfg.redundancy}), {d['airflow_cfm']} cfm · hot-aisle containment · economizer option")
+               f"BEN 30 / BEN 150 default · example BEN 150: {cfg.it_kw:.0f} kW IT, {d['cooling_units_total']} × {d['cooling_unit_kw_derated']} kW in-row DX ({cfg.redundancy}), {d['airflow_cfm']} cfm · hot-aisle containment · economizer option")
     # container outline
     c.parts.append(f'<rect x="80" y="130" width="900" height="520" rx="10" fill="none" stroke="{MUTED}" stroke-width="2"/>')
     c.text(90, 152, "INSIDE CONTAINER (ISO 20 ft HC)  — cold aisle at the door side, hot aisle contained", 13, MUTED)
@@ -546,7 +546,7 @@ def cooling_air():
 def cooling_liquid():
     cfg = Config.preset("ben40"); d = cfg.derived()
     c = Canvas(1600, 990, "BEN Engine — Cooling One-Line (Liquid: DLC → CDU → dry cooler) — Schreiber AI — IFC Rev A",
-               f"BEN 40 default (BEN 20 option) · example BEN 40: {cfg.it_kw:.0f} kW IT in {cfg.racks} racks, {d['cooling_units_total']} × CDU ({cfg.redundancy}) · RDHx for residual air heat")
+               f"BEN 500 default (BEN 150 option) · example BEN 500: {cfg.it_kw:.0f} kW IT in {cfg.racks} racks, {d['cooling_units_total']} × CDU ({cfg.redundancy}) · RDHx for residual air heat")
     c.parts.append(f'<rect x="80" y="130" width="860" height="520" rx="10" fill="none" stroke="{MUTED}" stroke-width="2"/>')
     c.text(90, 152, "INSIDE CONTAINER (ISO 40 ft HC)", 13, MUTED)
     # racks with cold plates

@@ -14,9 +14,9 @@ I am writing from Schreiber AI. We design and build BEN Engine, a family of modu
 New / one-trip high-cube ISO containers delivered to our integration site: 10 ft HC, 20 ft HC and 40 ft HC, with CSC plates, factory-standard marine plywood floors, lockbox, and ideally RAL 9010 or 7035 exterior. We will cut openings and fit out the interior ourselves.
 
 **Quantities**
-- 10 ft HC: 2 units (BEN 10 pilots)
-- 20 ft HC: 6 units (BEN 20)
-- 40 ft HC: 2 units (BEN 40)
+- 10 ft HC: 2 units (BEN 30 pilots)
+- 20 ft HC: 6 units (BEN 150)
+- 40 ft HC: 2 units (BEN 500)
 
 **Questions**
 1. Confirmed delivered price for each size to ZIP (TBD) and whether the 40 ft HC backorder shown online on 2026-11-07 is resolved.
