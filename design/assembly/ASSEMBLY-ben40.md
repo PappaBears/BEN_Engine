@@ -191,7 +191,7 @@ All positions are in millimetres. x is along the length from the door-end liner.
 **Personnel:** 3 workers, 1 QC inspector (witness)  
 **Time:** 2.8 days (22 h)  
 **Tools:** T-01 Steel tape 8 m; T-02 Spirit level 1.8 m / laser level; T-03 Calibrated torque wrench 20-200 N·m (cal. within 12 months); T-08 Pallet jack / rack lifter, 1000 kg; T-15 PPE: hard hat, safety glasses, gloves, steel-toe boots, hearing protection  
-**Parts:** STR-RACK48 (NetShelter SX 48U 600x1200 mm enclosure with sides) x 10; STR-SEISMIC (NetShelter SX high-seismic / OSHPD bolt-down kit) x 20; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)), zinc flake) x 40; CMP-BLANK (1U tool-less blanking panels, pack of 10 (every open U, CTQ-B5)) x 42; PWR-GROUNDBAR (Telecom grounding busbar kit 1/4 x 4 x 12 in with insulators/brackets)) x 10; CTL-LABELS (Label printer cartridges, cable labels, engraved phenolic tags (lot)) x 1  
+**Parts:** STR-RACK48 (NetShelter SX 48U 600x1070 mm enclosure with sides (1070 deep keeps the 900 mm aisle in a 2.2 m container; AR3307 1200-deep rejected by interference check I-C22)) x 10; STR-SEISMIC (NetShelter SX high-seismic / OSHPD bolt-down kit) x 20; STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors)), zinc flake) x 40; CMP-BLANK (1U tool-less blanking panels, pack of 10 (every open U, CTQ-B5)) x 42; PWR-GROUNDBAR (Telecom grounding busbar kit 1/4 x 4 x 12 in with insulators/brackets)) x 10; CTL-LABELS (Label printer cartridges, cable labels, engraved phenolic tags (lot)) x 1  
 
 
 > **WARNING:** A rack can fall over when you move it. Keep the rack on the lifter until two hold-downs are fitted.
@@ -606,4 +606,4 @@ Codes are purchasing catalog codes (`purchasing/parts_catalog.json`); see `desig
 - STR-TRAY (Wire-mesh cable tray 300 x 100 mm, 3 m length, with ceiling hangers (data + power runs)))
 - STR-TRAY (Wire-mesh cable tray 300 x 100 mm, 3 m length, with ceiling hangers (data + power runs)))
 - STR-FASTENERS (Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors))
-- STR-RACK48 (NetShelter SX 48U 600x1200 mm enclosure with sides)
+- STR-RACK48 (NetShelter SX 48U 600x1070 mm enclosure with sides (1070 deep keeps the 900 mm aisle in a 2.2 m container; AR3307 1200-deep rejected by interference check I-C22))

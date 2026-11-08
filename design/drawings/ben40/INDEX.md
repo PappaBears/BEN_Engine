@@ -22,9 +22,9 @@ Status: **ISSUE FOR CONSTRUCTION Rev A** — Drawn: BEN Engine generator; Checke
 | BEN 40 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
 | BEN 40 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 7700 vs 11850 | <= 11850 | **OK** |  |
 | BEN 40 | I-C2 | A-002 | Row length with layout footprints (dlc_cdu: 10 racks, 2 cooling units, power cabinets) vs usable length | 10400 vs 11350 | <= 11350 | **OK** |  |
-| BEN 40 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (6 x Galaxy VS 100 kW @521 + 4 x Li cab @600) vs usable length | 13926 vs 11350 | <= 11350 | **FAIL** | Catalog qty rules (ceil(kVA/100) x ups_modules) over-provision; drawings use 1 modular frame(s) + 2 battery cabinet(s). Reconcile PWR-UPS-GVS100 / PWR-BATT-LI qty rules with N+1 modular sizing |
+| BEN 40 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 2 x Li cab @600, catalog qty rules) vs usable length | 9600 vs 11350 | <= 11350 | **OK** |  |
 | BEN 40 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 200 - 1070 = 930 | >= 900 | **OK** |  |
-| BEN 40 | I-C22 | A-002 | Aisle width with the catalog 48U rack (STR-RACK48 is 600 x 1200 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1200 = 800 | >= 900 | **FAIL** | Drawings use a 48U 600 x 1070 enclosure. Change catalog STR-RACK48 to a 1070-deep 48U model, or use 42U 1070 racks (12 x 42U) for BEN 40 |
+| BEN 40 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK48: 600 x 1070 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1070 = 930 | >= 914 | **OK** |  |
 | BEN 40 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
 | BEN 40 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
 | BEN 40 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 11850 - 500 - 10400 = 950 | >= 0 | **OK** |  |

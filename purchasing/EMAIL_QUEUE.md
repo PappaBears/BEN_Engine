@@ -20,4 +20,6 @@ One file per supplier question. Each is addressed **To: Ben@SchreiberAI.com** so
 | 14 | [14-jlcpcb-node-carrier-pcb.md](email_queue/14-jlcpcb-node-carrier-pcb.md) | jlcpcb node carrier pcb | RFQ: BEN Node carrier PCB fabrication + SMT assembly, 100 pcs | Make item: carrier PCB price is an estimate. |
 | 15 | [15-local-site-civil-electrical.md](email_queue/15-local-site-civil-electrical.md) | local site civil electrical | RFQ: site civil & electrical package per BEN unit (pad, service, grounding, fiber), regional pricing | SITE- lines are regional estimates; utility lead time is the critical path. |
 
-Gmail drafts: not created in this session (no mailbox action taken); the files above are ready to paste into drafts.
+Gmail drafts: all 16 created on 2026-11-07/08 in the schreibears@gmail.com account, addressed to Ben@SchreiberAI.com, nothing sent. Each draft carries a header line naming the supplier to forward to and the source file.
+
+| 16 | Contract manufacturer RFI (shortlist in docs/MANUFACTURING_STRATEGY.md §3.1) | `16-contract-manufacturer-rfi.md` | queued |

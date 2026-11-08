@@ -60,8 +60,8 @@ Unit economics are derived from the bill of materials in `docs/BOM.md`. The tabl
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | BEN Micro | 5 | $135,082 | $187,614 | $135,811 | $52,532 | 69 % / 0 % / 31 % | $1,200 | $2,700 | $37,523 |
 | BEN 10 | 30 | $659,524 | $916,006 | $278,290 | $256,482 | 81 % / 0 % / 19 % | $4,800 | $16,200 | $30,534 |
-| BEN 20 | 96 | $1,984,953 | $2,756,879 | $769,733 | $771,926 | 84 % / 0 % / 16 % | $12,000 | $51,840 | $28,717 |
-| BEN 40 | 192 | $4,458,727 | $6,192,676 | $1,319,932 | $1,733,949 | 86 % / 0 % / 14 % | $30,000 | $103,680 | $32,254 |
+| BEN 20 | 96 | $1,872,923 | $2,601,282 | $614,136 | $728,359 | 79 % / 0 % / 21 % | $12,000 | $51,840 | $27,097 |
+| BEN 40 | 192 | $4,428,311 | $6,150,432 | $1,277,687 | $1,722,121 | 83 % / 0 % / 17 % | $30,000 | $103,680 | $32,033 |
 
 Assumptions: hardware gross margin 28%; managed service $45/kW-month; controls licence per tier as shown. BOM cost excludes site civil and utility service (SITE- lines are shown separately in `docs/BOM.md`). Compute is the reference GPU/CPU node set from the catalog and dominates the all-modules price (one 8-GPU server is ~$82–236 k); most SMB customers will size their own compute or start with the infrastructure-only price and grow.
 

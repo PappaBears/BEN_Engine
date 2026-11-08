@@ -10,6 +10,7 @@ import calibrationPanel from './panels/calibration.js';
 import cfdPanel from './panels/cfd.js';
 import commissioningPanel from './panels/commissioning.js';
 import exportPanel from './panels/export.js';
+import proposalPanel from './panels/proposal.js';
 
 // ----------------------------------------------------------------------------- store
 class Store extends EventTarget {
@@ -67,7 +68,7 @@ function connectWS() {
 }
 
 // ----------------------------------------------------------------------------- panels
-const PANELS = [selectorPanel, livePanel, alarmsPanel, sweepsPanel, ioPanel, calibrationPanel, cfdPanel, commissioningPanel, exportPanel];
+const PANELS = [selectorPanel, livePanel, alarmsPanel, sweepsPanel, ioPanel, calibrationPanel, cfdPanel, commissioningPanel, exportPanel, proposalPanel];
 const mounted = new Map();
 let activePanel = null;
 const tabsEl = document.getElementById('tabs');

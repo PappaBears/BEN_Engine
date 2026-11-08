@@ -22,8 +22,9 @@ Status: **ISSUE FOR CONSTRUCTION Rev A** — Drawn: BEN Engine generator; Checke
 | BEN 20 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
 | BEN 20 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 3500 vs 5750 | <= 5750 | **OK** |  |
 | BEN 20 | I-C2 | A-002 | Row length with layout footprints (rdhx_drycooler: 5 racks, 4 cooling units, power cabinets) vs usable length | 4800 vs 5250 | <= 5250 | **OK** |  |
-| BEN 20 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (4 x Galaxy VS 100 kW @521 + 2 x Li cab @600) vs usable length | 7484 vs 5250 | <= 5250 | **FAIL** | Catalog qty rules (ceil(kVA/100) x ups_modules) over-provision; drawings use 1 modular frame(s) + 0 battery cabinet(s). Reconcile PWR-UPS-GVS100 / PWR-BATT-LI qty rules with N+1 modular sizing |
+| BEN 20 | I-C21 | A-002 | Row length with catalog UPS/battery quantities (0 x Galaxy VS 100 kW @521 + 0 x Li cab @600, catalog qty rules) vs usable length | 4200 vs 5250 | <= 5250 | **OK** |  |
 | BEN 20 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 0 - 1270 = 930 | >= 900 | **OK** |  |
+| BEN 20 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK42: 600 x 1070 deep + RDHx) vs 900 egress / 914 NEC | 2200 - 0 - 1070 = 930 | >= 914 | **OK** |  |
 | BEN 20 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
 | BEN 20 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
 | BEN 20 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 5750 - 500 - 4800 = 450 | >= 0 | **OK** |  |

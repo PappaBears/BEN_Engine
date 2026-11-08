@@ -80,10 +80,10 @@
   "preset_cooling_units": 4,
   "by_subsystem": {
    "power": {
-    "total": 309703.06944444444,
-    "confirmed": 268494.7361111111,
+    "total": 154105.90277777778,
+    "confirmed": 18453.125,
     "list": 0.0,
-    "estimate": 41208.333333333336
+    "estimate": 135652.77777777778
    },
    "cooling": {
     "total": 282368.05555555556,
@@ -118,10 +118,10 @@
   "preset_cooling_units": 2,
   "by_subsystem": {
    "power": {
-    "total": 486330.6805555555,
-    "confirmed": 418525.12499999994,
+    "total": 444086.2916666667,
+    "confirmed": 187391.84722222225,
     "list": 0.0,
-    "estimate": 67805.55555555556
+    "estimate": 256694.44444444447
    },
    "cooling": {
     "total": 542083.3333333334,

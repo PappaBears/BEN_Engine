@@ -333,7 +333,10 @@ def _resolve_container(lay: Layout):
             rl_cat = rl - lay_power + cat_power
             _chk(lay, "I-C21", "A-002", f"Row length with catalog UPS/battery quantities ({n_gvs} x Galaxy VS 100 kW @521 + {n_bat} x Li cab @600, catalog qty rules) vs usable length",
                  f"{rl_cat:.0f} vs {budget:.0f}", rl_cat, budget, "<=",
-                 resolution="" if rl_cat <= budget else "Catalog qty rules over-provision; reconcile PWR-UPS-GVS100 / PWR-BATT-LI qty rules with N+1 modular sizing")
+                 resolution="" if rl_cat <= budget else (
+                     f"Over by {rl_cat - budget:.0f} mm with {n_gvs} Galaxy VS 100 kW frames. Drawings assume one modular frame with internal N+1 modules "
+                     f"({lay_power:.0f} mm incl. batteries). Options: Galaxy VS 150 kW single frame with redundant power module (521 mm) "
+                     + ("- still 71 mm over for BEN 20: reduce end zone to 430 mm or preset 4 racks" if lay.tier == "ben20" else "or BEN 40 preset at 9 racks (frees 600 mm)")))
             lay.notes["catalog_power_mm"] = cat_power
         else:
             n93 = _q("PWR-UPS-93PM50") * CATALOG_FOOTPRINT["PWR-UPS-93PM50"]

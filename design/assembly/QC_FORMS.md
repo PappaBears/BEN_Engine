@@ -228,3 +228,73 @@ Surveyor (HOLD): ____________________ Rigger (HOLD): ____________________ Inspec
 | 10 | Commissioning script `--stage site` report ID (handover point) | Signed report | | | |
 
 Electrician (HOLD): ____________________ HVAC (HOLD): ____________________ Inspector: ____________________ Customer: ____________________ Date: ________
+
+---
+
+## NCR-01 Non-conformance report and disposition
+
+| Field | Entry |
+|---|---|
+| NCR number / date raised | NCR-____ / ________ |
+| Unit serial / tier / IFC rev | |
+| Found at (task, stage, hold/witness point) | |
+| Drawing / CTQ-CTP reference | |
+| Requirement (specification and tolerance) | |
+| Actual condition (measured value, instrument ID) | |
+| Classification | critical / major / minor |
+| Containment (other units or features affected, tag fitted) | |
+| Proposed disposition | rework / use-as-is / scrap-replace |
+| Schreiber AI Engineering decision (required for any CTQ; use-as-is never for critical) | Name / date / signature |
+| Rework instruction and re-inspection result (100 %) | |
+| CAPA required? (critical, repeated major, bypassed hold point) | yes → CAPA-____ / no |
+| Closed by (supplier quality lead) / verified by (Schreiber AI Quality) | |
+
+## FAI-01 First-article inspection report
+
+Header: unit serial, tier, configuration line, IFC revision, supplier, dates, Schreiber AI witness name.
+
+| Balloon | Drawing / sheet | Characteristic | Specification | Measured | Instrument ID (cal due) | Pass / fail | Witness |
+|---|---|---|---|---|---|---|---|
+| 1…n | A-002 equipment schedule | Every tag x, y, z | ±10 mm | | | | |
+| | A-001 | External dims, diagonals | +0/−6 mm, 10 mm | | | | |
+| | S-001 | Channel level, bolt torque (every bolt) | 3 mm; 85 N·m | | | | |
+| | E-001 | Insulation resistance, ground, rotation, lug torque | per register | | | | |
+| | M-001 | Pressure tests, charge, glycol, flow | per register | | | | |
+| | C-001 | Probe positions, labels, calibration error | ±20 mm; 100 %; ±0.25 C | | | | |
+| | — | Full CTQ/CTP register (attach section 5 of SQAM with values) | all | | | | |
+
+Attachments: complete Q-01…Q-12, NCR log, FAT report + CSV hash, photos of every hold point, certificates of qualified persons.
+Approval: Schreiber AI Engineering ____________ Quality ____________ Date ________ (second unit of this tier may not start before this signature).
+
+## DR-01 Deviation request
+
+| Field | Entry |
+|---|---|
+| DR number / date | |
+| Unit(s) / tier / IFC rev / sheet and item | |
+| Requirement as drawn | |
+| Proposed deviation (what, why, how long) | |
+| CTQ / CTP items affected and the supplier's assessment | |
+| Interference / footprint check needed? (substituted part dims) | yes / no |
+| Schreiber AI Engineering decision | approved / approved with conditions / rejected — name, date |
+| Conditions and record (red-line, Q-form note) | |
+
+## CAPA-01 Corrective and preventive action (8D-lite)
+
+| D | Step | Entry |
+|---|---|---|
+| D1 | Team (names, roles) | |
+| D2 | Problem statement (NCR numbers, what, where, how many) | |
+| D3 | Containment (units checked, result, date) | |
+| D4 | Root cause (5-why; evidence) | |
+| D5 | Corrective action (what changes, owner, date) | |
+| D6 | Verification (measurement showing the problem is gone, on which units) | |
+| D7 | Prevention (instruction / form / fixture / training change; drawing change request if needed) | |
+| D8 | Close-out (supplier quality lead; Schreiber AI Quality verification, date) | |
+
+## COC-01 Certificate of conformance (FAT)
+
+Unit serial ________ Tier ________ Configuration hash ________ IFC rev ________
+FAT report file ________ Telemetry CSV SHA-256 ________ Date of test ________
+All Q-forms complete: yes/no. Open NCRs: critical ____ major ____ minor ____ (critical and major must be 0). FAI approved (first unit): yes/no/N-A.
+Schreiber AI Quality ____________ Supplier quality lead ____________ Date ________

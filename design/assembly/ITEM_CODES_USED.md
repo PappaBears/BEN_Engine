@@ -92,7 +92,7 @@ Generated 2026-11-07 by `design/assembly/gen_assembly.py`. Every code in the ass
 | STR-FASTENERS | Fastener & hardware kit (self-drilling TEK screws, rivets, Unistrut, anchors) | estimate | micro, ben10, ben20, ben40 |  | STR-011, STR-022 |
 | STR-FLOORCHAN | Floor channel C100x50x5 hot-dip galvanised, 3 m length (2 runs under the row, S-001) | **new** (estimate) | ben10, ben20, ben40 | ben10, ben20, ben40 | STR-001 |
 | STR-RACK42 | NetShelter SX 42U 600x1070 mm enclosure with sides | confirmed | ben10, ben20 | ben10, ben20 |  |
-| STR-RACK48 | NetShelter SX 48U 600x1200 mm enclosure with sides | confirmed | ben40 | ben40 |  |
+| STR-RACK48 | NetShelter SX 48U 600x1070 mm enclosure with sides (1070 deep keeps the 900 mm aisle in a  | estimate | ben40 | ben40 |  |
 | STR-SEISMIC | NetShelter SX high-seismic / OSHPD bolt-down kit | confirmed | ben10, ben20, ben40 |  | STR-005 |
 | STR-SKID | Steel skid base for Micro cabinet (C6 channel frame, forklift pockets, 4 lifting eyes) | estimate | micro | micro | STR-010 |
 | STR-TIEDOWN | Twistlock / tie-down anchor set (4 corner castings to pad) | estimate | micro, ben10, ben20, ben40 |  | SITE-002 |

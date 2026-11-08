@@ -2,7 +2,7 @@
 
 **Configuration:** BEN 20 · ai_inference · 96 kW IT in 5 rack(s) · Rear-door heat exchanger + dry cooler (4 units, N+1) · 480 V 3ph · 200 A service · UPS 2 × 116 kVA · battery 17.8 kWh · generator no · subsystems: power, cooling, compute, controls
 
-**Total: $1,984,953.03** across 95 lines — $1,659,011 confirmed (83.6%), $12 list price, $325,930 estimate. Confirmed share excluding compute servers: 41.6%. Longest lead time in BOM: 14 weeks.
+**Total: $1,872,923.07** across 94 lines — $1,478,981 confirmed (79.0%), $12 list price, $393,930 estimate. Confirmed share excluding compute servers: 11.4%. Longest lead time in BOM: 14 weeks.
 
 Price status key: **confirmed** = price seen on a vendor/distributor listing on the date shown (via search-result snippet; direct vendor pages were not reachable from the build environment); **list** = manufacturer published price; **estimate** = engineering estimate with basis in the note.
 
@@ -13,7 +13,7 @@ Price status key: **confirmed** = price seen on a vendor/distributor listing on 
 | cooling | 203,305.00 |
 | env | 6,504.85 |
 | fs | 27,604.34 |
-| power | 222,986.21 |
+| power | 110,956.25 |
 | site | 25,000.00 |
 | str | 26,294.87 |
 | svc | 38,185.00 |
@@ -36,8 +36,7 @@ Price status key: **confirmed** = price seen on a vendor/distributor listing on 
 | ENV-LED | 4 ft LED strip light 4000K, 120-277 V | Lithonia Lighting MNSL L46 1LL 120V 40K 80CRI M6 | [Home Depot](https://www.homedepot.com/p/335349236) | 5 | ea | 37.41 | 187.05 | confirmed | 2026-11-07 | 1 | Home Depot $37.41 seen 2026-11-07 (cached listing; verify live) Stock. |
 | ENV-FLOOR | Anti-static vinyl floor tile over container plywood floor | Armstrong / Staticworx ESD-VCT | flooring distributor | 144 | sqft | 3.50 | 504.00 | estimate | — | 1 | Engineering estimate: ESD VCT $2.5-4.5/sqft material Stock. |
 | ENV-PAINT | Exterior high-reflectance (cool roof) elastomeric coating | Sherwin-Williams / Henry 587 White Roof Coating | Home Depot | 8 | gal | 60.00 | 480.00 | estimate | — | 1 | Engineering estimate; $45-75/gal; ~1 gal per 100 sqft two coats Stock. |
-| PWR-UPS-GVS100 | Galaxy VS UPS 100 kW 480 V for external batteries, start-up 5x8 | Schneider Electric GVSUPS100KGS | [AVENDOR](https://www.avendor.com/products/apc-by-schneider-electric-galaxy-vs-ups-100kw-480v-for-external-batteries-start-up-5x8) | 3 | ea | 41,603.99 | 124,811.97 | confirmed | 2026-11-07 | 10 | AVENDOR $41,603.99 seen 2026-11-07; SHI $42,578 (MSRP $58,485); Camcor $36,115.99 Factory order; 8-12 wk typical. Modular 50 kW power modules inside the frame give N+1 within the frame. Qty rule: frames to carry the IT load at 100 kW each, plus one redundant frame for N+1/2N (2N customers get a second full string via the proposal option). Internal-module N+1 within a 150 kW frame is requested in email 09 and would reduce frame count. |
-| PWR-BATT-LI | Galaxy Lithium-ion battery cabinet UL, 16 x 2.04 kWh modules (32.6 kWh) | Schneider Electric LIBSESMG16UL | [AVENDOR](https://www.avendor.com/products/apc-by-schneider-electric-galaxy-lithium-ion-battery-cabinet-ul-with-16-x-2-04-kwh-battery-modules) | 1 | ea | 55,217.99 | 55,217.99 | confirmed | 2026-11-07 | 10 | AVENDOR sale $55,217.99 (reg $69,740) seen 2026-11-07; 17-module UL variant $62,215.99 Factory order; UL9540A documentation needed for AHJ. Lead time tracks cell supply. Qty rule: one shared cabinet string sized to battery_kwh (shared bus between frames per vendor confirmation requested in email 09); 2N adds a second string via the proposal option. |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40) | Schneider Electric GVSUPS150KHS (configure-to-order) | [AVENDOR](https://www.avendor.com/products/apc-by-schneider-electric-galaxy-vs-ups-100kw-480v-for-external-batteries-start-up-5x8) | 1 | ea | 68,000.00 | 68,000.00 | estimate | — | 14 | Estimate: 1.6x the confirmed GVSUPS100KGS listing ($41,603.99, 2026-11-07) for the 150 kW frame plus redundant power module and internal battery option; quote requested in email 09. Single frame per N string; redundancy inside the frame (N+1 power modules). 2N customers take a second frame via the proposal option. |
 | PWR-XFMR | Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben20) / 300 kVA (ben40), for rack PDUs | Square D / Eaton EX150T3H / EX300T3H | electrical distributor | 2 | ea | 9,500.00 | 19,000.00 | estimate | — | 8 | Engineering estimate: 150 kVA ~ $8-12k, 300 kVA ~ $15-19k distributor pricing (copper surcharge sensitive). qty = one per UPS output path. Distributor stock for 150 kVA common; 300 kVA often 6-10 wk. |
 | PWR-PANEL-ILINE | I-Line panelboard interior 400 A MLO 480Y/277 V, 42 circuit (HCJ) | Square D (Schneider) HCJ14484 | [Standard Electric Supply](https://www.standardelectricsupply.com/Schneider-Electric-HCJ14484) | 1 | ea | 1,405.30 | 1,405.30 | confirmed | 2026-11-07 | 3 | Standard Electric Supply $1,405.30 (typical $1,855) seen 2026-11-07; Cu-bus variant HCJ14484CU $1,875.72 Distributor stock. |
 | PWR-PANEL-BOX | I-Line panelboard box + trim, NEMA 1, 32 in W x 73 in H | Square D (Schneider) HC3273DB + HC3273TF | electrical distributor | 1 | set | 900.00 | 900.00 | estimate | — | 3 | Engineering estimate from distributor box/trim pricing $700-1,100 Distributor stock. |

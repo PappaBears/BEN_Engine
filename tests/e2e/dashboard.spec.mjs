@@ -237,6 +237,21 @@ try {
     return `last caption "${cap.replace(/\s+/g, ' ').slice(0, 50)}…"`;
   });
 
+  // ---------------------------------------------------------------------------------------------- proposal
+  await step('proposal panel generates a proposal from the current configuration', async () => {
+    await page.evaluate(() => window.__ben.showPanel('proposal'));
+    await page.waitForSelector('#btn-proposal', { timeout: 15000 });
+    await page.click('#btn-proposal');
+    await page.waitForSelector('a[href^="/api/proposal/"][href$=".html"]', { timeout: 60000 });
+    const href = await page.getAttribute('a[href^="/api/proposal/"][href$=".html"]', 'href');
+    const res = await page.request.get(BASE + href);
+    if (res.status() !== 200) throw new Error(`proposal html ${res.status()}`);
+    const body = await res.text();
+    if (!/Schreiber AI/.test(body)) throw new Error('proposal html missing brand');
+    await page.evaluate(() => window.__ben.scene.setPixelRatio(1)); await shot(page, `${SCREENS}/proposal-panel.png`);
+    return href;
+  });
+
   // ---------------------------------------------------------------------------------------------- narrow
   await step('390 px layout stacks and keeps the scene', async () => {
     const narrow = await ctx.newPage();

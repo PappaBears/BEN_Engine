@@ -20,6 +20,8 @@ Companion generators that use the same layout engine:
 ```bash
 python design/renders/gen_renders.py                   # assembly stage renders + contact sheets
 python design/assembly/gen_assembly.py                 # STE assembly instructions + ITEM_CODES_USED.md
+python design/gen_design_basis.py                      # DESIGN_BASIS.md (run after gen_drawings.py)
+python design/gen_sqam.py                              # docs/SQAM.md + design/assembly/CTQ-CARD-<tier>.md from ctq.py
 python design/layout.py                                # prints the resolved layout and the interference table
 ```
 

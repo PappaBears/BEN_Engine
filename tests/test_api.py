@@ -301,3 +301,18 @@ def test_commission_status_idle_or_module_flag(client):
     r = client.get("/api/commission/status")
     assert r.status_code == 200
     assert r.json()["status"] in ("idle", "running", "done", "failed")
+
+
+def test_proposal_and_package_endpoints(client):
+    r = client.get("/api/proposal/options")
+    assert r.status_code == 200 and "managed" in r.json()["options"]
+    r = client.post("/api/proposal", json={"option": "managed", "customer": "Test Co", "site": "Test Site"})
+    assert r.status_code == 200, r.text
+    j = r.json()
+    assert j["proposal_id"].startswith("SAI-")
+    h = client.get(j["html_url"])
+    assert h.status_code == 200 and "Schreiber AI" in h.text
+    r = client.post("/api/package", json={"option": "hardware_controls", "customer": "Test Co", "site": "Test Site", "drawings": False})
+    assert r.status_code == 200, r.text
+    z = client.get(r.json()["customer"]["zip_url"])
+    assert z.status_code == 200 and z.headers["content-type"].startswith("application/zip")

@@ -22,8 +22,9 @@ Status: **ISSUE FOR CONSTRUCTION Rev A** — Drawn: BEN Engine generator; Checke
 | BEN 10 | I-C0 | A-003 | Config interior height vs envelope build-up (2698 shipped - 100 floor - 110 roof), 10 mm tolerance | config 2490 vs computed 2488 | <= 2498 | **OK** |  |
 | BEN 10 | I-C1 | A-002 | Config row_length_mm (racks + cooling units + 500 end zone) vs interior length, config rule | 2600 vs 2700 | <= 2700 | **OK** |  |
 | BEN 10 | I-C2 | A-002 | Row length with layout footprints (inrow_dx_300: 2 racks, 3 cooling units, power cabinets) vs usable length | 2100 vs 2200 | <= 2200 | **OK** |  |
-| BEN 10 | I-C21 | A-002 | Row length with catalog UPS (2 x 93PM 50 kW tower @495) vs usable length | 3090 vs 2200 | <= 2200 | **FAIL** | 93PM towers do not fit the BEN 10 row; drawings use 3 x 20 kVA rack-mount UPS (10U each) in R1 - catalog item PWR-UPS-RM20 added |
+| BEN 10 | I-C21 | A-002 | Row length with catalog UPS (0 x 93PM 50 kW tower @495 in the row; 3 x PWR-UPS-RM20 rack-mount alternative) vs usable length | 2100 vs 2200 | <= 2200 | **OK** |  |
 | BEN 10 | I-C4 | A-002 | Cold aisle / egress width (int W - plenum - row depth) vs 900 egress | 2200 - 200 - 1070 = 930 | >= 900 | **OK** |  |
+| BEN 10 | I-C22 | A-002 | Aisle width with the catalog rack (STR-RACK42: 600 x 1070 deep) vs 900 egress / 914 NEC | 2200 - 200 - 1070 = 930 | >= 914 | **OK** |  |
 | BEN 10 | I-C5 | A-002 | Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite) | 930 vs 914 | >= 914 | **OK** |  |
 | BEN 10 | I-C6 | A-002 | Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative | 930 vs 1067 | >= 1067 | **FAIL** | Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies |
 | BEN 10 | I-C7 | A-002 | Door zone (free length between door and first row item) vs 0 | 2700 - 500 - 2100 = 100 | >= 0 | **OK** |  |

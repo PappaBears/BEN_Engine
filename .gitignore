@@ -13,3 +13,4 @@ data/*.sqlite
 *.log
 .DS_Store
 /.schreiber-ai/
+dist/

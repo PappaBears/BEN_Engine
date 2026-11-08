@@ -542,13 +542,31 @@
   "price_source_note": "AVENDOR $41,603.99 seen 2026-11-07; SHI $42,578 (MSRP $58,485); Camcor $36,115.99",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 10,
-  "availability_note": "Factory order; 8-12 wk typical. Modular 50 kW power modules inside the frame give N+1 within the frame. Qty rule: frames to carry the IT load at 100 kW each, plus one redundant frame for N+1/2N (2N customers get a second full string via the proposal option). Internal-module N+1 within a 150 kW frame is requested in email 09 and would reduce frame count.",
+  "availability_note": "Factory order; 8-12 wk typical. Modular 50 kW power modules inside the frame give N+1 within the frame. Qty rule: frames to carry the IT load at 100 kW each, plus one redundant frame for N+1/2N (2N customers get a second full string via the proposal option). Internal-module N+1 within a 150 kW frame is requested in email 09 and would reduce frame count. ALTERNATE: replaced in presets by PWR-UPS-GVS150 single frame with internal N+1 power modules (interference check I-C21: per-frame N+1 does not fit the 20 ft row).",
+  "moq": 1,
+  "applies_to_tiers": [],
+  "qty_rule": "ceil(ups_kva_each/100) + (1 if ups_modules > 1 else 0)"
+ },
+ {
+  "code": "PWR-UPS-GVS150",
+  "name": "Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 20) or external cabinets (BEN 40)",
+  "manufacturer": "Schneider Electric",
+  "mpn": "GVSUPS150KHS (configure-to-order)",
+  "vendor": "AVENDOR",
+  "vendor_url": "https://www.avendor.com/products/apc-by-schneider-electric-galaxy-vs-ups-100kw-480v-for-external-batteries-start-up-5x8",
+  "unit": "ea",
+  "unit_price_usd": 68000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: 1.6x the confirmed GVSUPS100KGS listing ($41,603.99, 2026-11-07) for the 150 kW frame plus redundant power module and internal battery option; quote requested in email 09.",
+  "price_checked": null,
+  "lead_time_weeks": 14,
+  "availability_note": "Single frame per N string; redundancy inside the frame (N+1 power modules). 2N customers take a second frame via the proposal option.",
   "moq": 1,
   "applies_to_tiers": [
    "ben20",
    "ben40"
   ],
-  "qty_rule": "ceil(ups_kva_each/100) + (1 if ups_modules > 1 else 0)"
+  "qty_rule": "max(1, ceil(ups_kva_each/150))"
  },
  {
   "code": "PWR-BATT-LI",
@@ -563,13 +581,13 @@
   "price_source_note": "AVENDOR sale $55,217.99 (reg $69,740) seen 2026-11-07; 17-module UL variant $62,215.99",
   "price_checked": "2026-11-07",
   "lead_time_weeks": 10,
-  "availability_note": "Factory order; UL9540A documentation needed for AHJ. Lead time tracks cell supply. Qty rule: one shared cabinet string sized to battery_kwh (shared bus between frames per vendor confirmation requested in email 09); 2N adds a second string via the proposal option.",
+  "availability_note": "Factory order; UL9540A documentation needed for AHJ. Lead time tracks cell supply. Qty rule: one shared cabinet string sized to battery_kwh (shared bus between frames per vendor confirmation requested in email 09); 2N adds a second string via the proposal option. Under 20 kWh (BEN 20 default, NFPA 855 threshold) the batteries are internal to the UPS frame and no cabinet is used.",
   "moq": 1,
   "applies_to_tiers": [
    "ben20",
    "ben40"
   ],
-  "qty_rule": "max(1, ceil(battery_kwh/32.6))"
+  "qty_rule": "0 if battery_kwh <= 20 else max(1, ceil(battery_kwh/32.6))"
  },
  {
   "code": "PWR-XFMR",

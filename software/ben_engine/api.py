@@ -1160,6 +1160,88 @@ async def bom():
     return _jsonable({"config": RT.cfg.to_dict(), "lines": rows, "totals": tot, "n": len(rows)})
 
 
+# ----------------------------------------------------------------------------- proposal + deal package
+@app.get("/api/proposal/options")
+async def proposal_options():
+    mod = _require("proposal")
+    return {"options": list(mod.OPTIONS), "default": "hardware_controls"}
+
+
+@app.post("/api/proposal")
+async def proposal_build(body: Dict[str, Any]):
+    """Build a complete customer proposal for the CURRENT configuration (the selector is the input).
+
+    body: {option, customer, site, format: md|html|json}
+    """
+    mod = _require("proposal")
+    option = str(body.get("option", "hardware_controls"))
+    if option not in mod.OPTIONS:
+        raise HTTPException(status_code=400, detail=f"option must be one of {list(mod.OPTIONS)}")
+    customer = str(body.get("customer") or "Customer")
+    site = str(body.get("site") or RT.cfg.site_name or "Site")
+    fmt = str(body.get("format", "html"))
+    try:
+        p = mod.build_proposal(RT.cfg, option=option, customer=customer, site=site)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"proposal failed: {type(e).__name__}: {e}")
+    out_dir = Path("dist/proposals"); out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / f"{p.proposal_id}.html").write_text(mod.to_html(p))
+    (out_dir / f"{p.proposal_id}.md").write_text(mod.to_markdown(p))
+    (out_dir / f"{p.proposal_id}.json").write_text(mod.to_json(p))
+    summary = {"proposal_id": p.proposal_id, "customer": p.customer, "site": p.site, "option": option,
+               "prices": _jsonable(getattr(p, "prices", None)), "milestones": _jsonable(getattr(p, "milestones", None)),
+               "html_url": f"/api/proposal/{p.proposal_id}.html", "md_url": f"/api/proposal/{p.proposal_id}.md",
+               "json_url": f"/api/proposal/{p.proposal_id}.json"}
+    if fmt == "md":
+        return PlainTextResponse(mod.to_markdown(p), media_type="text/markdown")
+    if fmt == "json":
+        return JSONResponse(json.loads(mod.to_json(p)))
+    return summary
+
+
+@app.get("/api/proposal/{pid}.{ext}")
+async def proposal_file(pid: str, ext: str):
+    if ext not in ("html", "md", "json") or "/" in pid or ".." in pid:
+        raise HTTPException(status_code=404, detail="not found")
+    f = Path("dist/proposals") / f"{pid}.{ext}"
+    if not f.exists():
+        raise HTTPException(status_code=404, detail="proposal not generated yet")
+    media = {"html": "text/html", "md": "text/markdown", "json": "application/json"}[ext]
+    return FileResponse(str(f), media_type=media)
+
+
+@app.post("/api/package")
+async def package_build(body: Dict[str, Any]):
+    """Assemble the customer and partner deal packages (zips) for the CURRENT configuration."""
+    mod = _require("package")
+    option = str(body.get("option", "hardware_controls"))
+    customer = str(body.get("customer") or "Customer")
+    site = str(body.get("site") or RT.cfg.site_name or "Site")
+    kind = str(body.get("kind", "both"))
+    extra = {k: str(v) for k, v in (body.get("fields") or {}).items()}
+    try:
+        res = mod.build_package(RT.cfg, option, customer, site, "dist/packages", kind, extra, include_drawings=bool(body.get("drawings", True)))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"package failed: {type(e).__name__}: {e}")
+    out = {"base": str(res["base"])}
+    for k in ("customer", "partner"):
+        if k in res:
+            man = (res[k] / "MANIFEST.md").read_text().splitlines()
+            out[k] = {"dir": str(res[k]), "summary": next((l for l in man if l.startswith("Files:")), ""),
+                      "zip_url": f"/api/package/{res['base'].name}/{res[k + '_zip'].name}"}
+    return out
+
+
+@app.get("/api/package/{pid}/{name}")
+async def package_file(pid: str, name: str):
+    if "/" in pid or ".." in pid or "/" in name or ".." in name or not name.endswith(".zip"):
+        raise HTTPException(status_code=404, detail="not found")
+    f = Path("dist/packages") / pid / name
+    if not f.exists():
+        raise HTTPException(status_code=404, detail="package not generated yet")
+    return FileResponse(str(f), media_type="application/zip", filename=name)
+
+
 # ----------------------------------------------------------------------------- static dashboard
 if STATIC_DIR.exists():
     app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="dashboard")

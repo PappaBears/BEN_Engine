@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "profile": "full",
+  "verification_report": "latest",
+  "acceptance_ids": ["python-suite", "selector-parity", "firmware-host-tests", "commissioning-sim-e2e", "sweeps-ben40"],
+  "ai_enabled": false,
+  "deliverables": [
+    {"kind": "readme", "path": "README.md"},
+    {"kind": "faq", "path": "docs/FAQ.md"},
+    {"kind": "project_notes", "path": "docs/PROJECT_NOTES.md"},
+    {"kind": "project_state", "path": "docs/PROJECT_STATE.md"},
+    {"kind": "tasks", "path": "docs/TASKS.md"},
+    {"kind": "system_integration", "path": "docs/SYSTEM_INTEGRATION.md"},
+    {"kind": "presentation", "path": "docs/presentation/index.html"},
+    {"kind": "speaker_notes", "path": "docs/presentation/speaker-notes.md"},
+    {"kind": "validation", "path": "docs/VALIDATION.md"},
+    {"kind": "demo", "path": "docs/media/demo.gif"},
+    {"kind": "poster", "path": "docs/media/demo-poster.png"}
+  ],
+  "capabilities": [
+    {"name": "Configuration model sizes and validates all tiers/profiles/climates", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["python-suite", "selector-parity"]},
+    {"name": "Digital twin with faults and ASHRAE alarms", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["python-suite", "sweeps-ben40"]},
+    {"name": "2-D lattice-Boltzmann CFD per tier", "status": "verified", "evidence": ["docs/VALIDATION.md", "docs/ANALYSIS_AND_CALIBRATION.md"], "check_ids": ["python-suite"]},
+    {"name": "Calibration budgets and predictive analysis", "status": "verified", "evidence": ["docs/ANALYSIS_AND_CALIBRATION.md"], "check_ids": ["python-suite"]},
+    {"name": "Automated sweeps with pass/fail and CSV", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["sweeps-ben40"]},
+    {"name": "Commissioning script FAT/SAT with signed report", "status": "verified", "evidence": ["docs/VALIDATION.md"], "check_ids": ["commissioning-sim-e2e"]},
+    {"name": "Dashboard with 3-D twin, walkthrough, sweeps, I/O test, export, proposal panel", "status": "verified", "evidence": ["docs/VALIDATION.md", "docs/media/screens/desktop-exterior-iso.png"], "check_ids": ["python-suite"]},
+    {"name": "Proposal generator and deal package assembler", "status": "verified", "evidence": ["docs/proposals/README.md", "docs/VALIDATION.md"], "check_ids": ["python-suite"]},
+    {"name": "Firmware core (calibration, telemetry, commands, buffering, failsafe)", "status": "verified", "evidence": ["firmware/README.md"], "check_ids": ["firmware-host-tests"]},
+    {"name": "Firmware ESP32 cross-build and hardware layer", "status": "blocked", "evidence": ["firmware/README.md"]},
+    {"name": "Gateway package on Raspberry Pi 5", "status": "implemented_unverified", "evidence": ["firmware/ben-gateway/README.md"]},
+    {"name": "IFC drawings, renders, STE assembly, SQAM generated from configuration", "status": "verified", "evidence": ["design/drawings/INTERFERENCE_CHECKS.md", "docs/SQAM.md"], "check_ids": ["python-suite"]},
+    {"name": "BOM with price confidence and RFQ queue", "status": "verified", "evidence": ["docs/BOM.md", "purchasing/SOURCING_NOTES.md"], "check_ids": ["python-suite"]},
+    {"name": "Two-sided contract templates with LD flow-down", "status": "implemented_unverified", "evidence": ["docs/contracts/README.md"]},
+    {"name": "Product page with profile picker and risks before price", "status": "verified", "evidence": ["docs/media/screens/web-hero.png", "docs/VALIDATION.md"], "check_ids": ["selector-parity"]},
+    {"name": "Live gateway / hardware telemetry", "status": "planned", "evidence": ["docs/ROADMAP.md"]}
+  ]
+}
