@@ -1,6 +1,6 @@
 # Evidence of the latest verification run
 
-- `audit` → exit 1
+- `audit` → exit 0
 - `links` → exit 0
 - `pytest` → exit 0
 - `firmware` → exit 0

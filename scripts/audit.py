@@ -147,6 +147,7 @@ def check_links() -> None:
 # ----------------------------------------------------------------------------- A5 stale references
 STALE = re.compile(r"ben-node|ben-gateway|Raspberry|Olimex|ESP32|NEMA 3R|BEN Micro|\bBEN (10|20|40)\b", re.I)
 ALLOWED_HISTORY = {
+    "docs/audit/evidence/", "docs/audit/AUDIT_REPORT_2026-11-08.md", "docs/audit/CAPA_LOG.md",
     "docs/PROJECT_NOTES.md", "docs/TIER_AND_ENCLOSURE_DECISION.md", "docs/CONTROLS_HARDWARE_DECISION.md",
     "docs/ORIGINAL_REQUEST.md", "docs/BRIEF.md", "docs/FAQ.md", "firmware/README.md", "software/ben_engine/config.py",
     "docs/audit/AUDIT_REPORT_2026-11-08.md", "docs/audit/AUDIT_CHECKLIST.md", "scripts/audit.py",

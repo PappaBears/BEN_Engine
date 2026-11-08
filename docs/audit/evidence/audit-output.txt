@@ -1,12 +1,12 @@
 $ /usr/local/bin/python3 scripts/audit.py
-# exit 1 · 2026-11-08T04:50:21+00:00
+# exit 0 · 2026-11-08T04:51:36+00:00
 BEN Engine audit — /home/user/ben_engine
 PASS A1    Brief §5 artifact paths exist (40/40)                                                           
 PASS A2    Launch manifest paths exist (24/24)                                                             
 PASS A2b   Manifest acceptance_ids exist in build-contract.json                                            
 PASS A3    Build-contract checks runnable as written (static)                                              
 PASS A4    Relative link check                                                                               | 152 markdown files, 131 relative targets checked, 0 broken
-FAIL A5    Stale generation-1 references outside history files (1 hard, 17 explained)                        | docs/audit/evidence/audit-output.txt:9 [NEMA 3R]
+WARN A5    Stale references only in explanatory context (18)                                                 | tests/test_bom.py:195 [NEMA 3R]; docs/BOM-ben30.md:107 [NEMA 3R]; docs/BOM-ben500.md:120 [NEMA 3R]; docs/BOM-ben150.md:119 [NEMA 3R]; docs/BOM-ben5.md:31 [NEMA 3R]; purchasing/parts_catalog.json:729 [NEMA 3R]; purchasing/parts_catalog.json:773 [NEMA 3R]; purchasing/parts_catalog.json:794 [NEMA 3R]; purchasing/parts_catalog.json:3275 [NEMA 3R]; purchasing/bom-ben5.csv:10 [NEMA 3R]; purchasing/SOURCING_NOTES.md:72 [NEMA 3R]; purchasing/EMAIL_QUEUE.md:30 [Olimex] …
 PASS A6a   Catalog: confirmed lines carry vendor_url + price_checked (50/50)                               
 PASS A6b   Catalog: estimate lines carry a price_source_note (144/144)                                     
 PASS A6c   Catalog: every line has lead_time_weeks (197/197)                                               
@@ -22,4 +22,4 @@ PASS A10b  STE instruction sentences over 20 words (0)
 PASS A11   Secrets / personal-data scan (0 hits)                                                           
 PASS A12   JSON files parse (22/22)                                                                        
 
-Summary: 18 PASS, 1 WARN, 1 FAIL
+Summary: 18 PASS, 2 WARN, 0 FAIL
