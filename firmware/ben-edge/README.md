@@ -18,7 +18,7 @@ writes exactly three advisory registers.
 | File | Installs to | Purpose |
 | --- | --- | --- |
 | `install.sh` | — | Pro installer: packages, user, **TPM 2.0 + LUKS (clevis, PCR 0,2,7)**, venv, VLANs + IPv6 prefix, PKI, broker, OTBR, chrony, firewall, VPN, services, backup target, Pod ACL entries |
-| `lite/install.sh` | — | Lite installer for the RevPi (no TPM/docker; native `otbr-agent`; interlock service; watchdog relay) |
+| `lite/install.sh` | — | Lite installer for the RevPi Connect 4 (TPM 2.0 present but not yet enrolled for LUKS, see `docs/CYBERSECURITY.md` §2a; no docker; native `otbr-agent`; interlock service; watchdog relay; refuses placeholder credentials) |
 | `mosquitto/ben.conf` | `/etc/mosquitto/conf.d/ben.conf` | Four listeners: **8883 mTLS on `fd00:ben::1` (Pods over Thread)**, 8883 mTLS on 10.20.0.1 (Pod E / bridge), 8884 TLS+password on 10.30.0.1 (API, laptop), 9001 WSS |
 | `mosquitto/ben_acl.template` | `/etc/mosquitto/ben_acl` | Per-Pod ACL keyed on the **certificate CN** `pod-<unit>-<podN>`: write own `telemetry/status/ack`, read own `cmd` |
 | `otbr/docker-compose.yml`, `otbr/otbr.env` | `/etc/ben/` | OpenThread Border Router container(s); one per MGM240P RCP on USB (`/dev/ttyACM0`, `/dev/ttyACM1` for the redundant RCP on BEN 150/500) |

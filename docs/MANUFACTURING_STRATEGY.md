@@ -21,7 +21,7 @@ What we do **not** outsource: configuration and sizing (`config.py`), drawings a
 flowchart LR
     subgraph SAI[Schreiber AI - design authority, controls, commissioning, operations]
         ENG[Engineering: config, IFC drawings, STE instructions, BOM, compliance pack]
-        KIT[Controls kit: UL 508A panel via partner, nodes, gateway, sensors, firmware, calibration]
+        KIT[Controls kit: UL 508A panel via partner, BEN Pods, edge computer, sensors, firmware, calibration]
         COM[Commissioning: FAT and SAT with commissioning.py, signed reports]
         OPS[Operations: monitoring, maintenance, calibration, patching, warranty]
         QUAL[Quality: CM qualification, witness points, QC forms Q-01..Q-12]
@@ -136,7 +136,7 @@ A second CM is qualified before unit 10 to avoid single-source risk (§9).
 | STE assembly instructions (`design/assembly/`) | PDF, one action per step | Written for a worker with no data-center experience; the CM's leads are trained on them at the first article |
 | BOM split: Schreiber AI-supplied vs CM-supplied, with approved alternates | CSV | Substitutions need written ENG approval (change control) |
 | QC forms Q-01..Q-12 pre-filled with serial and tolerances | PDF + CSV template | Returned signed; countersigned by Schreiber AI quality before the next hold point |
-| **Controls kit** (consigned) | Crate with packing list | UL 508A-labelled controls panel, calibrated nodes with `cal_id`, imaged gateway, sensor strings, cut-and-labelled cables, dP tubing, installation sheet; bench-tested 100 % before shipping |
+| **Controls kit** (consigned) | Crate with packing list | UL 508A-labelled controls panel, calibrated BEN Pods with `cal_id`, imaged edge computer, sensor strings, cut-and-labelled cables, dP tubing, installation sheet; bench-tested 100 % before shipping |
 | Long-lead and listed equipment (consigned or drop-shipped to the CM) | — | UPS, switchgear, in-row/CDU, batteries, fire system, racks; receiving inspection by the CM on our form |
 | Commissioning script and FAT procedure (`TEST_GUIDE.md`) | Software + PDF | Run by Schreiber AI engineers on our laptop against the unit; the CM provides load banks, power and labour |
 | Compliance pack excerpts (refrigerant spec, torque table, labelling scheme, colour codes) | PDF (`BUILD_AND_WIRING.md`) | |

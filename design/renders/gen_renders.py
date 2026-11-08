@@ -24,6 +24,7 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 import layout as L  # noqa: E402
+from revision import REV  # noqa: E402  (design/REVISION.json)
 
 BRAND = {"graphite": "#0B1018", "slate": "#152234", "panel": "#1B2B42", "text": "#EDF4FF", "muted": "#9FB3CC",
          "cyan": "#66E3FF", "amber": "#FFC66D", "red": "#FF707D", "green": "#6EE7A8", "purple": "#C7A6FF"}
@@ -316,7 +317,7 @@ def render_stage(lay: L.Layout, n: int, out_png: str):
     for i, ln in enumerate(cfg_lines):
         fig.text(0.80, 0.235 - i * 0.022, ln, color=BRAND["text"], fontsize=8)
     fig.text(0.80, 0.12, "Concept render — generated from configuration", color=BRAND["amber"], fontsize=8.5, fontweight="bold")
-    fig.text(0.80, 0.095, "design/renders/gen_renders.py · not to scale · see IFC set A-001…C-001", color=BRAND["muted"], fontsize=7.5)
+    fig.text(0.80, 0.095, f"design/renders/gen_renders.py · not to scale · see drawing set {REV['set_label']} A-001…C-001", color=BRAND["muted"], fontsize=7.5)
     fig.text(0.80, 0.05, "Schreiber AI", color=BRAND["cyan"], fontsize=9, fontweight="bold")
     fig.text(0.80, 0.03, "AI infrastructure that arrives finished.", color=BRAND["muted"], fontsize=7.5)
     # legend
@@ -324,7 +325,7 @@ def render_stage(lay: L.Layout, n: int, out_png: str):
     for i, (k, lab) in enumerate([("rack", "Racks"), ("cooling", "Cooling"), ("power", "Power"), ("controls", "Controls"), ("fire", "Fire"), ("tray", "Tray / channel")]):
         fig.patches.append(plt.Rectangle((lx + i * 0.075, 0.035), 0.012, 0.02, transform=fig.transFigure, color=KIND_COLOR[k]))
         fig.text(lx + i * 0.075 + 0.016, 0.038, lab, color=BRAND["muted"], fontsize=8)
-    fig.savefig(out_png, dpi=100, facecolor=BRAND["graphite"])
+    fig.savefig(out_png, dpi=100, facecolor=BRAND["graphite"], metadata={"Software": None})
     plt.close(fig)
 
 

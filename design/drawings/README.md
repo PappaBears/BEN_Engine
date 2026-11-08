@@ -1,15 +1,47 @@
 # BEN Engine — drawing set generator
 
-Issue-for-construction (IFC) drawing sets for every tier are generated from the configuration model.
-Nothing in `design/drawings/<tier>/` is hand-drawn; change the configuration or the generator and regenerate.
+Drawing sets for every tier are generated from the configuration model. Nothing in `design/drawings/<tier>/`
+is hand-drawn; change the configuration or the generator and regenerate.
+
+**Current issue:** see `design/REVISION.json` (Rev B, 2026-11-08, ISSUED FOR REVIEW — no checker named yet). The set
+is not an issue-for-construction (IFC) set until a named checker is written into that file and the set is regenerated.
+
+## Revision procedure (document control)
+
+One file, `design/REVISION.json`, holds the revision of the whole design set: drawings (42 sheets + INDEX.md files),
+renders, STE assembly instructions, QC forms reference, SQAM, DESIGN_BASIS.md, the wiring one-lines and the
+`DRAWING_INDEX_REV` field of generated proposals / SOW drafts. No generator carries a hard-coded revision or date.
+
+1. Edit `design/REVISION.json`: bump `drawing_rev` (A → B → C …), set `issue_date`, write what changed in `notes`.
+   Leave `checker` empty while the set is for review. The generators then print
+   "ISSUED FOR REVIEW — not for construction until checked" in every title block and INDEX.
+2. When a named person has checked the set, write their name in `checker` (`status` may then read
+   "ISSUE FOR CONSTRUCTION"). The title blocks switch to IFC and the checker's name appears in the CHECKED field.
+3. Regenerate everything, in this order:
+   ```bash
+   python design/drawings/gen_drawings.py && python design/gen_design_basis.py
+   python design/renders/gen_renders.py
+   python design/assembly/gen_assembly.py        # fails on an STE violation
+   python design/gen_sqam.py
+   python design/specs/wiring/gen_wiring.py
+   (cd software && python -m ben_engine.bom --all)   # if catalog attributes changed
+   ```
+   then regenerate the sample proposals (`docs/proposals/README.md` "Regenerate") so the SOW cites the new revision.
+4. Confirm nothing cites the old issue: `grep -rn "<old date>" design docs/SQAM.md docs/proposals | grep -i "rev\|issue"` must return nothing;
+   `python scripts/audit.py` A13 must show one date for drawings, SQAM, QC forms and assembly.
+5. The lead re-issues: commit the regenerated set in one commit titled "Drawing set Rev <X> (<date>)".
+   Generation is deterministic (fixed `svg.hashsalt`, no `<dc:date>`), so a regeneration with no design change gives no diff.
+
+Sheet A-001 of every tier carries the revision table (Rev / date / description / checked) from the same file.
+`design/assembly/QC_FORMS.md` is hand-written; update its issue line and the Rev column in the header table by hand in the same change.
 
 ## Regenerate
 
 ```bash
 cd /home/user/ben_engine
 python design/drawings/gen_drawings.py                 # all tiers, all sheets, + INTERFERENCE_CHECKS.md
-python design/drawings/gen_drawings.py --tier ben20    # one tier
-python design/drawings/gen_drawings.py --tier ben40 --sheet E-001 --sheet M-001
+python design/drawings/gen_drawings.py --tier ben150   # one tier
+python design/drawings/gen_drawings.py --tier ben500 --sheet E-001 --sheet M-001
 python design/drawings/gen_drawings.py --dpi 150       # larger PNGs (default 110 dpi on an A1 sheet = 3642 px wide)
 ```
 
@@ -22,6 +54,7 @@ python design/renders/gen_renders.py                   # assembly stage renders 
 python design/assembly/gen_assembly.py                 # STE assembly instructions + ITEM_CODES_USED.md
 python design/gen_design_basis.py                      # DESIGN_BASIS.md (run after gen_drawings.py)
 python design/gen_sqam.py                              # docs/SQAM.md + design/assembly/CTQ-CARD-<tier>.md from ctq.py
+python design/specs/wiring/gen_wiring.py               # one-line wiring diagrams (03_power_one_line_<tier>.svg for ben5/ben30/ben150/ben500)
 python design/layout.py                                # prints the resolved layout and the interference table
 ```
 
@@ -42,14 +75,14 @@ python design/layout.py                                # prints the resolved lay
 | No. | Title | Content |
 |---|---|---|
 | A-001 | General arrangement | Roof plan, two elevations, door-end view, corner castings, roof penetrations, brand panel, weight table, general notes |
-| A-002 | Interior layout plan | Row with pitch, hot plenum / RDHx, cold aisle and egress (>= 900), NEC 110.26 working space (914 / 1067), containment, power cabinets, panels, gateway, trays, leak rope, cylinder, row elevation, equipment schedule |
+| A-002 | Interior layout plan | Row with pitch, hot plenum / RDHx, cold aisle and egress (>= 900), NEC 110.26 working space (914 / 1067), containment, power cabinets, panels, BEN Controller panel, trays, leak rope, cylinder, row elevation, equipment schedule |
 | A-003 | Envelope section | Cross section, wall / floor / door-seal / roof-curb details at 1:2 and 1:2.5, R-value, condensation check, thermal-bridge notes |
 | S-001 | Floor framing and anchoring | Cross members, floor channels, through-bolt and hold-down pattern, equipment skid bolts, lifting and tie-down, seismic option, structural data and torques |
 | E-001 | Power one-line | Utility → meter → service section (main CB, SPD) → ATS / generator → UPS (+ transformer) → IT distribution → rack PDUs; mechanical panel; EPO; grounding electrode system |
 | M-001 | Cooling P&ID | DX air section (in-row / cabinet units, roof condensers, line sets, condensate), liquid section (dry cooler, pumping unit / CDUs, manifolds, RDHx or cold plates, instruments, make-up, leak rope) |
-| C-001 | Controls layout | Sensor and node plan, probe heights, sensor schedule with PROTOCOL.md channel names and twin coordinates, controls network |
+| C-001 | Controls layout | Sensor and Pod plan, probe heights, sensor schedule with PROTOCOL.md channel names and twin coordinates, controls network |
 
-Every sheet carries the title block (Schreiber AI · BEN Engine · tier · drawing no. · ISSUE FOR CONSTRUCTION Rev A · 2026-11-07 · scale · sheet n/7 · Drawn: BEN Engine generator · Checked: blank) and a CTQ / CTP table for that sheet.
+Every sheet carries the title block (Schreiber AI · BEN Engine · tier · drawing no. · status, Rev and date from `design/REVISION.json` · scale · sheet n/N · Drawn: BEN Engine generator · Checked: the `checker` field, blank while ISSUED FOR REVIEW) and a CTQ / CTP table for that sheet. A-001 also carries the revision table.
 
 ## Conventions
 
@@ -58,8 +91,8 @@ Every sheet carries the title block (Schreiber AI · BEN Engine · tier · drawi
 - Colours on the sheets are print-safe darkened versions of the brand palette (racks teal, cooling green, power amber, controls purple, fire red). The title block uses the brand graphite / cyan.
 - "OK*" in an interference table means the check passes only with the resolution written next to it. "FAIL" with a resolution means the drawn solution deviates from the configuration or from the first-choice design; the deviation is also printed in red on every sheet of that tier.
 
-## Known limits (Rev A)
+## Known limits
 
 - The generator is a drafting aid, not a CAD model: there are no hidden-line views and no 3D-derived sections. Details are schematic and dimensioned by rule, not by part drawings.
 - Breaker sizes, conductor sizes, refrigerant line sizes and the cylinder size are preliminary and say so on the sheets; a licensed engineer / technician completes them.
-- "Checked" is blank on purpose. A person checks the set before it is used for construction.
+- "Checked" is blank while `design/REVISION.json` has no `checker`. A person checks the set, their name goes into that file, and the set is regenerated as IFC before it is used for construction.

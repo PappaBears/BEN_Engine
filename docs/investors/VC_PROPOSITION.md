@@ -69,11 +69,11 @@ Unit economics are derived from the bill of materials in `docs/BOM.md`. The tabl
 <!-- UNIT_ECONOMICS_TABLE -->
 | Tier (preset) | IT kW | BOM cost (all modules) | Sell price (28 % GM) | Infrastructure-only sell price (no compute) | Gross profit | Confirmed / list / estimate share of cost | Controls licence /yr | Managed service /yr | Price per kW IT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| BEN 5 | 5 | $132,118 | $183,497 | $131,695 | $51,379 | 60 % / 1 % / 39 % | $1,200 | $2,700 | $36,699 |
-| BEN 30 | 30 | $666,095 | $925,132 | $287,415 | $259,037 | 80 % / 0 % / 20 % | $4,800 | $16,200 | $30,838 |
-| BEN 150 | 96 | $1,890,335 | $2,625,466 | $638,320 | $735,130 | 79 % / 0 % / 21 % | $12,000 | $51,840 | $27,349 |
-| BEN 500 | 192 | $4,446,283 | $6,175,394 | $1,302,649 | $1,729,110 | 83 % / 0 % / 17 % | $30,000 | $103,680 | $32,164 |
-| BEN 2000 | 1600 | $40,414,106 | $56,130,703 | $16,389,803 | $15,716,597 | 73 % / 0 % / 27 % | $90,000 | $864,000 | $35,082 |
+| BEN 5 | 5 | $132,082 | $183,447 | $131,645 | $51,365 | 60 % / 0 % / 39 % | $1,200 | $2,700 | $36,689 |
+| BEN 30 | 30 | $666,059 | $925,082 | $287,365 | $259,023 | 79 % / 0 % / 21 % | $4,800 | $16,200 | $30,836 |
+| BEN 150 | 96 | $1,889,829 | $2,624,763 | $637,617 | $734,934 | 78 % / 0 % / 22 % | $12,000 | $51,840 | $27,341 |
+| BEN 500 | 192 | $4,935,406 | $6,854,731 | $1,302,432 | $1,919,325 | 84 % / 0 % / 16 % | $30,000 | $103,680 | $35,702 |
+| BEN 2000 | 1600 | $44,502,455 | $61,808,966 | $16,388,936 | $17,306,510 | 75 % / 0 % / 25 % | $90,000 | $864,000 | $38,631 |
 
 Assumptions: hardware gross margin 28%; managed service $45/kW-month; controls licence per tier as shown. BOM cost excludes site civil and utility service (SITE- lines are shown separately in `docs/BOM.md`). Compute is the reference GPU/CPU node set from the catalog and dominates the all-modules price (one 8-GPU server is ~$82–236 k); most SMB customers will size their own compute or start with the infrastructure-only price and grow.
 

@@ -1,6 +1,6 @@
 # Item codes — reconciled with purchasing/parts_catalog.json
 
-Generated 2026-11-07 by `design/assembly/gen_assembly.py`. Every code in the assembly instructions and on the drawings is a code from `purchasing/parts_catalog.json` (204 parts). Codes marked **new** were appended to the catalog by the design generator as `estimate` lines (basis note on each) because no catalog part covered them; purchasing confirms or replaces them.
+Generated 2026-11-08 by `design/assembly/gen_assembly.py`. Every code in the assembly instructions and on the drawings is a code from `purchasing/parts_catalog.json` (197 parts). Codes marked **new** were appended to the catalog by the design generator as `estimate` lines (basis note on each) because no catalog part covered them; purchasing confirms or replaces them.
 
 | Catalog code | Catalog name | Status | Used in assembly docs (tiers) | On drawings (tiers) | Working code it replaced |
 |---|---|---|---|---|---|

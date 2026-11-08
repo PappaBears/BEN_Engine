@@ -27,7 +27,7 @@ Lakeshore Foundry needs 13 kW of IT capacity for a Industrial OT analytics workl
 
 The unit arrives finished and factory-tested. It needs a pad, a 100 A 208 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the hardware + ben controls option: $551,270 capital ($42,405 per kW IT) plus $4,800 per year (BEN Controls licence). 68 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 32 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the hardware + ben controls option: $551,220 capital ($42,402 per kW IT) plus $4,800 per year (BEN Controls licence). 66 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 33 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 21 weeks, set by the longest-lead item (10 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -74,7 +74,7 @@ What this means for you: the environmental class sets the alarm limits your IT w
 | Power module | included | 12 lines | $47,363 |
 | Cooling module | included | 4 lines | $66,724 |
 | Compute module | included | 5 lines | $294,679 |
-| Controls module | included | 22 lines | $10,520 |
+| Controls module | included | 22 lines | $10,470 |
 | Structure (container / cabinet) | included | 17 lines | $36,483 |
 | Envelope (insulation, liner, coatings) | included | 18 lines | $17,254 |
 | Fire detection and suppression | included | 6 lines | $15,795 |
@@ -93,7 +93,7 @@ Top 15 lines of the 101-line bill of materials for this option (sell price at 28
 | CMP-SW100G | Spectrum SN2700 32x100GbE QSFP28 switch, Cumulus Linux | NVIDIA Mellanox MSN2700-CS2RC | 1 ea | $14,712 | confirmed | 2 |
 | FS-CLEAN-AGENT | Pre-engineered FK-5-1-12 (Novec 1230) clean agent system, installed: cylinder, nozzles, releasing panel, detection, design & AHJ submittal | Fike / Kidde (via licensed fire contractor) ECS-500 / Fike CA | 17 m3 protected | $12,986 | estimate | 8 |
 | SVC-ELECTRICIAN | Licensed electrician (commercial journeyman, billed) | local electrical contractor ELEC-HR | 66 h | $10,083 | estimate | 1 |
-| STR-CONT10 | 10 ft high-cube ISO container, one-trip (new) | CIMC/various 10HC-1TRIP | 1 ea | $6,806 | confirmed | 3 |
+| STR-CONT10 | 10 ft high-cube ISO container, one-trip (new) | CIMC/various 10HC-1TRIP | 1 ea | $6,806 | estimate | 3 |
 | STR-RACK42 | NetShelter SX 42U 600x1070 mm enclosure with sides | APC by Schneider Electric AR3100 | 2 ea | $6,444 | confirmed | 1 |
 | STR-FLOOD-PLINTH | Flood plinth 600 mm: hot-dip galvanised steel frame with cross-bracing, grating step and sealed service risers, per m of enclosure perimeter (H2 severe environment) | local steel fabricator PLINTH-600 | 11 m | $6,417 | estimate | 8 |
 | SITE-ELEC | Utility service interconnect: meter base, trench, conduit, utility fees, per ampere | local electrical contractor / utility SVC-INTERCONNECT | 100 A | $6,250 | estimate | 6 |
@@ -114,27 +114,27 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $540,750 | $41,596 | - | 1 yr | $540,750 | 69 / 0 / 31 % | 79 | alternative |
-| Hardware + BEN Controls | $551,270 | $42,405 | $4,800 | 1 yr | $556,070 | 68 / 0 / 32 % | 101 | PROPOSED |
-| White-label | $551,270 | $42,405 | $6,000 | 1 yr | $557,270 | 68 / 0 / 32 % | 101 | alternative |
-| Managed service | $551,270 | $42,405 | $7,020 | 3 yr | $572,330 | 68 / 0 / 32 % | 101 | alternative |
+| Hardware only | $540,750 | $41,596 | - | 1 yr | $540,750 | 67 / 0 / 33 % | 79 | alternative |
+| Hardware + BEN Controls | $551,220 | $42,402 | $4,800 | 1 yr | $556,020 | 66 / 0 / 33 % | 101 | PROPOSED |
+| White-label | $551,220 | $42,402 | $6,000 | 1 yr | $557,220 | 66 / 0 / 33 % | 101 | alternative |
+| Managed service | $551,220 | $42,402 | $7,020 | 3 yr | $572,280 | 66 / 0 / 33 % | 101 | alternative |
 
-Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 13 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
+Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 13 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $551,270 | $7,020 | $558,290 |
-| 3 years | $551,270 | $21,060 | $572,330 |
-| 5 years | $551,270 | $35,100 | $586,370 |
+| 1 year | $551,220 | $7,020 | $558,240 |
+| 3 years | $551,220 | $21,060 | $572,280 |
+| 5 years | $551,220 | $35,100 | $586,320 |
 
-Payment milestones for the proposed option (Hardware + BEN Controls, capital $551,270):
+Payment milestones for the proposed option (Hardware + BEN Controls, capital $551,220):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $165,381 | 4 |
-| Factory acceptance test (H13) | 40 % | $220,508 | 17 |
-| Site acceptance test (H19) | 25 % | $137,817 | 20 |
-| Turnover (W20) | 5 % | $27,564 | 21 |
+| Engineering release (H4) | 30 % | $165,366 | 4 |
+| Factory acceptance test (H13) | 40 % | $220,488 | 17 |
+| Site acceptance test (H19) | 25 % | $137,805 | 20 |
+| Turnover (W20) | 5 % | $27,561 | 21 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -169,17 +169,17 @@ Long-lead items (ordered at engineering release):
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 30, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. Issue for construction set regenerated from the frozen configuration at engineering release (index not readable at proposal time)
+Issue-for-construction drawing set for the BEN 30, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUED FOR REVIEW — not for construction until checked — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
 
 | Sheet | Title | Scale |
 |---|---|---|
-| A-001 | General arrangement | see sheet |
-| A-002 | Interior layout plan | see sheet |
-| A-003 | Envelope section | 1:10 / 1:2 |
-| S-001 | Floor framing and anchoring | see sheet / 1:5 |
-| E-001 | Power one-line | NTS |
-| M-001 | Cooling P&ID | NTS |
-| C-001 | Controls layout | see sheet |
+| A-001 | General arrangement (sheet 1/7) | see sheet |
+| A-002 | Interior layout plan (sheet 2/7) | see sheet |
+| A-003 | Envelope section and hardening (sheet 3/7) | see sheet / 1:2 |
+| S-001 | Floor framing and anchoring (sheet 4/7) | see sheet / 1:5 |
+| E-001 | Power one-line (sheet 5/7) | NTS |
+| M-001 | Cooling P&ID (sheet 6/7) | NTS |
+| C-001 | Controls layout (sheet 7/7) | see sheet |
 
 Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):
 
@@ -347,12 +347,12 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 ## 15. Assumptions and what is not included
 
 - Configuration as on the cover: 13 kW IT, 2 rack(s), In-row DX cooling unit (300 mm, 20 kW), N+1, climate Cold; any change is priced as a change order
-- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 68 % confirmed, 0 % list, 32 % estimate for this option; the estimate share is re-priced at engineering release
+- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 66 % confirmed, 0 % list, 33 % estimate for this option; the estimate share is re-priced at engineering release
 - Gross margin 28% on hardware and build labour; controls licence $4,800/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
 - Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost
-- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 13 lists editions not verified on the proposal date)
+- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 16 lists editions not verified on the proposal date)
 - Compute hardware prices are reseller listings on the BOM date; GPU server availability can move lead times
 - Not included: site civil, utility service, permits, fiber circuits, customer IT software, generator fuel, insurance after set-down, spare parts beyond the turnover kit, decommissioning (quoted separately)
 

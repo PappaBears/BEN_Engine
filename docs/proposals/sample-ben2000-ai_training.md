@@ -27,7 +27,7 @@ Northwind Partners for Meridian Compute needs 1600 kW of IT capacity for a AI tr
 
 The unit arrives finished and factory-tested. It needs a pad, a 3000 A 12.47 kV MV service → 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the white-label option: $55,225,268 capital ($34,516 per kW IT) plus $112,500 per year (White-label licence under the Northwind Partners brand). 73 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 27 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the white-label option: $60,903,531 capital ($38,065 per kW IT) plus $112,500 per year (White-label licence under the Northwind Partners brand). 75 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 25 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 71 weeks, set by the longest-lead item (52 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -74,8 +74,8 @@ What this means for you: the environmental class sets the alarm limits your IT w
 |---|---|---|---|
 | Power module | included | 18 lines | $7,400,615 |
 | Cooling module | included | 6 lines | $3,178,222 |
-| Compute module | included | 5 lines | $39,128,950 |
-| Controls module | included | 30 lines | $82,821 |
+| Compute module | included | 5 lines | $44,808,080 |
+| Controls module | included | 30 lines | $81,954 |
 | Structure (container / cabinet) | included | 12 lines | $2,849,754 |
 | Envelope (insulation, liner, coatings) | included | 9 lines | $73,274 |
 | Fire detection and suppression | included | 8 lines | $963,514 |
@@ -86,7 +86,7 @@ Top 15 lines of the 103-line bill of materials for this option (sell price at 28
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
-| CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Supermicro SYS-821GE-TNHR | 117 ea | $38,333,750 | confirmed | 10 |
+| CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Supermicro SYS-821GE-TNHR | 117 ea | $44,012,880 | confirmed | 10 |
 | PWR-GEN-1250 | Diesel standby generator 1,250 kW / 1,562 kVA 480 V, EPA Tier 2 stationary emergency, Level 2 sound-attenuated enclosure, 24 h sub-base tank, paralleling-ready controls (N+1 set) | Caterpillar / Cummins / Kohler CAT D1250 GC / Cummins QSK50-DQGAA | 3 ea | $2,583,333 | estimate | 52 |
 | STR-MODULE-WB | Wide-body prefabricated data-hall module (one 12.2 m bay = three road sections 12.2 x 3.66 x 4.2 m, site-joined to 12.2 x 11.0 m), factory-finished steel frame, 100 mm PIR sandwich walls/roof, IP66 envelope, 3.6 m clear interior, C3 coating | modular building manufacturer (PCX / Whitley / Compass Datacenters-class, RFQ email 19) WB-12.2-DH | 3 ea | $1,750,000 | estimate | 26 |
 | CLG-CDU | Row CDU 450-750 kW liquid-to-liquid (DLC) | Vertiv / CoolIT XDU450 / CHx750 | 7 ea | $1,458,333 | estimate | 16 |
@@ -114,33 +114,33 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $55,142,447 | $34,464 | - | 1 yr | $55,142,447 | 73 / 0 / 27 % | 73 | alternative |
-| Hardware + BEN Controls | $55,225,268 | $34,516 | $90,000 | 1 yr | $55,315,268 | 73 / 0 / 27 % | 103 | alternative |
-| White-label | $55,225,268 | $34,516 | $112,500 | 1 yr | $55,337,768 | 73 / 0 / 27 % | 103 | PROPOSED |
-| Managed service | $55,225,268 | $34,516 | $864,000 | 3 yr | $57,817,268 | 73 / 0 / 27 % | 103 | alternative |
+| Hardware only | $60,821,576 | $38,013 | - | 1 yr | $60,821,576 | 75 / 0 / 25 % | 73 | alternative |
+| Hardware + BEN Controls | $60,903,531 | $38,065 | $90,000 | 1 yr | $60,993,531 | 75 / 0 / 25 % | 103 | alternative |
+| White-label | $60,903,531 | $38,065 | $112,500 | 1 yr | $61,016,031 | 75 / 0 / 25 % | 103 | PROPOSED |
+| Managed service | $60,903,531 | $38,065 | $864,000 | 3 yr | $63,495,531 | 75 / 0 / 25 % | 103 | alternative |
 
-Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Northwind Partners brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 1600 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
+Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Northwind Partners brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 1600 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $55,225,268 | $864,000 | $56,089,268 |
-| 3 years | $55,225,268 | $2,592,000 | $57,817,268 |
-| 5 years | $55,225,268 | $4,320,000 | $59,545,268 |
+| 1 year | $60,903,531 | $864,000 | $61,767,531 |
+| 3 years | $60,903,531 | $2,592,000 | $63,495,531 |
+| 5 years | $60,903,531 | $4,320,000 | $65,223,531 |
 
-Payment milestones for the proposed option (White-label, capital $55,225,268):
+Payment milestones for the proposed option (White-label, capital $60,903,531):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $16,567,580 | 12 |
-| Factory acceptance test (H13) | 40 % | $22,090,107 | 50 |
-| Site acceptance test (H19) | 25 % | $13,806,317 | 70 |
-| Turnover (W20) | 5 % | $2,761,263 | 71 |
+| Engineering release (H4) | 30 % | $18,271,059 | 12 |
+| Factory acceptance test (H13) | 40 % | $24,361,412 | 50 |
+| Site acceptance test (H19) | 25 % | $15,225,883 | 70 |
+| Turnover (W20) | 5 % | $3,045,177 | 71 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
 ## 7. Schedule
 
-Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 2000 (reference order-to-service about 52 weeks with 40-week long-lead items (MV transformers, 2 MW UPS); longer when generator or utility lead times run to 52 weeks) and the longest lead time in this bill of materials (52 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
+Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 2000 (reference order-to-service 52 weeks when the utility energises inside 40 weeks and transformers are ordered at engineering release; 60–72 weeks at today's catalog lead times (48–52 weeks for pad-mount transformers and 1,250 kW generators), which is what this schedule shows) and the longest lead time in this bill of materials (52 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
 
 | Week | Milestone | Owner | Hold / witness point | Path |
 |---|---|---|---|---|
@@ -169,17 +169,24 @@ Long-lead items (ordered at engineering release):
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 2000, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. Issue for construction set regenerated from the frozen configuration at engineering release (index not readable at proposal time)
+Issue-for-construction drawing set for the BEN 2000, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUED FOR REVIEW — not for construction until checked — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
 
 | Sheet | Title | Scale |
 |---|---|---|
-| A-001 | General arrangement | see sheet |
-| A-002 | Interior layout plan | see sheet |
-| A-003 | Envelope section | 1:10 / 1:2 |
-| S-001 | Floor framing and anchoring | see sheet / 1:5 |
-| E-001 | Power one-line | NTS |
-| M-001 | Cooling P&ID | NTS |
-| C-001 | Controls layout | see sheet |
+| A-000 | Site plan (sheet 1/14) | see sheet |
+| A-001 | General arrangement (sheet 2/14) | see sheet |
+| A-001-M1 | Module 1 general arrangement (sheet 3/14) | 1:50 |
+| A-001-M2 | Module 2 general arrangement (sheet 4/14) | 1:50 |
+| A-001-M3 | Module 3 general arrangement (sheet 5/14) | 1:50 |
+| A-002 | Interior layout plan (sheet 6/14) | see sheet |
+| A-002-M1 | Module 1 interior layout (sheet 7/14) | 1:50 |
+| A-002-M2 | Module 2 interior layout (sheet 8/14) | 1:50 |
+| A-002-M3 | Module 3 interior layout (sheet 9/14) | 1:50 |
+| A-003 | Envelope section and hardening (sheet 10/14) | see sheet / 1:2 |
+| S-001 | Foundation and anchoring (sheet 11/14) | see sheet / 1:5 |
+| E-001 | Power one-line (MV service) (sheet 12/14) | NTS |
+| M-001 | Cooling P&ID (sheet 13/14) | NTS |
+| C-001 | Controls layout (sheet 14/14) | see sheet |
 
 Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):
 
@@ -354,12 +361,12 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 ## 15. Assumptions and what is not included
 
 - Configuration as on the cover: 1600 kW IT, 27 rack(s), Direct liquid cooling + CDU + dry cooler, N+1, climate Hot / arid; any change is priced as a change order
-- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 73 % confirmed, 0 % list, 27 % estimate for this option; the estimate share is re-priced at engineering release
+- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 75 % confirmed, 0 % list, 25 % estimate for this option; the estimate share is re-priced at engineering release
 - Gross margin 28% on hardware and build labour; controls licence $90,000/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
 - Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost
-- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 13 lists editions not verified on the proposal date)
+- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 16 lists editions not verified on the proposal date)
 - Compute hardware prices are reseller listings on the BOM date; GPU server availability can move lead times
 - Not included: site civil, utility service, permits, fiber circuits, customer IT software, generator fuel, insurance after set-down, spare parts beyond the turnover kit, decommissioning (quoted separately)
 

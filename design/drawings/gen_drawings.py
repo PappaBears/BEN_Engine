@@ -1,4 +1,4 @@
-"""BEN Engine — ISSUE FOR CONSTRUCTION drawing set generator.
+"""BEN Engine — drawing set generator (revision and status from design/REVISION.json).
 
 Reads the configuration for each tier preset through design/layout.py and writes, per tier:
     design/drawings/<tier>/A-001 ... C-001 as .svg and .png, plus INDEX.md
@@ -23,10 +23,11 @@ sys.path.insert(0, HERE)
 import layout as L  # noqa: E402
 import ctq as C  # noqa: E402
 import gen_hall as GH  # noqa: E402
+from revision import REV  # noqa: E402
 from drawkit import (Sheet, View, INK, MUTED, LIGHT, PAPER, CTQ_C, CTP_C, RED, GREEN, PURPLE, FILL, EDGE,  # noqa: E402
                      sym_box, sym_valve, sym_pump, sym_instr, sym_hx, sym_tank, sym_breaker)
 
-DATE = "2026-11-08"
+DATE = REV["issue_date"]          # from design/REVISION.json — do not hard-code
 SHEETS = [("A-001", "General arrangement"), ("A-002", "Interior layout plan"), ("A-003", "Envelope section and hardening"),
           ("S-001", "Floor framing and anchoring"), ("E-001", "Power one-line"), ("M-001", "Cooling P&ID"),
           ("C-001", "Controls layout")]
@@ -59,6 +60,31 @@ def config_line(lay):
 
 def new_sheet(lay, no, title, scale_text, n):
     return Sheet(no, title, lay.d["tier_label"], scale_text, n, len(sheets_for(lay)), config_line(lay), DATE)
+
+
+def _refrigerant_note(lay):
+    """Refrigerant / charge note for M-001 on DX tiers, from the catalog lines' `refrigerant` / `gwp` attributes
+    (purchasing/parts_catalog.json; COMPLIANCE.md §0 findings 1 and 2: A1 refrigerant, GWP < 700)."""
+    import json
+    cat_path = os.path.join(os.path.dirname(os.path.dirname(HERE)), "purchasing", "parts_catalog.json")
+    with open(cat_path, encoding="utf-8") as f:
+        cat = {p["code"]: p for p in json.load(f)}
+    codes = ["CLG-CABAC"] if not lay.is_container else ["CLG-INROW", "CLG-COND", "CLG-REFRIG"]
+    parts = [cat[c] for c in codes if c in cat and c in cat and "gwp" in cat[c]]
+    vol = lay.L * lay.W * lay.H / 1e9
+    if not parts:
+        return ("Refrigerant: per unit nameplate — catalog line carries no `refrigerant` attribute; add it before purchase.", f"Room volume {vol:.1f} m3.")
+    p = parts[0]
+    gwp = p["gwp"]
+    ok = "meets" if gwp < 700 else "DOES NOT MEET"
+    line1 = (f"Refrigerant: {p['refrigerant'].split(' — ')[0]} (catalog {', '.join(codes)}), GWP {gwp} — {ok} the AIM Act < 700 GWP limit for data-center cooling from 2027-01-01 (COMPLIANCE §0 finding 2).")
+    if lay.is_container:
+        line2 = (f"A1 (non-flammable) refrigerant, so UL 60335-2-40 / ASHRAE 15 A2L charge limits do not apply; room volume {vol:.1f} m3; charge per unit nameplate, "
+                 "record the charge per circuit on form Q-06 (CTP-M1 HOLD). No A2L unit may be substituted without a new charge-vs-volume check.")
+    else:
+        line2 = (f"Cabinet volume {vol:.2f} m3, sealed and not for human occupancy. " + ("Factory-sealed unit, no field charge." if gwp < 700 else
+                 "RFQ NOTE: the 5.8 kW rating is the R-134a variant (GWP 1430); purchasing must quote the R-513A variant (5.5 kW, GWP 631) or an R-1234yf / R-516A unit before release."))
+    return (line1, line2)
 
 
 def deviation_note(sh, lay, x, y):
@@ -234,6 +260,8 @@ def sheet_a001(lay: L.Layout, out):
                 ["Longitudinal CoG from door end (layout)", f"{cgx:.0f} mm  ({cgx / el * 100:.0f} % of L)"],
                 ["Max gross ISO 668 (module) / forklift (BEN 5)", "30480" if lay.is_container else "2500"]]
         y = sh.table(x, y, ["WEIGHT TABLE", "kg"], rows, [RW * 0.72, RW * 0.28], title="WEIGHTS")
+        y -= 8
+        y = sh.revision_table(x, y, RW)
         y -= 8
         notes = [
             "All dimensions in millimetres unless noted. Do not scale from this drawing; use figured dimensions.",
@@ -1036,9 +1064,12 @@ def sheet_m001(lay: L.Layout, out):
         sh.line(xh0, y0 - 122, xh1, y0 - 122, c=RED, lw=0.6, ls=":")
         sh.text(min(xh1 + 2, 300), y0 - 122, "Leak rope under every unit -> leak controller / Pod E (CTQ-M3)", h=1.8, va="center", c=RED, bg=PAPER)
         notes_y = y0 - 130
-        sh.text(xleft, notes_y, f"Refrigerant: R-454B (A2L) or R-410A per unit nameplate; line sizes PLACEHOLDER L 3/8\" / S 7/8\" for <= 15 m equivalent — HVAC technician sizes per manufacturer table (CTP-M1 HOLD).", h=1.9, c=MUTED)
-        sh.text(xleft, notes_y - 3.5, f"Each unit: {L.LIB.get(lay.notes.get('air_key', 'inrow300'), {}).get('kw', 5.8) if lay.is_container else 5.8} kW sensible; EC fans modulate on supply temp 18-22 C and dP_aisle setpoint; A2L refrigerant detector in hot plenum interlocked to fans.", h=1.9, c=MUTED)
-        y_water = notes_y - 14
+        refr = _refrigerant_note(lay)
+        sh.text(xleft, notes_y, refr[0], h=1.9, c=MUTED)
+        sh.text(xleft, notes_y - 3.5, refr[1], h=1.9, c=MUTED)
+        sh.text(xleft, notes_y - 7, f"Each unit: {L.LIB.get(lay.notes.get('air_key', 'inrow300'), {}).get('kw', 5.8) if lay.is_container else 5.8} kW sensible; EC fans modulate on supply temp 18-22 C and dP_aisle setpoint; "
+                "line sizes PLACEHOLDER L 3/8\" / S 7/8\" for <= 15 m equivalent — HVAC technician sizes per manufacturer table (CTP-M1 HOLD).", h=1.9, c=MUTED)
+        y_water = notes_y - 17
     else:
         y_water = y0
     # ---------------- water / liquid section (ben20 RDHx, ben40 DLC)
@@ -1130,7 +1161,7 @@ def sheet_m001(lay: L.Layout, out):
         notes = ["Refrigerant work (brazing, pressure test, evacuation, charging) only by a licensed HVAC technician (EPA 608 / F-gas). HOLD POINT CTP-M1.",
                  "Workers set units in position, bolt them down, run condensate drains, mount roof condensers on curbs and pull (do not braze) pre-insulated line sets.",
                  "Line sizes on this sheet are placeholders; final sizes, traps and oil return per the unit manufacturer's installation manual for the measured equivalent length.",
-                 "A2L refrigerant: detector in the hot plenum, fan interlock, no ignition sources in the plenum; follow UL 60335-2-40 charge limits per room volume.",
+                 "Refrigerant is A1 (R-513A, GWP 631, catalog CLG-INROW / CLG-COND / CLG-REFRIG; BEN 5 cabinet AC see DX note): no A2L charge limit applies. If an A2L unit is ever substituted: detector in the hot plenum, fan interlock, no ignition sources, UL 60335-2-40 charge-vs-volume check before release.",
                  "Every drain and drip tray is water-tested before the floor is closed (CTQ-M2).",
                  "Controls: unit supply temperature setpoint and fan speed follow the gateway; units default to local control on loss of comms; PLC / RevPi watchdog relay (CTP-K2); PROTOCOL.md safety rules."]
         return sh.notes(x, y, "COOLING NOTES", notes, h=2.0, lead=3.1)
@@ -1265,14 +1296,20 @@ GENERATORS = {"A-001": sheet_a001, "A-002": sheet_a002, "A-003": sheet_a003, "S-
 
 def write_index(lay, out):
     sheets = sheets_for(lay)
-    lines = [f"# {lay.d['tier_label']} — Issue-for-construction drawing set", "",
-             f"Generated {DATE} by `design/drawings/gen_drawings.py` from `Config.preset('{lay.tier}')`.",
+    lines = [f"# {lay.d['tier_label']} — drawing set, Rev {REV['drawing_rev']} ({REV['status_title']})", "",
+             f"Generated {DATE} by `design/drawings/gen_drawings.py` from `Config.preset('{lay.tier}')`; revision from `design/REVISION.json`.",
              f"Configuration: {config_line(lay)}", f"Enclosure: {lay.d['enclosure']} — {lay.d['hardening_rating']} ({lay.d['hardening_label']}).", "",
              "| Sheet | Title | Scale | Files |", "|---|---|---|---|"]
     scales = {"A-000": "see sheet", "A-001": "see sheet", "A-002": "see sheet", "A-003": "see sheet / 1:2", "S-001": "see sheet / 1:5", "E-001": "NTS", "M-001": "NTS", "C-001": "see sheet"}
     for i, (no, title) in enumerate(sheets, 1):
         lines.append(f"| {no} | {title} (sheet {i}/{len(sheets)}) | {scales.get(no, '1:50')} | [{no}.svg]({no}.svg), [{no}.png]({no}.png) |")
-    lines += ["", "Status: **ISSUE FOR CONSTRUCTION Rev A** — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).", ""]
+    checked = f"Checked: {REV['checker']}" if REV["checked"] else "Checked: blank (requires a checker before the set is re-issued for construction)"
+    lines += ["", f"Status: **{REV['status_long']}** — Rev {REV['drawing_rev']}, {REV['issue_date']}. Drawn: BEN Engine generator; {checked}.", "",
+              "| Rev | Date | Description | Checked |", "|---|---|---|---|"]
+    if REV.get("supersedes"):
+        sp = REV["supersedes"]
+        lines.append(f"| {sp['drawing_rev']} | {sp['issue_date']} | {sp['notes']} | — |")
+    lines += [f"| {REV['drawing_rev']} | {REV['issue_date']} | {REV['notes_short']} | {REV['checker'] or 'not checked'} |", ""]
     if lay.deviations:
         lines += ["## Configuration deviations applied on this set", ""] + [f"- {dv}" for dv in lay.deviations] + [""]
     lines += ["## Interference checks for this tier", "", L.checks_table([lay]), ""]

@@ -298,7 +298,7 @@ python -m ben_engine.commissioning --live --url http://ben-controller.local:8000
 Ten steps, each with recorded values and PASS/FAIL, then a markdown report with a step table,
 detail tables, the sweep criteria, the SHA-256 of the exported CSV and a signature block. The
 simulation run for BEN 150 passes all ten steps in under a second and exports ~1 400 rows. The
-`--live` entry currently only proves the gateway answers `/api/config` and `/api/state` and
+`--live` entry currently only proves the edge computer answers `/api/config` and `/api/state` and
 writes a report saying so; the live steps need a person at the panel and a load bank, and are
 driven from the dashboard's commissioning page.
 
@@ -343,6 +343,6 @@ Both additive, nothing else touched:
 * `TwinParams.recirculation_profile: Optional[List[float]]` — per-rack recirculation from the
   CFD; when set with length `racks` it replaces the scalar and the position bias.
 * `_update_alarms` evaluates rack-inlet alarms on the *reported* reading
-  (`rack_inlet_c + drift_c`), as the gateway does, so a sensor-drift fault can raise the alarm
+  (`rack_inlet_c + drift_c`), as the edge computer does, so a sensor-drift fault can raise the alarm
   that commissioning step 9 verifies. Before, the drift only changed the reading and never the
   alarm.

@@ -1,0 +1,12 @@
+{
+  "drawing_rev": "B",
+  "issue_date": "2026-11-08",
+  "status": "ISSUED FOR REVIEW",
+  "checker": "",
+  "notes": "Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). The generation-1 container set (Rev A) is superseded; see superseded_set.",
+  "superseded_set": {
+    "letter": "A",
+    "date_text": "7 Nov 2026",
+    "notes": "Generation-1 container set (BEN Micro/10/20/40, NEMA 3R); superseded, do not build from it."
+  }
+}

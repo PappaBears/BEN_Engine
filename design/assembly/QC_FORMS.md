@@ -1,6 +1,6 @@
 # BEN Engine — QC forms Q-01 to Q-12
 
-Issue A, 2026-11-07. One set of forms per unit. The unit serial number, the tier and the configuration hash go on every page.
+Issue B, 2026-11-08 (matches drawing set Rev B, `design/REVISION.json`; the set is ISSUED FOR REVIEW until a named checker signs). One set of forms per unit. The unit serial number, the tier and the configuration hash go on every page.
 A **HOLD** line needs the signature of the named qualified person before the next task starts. A **WITNESS** line needs the QC inspector present.
 Every measured value is written as a number, never as a tick. "N/A" needs a reason. The CTQ/CTP references are defined in `design/ctq.py` and shown on the drawings.
 
@@ -8,7 +8,7 @@ Header on every form:
 
 | Unit serial | Tier | Config (tier / kW / racks / cooling / redundancy / climate) | Drawing set issue | Form issue |
 |---|---|---|---|---|
-| __________ | ______ | ______________________________________ | IFC Rev A 2026-11-07 | A |
+| __________ | ______ | ______________________________________ | Rev B 2026-11-08 (IFR) | B |
 
 ---
 

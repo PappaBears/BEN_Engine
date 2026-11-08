@@ -148,6 +148,7 @@ ALLOWED_HISTORY = {
     "docs/PROJECT_NOTES.md", "docs/TIER_AND_ENCLOSURE_DECISION.md", "docs/CONTROLS_HARDWARE_DECISION.md",
     "docs/ORIGINAL_REQUEST.md", "docs/BRIEF.md", "docs/FAQ.md", "firmware/README.md", "software/ben_engine/config.py",
     "docs/audit/AUDIT_REPORT_2026-11-08.md", "docs/audit/AUDIT_CHECKLIST.md", "scripts/audit.py",
+    "purchasing/parts_catalog_withdrawn.json",  # generation-1 catalog lines kept for history (F-22); nothing loads it
 }
 CONTEXT_OK = re.compile(r"replaced|retired|dropped|changed from|alias|history|supersed|formerly|was |old |earlier|generation.1|gen-1|not in|no longer|rejected", re.I)
 

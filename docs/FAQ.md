@@ -22,7 +22,7 @@
 
 **Is the CFD real?** It is a real 2-D thermal lattice-Boltzmann solver, run per tier, useful for ranking layouts and scenario deltas (fan turn-down, failed unit, door open). It is not a 3-D absolute-temperature prediction and says so.
 
-**Where do prices come from?** `purchasing/parts_catalog.json`, 204 parts (12 of them withdrawn or factory-tooling lines), each with vendor, URL, price and a status: confirmed (seen on a distributor listing on 2026-11-07/08), list, or estimate (with basis). Totals per tier are in `docs/BOM.md` (BEN 5 $132k, BEN 30 $666k, BEN 150 $1.89 M, BEN 500 $4.45 M, BEN 2000 $40.4 M, reference compute included). The BOM and the proposal show the share of each. Nothing is a quote until the queued RFQ emails are answered.
+**Where do prices come from?** `purchasing/parts_catalog.json`, 197 parts (5 of them consigned-component or factory-tooling lines; the 7 withdrawn generation-1 lines sit in `purchasing/parts_catalog_withdrawn.json` for history), each with vendor, URL, price and a status: confirmed listing (a price seen on the vendor's or distributor's own product page on 2026-11-07/08, not a quote), list (manufacturer published price), or estimate (with basis). Totals per tier are in `docs/BOM.md` (BEN 5 $132k, BEN 30 $666k, BEN 150 $1.89 M, BEN 500 $4.45 M, BEN 2000 $40.4 M, reference compute included). The BOM and the proposal show the share of each. Nothing is a quote until the queued RFQ emails are answered.
 
 **Were any emails sent?** No. 21 RFQs were created as Gmail drafts addressed to Ben@SchreiberAI.com and as files in `purchasing/email_queue/`. Ben forwards them.
 

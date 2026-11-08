@@ -1,7 +1,7 @@
 # Statement of Work (SOW) — BEN Engine Unit
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOW_TEMPLATE.md` · Template rev ac1285f
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOW_TEMPLATE.md` · Template rev 9fed473
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. The configuration block in Section 2 is pasted verbatim from the frozen `config.json`. Delete this box before signature.
 
 **SOW ID:** SOW-BEN150-20261108-C10DE35C
@@ -21,7 +21,7 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 | Delivery model | Managed service (hardware only / hardware + BEN Controls / white-label / managed) |
 | Modules ordered | power, cooling, compute, controls (any of: power, cooling, compute, controls) |
 | White-label | false (yes / no); brand to apply: Schreiber AI |
-| Managed Services | true (yes / no); if yes, SLA `docs/contracts/MANAGED_SERVICES_SLA.md` rev ac1285f attached, term 36 months |
+| Managed Services | true (yes / no); if yes, SLA `docs/contracts/MANAGED_SERVICES_SLA.md` rev 9fed473 attached, term 36 months |
 | Turnkey site works by Schreiber AI | no (yes / no / partial, list: [TURNKEY_SITE_WORKS_LIST]) |
 | Factory | [FACTORY_NAME], [FACTORY_ADDRESS] (Schreiber AI facility or Contract Manufacturer under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md`) |
 | Schreiber AI project manager | [SCHREIBER_PM_NAME], [SCHREIBER_PM_EMAIL], [SCHREIBER_PM_PHONE] |
@@ -86,17 +86,17 @@ This SOW orders one BEN Engine Unit and the Services for it under the MSA. Capit
 
 | Document | Revision |
 | --- | --- |
-| `docs/PROCESS_FLOW.md` | ac1285f |
-| `docs/SITE_REQUIREMENTS.md` (signed copy attached as Annex A) | ac1285f |
-| `docs/COMPLIANCE.md` compliance pack for profile healthcare | ac1285f |
-| `docs/TEST_GUIDE.md` | ac1285f |
-| `docs/TURNOVER.md` | ac1285f |
-| `docs/MAINTENANCE.md` | ac1285f |
-| `docs/RISK_REGISTER.md` (risk acknowledgement signed [RISK_ACK_DATE]) | ac1285f |
-| `docs/CYBERSECURITY.md` | ac1285f |
-| `design/assembly/QC_FORMS.md` (Q-01 to Q-12) | ac1285f |
-| `spec/PROTOCOL.md`, `spec/INTERFACES.md` | ac1285f |
-| Issue-for-construction drawing set `design/drawings/ben150/` | issued at H4, index IFC Rev A (ac1285f) |
+| `docs/PROCESS_FLOW.md` | 9fed473 |
+| `docs/SITE_REQUIREMENTS.md` (signed copy attached as Annex A) | 9fed473 |
+| `docs/COMPLIANCE.md` compliance pack for profile healthcare | 9fed473 |
+| `docs/TEST_GUIDE.md` | 9fed473 |
+| `docs/TURNOVER.md` | 9fed473 |
+| `docs/MAINTENANCE.md` | 9fed473 |
+| `docs/RISK_REGISTER.md` (risk acknowledgement signed [RISK_ACK_DATE]) | 9fed473 |
+| `docs/CYBERSECURITY.md` | 9fed473 |
+| `design/assembly/QC_FORMS.md` (Q-01 to Q-12) | 9fed473 |
+| `spec/PROTOCOL.md`, `spec/INTERFACES.md` | 9fed473 |
+| Issue-for-construction drawing set `design/drawings/ben150/` | issued at H4, index IFR Rev B (2026-11-08) (9fed473) |
 
 ## 3. Scope by module
 
@@ -164,7 +164,7 @@ Mark each row **Included** or **Excluded**. Excluded rows are Customer's respons
 | --- | --- | --- |
 | BEN Controller, tier BEN Controls Pro: Pro = UL 508A listed panel with Phoenix Contact PLCnext AXC F 2152 PLC and Axioline F I/O, OnLogic Karbon 400 edge computer (TPM 2.0), redundant QUINT4 24 V DC supplies, surge protection, managed switch, interface relays, firewall, remote-support key switch; Lite = DIN-rail cabinet with Revolution Pi RevPi Connect 4 controller and DIO/AIO modules, 24 V DC supply, switch, watchdog relay | Included | |
 | BEN Pods x 12 on the BEN Mesh (Thread/IPv6, Silicon Labs MGM240P with Secure Vault, per-Pod certificate and attestation), with Pt1000 probe strings, SHT45, SDP810, rope leak, door reed, 4–20 mA inputs, pulse input per `spec/PROTOCOL.md`; wired transmitters on the PLC (Pro): Setra 264 dP, Vaisala HMW90 RH, RLE LD2100 leak controller | Included | |
-| Signed firmware load, per-node certificates, `cal_id` applied, factory calibration with traceable references (Q-08, W12) | Included | |
+| Signed firmware load, per-Pod certificates, `cal_id` applied, factory calibration with traceable references (Q-08, W12) | Included | |
 | Modbus/SNMP integration to UPS, cooling units, PDUs, meters, fire panel dry contacts (monitor only), door controller | Excluded (option) | |
 | Dashboard (live data, 3-D twin, alarms, sweeps, CSV export, I/O test, calibration), digital twin fitted from commissioning data | Included | |
 | Software Licence per `docs/contracts/SOFTWARE_LICENSE_BEN_CONTROLS.md`: [LICENSE_TYPE] | Included | perpetual per-Unit / subscription / white-label |
@@ -284,19 +284,19 @@ Hold points H7, H10a, H10b, H11, H18 and the fire system commissioning may only 
 
 | Line | Amount (USD) | Basis |
 | --- | --- | --- |
-| Enclosure, structure, envelope, fire and life safety | 117,702.86 | Firm |
+| Enclosure, structure, envelope, fire and life safety | 117,216.75 | Firm |
 | Power module | 273,828.12 | Firm |
 | Cooling module | 272,472.22 | Firm |
 | Compute module | 1,072,379.14 | Firm (or Customer-supplied: 0) |
-| Controls module (hardware and integration) | 26,791.54 | Firm |
+| Controls module (hardware and integration) | 26,574.94 | Firm |
 | Engineering, FAT, transport, set-down, hook-up, SAT, training, turnover | 51,694.44 | Firm |
-| **Unit price (basis for milestones and liquidated damages)** | **1,848,896.11** | |
+| **Unit price (basis for milestones and liquidated damages)** | **1,848,193.40** | |
 | Software Licence (perpetual per-Unit fee, or first-year subscription) | 12,000.00 | Per Software Licence |
 | Turnkey site works | 34,027.78 | Allowance; reconciled to actual with 10 % markup |
 | Permit services | 0.00 | Time and materials at Section 7.5 rates; fees at cost |
 | Options selected: none | 0.00 | Firm |
 | Managed Services | USD 45 per kW-month x 50 kW = 2,250.00 per month | Per SLA, from SAT Acceptance |
-| **Total contract value at signature** | **1,875,896.11** | Excludes taxes |
+| **Total contract value at signature** | **1,875,193.40** | Excludes taxes |
 
 Price confidence: the bill of materials behind this price carries a confirmed / list / estimate split of 62 % confirmed / 0 % list / 38 % estimate as of 2026-11-08; items marked "estimate" are firm to Customer once this SOW is signed, and the risk of their variance is Schreiber AI's except under MSA 6.6 and 17.2.
 
@@ -304,10 +304,10 @@ Price confidence: the bill of materials behind this price carries a confirmed / 
 
 | # | Trigger | Share | Amount | Baseline invoice date |
 | --- | --- | --- | --- | --- |
-| 1 | SOW signature | 30 % | 554,668.83 | 2026-11-08 |
-| 2 | H4 Engineering Release | 40 % | 739,558.44 | 2026-12-20 |
-| 3 | H13 FAT Acceptance (title passes; Unit ships on receipt) | 25 % | 462,224.03 | 2027-06-06 |
-| 4 | H19 SAT Acceptance and Turnover, less LD credits and Punch List holdback | 5 % | 92,444.81 | 2027-07-04 |
+| 1 | SOW signature | 30 % | 554,458.02 | 2026-11-08 |
+| 2 | H4 Engineering Release | 40 % | 739,277.36 | 2026-12-20 |
+| 3 | H13 FAT Acceptance (title passes; Unit ships on receipt) | 25 % | 462,048.35 | 2027-06-06 |
+| 4 | H19 SAT Acceptance and Turnover, less LD credits and Punch List holdback | 5 % | 92,409.67 | 2027-07-04 |
 
 Payment terms 30 days. Milestones delayed by Customer-Caused Delay are invoiced on the baseline date (MSA 9.3).
 
@@ -347,7 +347,7 @@ Payment terms 30 days. Milestones delayed by Customer-Caused Delay are invoiced 
 | 1 | Pre-power visual checklist | Operator confirms each checklist item: unit level and tied down, CSC plate legible; grounding electrode conductor landed and tested; feeder terminated with torque marks, breaker open and locked; no shipping damage to cooling units, condensate drains connected; fire suppression and EPO hardwired and tagged, not on controls bus; racks anchored, blanking panels fitted, containment doors latch; controls LAN has no route to the internet; uplinks labelled both ends | Every item confirmed "yes" by the operator and the Customer witness; any "no" fails the step | Yes (factory equivalents for pad and feeder) | Yes | — |
 | 2 | Pod discovery, attestation and firmware versions | The BEN Controller discovers all BEN Pods on the mesh | Pod count equals 12 (two per rack + room + outdoor; BEN 5 3); every Pod attested; every Pod reports the same signed firmware version [FIRMWARE_VERSION]; every Pod `status` heartbeat < 60 s old; logical node ids 4 | Yes | Yes | E12 (part) |
 | 3 | Sensor sanity at idle | 20 % load for 5 minutes; read all inlet probes, RH, tare dP | All rack inlet probes within 2.0 K of each other; RH between 20 % and 80 %; dP tare acknowledged and residual ≤ 0.5 Pa | Yes | Yes | E1, E2 |
-| 4 | I/O point-to-point | Each relay on each node set 1 then 0 and read back; door and leak contacts read 0, forced 1, released 0 | 100 % of points read back as set; 0 failed points | Yes | Yes | — |
+| 4 | I/O point-to-point | Each relay on each Pod set 1 then 0 and read back; door and leak contacts read 0, forced 1, released 0 | 100 % of points read back as set; 0 failed points | Yes | Yes | — |
 | 5 | Power chain: meter vs PDU sum | 60 % load for 5 minutes; utility meter reconciled to PDU sum after subtracting metered cooling, house load and UPS losses | Disagreement ≤ 3.0 %; PUE recorded | Yes | Yes | E9 |
 | 6 | Cooling unit sequential start and failover | Each cooling unit started in sequence; then one unit failed at 100 % load for 10 minutes and recovered | Every unit starts and reports running with kW > 0; during failover max rack inlet stays within ASHRAE Class A1 allowable (27 °C) and the standby unit picks up load; all failover criteria in `sweeps.cooling_unit_failover` pass | Yes | Yes | E4 |
 | 7 | Load step to 100 % and thermal steady state | Load stepped 20 → 100 % in levels, each held 15 minutes | Max rack inlet within ASHRAE Class A1 allowable at every level; steady state reached at each level; rack ΔT within band at full load. Inlet above the 27 °C recommended envelope but within allowable is recorded as a note, not a failure | Yes (full) | Yes (reduced per `docs/TEST_GUIDE.md` E3) | E3, E8 |

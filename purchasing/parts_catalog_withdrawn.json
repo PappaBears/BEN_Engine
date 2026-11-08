@@ -1,0 +1,162 @@
+{
+ "_meta": {
+  "note": "Generation-1 catalog lines withdrawn on 2026-11-08 (docs/CONTROLS_HARDWARE_DECISION.md). Kept for history only; bom.py never loads this file.",
+  "withdrawn_on": "2026-11-08"
+ },
+ "parts": [
+  {
+   "code": "CTL-POE-SW",
+   "name": "[WITHDRAWN] UniFi Industrial 10-port switch, 8x PoE++ 802.3bt, 430 W, -40..+70 C",
+   "manufacturer": "Ubiquiti",
+   "mpn": "USW-Industrial",
+   "vendor": "CDW",
+   "vendor_url": "https://www.cdw.com/product/ubiquiti-unifi-switch-usw-industrial-switch-10-ports-managed/5714250",
+   "unit": "ea",
+   "unit_price_usd": 609.99,
+   "price_status": "confirmed",
+   "price_source_note": "CDW $609.99 seen 2026-11-07; Altex $549.99; wifi-stock $456.25. Netgear GS110TUP as alternate (~$456-525).",
+   "price_checked": "2026-11-07",
+   "lead_time_weeks": 2,
+   "availability_note": "Withdrawn 2026-11-08: hobby-grade PoE switch; Pod E is 24 VDC powered from the panel, control LAN on CTL-SWITCH (Pro) / CTL-SWITCH-LITE (Lite). Stock at US distributors.",
+   "moq": 1,
+   "applies_to_tiers": [],
+   "qty_rule": "ceil(nodes/8)",
+   "applies_to_controls": [
+    "lite",
+    "pro"
+   ]
+  },
+  {
+   "code": "CTL-SHT45",
+   "name": "[WITHDRAWN] SHT45 precision temp/RH breakout, STEMMA QT",
+   "manufacturer": "Adafruit (Sensirion)",
+   "mpn": "5665",
+   "vendor": "Jameco",
+   "vendor_url": "https://www.jameco.com/z/5665-Adafruit-Industries-Adafruit-Sensirion-Sht45-Precision-Temperature-Humidity-Sensor-Stemma-QT-Qwiic_2526119.html",
+   "unit": "ea",
+   "unit_price_usd": 16.55,
+   "price_status": "confirmed",
+   "price_source_note": "Jameco $16.55 seen 2026-11-07 (adafruit.com blocked in session; Adafruit list typically $14.95)",
+   "price_checked": "2026-11-07",
+   "lead_time_weeks": 1,
+   "availability_note": "Withdrawn 2026-11-08: hobby breakout; the SHT45 is now a reflowed component on the BEN Pod PCB (CTL-POD). Stock.",
+   "moq": 1,
+   "applies_to_tiers": [],
+   "qty_rule": "nodes",
+   "applies_to_controls": [
+    "lite",
+    "pro"
+   ]
+  },
+  {
+   "code": "CTL-ADS1115",
+   "name": "[WITHDRAWN] ADS1115 16-bit 4-ch ADC breakout, STEMMA QT",
+   "manufacturer": "Adafruit (TI)",
+   "mpn": "1085",
+   "vendor": "Mouser",
+   "vendor_url": "https://www.mouser.com/ProductDetail/485-1085",
+   "unit": "ea",
+   "unit_price_usd": 14.95,
+   "price_status": "confirmed",
+   "price_source_note": "Mouser $14.95, 538 in stock seen 2026-11-07; Adafruit $13.46 (10-99)",
+   "price_checked": "2026-11-07",
+   "lead_time_weeks": 1,
+   "availability_note": "Withdrawn 2026-11-08: hobby ADC breakout; the Pod carries a 24-bit RTD front end on the PCB (CTL-POD). Stock.",
+   "moq": 1,
+   "applies_to_tiers": [],
+   "qty_rule": "nodes",
+   "applies_to_controls": [
+    "lite",
+    "pro"
+   ]
+  },
+  {
+   "code": "CTL-DS18B20",
+   "name": "[WITHDRAWN] Waterproof DS18B20 1-Wire temperature probe, 1 m",
+   "manufacturer": "Adafruit",
+   "mpn": "381",
+   "vendor": "Adafruit",
+   "vendor_url": "https://www.adafruit.com/products/381",
+   "unit": "ea",
+   "unit_price_usd": 9.95,
+   "price_status": "confirmed",
+   "price_source_note": "Adafruit $9.95 (1-9), $8.96 (10-99), $7.96 (100+) seen 2026-11-07 via listing snippet; Mouser 485-381 251 in stock",
+   "price_checked": "2026-11-07",
+   "lead_time_weeks": 1,
+   "availability_note": "Withdrawn 2026-11-08: hobby 1-Wire probe; replaced by Pt1000 class A probe strings (CTL-PT1000). Stock; 100+ price break applies for 10-unit run.",
+   "moq": 1,
+   "applies_to_tiers": [],
+   "qty_rule": "racks*8",
+   "applies_to_controls": [
+    "lite",
+    "pro"
+   ]
+  },
+  {
+   "code": "CTL-PSU24",
+   "name": "[WITHDRAWN] DIN-rail 24 VDC 2.5 A power supply (relay coil power)",
+   "manufacturer": "Mean Well",
+   "mpn": "HDR-60-24",
+   "vendor": "DigiKey / Mouser",
+   "vendor_url": "",
+   "unit": "ea",
+   "unit_price_usd": 22.0,
+   "price_status": "estimate",
+   "price_source_note": "Not priced this session; typical $19-26",
+   "price_checked": null,
+   "lead_time_weeks": 1,
+   "availability_note": "Withdrawn 2026-11-08: replaced by QUINT4 24 VDC supply (CTL-PSU-QUINT). Stock.",
+   "moq": 1,
+   "applies_to_tiers": [],
+   "qty_rule": "nodes",
+   "applies_to_controls": [
+    "lite",
+    "pro"
+   ]
+  },
+  {
+   "code": "CTL-PCB",
+   "name": "[WITHDRAWN] BEN Node carrier PCB (4-layer, 100x80 mm, assembled passives) - make item",
+   "manufacturer": "Schreiber AI (JLCPCB/PCBWay fab)",
+   "mpn": "BEN-NODE-PCB-v1",
+   "vendor": "JLCPCB",
+   "vendor_url": "",
+   "unit": "ea",
+   "unit_price_usd": 18.0,
+   "price_status": "estimate",
+   "price_source_note": "Engineering estimate at 50 pcs with SMT passives; quote queued",
+   "price_checked": null,
+   "lead_time_weeks": 3,
+   "availability_note": "Withdrawn 2026-11-08: node carrier PCB superseded by the BEN Pod PCBA (CTL-POD); RFQ 14 now covers the Pod PCB. 2-3 wk fab+assembly.",
+   "moq": 1,
+   "applies_to_tiers": [],
+   "qty_rule": "nodes",
+   "applies_to_controls": [
+    "lite",
+    "pro"
+   ]
+  },
+  {
+   "code": "CTL-MISC",
+   "name": "[WITHDRAWN] Node electronics lot: 165 ohm 0.1% shunts, 4.7k pull-ups, JST/STEMMA cables, M12 glands, fuses",
+   "manufacturer": "various",
+   "mpn": "BEN-NODE-KIT",
+   "vendor": "DigiKey / Mouser",
+   "vendor_url": "",
+   "unit": "per node",
+   "unit_price_usd": 14.0,
+   "price_status": "estimate",
+   "price_source_note": "Engineering estimate from node schematic",
+   "price_checked": null,
+   "lead_time_weeks": 1,
+   "availability_note": "Withdrawn 2026-11-08: node electronics lot rolled into the BEN Pod BOM (CTL-POD). Stock.",
+   "moq": 1,
+   "applies_to_tiers": [],
+   "qty_rule": "nodes",
+   "applies_to_controls": [
+    "lite",
+    "pro"
+   ]
+  }
+ ]
+}

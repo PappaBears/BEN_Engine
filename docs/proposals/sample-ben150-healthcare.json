@@ -75,27 +75,27 @@
     "pods": 12
   },
   "bom_totals": {
-    "total_usd": 1331205.2,
+    "total_usd": 1330699.25,
     "by_subsystem": {
       "compute": 772112.98,
-      "controls": 19289.91,
+      "controls": 19133.96,
       "cooling": 196180.0,
       "env": 16666.85,
       "fs": 27604.34,
       "power": 197156.25,
       "site": 24500.0,
-      "str": 40474.87,
+      "str": 40124.87,
       "svc": 37220.0
     },
     "by_status": {
-      "confirmed": 825524.2,
+      "confirmed": 823813.25,
       "list": 78.0,
-      "estimate": 505603.0
+      "estimate": 506808.0
     },
-    "confirmed_pct": 62.0,
+    "confirmed_pct": 61.9,
     "items": 116,
     "max_lead_time_weeks": 20,
-    "confirmed_pct_ex_compute": 10.0
+    "confirmed_pct_ex_compute": 9.7
   },
   "prices": [
     {
@@ -106,16 +106,16 @@
         "cooling",
         "compute"
       ],
-      "hardware_cost_usd": 1311915.29,
-      "capital_price_usd": 1822104.57,
+      "hardware_cost_usd": 1311565.29,
+      "capital_price_usd": 1821618.46,
       "recurring_usd_per_year": 0.0,
       "recurring_label": "none (vendor warranties pass through; support on request)",
       "term_years": 1,
-      "total_term_usd": 1822104.57,
-      "price_per_kw_usd": 36442.09,
-      "confirmed_pct": 62.2,
+      "total_term_usd": 1821618.46,
+      "price_per_kw_usd": 36432.37,
+      "confirmed_pct": 62.1,
       "list_pct": 0.0,
-      "estimate_pct": 37.8,
+      "estimate_pct": 37.9,
       "bom_lines": 86,
       "headline": false
     },
@@ -128,16 +128,16 @@
         "compute",
         "controls"
       ],
-      "hardware_cost_usd": 1331205.2,
-      "capital_price_usd": 1848896.11,
+      "hardware_cost_usd": 1330699.25,
+      "capital_price_usd": 1848193.4,
       "recurring_usd_per_year": 12000.0,
       "recurring_label": "BEN Controls licence (dashboard, twin, firmware updates, remote support hooks)",
       "term_years": 1,
-      "total_term_usd": 1860896.11,
-      "price_per_kw_usd": 36977.92,
-      "confirmed_pct": 62.0,
+      "total_term_usd": 1860193.4,
+      "price_per_kw_usd": 36963.87,
+      "confirmed_pct": 61.9,
       "list_pct": 0.0,
-      "estimate_pct": 38.0,
+      "estimate_pct": 38.1,
       "bom_lines": 116,
       "headline": false
     },
@@ -150,16 +150,16 @@
         "compute",
         "controls"
       ],
-      "hardware_cost_usd": 1331205.2,
-      "capital_price_usd": 1848896.11,
+      "hardware_cost_usd": 1330699.25,
+      "capital_price_usd": 1848193.4,
       "recurring_usd_per_year": 15000,
       "recurring_label": "White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow)",
       "term_years": 1,
-      "total_term_usd": 1863896.11,
-      "price_per_kw_usd": 36977.92,
-      "confirmed_pct": 62.0,
+      "total_term_usd": 1863193.4,
+      "price_per_kw_usd": 36963.87,
+      "confirmed_pct": 61.9,
       "list_pct": 0.0,
-      "estimate_pct": 38.0,
+      "estimate_pct": 38.1,
       "bom_lines": 116,
       "headline": false
     },
@@ -172,16 +172,16 @@
         "compute",
         "controls"
       ],
-      "hardware_cost_usd": 1331205.2,
-      "capital_price_usd": 1848896.11,
+      "hardware_cost_usd": 1330699.25,
+      "capital_price_usd": 1848193.4,
       "recurring_usd_per_year": 27000.0,
       "recurring_label": "Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule)",
       "term_years": 3,
-      "total_term_usd": 1929896.11,
-      "price_per_kw_usd": 36977.92,
-      "confirmed_pct": 62.0,
+      "total_term_usd": 1929193.4,
+      "price_per_kw_usd": 36963.87,
+      "confirmed_pct": 61.9,
       "list_pct": 0.0,
-      "estimate_pct": 38.0,
+      "estimate_pct": 38.1,
       "bom_lines": 116,
       "headline": true
     }
@@ -195,16 +195,16 @@
       "compute",
       "controls"
     ],
-    "hardware_cost_usd": 1331205.2,
-    "capital_price_usd": 1848896.11,
+    "hardware_cost_usd": 1330699.25,
+    "capital_price_usd": 1848193.4,
     "recurring_usd_per_year": 27000.0,
     "recurring_label": "Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule)",
     "term_years": 3,
-    "total_term_usd": 1929896.11,
-    "price_per_kw_usd": 36977.92,
-    "confirmed_pct": 62.0,
+    "total_term_usd": 1929193.4,
+    "price_per_kw_usd": 36963.87,
+    "confirmed_pct": 61.9,
     "list_pct": 0.0,
-    "estimate_pct": 38.0,
+    "estimate_pct": 38.1,
     "bom_lines": 116,
     "headline": true
   },
@@ -298,25 +298,25 @@
     {
       "milestone": "Engineering release (H4)",
       "share": 0.3,
-      "amount_usd": 554668.83,
+      "amount_usd": 554458.02,
       "week": 6
     },
     {
       "milestone": "Factory acceptance test (H13)",
       "share": 0.4,
-      "amount_usd": 739558.44,
+      "amount_usd": 739277.36,
       "week": 30
     },
     {
       "milestone": "Site acceptance test (H19)",
       "share": 0.25,
-      "amount_usd": 462224.03,
+      "amount_usd": 462048.35,
       "week": 33
     },
     {
       "milestone": "Turnover (W20)",
       "share": 0.05,
-      "amount_usd": 92444.81,
+      "amount_usd": 92409.67,
       "week": 34
     }
   ],
@@ -457,7 +457,7 @@
         },
         {
           "kind": "p",
-          "text": "Price for the managed service option: $1,848,896 capital ($36,978 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 62 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 38 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.",
+          "text": "Price for the managed service option: $1,848,193 capital ($36,964 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 62 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 38 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.",
           "items": [],
           "headers": [],
           "rows": []
@@ -660,13 +660,13 @@
               "Controls module",
               "included",
               "30 lines",
-              "$26,792"
+              "$26,575"
             ],
             [
               "Structure (container / cabinet)",
               "included",
               "17 lines",
-              "$56,215"
+              "$55,729"
             ],
             [
               "Envelope (insulation, liner, coatings)",
@@ -896,44 +896,44 @@
           "rows": [
             [
               "Hardware only",
-              "$1,822,105",
-              "$36,442",
+              "$1,821,618",
+              "$36,432",
               "-",
               "1 yr",
-              "$1,822,105",
+              "$1,821,618",
               "62 / 0 / 38 %",
               "86",
               "alternative"
             ],
             [
               "Hardware + BEN Controls",
-              "$1,848,896",
-              "$36,978",
+              "$1,848,193",
+              "$36,964",
               "$12,000",
               "1 yr",
-              "$1,860,896",
+              "$1,860,193",
               "62 / 0 / 38 %",
               "116",
               "alternative"
             ],
             [
               "White-label",
-              "$1,848,896",
-              "$36,978",
+              "$1,848,193",
+              "$36,964",
               "$15,000",
               "1 yr",
-              "$1,863,896",
+              "$1,863,193",
               "62 / 0 / 38 %",
               "116",
               "alternative"
             ],
             [
               "Managed service",
-              "$1,848,896",
-              "$36,978",
+              "$1,848,193",
+              "$36,964",
               "$27,000",
               "3 yr",
-              "$1,929,896",
+              "$1,929,193",
               "62 / 0 / 38 %",
               "116",
               "PROPOSED"
@@ -942,7 +942,7 @@
         },
         {
           "kind": "p",
-          "text": "Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).",
+          "text": "Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).",
           "items": [],
           "headers": [],
           "rows": []
@@ -960,27 +960,27 @@
           "rows": [
             [
               "1 year",
-              "$1,848,896",
+              "$1,848,193",
               "$27,000",
-              "$1,875,896"
+              "$1,875,193"
             ],
             [
               "3 years",
-              "$1,848,896",
+              "$1,848,193",
               "$81,000",
-              "$1,929,896"
+              "$1,929,193"
             ],
             [
               "5 years",
-              "$1,848,896",
+              "$1,848,193",
               "$135,000",
-              "$1,983,896"
+              "$1,983,193"
             ]
           ]
         },
         {
           "kind": "p",
-          "text": "Payment milestones for the proposed option (Managed service, capital $1,848,896):",
+          "text": "Payment milestones for the proposed option (Managed service, capital $1,848,193):",
           "items": [],
           "headers": [],
           "rows": []
@@ -999,25 +999,25 @@
             [
               "Engineering release (H4)",
               "30 %",
-              "$554,669",
+              "$554,458",
               "6"
             ],
             [
               "Factory acceptance test (H13)",
               "40 %",
-              "$739,558",
+              "$739,277",
               "30"
             ],
             [
               "Site acceptance test (H19)",
               "25 %",
-              "$462,224",
+              "$462,048",
               "33"
             ],
             [
               "Turnover (W20)",
               "5 %",
-              "$92,445",
+              "$92,410",
               "34"
             ]
           ]
@@ -1204,7 +1204,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Issue-for-construction drawing set for the BEN 150, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. Issue for construction set regenerated from the frozen configuration at engineering release (index not readable at proposal time)",
+          "text": "Issue-for-construction drawing set for the BEN 150, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUED FOR REVIEW \u2014 not for construction until checked \u2014 Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).",
           "items": [],
           "headers": [],
           "rows": []
@@ -1221,37 +1221,37 @@
           "rows": [
             [
               "A-001",
-              "General arrangement",
+              "General arrangement (sheet 1/7)",
               "see sheet"
             ],
             [
               "A-002",
-              "Interior layout plan",
+              "Interior layout plan (sheet 2/7)",
               "see sheet"
             ],
             [
               "A-003",
-              "Envelope section",
-              "1:10 / 1:2"
+              "Envelope section and hardening (sheet 3/7)",
+              "see sheet / 1:2"
             ],
             [
               "S-001",
-              "Floor framing and anchoring",
+              "Floor framing and anchoring (sheet 4/7)",
               "see sheet / 1:5"
             ],
             [
               "E-001",
-              "Power one-line",
+              "Power one-line (sheet 5/7)",
               "NTS"
             ],
             [
               "M-001",
-              "Cooling P&ID",
+              "Cooling P&ID (sheet 6/7)",
               "NTS"
             ],
             [
               "C-001",
-              "Controls layout",
+              "Controls layout (sheet 7/7)",
               "see sheet"
             ]
           ]
@@ -2014,7 +2014,7 @@
             "Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra",
             "Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order",
             "Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost",
-            "Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 13 lists editions not verified on the proposal date)",
+            "Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 16 lists editions not verified on the proposal date)",
             "Compute hardware prices are reseller listings on the BOM date; GPU server availability can move lead times",
             "Not included: site civil, utility service, permits, fiber circuits, customer IT software, generator fuel, insurance after set-down, spare parts beyond the turnover kit, decommissioning (quoted separately)"
           ],

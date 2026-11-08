@@ -1,8 +1,8 @@
 # Purchase Order Terms and Conditions, with Supplier Quality Requirements — BEN Engine
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SUPPLIER_TERMS.md` · Template rev 5c0e57e
-> Bracketed `[FIELDS]` are filled by the proposal generator and the purchasing system from `docs/contracts/fields.json`. Part 1 is referenced on every Schreiber AI purchase order ("These Terms apply: docs/contracts/SUPPLIER_TERMS.md rev 5c0e57e"). Part 2 is the Supplier Quality Requirements appendix. Contract Manufacturers buying Purchased Materials under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` use these Terms or terms at least as protective. Delete this box before issue.
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SUPPLIER_TERMS.md` · Template rev 9fed473
+> Bracketed `[FIELDS]` are filled by the proposal generator and the purchasing system from `docs/contracts/fields.json`. Part 1 is referenced on every Schreiber AI purchase order ("These Terms apply: docs/contracts/SUPPLIER_TERMS.md rev 9fed473"). Part 2 is the Supplier Quality Requirements appendix. Contract Manufacturers buying Purchased Materials under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` use these Terms or terms at least as protective. Delete this box before issue.
 
 # Part 1 — Purchase Order Terms and Conditions
 
@@ -230,7 +230,7 @@ Buyer tracks on-time delivery, documentation completeness, receiving rejects, SC
 | Payment terms | Net 30 |
 | Required documents (Q1 category rows and Q2) | [PO_REQUIRED_DOCS] |
 | Buyer contact | [BUYER_CONTACT_NAME], [BUYER_CONTACT_EMAIL] |
-| Terms | `docs/contracts/SUPPLIER_TERMS.md` rev 5c0e57e |
+| Terms | `docs/contracts/SUPPLIER_TERMS.md` rev 9fed473 |
 
 ---
 Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/SUPPLIER_TERMS.md` · TEMPLATE — not legal advice — have counsel review before use.

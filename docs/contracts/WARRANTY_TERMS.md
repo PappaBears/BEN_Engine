@@ -14,7 +14,7 @@
 
 ## 1. Schreiber AI workmanship warranty
 
-1.1 **Promise.** Schreiber AI warrants to Customer that for **12 months** ([WARRANTY_MONTHS] months) from SAT Acceptance the Unit, as a system, is free from defects in design, workmanship and integration and conforms to the frozen Configuration, the as-built drawings (Turnover item A2), the compliance pack for the profile, and the SAT Commissioning Report (Turnover item B2). "Workmanship" includes: container structural modification and welds; envelope (insulation, vapour barrier, liner, doors, seals, coatings, drains); mechanical fit-out (racks, containment, trays, anchors); electrical installation (terminations, conductors, raceway, grounding and bonding, labels); cooling installation (piping, brazing, pressure integrity, charge, glycol loop); controls panel assembly, wiring, node installation, sensor placement and calibration; firmware load and configuration; integration of OEM equipment; and the Services (engineering, FAT, transport preparation, set-down, hook-up, SAT, training).
+1.1 **Promise.** Schreiber AI warrants to Customer that for **12 months** ([WARRANTY_MONTHS] months) from SAT Acceptance the Unit, as a system, is free from defects in design, workmanship and integration and conforms to the frozen Configuration, the as-built drawings (Turnover item A2), the compliance pack for the profile, and the SAT Commissioning Report (Turnover item B2). "Workmanship" includes: container structural modification and welds; envelope (insulation, vapour barrier, liner, doors, seals, coatings, drains); mechanical fit-out (racks, containment, trays, anchors); electrical installation (terminations, conductors, raceway, grounding and bonding, labels); cooling installation (piping, brazing, pressure integrity, charge, glycol loop); controls panel assembly, wiring, Pod installation, sensor placement and calibration; firmware load and configuration; integration of OEM equipment; and the Services (engineering, FAT, transport preparation, set-down, hook-up, SAT, training).
 
 1.2 **Performance conformance.** During the workmanship warranty the Unit will, when operated within the Configuration, continue to meet the acceptance criteria of SOW Section 8.1 steps 3 to 9 and the SAT measured values within the tolerances stated there (rack inlets within ASHRAE class [ASHRAE_CLASS] allowable at up to [IT_KW] kW IT load; N+1 failover without excursion where configured; meter-PDU reconciliation within 3 %; alarms raised and cleared). If Customer believes a performance criterion is no longer met, the step is re-run with the Commissioning Script; a FAIL within the warranty for a covered cause is a warranty defect.
 
@@ -49,7 +49,7 @@
 | BEN Controls software | Per Software Licence Section 12 | Open Components per their licences | |
 | Compute module (if ordered) | 12 months installation and cabling | Servers and switches per OEM [OEM_WARRANTY_COMPUTE_TERM] [OEM_WARRANTY_COMPUTE_ID] | Customer-supplied compute is not covered |
 | Site works by Schreiber AI (turnkey only) | 12 months | Concrete and materials per subcontractor | Customer-built pad is not covered |
-| Spares kit items | Per OEM from delivery; Schreiber AI-programmed spare nodes 24 months | | |
+| Spares kit items | Per OEM from delivery; Schreiber AI-programmed spare Pods 24 months | | |
 
 ## 3. OEM pass-through warranties
 
@@ -142,9 +142,9 @@ The warranty does not cover, and Schreiber AI may void the affected part of the 
 
 7.6 **Analysis.** Schreiber AI reports the failure cause within 20 Business Days. Failures caused by excluded causes (water, over-voltage on a field terminal, physical damage, unsigned firmware attempt) are charged at the spare-part price in the SOW.
 
-7.7 **Firmware mismatch.** A replacement node with a newer firmware than the fleet is downgraded or the fleet is upgraded in a maintenance window so that step 2 (same firmware on every node) passes; mixed firmware is not left in service.
+7.7 **Firmware mismatch.** A replacement Pod with a newer firmware than the fleet is downgraded or the fleet is upgraded in a maintenance window so that step 2 (same firmware on every node) passes; mixed firmware is not left in service.
 
-7.8 **Calibration after swap.** A swapped node triggers early recalibration of its channels under `docs/MAINTENANCE.md` Section 6(e), performed at the next visit or remotely verified against `T_ref` and the redundant string within 0.5 °C in the meantime.
+7.8 **Calibration after swap.** A swapped Pod triggers early recalibration of its channels under `docs/MAINTENANCE.md` Section 6(e), performed at the next visit or remotely verified against `T_ref` and the redundant string within 0.5 °C in the meantime.
 
 ## 8. Warranty transfer and relocation
 

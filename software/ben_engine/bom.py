@@ -47,6 +47,60 @@ PREFIX_TO_SUBSYSTEM = {"PWR": "power", "CLG": "cooling", "CMP": "compute", "CTL"
 ALWAYS_PREFIXES = ("STR", "ENV", "FS", "SITE", "SVC")
 STATUSES = ("confirmed", "list", "estimate")
 
+# Hosts that are marketplaces, aggregators or storefront platforms rather than the vendor's own product page.
+# A "confirmed" price must be seen on the vendor's or distributor's own page (audit F-05, scripts/audit.py A6d).
+# amazon.com is treated as not allowed because a seller cannot be told apart from the marketplace in a URL.
+MARKETPLACE_HOSTS = (
+    "alibaba.com", "aliexpress.com", "reach.dog", "findchips.com", "octopart.com", "ebay.com", "ebay.de",
+    "amazon.com", "amazon.co.uk", "amazon.de", "craigslist.org", "pages.dev",
+)
+MARKETPLACE_HOST_PREFIXES = ("marketplace-admin.",)
+MARKETPLACE_PATH_FRAGMENTS = ("/videos/",)
+
+# Reader-facing label for the JSON status key "confirmed" (audit F-14): the key stays "confirmed" for the
+# tests and the CSVs; the label and this definition are what BOM.md, SOURCING_NOTES and the proposal print.
+CONFIRMED_LABEL = "confirmed listing"
+CONFIRMED_DEFINITION = ("A confirmed listing is a price seen on the vendor's or distributor's own product page on the date shown "
+                        "(read from a search-result snippet, not a quote); re-verify before purchase order.")
+
+
+def _url_host(url: str) -> str:
+    from urllib.parse import urlparse
+    try:
+        return (urlparse(url).hostname or "").lower()
+    except ValueError:
+        return ""
+
+
+def is_marketplace_url(url: str) -> bool:
+    """True if ``url`` is on a marketplace/aggregator host or a non-product path (video pages)."""
+    host = _url_host(url)
+    if not host:
+        return True
+    if any(host == h or host.endswith("." + h) for h in MARKETPLACE_HOSTS):
+        return True
+    if any(host.startswith(pre) for pre in MARKETPLACE_HOST_PREFIXES):
+        return True
+    path = url.split(host, 1)[-1].lower()
+    return any(frag in path for frag in MARKETPLACE_PATH_FRAGMENTS)
+
+
+def validate_price_evidence(part: Dict[str, Any]) -> None:
+    """Raise ValueError if the price_status of ``part`` is not backed by the evidence its definition promises."""
+    code, st = part.get("code"), part.get("price_status")
+    url = (part.get("vendor_url") or "").strip()
+    note = (part.get("price_source_note") or "").strip()
+    if st == "confirmed":
+        if not url.startswith("http"):
+            raise ValueError(f"{code}: confirmed price needs the vendor_url it was seen on")
+        if is_marketplace_url(url):
+            raise ValueError(f"{code}: confirmed price must be on the vendor's own product page, not a marketplace/aggregator/video page ({url})")
+        if not part.get("price_checked"):
+            raise ValueError(f"{code}: confirmed price needs price_checked (date seen)")
+    elif st == "list":
+        if not url.startswith("http") and not note.startswith("MSRP"):
+            raise ValueError(f"{code}: list price needs a vendor_url or a price_source_note starting 'MSRP'")
+
 # ----------------------------------------------------------------------------- safe evaluator
 _BIN = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
         ast.Div: operator.truediv, ast.FloorDiv: operator.floordiv, ast.Mod: operator.mod}
@@ -113,6 +167,7 @@ def load_catalog(path: Path | str = CATALOG_PATH) -> List[Dict[str, Any]]:
         seen.add(p["code"])
         if p["price_status"] not in STATUSES:
             raise ValueError(f"{p['code']}: bad price_status {p['price_status']}")
+        validate_price_evidence(p)
     for p in cat:
         p["applies_to_tiers"] = sorted({canonical_tier(t) for t in p.get("applies_to_tiers", [])})
         if "applies_to_controls" in p and not p["applies_to_controls"]:
@@ -213,6 +268,8 @@ def generate_bom(cfg: Config, catalog: List[Dict[str, Any]] | None = None) -> Li
             "price_source_note": p.get("price_source_note", ""),
             "lead_time_weeks": p.get("lead_time_weeks"), "availability_note": p.get("availability_note", ""),
             "qty_rule": p["qty_rule"],
+            # refrigerant-charged lines carry the refrigerant and its GWP (AIM Act < 700 from 2027-01-01, COMPLIANCE.md §0 finding 2)
+            "refrigerant": p.get("refrigerant", ""), "gwp": p.get("gwp"),
         })
     return rows
 
@@ -248,7 +305,17 @@ def _confirmed_pct_ex_compute(rows: List[Dict[str, Any]]) -> float:
 # ----------------------------------------------------------------------------- output
 CSV_FIELDS = ["code", "subsystem", "name", "manufacturer", "mpn", "vendor", "vendor_url", "unit", "qty",
               "unit_price_usd", "ext_price_usd", "price_status", "price_checked", "lead_time_weeks",
-              "availability_note", "price_source_note", "qty_rule"]
+              "availability_note", "price_source_note", "qty_rule", "refrigerant", "gwp"]
+GWP_LIMIT = 700   # AIM Act Technology Transitions: data-center / IT-room cooling installed from 2027-01-01
+
+
+def _gwp_cell(r: Dict[str, Any]) -> str:
+    """Markdown cell for the GWP column: 'R-513A / 631' or 'R-134a / 1430 (> 700!)'; '—' for lines with no refrigerant."""
+    if r.get("gwp") is None:
+        return "—"
+    name = str(r.get("refrigerant", "")).split(" — ")[0].split(" (")[0].strip() or "?"
+    flag = "" if r["gwp"] < GWP_LIMIT else f" (> {GWP_LIMIT}!)"
+    return f"{name} / {r['gwp']}{flag}"
 
 
 def to_csv(rows: List[Dict[str, Any]], path: Path | str) -> Path:
@@ -282,27 +349,39 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
                    f"battery {d['battery_kwh']} kWh · generator {'yes' if cfg.generator else 'no'} · controls: {d['controls_label']} "
                    f"({d['pods']} BEN Pods) · subsystems: {', '.join(cfg.subsystems)}\n")
     out.append(f"**Total: ${t['total_usd']:,.2f}** across {t['items']} lines — "
-               f"${t['by_status']['confirmed']:,.0f} confirmed ({t['confirmed_pct']}%), "
+               f"${t['by_status']['confirmed']:,.0f} {CONFIRMED_LABEL} ({t['confirmed_pct']}%), "
                f"${t['by_status']['list']:,.0f} list price, ${t['by_status']['estimate']:,.0f} estimate. "
-               f"Confirmed share excluding compute servers: {t['confirmed_pct_ex_compute']}%. "
+               f"Confirmed-listing share excluding compute servers: {t['confirmed_pct_ex_compute']}%. "
                f"Longest lead time in BOM: {t['max_lead_time_weeks']} weeks.\n")
-    out.append("Price status key: **confirmed** = price seen on a vendor/distributor listing on the date shown (via search-result "
-               "snippet; direct vendor pages were not reachable from the build environment); **list** = manufacturer published price; "
+    out.append(f"Price status key: **{CONFIRMED_LABEL}** (JSON key `confirmed`) — {CONFIRMED_DEFINITION} "
+               "Direct vendor pages were not reachable from the build environment. **list** = manufacturer published price (URL or MSRP note); "
                "**estimate** = engineering estimate with basis in the note.\n")
     out.append("| Subsystem | Extended USD |\n|---|---:|")
     for k, v in t["by_subsystem"].items():
         out.append(f"| {k} | {v:,.2f} |")
     out.append("")
-    out.append("| Code | Item | Mfr / MPN | Vendor | Qty | Unit | Unit USD | Ext USD | Status | Checked | Lead wk | Note |")
-    out.append("|---|---|---|---|---:|---|---:|---:|---|---|---:|---|")
+    has_gwp = any(r.get("gwp") is not None for r in rows)   # GWP column present when the BOM holds a refrigerant-charged line
+    gwp_h = " Refrigerant / GWP |" if has_gwp else ""
+    out.append(f"| Code | Item | Mfr / MPN | Vendor | Qty | Unit | Unit USD | Ext USD | Status | Checked | Lead wk |{gwp_h} Note |")
+    out.append("|---|---|---|---|---:|---|---:|---:|---|---|---:|" + ("---|" if has_gwp else "") + "---|")
     for r in rows:
         vendor = f"[{_md_escape(r['vendor'])}]({r['vendor_url']})" if r.get("vendor_url") else _md_escape(r["vendor"])
-        out.append("| " + " | ".join([
+        cells = [
             r["code"], _md_escape(r["name"]), _md_escape(f"{r['manufacturer']} {r['mpn']}".strip()), vendor,
             f"{r['qty']:,}", _md_escape(r["unit"]), f"{r['unit_price_usd']:,.2f}", f"{r['ext_price_usd']:,.2f}",
             r["price_status"], r["price_checked"] or "—", str(r["lead_time_weeks"] if r["lead_time_weeks"] is not None else "—"),
-            _md_escape(r["price_source_note"] + (" " + r["availability_note"] if r["availability_note"] else "")),
-        ]) + " |")
+        ]
+        if has_gwp:
+            cells.append(_gwp_cell(r))
+        cells.append(_md_escape(r["price_source_note"] + (" " + r["availability_note"] if r["availability_note"] else "")))
+        out.append("| " + " | ".join(cells) + " |")
+    if has_gwp:
+        bad = [r for r in rows if r.get("gwp") is not None and r["gwp"] >= GWP_LIMIT]
+        out.append("")
+        out.append(f"Refrigerant / GWP column: every refrigerant-charged line carries `refrigerant` and `gwp` from the catalog; the AIM Act limit for "
+                   f"data-center cooling installed from 2027-01-01 is GWP < {GWP_LIMIT} (`docs/COMPLIANCE.md` §0 finding 2). "
+                   + (f"**{len(bad)} line(s) exceed the limit: " + ", ".join(f"{r['code']} ({r['gwp']})" for r in bad) + " — see the RFQ note on the catalog line.**"
+                      if bad else "All lines are below the limit."))
     out.append("")
     return "\n".join(out)
 
@@ -312,7 +391,10 @@ def summary_markdown(presets: Dict[str, Config], boms: Dict[str, List[Dict[str, 
            "Generated by `python -m ben_engine.bom --all` from `purchasing/parts_catalog.json` and `ben_engine.config` presets "
            "(profile `ai_inference`, climate `temperate`, hardening H1, all four subsystems; generator only where the preset carries one — BEN 2000 always has N+1 generators). Per-tier detail: "
            + ", ".join(f"[{t}](BOM-{t}.md)" for t in boms) + ". CSVs in `purchasing/bom-<tier>.csv`.\n",
-           "| Tier | IT kW | Racks | Lines | Total USD | Confirmed USD | Confirmed % | Confirmed % excl. compute | List USD | Estimate USD | Max lead (wk) |",
+           f"**Status labels.** *Confirmed listing* (JSON key `confirmed`): {CONFIRMED_DEFINITION} "
+           "*List* = manufacturer published price. *Estimate* = engineering estimate with its basis in the line note. "
+           "Nothing in this BOM is a quote.\n",
+           "| Tier | IT kW | Racks | Lines | Total USD | Confirmed listing USD | Confirmed listing % | Confirmed listing % excl. compute | List USD | Estimate USD | Max lead (wk) |",
            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for tier, rows in boms.items():
         t = totals(rows)
@@ -323,7 +405,7 @@ def summary_markdown(presets: Dict[str, Config], boms: Dict[str, List[Dict[str, 
     for tier, rows in boms.items():
         t = totals(rows)
         out.append(f"## {tier}\n")
-        out.append(f"Total ${t['total_usd']:,.0f}: ${t['by_status']['confirmed']:,.0f} confirmed, ${t['by_status']['list']:,.0f} list, "
+        out.append(f"Total ${t['total_usd']:,.0f}: ${t['by_status']['confirmed']:,.0f} {CONFIRMED_LABEL}, ${t['by_status']['list']:,.0f} list, "
                    f"${t['by_status']['estimate']:,.0f} estimate. By subsystem: " +
                    ", ".join(f"{k} ${v:,.0f}" for k, v in t["by_subsystem"].items()) + ".\n")
         drivers = sorted(rows, key=lambda r: -r["ext_price_usd"])[:5]
@@ -331,7 +413,7 @@ def summary_markdown(presets: Dict[str, Config], boms: Dict[str, List[Dict[str, 
         for r in drivers:
             out.append(f"- {r['code']} {r['name']} — {r['qty']} × ${r['unit_price_usd']:,.0f} = **${r['ext_price_usd']:,.0f}** ({r['price_status']})")
         unc = sorted([r for r in rows if r["price_status"] != "confirmed"], key=lambda r: -r["ext_price_usd"])[:5]
-        out.append("\n**Biggest 5 uncertainties (non-confirmed lines by extended value)**\n")
+        out.append("\n**Biggest 5 uncertainties (lines without a confirmed listing, by extended value)**\n")
         for r in unc:
             out.append(f"- {r['code']} {r['name']} — **${r['ext_price_usd']:,.0f}** {r['price_status']}: {r['price_source_note']}")
         out.append("")

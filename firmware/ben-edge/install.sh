@@ -167,7 +167,16 @@ if [ -n "$BACKUP_DEV" ]; then
     grep -q "$uuid" /etc/fstab || echo "UUID=$uuid /mnt/ben-backup auto defaults,nofail,noatime,x-systemd.device-timeout=10 0 2" >> /etc/fstab
 elif [ -n "$NAS" ]; then
     grep -q "$NAS" /etc/fstab || echo "$NAS /mnt/ben-backup cifs credentials=/etc/ben/nas.cred,nofail,_netdev,uid=ben,gid=ben 0 0" >> /etc/fstab
-    [ -f /etc/ben/nas.cred ] || { printf "username=ben\npassword=CHANGE_ME\n" > /etc/ben/nas.cred; chmod 0600 /etc/ben/nas.cred; }
+    if [ ! -f /etc/ben/nas.cred ]; then
+        # No default credential (audit F-11): generate a random one, print where it lives; the operator sets the NAS account to it.
+        NAS_PASS=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32)
+        printf "username=ben\npassword=%s\n" "$NAS_PASS" > /etc/ben/nas.cred; chmod 0600 /etc/ben/nas.cred
+        echo "NAS credential generated in /etc/ben/nas.cred (user ben). Set the NAS account 'ben' to this password or edit the file, then: mount -a"
+    fi
+fi
+# Refuse to finish with a placeholder credential anywhere in /etc/ben (ben.env is rendered from ben.env.example above).
+if grep -rqs -E "CHANGE_ME|change-me-at-install" /etc/ben; then
+    echo "ERROR: placeholder credential found in /etc/ben — replace it before the unit is commissioned:"; grep -rls -E "CHANGE_ME|change-me-at-install" /etc/ben; exit 1
 fi
 mount -a || true
 chmod 0755 "$HERE/scripts/ben-backup.sh"

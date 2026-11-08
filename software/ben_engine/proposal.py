@@ -661,7 +661,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
             [[p.label, _usd(p.capital_price_usd), _usd(p.price_per_kw_usd), _usd(p.recurring_usd_per_year) if p.recurring_usd_per_year else "-",
               f"{p.term_years} yr", _usd(p.total_term_usd), f"{p.confirmed_pct:.0f} / {p.list_pct:.0f} / {p.estimate_pct:.0f} %", p.bom_lines,
               "PROPOSED" if p.headline else "alternative"] for p in prices])
-    s.p("Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. "
+    s.p("Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. "
         f"Capital prices carry a {margin:.0%} gross margin on purchased hardware and build labour. Recurring items: " + "; ".join(f"{p.label}: {p.recurring_label}" for p in prices if p.recurring_usd_per_year) + ".")
     if any(p.key == "managed" for p in prices):
         mp = next(p for p in prices if p.key == "managed")
@@ -835,7 +835,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
         "Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra",
         "Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order",
         "Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost",
-        "Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 13 lists editions not verified on the proposal date)",
+        "Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 16 lists editions not verified on the proposal date)",
         "Compute hardware prices are reseller listings on the BOM date; GPU server availability can move lead times",
         "Not included: site civil, utility service, permits, fiber circuits, customer IT software, generator fuel, insurance after set-down, spare parts beyond the turnover kit, decommissioning (quoted separately)",
     ])
@@ -1044,6 +1044,16 @@ def contract_fields(p: Proposal, extra_fields: Optional[Dict[str, Any]] = None) 
     return {k: str(v) for k, v in f.items()}
 
 
+def _drawing_rev() -> str:
+    """Drawing set label from design/REVISION.json (e.g. 'IFR Rev B (2026-11-08)'): one revision for drawings, SQAM, assembly and this proposal."""
+    try:
+        r = json.loads((REPO_ROOT / "design" / "REVISION.json").read_text(encoding="utf-8"))
+        status = "IFC" if r.get("checker", "").strip() else "IFR"
+        return f"{status} Rev {r['drawing_rev']} ({r['issue_date']})"
+    except Exception:
+        return "Rev ? (design/REVISION.json unreadable)"
+
+
 def _git_rev() -> str:
     try:
         import subprocess
@@ -1136,7 +1146,7 @@ def _extended_fields(p: Proposal, base: Dict[str, Any], ms: Dict[str, Any], week
         "SCOPE_SITE_CIVIL": "Excluded", "SCOPE_SITE_UTILITY": "Excluded", "SCOPE_SITE_GROUNDING": "Excluded", "SCOPE_SITE_FIBER": "Excluded", "SCOPE_SITE_CRANE": "Included (set-down)",
         "SCOPE_SITE_FENCE": "Excluded", "SCOPE_SITE_WATER": inc(False), "SCOPE_SITE_PERMITS": "Excluded (Customer)",
         # repository revisions and identifiers
-        "TEMPLATE_REV": _git_rev(), "DRAWING_INDEX_REV": f"IFC Rev A ({_git_rev()})", "BOM_REV": f"{p.date} ({_git_rev()})", "BOM_DATE": p.date, "ASSEMBLY_ISSUE": f"Issue 1 ({_git_rev()})",
+        "TEMPLATE_REV": _git_rev(), "DRAWING_INDEX_REV": f"{_drawing_rev()} ({_git_rev()})", "BOM_REV": f"{p.date} ({_git_rev()})", "BOM_DATE": p.date, "ASSEMBLY_ISSUE": f"Issue 1 ({_git_rev()})",
         "BOM_CONFIDENCE_SPLIT": f"{h.confirmed_pct:.0f} % confirmed / {h.list_pct:.0f} % list / {h.estimate_pct:.0f} % estimate", "BEN_ENGINE_VERSION": "0.1.0",
         "MSA_ID": f"MSA-{p.customer[:12].upper().replace(' ', '')}-{p.date[:4]}", "SOW_ID": f"SOW-{stem}", "NDA_ID": f"NDA-{stem}", "LICENSE_ID": f"LIC-{stem}", "SLA_ID": f"SLA-{stem}",
         "FAT_CERT_ID": f"FAT-{stem}", "SAT_CERT_ID": f"SAT-{stem}", "TURNOVER_CERT_ID": f"TOC-{stem}", "WARRANTY_CERT_ID": f"WAR-{stem}", "UNIT_SERIAL": f"BEN-{tier.upper()}-{stem[-8:]}",

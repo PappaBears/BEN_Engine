@@ -11,7 +11,7 @@ Hello,
 I am writing from Schreiber AI. We design and build BEN Engine, a family of modular edge data centers (an outdoor 24U cabinet unit and 10 ft / 20 ft / 40 ft high-cube ISO container units from 6 kW to 500 kW IT). We are finalising the bill of materials for a first production run of 10 units and would like to qualify you as a supplier.
 
 **What we need**
-Optional backup power package: ASCO Series 300 ATS 200 A 208 V and 400 A 480 V (service-entrance rated, NEMA 4X) and Generac SD150 / SD250 diesel generators with L2 enclosure and 24 h sub-base tank. Norwall listed the 400 A SE NEMA 3R at $11,060 on 2026-11-07; generator pricing is dealer-only and our BOM estimates $75k / $110k.
+Optional backup power package: ASCO Series 300 ATS 200 A 208 V and 400 A 480 V (service-entrance rated, NEMA 4X) and Generac SD150 / SD250 diesel generators with L2 enclosure and 24 h sub-base tank. Norwall listed the 400 A SE at $11,060 on 2026-11-07 (that listing was the NEMA 3R version; we specify NEMA 4X); generator pricing is dealer-only and our BOM estimates $75k / $110k.
 
 **Quantities**
 - ATS 400 A: 4

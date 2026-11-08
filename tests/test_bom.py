@@ -29,9 +29,13 @@ def test_catalog_loads_and_has_required_fields(catalog):
         if p["price_status"] == "confirmed":
             assert p["price_checked"] in ("2026-11-07", "2026-11-08"), p["code"]
             assert p["vendor_url"].startswith("http"), f"{p['code']} confirmed price needs the URL it was seen on"
+        elif p["price_status"] == "list":
+            # audit F-05: list lines carry the date the manufacturer price was seen (or None if never checked)
+            assert p["price_checked"] in (None, "2026-11-07", "2026-11-08"), p["code"]
+            assert p["price_source_note"], f"{p['code']} list needs a basis note"
         else:
             assert p["price_checked"] is None, p["code"]
-            assert p["price_source_note"], f"{p['code']} estimate/list needs a basis note"
+            assert p["price_source_note"], f"{p['code']} estimate needs a basis note"
 
 
 def test_every_code_unique(catalog):
@@ -281,3 +285,36 @@ def test_generated_artifacts_exist():
         assert (root / "docs" / f"BOM-{tier}.md").exists()
     assert (root / "docs" / "BOM.md").exists()
     assert (root / "purchasing" / "bom.csv").exists()
+
+
+def test_price_status_evidence_rule():
+    """Audit F-05: a confirmed price must sit on the vendor's own page with a date; a list price needs a URL or an MSRP note."""
+    from ben_engine.bom import validate_price_evidence, is_marketplace_url
+    base = {"code": "X-1", "name": "x", "unit": "ea", "unit_price_usd": 1.0, "applies_to_tiers": [], "qty_rule": "1",
+            "price_source_note": "seen", "price_checked": "2026-11-08"}
+    ok = dict(base, price_status="confirmed", vendor_url="https://www.cdw.com/product/x/123")
+    validate_price_evidence(ok)
+    for bad_url in ("https://www.alibaba.com/product-detail/x.html", "https://reach.dog/shop/dealer/products/x",
+                    "https://www.findchips.com/detail/x", "https://marketplace-admin.example.com/x.html",
+                    "https://www.digikey.co.uk/en/videos/r/rittal/x", "https://www.amazon.com/dp/B000", ""):
+        assert is_marketplace_url(bad_url) or bad_url == ""
+        with pytest.raises(ValueError):
+            validate_price_evidence(dict(base, price_status="confirmed", vendor_url=bad_url))
+    with pytest.raises(ValueError):
+        validate_price_evidence(dict(ok, price_checked=None))
+    validate_price_evidence(dict(base, price_status="list", vendor_url="", price_source_note="MSRP $39 on the product page"))
+    validate_price_evidence(dict(base, price_status="list", vendor_url="https://vendor.example.com/p/1", price_source_note="x"))
+    with pytest.raises(ValueError):
+        validate_price_evidence(dict(base, price_status="list", vendor_url="", price_source_note="no url, no msrp"))
+    validate_price_evidence(dict(base, price_status="estimate", vendor_url="", price_checked=None))
+
+
+def test_catalog_confirmed_lines_sit_on_vendor_pages(catalog):
+    from ben_engine.bom import is_marketplace_url
+    for p in catalog:
+        if p["price_status"] == "confirmed":
+            assert not is_marketplace_url(p["vendor_url"]), p["code"]
+            assert p["price_checked"], p["code"]
+        if p["price_status"] == "list":
+            assert p["vendor_url"].startswith("http") or p["price_source_note"].startswith("MSRP"), p["code"]
+        assert not p["name"].startswith("[WITHDRAWN]"), f"{p['code']}: withdrawn lines live in parts_catalog_withdrawn.json"

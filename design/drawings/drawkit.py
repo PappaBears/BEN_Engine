@@ -7,12 +7,20 @@ and PNG from the same figure.
 from __future__ import annotations
 
 import math
+import os
+import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, Polygon, Circle, FancyArrowPatch, PathPatch
 from matplotlib.path import Path
 from matplotlib.lines import Line2D
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from revision import REV  # noqa: E402  (design/REVISION.json — one revision for the whole set)
+
+# Deterministic SVG output (audit F-21): fixed hash salt for clip-path ids, no <dc:date> in the metadata.
+plt.rcParams["svg.hashsalt"] = "ben-engine"
 
 SHEET_W, SHEET_H = 841.0, 594.0
 MARGIN = 10.0
@@ -43,7 +51,7 @@ def pt(mm):  # text height in mm -> font size in points (sheet is 1 mm = 1 unit,
 
 
 class Sheet:
-    def __init__(self, dwg_no, title, tier_label, scale_text, sheet_n, sheet_total, config_line, date="2026-11-07"):
+    def __init__(self, dwg_no, title, tier_label, scale_text, sheet_n, sheet_total, config_line, date=None, rev=None):
         self.fig = plt.figure(figsize=(SHEET_W / 25.4, SHEET_H / 25.4))
         self.ax = self.fig.add_axes([0, 0, 1, 1])
         self.ax.set_xlim(0, SHEET_W); self.ax.set_ylim(0, SHEET_H)
@@ -51,7 +59,9 @@ class Sheet:
         self.fig.patch.set_facecolor(PAPER)
         self.dwg_no, self.title, self.tier_label = dwg_no, title, tier_label
         self.scale_text, self.sheet_n, self.sheet_total = scale_text, sheet_n, sheet_total
-        self.config_line, self.date = config_line, date
+        self.config_line = config_line
+        self.date = date or REV["issue_date"]
+        self.rev = rev or REV["drawing_rev"]
         self._border()
 
     # ------------------------------------------------------------ primitives
@@ -176,7 +186,11 @@ class Sheet:
             self.text(MARGIN - 3, y, "FEDCBA"[i], h=2.2, c=MUTED, ha="center", va="center")
             self.text(SHEET_W - MARGIN + 3, y, "FEDCBA"[i], h=2.2, c=MUTED, ha="center", va="center")
 
-    def title_block(self, status="ISSUE FOR CONSTRUCTION", rev="A"):
+    def title_block(self, status=None, rev=None):
+        """Title block. Status and revision come from design/REVISION.json unless overridden:
+        while REVISION.json has no checker the sheet says ISSUED FOR REVIEW; with a named checker it says ISSUE FOR CONSTRUCTION."""
+        status = status or REV["status_long"]
+        rev = rev or self.rev
         w, h = 260, 58
         x, y = SHEET_W - MARGIN - w, MARGIN
         self.rect(x, y, w, h, fc=PAPER, lw=1.0, z=8)
@@ -187,8 +201,10 @@ class Sheet:
         self.text(x + 26, y + h - 10, "Schreiber AI", h=3.6, c="#EDF4FF", bold=True, z=11)
         self.text(x + 26, y + h - 16, "BEN Engine", h=3.0, c="#66E3FF", z=11)
         self.text(x + 6, y + h - 30, self.tier_label.upper(), h=4.2, c="#EDF4FF", bold=True, z=11)
-        self.text(x + 6, y + 12, status, h=2.6, c="#FFC66D", bold=True, z=11)
-        self.text(x + 6, y + 6, f"Rev {rev}   {self.date}", h=2.4, c="#9FB3CC", z=11)
+        st_lines = _wrap(status, 40)[:2]
+        for k, ln in enumerate(st_lines):
+            self.text(x + 6, y + 14 - k * 3.2, ln, h=2.6 if k == 0 else 1.9, c="#FFC66D", bold=(k == 0), z=11)
+        self.text(x + 6, y + 5.5, f"Rev {rev}   {self.date}", h=2.4, c="#9FB3CC", z=11)
         # fields
         fx = x + 62
         self.line(fx, y + h - 20, x + w, y + h - 20, lw=0.5, z=10)
@@ -196,7 +212,7 @@ class Sheet:
         self.text(fx + 3, y + h - 5, "TITLE", h=1.8, c=MUTED, z=11)
         self.text(fx + 3, y + h - 15, self.title, h=4.0, bold=True, z=11)
         cols = [("DRAWING No.", self.dwg_no, 48), ("REV", rev, 16), ("SCALE", self.scale_text, 40), ("SHEET", f"{self.sheet_n} / {self.sheet_total}", 26),
-                ("DATE", self.date, 34), ("STATUS", "IFC", 32)]
+                ("DATE", self.date, 34), ("STATUS", REV["status_short"], 32)]
         xx = fx
         for lab, val, cw in cols:
             self.line(xx, y + 20, xx, y + h - 20, lw=0.4, z=10)
@@ -204,8 +220,19 @@ class Sheet:
             self.text(xx + 2, y + 24, val, h=3.2 if len(val) < 14 else 2.4, bold=True, z=11)
             xx += cw
         self.text(fx + 3, y + 14, "DRAWN: BEN Engine generator (design/drawings/gen_drawings.py)", h=2.1, z=11)
-        self.text(fx + 3, y + 9.5, "CHECKED: ____________________   APPROVED: ____________________", h=2.1, z=11)
+        self.text(fx + 3, y + 9.5, f"CHECKED: {REV['checker_text']}   APPROVED: ____________________", h=2.1, z=11)
         self.text(fx + 3, y + 4.5, f"CONFIG: {self.config_line}", h=1.9, c=MUTED, mono=True, z=11)
+
+    def revision_table(self, x, y, w=None):
+        """Revision history (design/REVISION.json): current issue plus the superseded one. Returns bottom y."""
+        w = w or 326.0
+        rows = []
+        sup = REV.get("supersedes")
+        if sup:
+            rows.append([sup["drawing_rev"], sup["issue_date"], sup["notes"], "—"])
+        rows.append([REV["drawing_rev"], REV["issue_date"], f"{REV['status_title']}. {REV['notes_short']}", REV["checker"].strip() or "not checked"])
+        return self.table(x, y, ["REV", "DATE", "DESCRIPTION", "CHECKED"], rows, [w * 0.07, w * 0.13, w * 0.62, w * 0.18], h=1.9, rowh=4.0,
+                          title="REVISIONS (design/REVISION.json)")
 
     def ctq_table(self, items, x, y, w=330):
         """CTQ / CTP table at (x, y top). Returns bottom y."""
@@ -228,8 +255,8 @@ class Sheet:
         return yy
 
     def save(self, path_base, dpi=110):
-        self.fig.savefig(path_base + ".svg", format="svg", facecolor=PAPER)
-        self.fig.savefig(path_base + ".png", format="png", dpi=dpi, facecolor=PAPER)
+        self.fig.savefig(path_base + ".svg", format="svg", facecolor=PAPER, metadata={"Date": None})
+        self.fig.savefig(path_base + ".png", format="png", dpi=dpi, facecolor=PAPER, metadata={"Software": None})
         plt.close(self.fig)
 
 

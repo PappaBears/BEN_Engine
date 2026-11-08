@@ -141,7 +141,7 @@ Integrator's general labour may perform the mechanical work in the STE instructi
 
 9.1 **L1 — Integrator.** First point of contact for End Customers; alarm triage using the Dashboard; dispatch of Integrator technicians and licensed subcontractors; spares kit management; monthly and quarterly maintenance per `docs/MAINTENANCE.md` where Integrator provides the managed service; RMA requests; Turnover Package custody. Target: acknowledge Critical alarms within 15 minutes, on-site within 4 hours where Integrator sells a managed SLA, or as Integrator's own SLA states.
 
-9.2 **L2 — Schreiber AI controls and commissioning engineering.** Remote diagnosis through the remote support path (where enabled) or from Integrator-exported diagnostics; firmware and gateway issues; twin and calibration questions; Commissioning Script failures; Change Order engineering. Response: Critical 1 hour, Major 4 business hours, Minor 2 Business Days, 24x7 for Critical.
+9.2 **L2 — Schreiber AI controls and commissioning engineering.** Remote diagnosis through the remote support path (where enabled) or from Integrator-exported diagnostics; firmware and edge computer issues; twin and calibration questions; Commissioning Script failures; Change Order engineering. Response: Critical 1 hour, Major 4 business hours, Minor 2 Business Days, 24x7 for Critical.
 
 9.3 **L3 — Schreiber AI principal engineering.** Design defects, PE and compliance questions, OEM escalations, root-cause analysis, safety notices. Response: 1 Business Day to engage; root-cause report within 10 Business Days.
 
@@ -169,11 +169,11 @@ Integrator's general labour may perform the mechanical work in the STE instructi
 
 ## 12. Warranty flow
 
-12.1 **Schreiber AI to Integrator.** Schreiber AI gives Integrator the warranties in `docs/contracts/WARRANTY_TERMS.md` for the scope Schreiber AI performs: for Resale, the whole Unit; for Install Partner, the Unit as shipped from FAT plus Schreiber AI's SAT participation; for Licensed Builder, the engineering release, the Controls Kit (BEN Nodes 24 months, gateway 12 months, RMA procedure) and BEN Controls under the Software Licence.
+12.1 **Schreiber AI to Integrator.** Schreiber AI gives Integrator the warranties in `docs/contracts/WARRANTY_TERMS.md` for the scope Schreiber AI performs: for Resale, the whole Unit; for Install Partner, the Unit as shipped from FAT plus Schreiber AI's SAT participation; for Licensed Builder, the engineering release, the Controls Kit (BEN Pods 24 months, edge computer 12 months, RMA procedure) and BEN Controls under the Software Licence.
 
 12.2 **Integrator to End Customer.** Integrator gives the End Customer at least the warranty in `docs/contracts/WARRANTY_TERMS.md` for the whole Unit, including Integrator's own site works and, for Licensed Builder, its own build. Integrator may offer more; the excess is Integrator's.
 
-12.3 **Claims.** The End Customer claims to Integrator (L1). Integrator triages, performs or procures the repair, and claims back-to-back to Schreiber AI within 10 Business Days for defects in Schreiber AI's scope, with the incident report and gateway data. Schreiber AI reimburses parts and, for Schreiber AI-scope defects, Integrator labour at [WARRANTY_LABOUR_REIMBURSEMENT_RATE] per hour up to the hours Schreiber AI approves. OEM warranties are registered in the End Customer's name and administered by Integrator during year one, with Schreiber AI's help.
+12.3 **Claims.** The End Customer claims to Integrator (L1). Integrator triages, performs or procures the repair, and claims back-to-back to Schreiber AI within 10 Business Days for defects in Schreiber AI's scope, with the incident report and edge computer data. Schreiber AI reimburses parts and, for Schreiber AI-scope defects, Integrator labour at [WARRANTY_LABOUR_REIMBURSEMENT_RATE] per hour up to the hours Schreiber AI approves. OEM warranties are registered in the End Customer's name and administered by Integrator during year one, with Schreiber AI's help.
 
 12.4 **Exclusions.** `docs/contracts/WARRANTY_TERMS.md` Sections 4 and 5 apply. Integrator-caused defects (STE steps not followed, QC forms incomplete, uncertified trades, unapproved parts, unsigned firmware, moving a Unit without the relocation procedure) are Integrator's responsibility toward the End Customer and toward Schreiber AI.
 

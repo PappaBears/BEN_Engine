@@ -1,6 +1,6 @@
-# BEN 2000 — Issue-for-construction drawing set
+# BEN 2000 — drawing set, Rev B (ISSUED FOR REVIEW)
 
-Generated 2026-11-08 by `design/drawings/gen_drawings.py` from `Config.preset('ben2000')`.
+Generated 2026-11-08 by `design/drawings/gen_drawings.py` from `Config.preset('ben2000')`; revision from `design/REVISION.json`.
 Configuration: ben2000 | ai_inference | 1600 kW IT | 48 racks | cooling dlc_cdu | N+1 | temperate | H1
 Enclosure: Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) + power module + plant yard, IP66 envelope — NEMA 4X / IP66 (H1 Standard).
 
@@ -21,7 +21,12 @@ Enclosure: Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) +
 | M-001 | Cooling P&ID (sheet 13/14) | NTS | [M-001.svg](M-001.svg), [M-001.png](M-001.png) |
 | C-001 | Controls layout (sheet 14/14) | see sheet | [C-001.svg](C-001.svg), [C-001.png](C-001.png) |
 
-Status: **ISSUE FOR CONSTRUCTION Rev A** — Drawn: BEN Engine generator; Checked: blank (requires a checker before release).
+Status: **ISSUED FOR REVIEW — not for construction until checked** — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
+
+| Rev | Date | Description | Checked |
+|---|---|---|---|
+| A | 7 Nov 2026 | Generation-1 container set (BEN Micro/10/20/40, NEMA 3R); superseded, do not build from it. | — |
+| B | 2026-11-08 | Rev B: generation-2 design (BEN 5/30/150/500/2000, IP66 envelope, hardening H1–H3, industrial controls). | not checked |
 
 ## Interference checks for this tier
 

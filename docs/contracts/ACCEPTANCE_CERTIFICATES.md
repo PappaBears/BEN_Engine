@@ -75,7 +75,7 @@ The CSV hash printed inside the Commissioning Report must equal the CSV SHA-256 
 | Q-05 | Racks, hold-downs and containment | [Q05_CLOSED] | [Q05_SIGNATORY] |
 | Q-06 | Cooling: piping, pressure test, charge (H11) | [Q06_CLOSED] | [Q06_SIGNATORY] |
 | Q-07 | Electrical installation and tests (H10a/b) | [Q07_CLOSED] | [Q07_SIGNATORY] |
-| Q-08 | Controls nodes, sensors and calibration (W12) | [Q08_CLOSED] | [Q08_SIGNATORY] |
+| Q-08 | BEN Pods, sensors and calibration (W12) | [Q08_CLOSED] | [Q08_SIGNATORY] |
 | Q-09 | Fire detection and suppression | [Q09_CLOSED] | [Q09_SIGNATORY] |
 | Q-10 | Final QC and pre-ship test | [Q10_CLOSED] | [Q10_SIGNATORY] |
 
@@ -83,8 +83,8 @@ The CSV hash printed inside the Commissioning Report must equal the CSV SHA-256 
 
 | Item | Value |
 | --- | --- |
-| Node firmware version / image SHA-256 | [FIRMWARE_VERSION] / [FIRMWARE_SHA256] |
-| Gateway image version / SHA-256 | [GATEWAY_IMAGE_VERSION] / [GATEWAY_IMAGE_SHA256] |
+| BEN Pod firmware version / image SHA-256 | [FIRMWARE_VERSION] / [FIRMWARE_SHA256] |
+| Edge computer image version / SHA-256 | [GATEWAY_IMAGE_VERSION] / [GATEWAY_IMAGE_SHA256] |
 | Signing certificate fingerprint | [SIGNING_CERT_FINGERPRINT] |
 | Calibration ID applied to all channels | [CAL_ID] |
 | Reference instrument certificates | [REFERENCE_CERT_IDS] |
@@ -177,7 +177,7 @@ Hash verified with `sha256sum` by both Parties at signing: [SAT_HASH_VERIFIED] (
 | Cooling: superheat/subcool, leak check, glycol | [SAT_COOLING_RESULT] | [SAT_COOLING_VALUES] | |
 | Generator NFPA 110 acceptance (if fitted) | [SAT_GENERATOR_RESULT] | [GENERATOR_ACCEPTANCE_ID] | |
 | Battery BMS commissioning / UL 9540A report on file (≥ 20 kWh) | [SAT_BATTERY_RESULT] | [BATTERY_9540A_REPORT_ID] | |
-| Gateway backup restored to spare gateway (Turnover G2) | [SAT_BACKUP_RESTORE_RESULT] | | |
+| Edge computer backup restored to spare edge computer (Turnover G2) | [SAT_BACKUP_RESTORE_RESULT] | | |
 | Default-credential scan; factory credentials replaced | [SAT_CREDENTIAL_SCAN_RESULT] | | |
 
 ### B.4 Site QC form
@@ -237,7 +237,7 @@ Customer accepts the Unit at SAT, subject to the Punch List in B.5. The **warran
 | G. Software, firmware and security | G1–G5 | [TO_G_DELIVERED] / 5 | [TO_G_NA] | |
 | H. Training and acceptance | H1–H4 | [TO_H_DELIVERED] / 4 | [TO_H_NA] | |
 
-Binder delivered as: PDF binder [TO_BINDER_SHA256]; encrypted USB in controls cabinet pocket [TO_USB_ID]; gateway share `/srv/ben/turnover/`.
+Binder delivered as: PDF binder [TO_BINDER_SHA256]; encrypted USB in controls cabinet pocket [TO_USB_ID]; edge computer share `/srv/ben/turnover/`.
 
 ### C.2 Report hashes carried forward
 
@@ -245,9 +245,9 @@ Binder delivered as: PDF binder [TO_BINDER_SHA256]; encrypted USB in controls ca
 | --- | --- |
 | FAT Commissioning Report / CSV | [FAT_REPORT_SHA256] / [FAT_CSV_SHA256] |
 | SAT Commissioning Report / CSV | [SAT_REPORT_SHA256] / [SAT_CSV_SHA256] |
-| Node firmware image | [FIRMWARE_SHA256] |
-| Gateway image | [GATEWAY_IMAGE_SHA256] |
-| Gateway backup image (G2) | [GATEWAY_BACKUP_SHA256] |
+| BEN Pod firmware image | [FIRMWARE_SHA256] |
+| Edge computer image | [GATEWAY_IMAGE_SHA256] |
+| Edge computer backup image (G2) | [GATEWAY_BACKUP_SHA256] |
 | Database backup (G2) | [DATABASE_BACKUP_SHA256] |
 | SBOM (SPDX) | [SBOM_SHA256] |
 

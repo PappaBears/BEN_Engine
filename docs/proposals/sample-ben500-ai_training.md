@@ -27,7 +27,7 @@ Northwind Partners for Helix Labs needs 500 kW of IT capacity for a AI training 
 
 The unit arrives finished and factory-tested. It needs a pad, a 1000 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the white-label option: $14,090,995 capital ($28,182 per kW IT) plus $37,500 per year (White-label licence under the Northwind Partners brand). 88 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 12 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the white-label option: $15,838,203 capital ($31,676 per kW IT) plus $37,500 per year (White-label licence under the Northwind Partners brand). 89 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 11 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 34 weeks, set by the longest-lead item (16 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -73,8 +73,8 @@ What this means for you: the environmental class sets the alarm limits your IT w
 |---|---|---|---|
 | Power module | included | 15 lines | $816,542 |
 | Cooling module | included | 5 lines | $810,208 |
-| Compute module | included | 5 lines | $12,055,162 |
-| Controls module | included | 30 lines | $31,175 |
+| Compute module | included | 5 lines | $13,802,587 |
+| Controls module | included | 30 lines | $30,958 |
 | Structure (container / cabinet) | included | 17 lines | $108,614 |
 | Envelope (insulation, liner, coatings) | included | 18 lines | $32,159 |
 | Fire detection and suppression | included | 7 lines | $65,503 |
@@ -85,7 +85,7 @@ Top 15 lines of the 114-line bill of materials for this option (sell price at 28
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
-| CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Supermicro SYS-821GE-TNHR | 36 ea | $11,795,000 | confirmed | 10 |
+| CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Supermicro SYS-821GE-TNHR | 36 ea | $13,542,425 | confirmed | 10 |
 | CLG-CDU | Row CDU 450-750 kW liquid-to-liquid (DLC) | Vertiv / CoolIT XDU450 / CHx750 | 3 ea | $625,000 | estimate | 16 |
 | PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | Schneider Electric GVSUPS150KHS (configure-to-order) | 5 ea | $472,222 | estimate | 14 |
 | PWR-BATT-LI | Galaxy Lithium-ion battery cabinet UL, 16 x 2.04 kWh modules (32.6 kWh) | Schneider Electric LIBSESMG16UL | 3 ea | $230,075 | confirmed | 10 |
@@ -114,27 +114,27 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $14,059,820 | $28,120 | - | 1 yr | $14,059,820 | 88 / 0 / 12 % | 84 | alternative |
-| Hardware + BEN Controls | $14,090,995 | $28,182 | $30,000 | 1 yr | $14,120,995 | 88 / 0 / 12 % | 114 | alternative |
-| White-label | $14,090,995 | $28,182 | $37,500 | 1 yr | $14,128,495 | 88 / 0 / 12 % | 114 | PROPOSED |
-| Managed service | $14,090,995 | $28,182 | $270,000 | 3 yr | $14,900,995 | 88 / 0 / 12 % | 114 | alternative |
+| Hardware only | $15,807,245 | $31,614 | - | 1 yr | $15,807,245 | 89 / 0 / 11 % | 84 | alternative |
+| Hardware + BEN Controls | $15,838,203 | $31,676 | $30,000 | 1 yr | $15,868,203 | 89 / 0 / 11 % | 114 | alternative |
+| White-label | $15,838,203 | $31,676 | $37,500 | 1 yr | $15,875,703 | 89 / 0 / 11 % | 114 | PROPOSED |
+| Managed service | $15,838,203 | $31,676 | $270,000 | 3 yr | $16,648,203 | 89 / 0 / 11 % | 114 | alternative |
 
-Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Northwind Partners brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 500 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
+Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Northwind Partners brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 500 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $14,090,995 | $270,000 | $14,360,995 |
-| 3 years | $14,090,995 | $810,000 | $14,900,995 |
-| 5 years | $14,090,995 | $1,350,000 | $15,440,995 |
+| 1 year | $15,838,203 | $270,000 | $16,108,203 |
+| 3 years | $15,838,203 | $810,000 | $16,648,203 |
+| 5 years | $15,838,203 | $1,350,000 | $17,188,203 |
 
-Payment milestones for the proposed option (White-label, capital $14,090,995):
+Payment milestones for the proposed option (White-label, capital $15,838,203):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $4,227,299 | 7 |
-| Factory acceptance test (H13) | 40 % | $5,636,398 | 29 |
-| Site acceptance test (H19) | 25 % | $3,522,749 | 33 |
-| Turnover (W20) | 5 % | $704,550 | 34 |
+| Engineering release (H4) | 30 % | $4,751,461 | 7 |
+| Factory acceptance test (H13) | 40 % | $6,335,281 | 29 |
+| Site acceptance test (H19) | 25 % | $3,959,551 | 33 |
+| Turnover (W20) | 5 % | $791,910 | 34 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -165,21 +165,21 @@ Long-lead items (ordered at engineering release):
 | PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | AVENDOR | 5 ea | 14 |
 | CLG-DRYCOOLER | Outdoor dry cooler (V-type, EC fans), adiabatic-ready, glycol | Guntner / Alfa Laval rep | 575 kW | 14 |
 | CLG-MANIFOLD | Rack coolant manifold pair + QD hose kit (DLC) | CoolIT / Staubli | 9 per rack | 12 |
-| CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Uvation | 36 ea | 10 |
+| CMP-GPU-H100 | GPU SuperServer 8U, 2x Xeon, 8x NVIDIA HGX H100 SXM5 (~10 kW) | Supermicro eStore | 36 ea | 10 |
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 500, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. Issue for construction set regenerated from the frozen configuration at engineering release (index not readable at proposal time)
+Issue-for-construction drawing set for the BEN 500, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUED FOR REVIEW — not for construction until checked — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
 
 | Sheet | Title | Scale |
 |---|---|---|
-| A-001 | General arrangement | see sheet |
-| A-002 | Interior layout plan | see sheet |
-| A-003 | Envelope section | 1:10 / 1:2 |
-| S-001 | Floor framing and anchoring | see sheet / 1:5 |
-| E-001 | Power one-line | NTS |
-| M-001 | Cooling P&ID | NTS |
-| C-001 | Controls layout | see sheet |
+| A-001 | General arrangement (sheet 1/7) | see sheet |
+| A-002 | Interior layout plan (sheet 2/7) | see sheet |
+| A-003 | Envelope section and hardening (sheet 3/7) | see sheet / 1:2 |
+| S-001 | Floor framing and anchoring (sheet 4/7) | see sheet / 1:5 |
+| E-001 | Power one-line (sheet 5/7) | NTS |
+| M-001 | Cooling P&ID (sheet 6/7) | NTS |
+| C-001 | Controls layout (sheet 7/7) | see sheet |
 
 Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):
 
@@ -353,12 +353,12 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 ## 15. Assumptions and what is not included
 
 - Configuration as on the cover: 500 kW IT, 9 rack(s), Direct liquid cooling + CDU + dry cooler, N+1, climate Hot / arid; any change is priced as a change order
-- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 88 % confirmed, 0 % list, 12 % estimate for this option; the estimate share is re-priced at engineering release
+- Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 89 % confirmed, 0 % list, 11 % estimate for this option; the estimate share is re-priced at engineering release
 - Gross margin 28% on hardware and build labour; controls licence $30,000/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
 - Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost
-- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 13 lists editions not verified on the proposal date)
+- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 16 lists editions not verified on the proposal date)
 - Compute hardware prices are reseller listings on the BOM date; GPU server availability can move lead times
 - Not included: site civil, utility service, permits, fiber circuits, customer IT software, generator fuel, insurance after set-down, spare parts beyond the turnover kit, decommissioning (quoted separately)
 

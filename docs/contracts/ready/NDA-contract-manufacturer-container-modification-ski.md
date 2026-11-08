@@ -1,7 +1,7 @@
 # Mutual Non-Disclosure Agreement — BEN Engine
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/NDA_MUTUAL.md` · Template rev 5c0e57e
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/NDA_MUTUAL.md` · Template rev 9fed473
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Used at Process Stage 1 (Inquiry) before the selector, site survey or any drawing, BOM price or firmware detail is shared, and with prospective integrators, contract manufacturers and suppliers. Delete this box before signature.
 
 **NDA ID:** NDA-2026-CONTRACT-MANUFACTURE
@@ -17,7 +17,7 @@ The Parties want to evaluate, and if they proceed, negotiate: RFI: contract manu
 
 2.1 "**Confidential Information**" means non-public information disclosed by the Discloser to the Recipient in any form on or after the Effective Date in connection with the Purpose that is marked or identified as confidential, or that a reasonable person would understand to be confidential from its nature or the circumstances.
 
-2.2 For Schreiber AI, Confidential Information includes: the configuration model and sizing rules; issue-for-construction drawings and CTQ/CTP tables; bills of materials with prices, supplier names and confirmation status; the parts catalog; STE assembly instructions and QC forms; firmware, gateway software, dashboard and digital twin source or binaries not publicly released; commissioning, calibration and analysis methods and data; the digital twin's fitted parameters and validation results; unit economics, margins, pricing and discount schedules; the investor proposition; supplier and integrator terms; and the identity of customers and sites.
+2.2 For Schreiber AI, Confidential Information includes: the configuration model and sizing rules; issue-for-construction drawings and CTQ/CTP tables; bills of materials with prices, supplier names and confirmation status; the parts catalog; STE assembly instructions and QC forms; firmware, edge computer software, dashboard and digital twin source or binaries not publicly released; commissioning, calibration and analysis methods and data; the digital twin's fitted parameters and validation results; unit economics, margins, pricing and discount schedules; the investor proposition; supplier and integrator terms; and the identity of customers and sites.
 
 2.3 For Counterparty, Confidential Information includes: site information, utility data, network diagrams, security practices, IT architecture, business plans, pricing it discloses, and, for integrators and manufacturers, facility capabilities, certifications and customer lists.
 
@@ -27,7 +27,7 @@ The Parties want to evaluate, and if they proceed, negotiate: RFI: contract manu
 
 ## 3. Obligations
 
-3.1 The Recipient will: (a) use Confidential Information only for the Purpose; (b) not disclose it to anyone except its and its affiliates' employees, officers, professional advisers, and, with the Discloser's prior written consent, contractors, who need to know it for the Purpose and are bound by written confidentiality obligations at least as protective as this NDA; (c) protect it with at least the care it uses for its own confidential information of similar importance and not less than reasonable care; (d) not reverse engineer, decompile or analyse the composition of any sample, firmware image, node or software provided under this NDA; (e) not remove confidentiality or watermark notices; (f) promptly notify the Discloser of any unauthorised use or disclosure and cooperate to limit the harm.
+3.1 The Recipient will: (a) use Confidential Information only for the Purpose; (b) not disclose it to anyone except its and its affiliates' employees, officers, professional advisers, and, with the Discloser's prior written consent, contractors, who need to know it for the Purpose and are bound by written confidentiality obligations at least as protective as this NDA; (c) protect it with at least the care it uses for its own confidential information of similar importance and not less than reasonable care; (d) not reverse engineer, decompile or analyse the composition of any sample, firmware image, BEN Pod or software provided under this NDA; (e) not remove confidentiality or watermark notices; (f) promptly notify the Discloser of any unauthorised use or disclosure and cooperate to limit the harm.
 
 3.2 **Compelled disclosure.** The Recipient may disclose Confidential Information to the extent required by law, regulation, court order or stock exchange rule, provided it gives the Discloser prompt notice where lawful, cooperates with efforts to obtain protective treatment, and discloses only what is required.
 

@@ -115,17 +115,17 @@ Explicitly excluded:
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
 | Hardware only | $177,569 | $35,514 | - | 1 yr | $177,569 | 60 / 0 / 40 % | 44 | PROPOSED |
-| Hardware + BEN Controls | $183,497 | $36,699 | $1,200 | 1 yr | $184,697 | 60 / 0 / 39 % | 65 | alternative |
-| White-label | $183,497 | $36,699 | $1,500 | 1 yr | $184,997 | 60 / 0 / 39 % | 65 | alternative |
-| Managed service | $183,497 | $36,699 | $2,700 | 3 yr | $191,597 | 60 / 0 / 39 % | 65 | alternative |
+| Hardware + BEN Controls | $183,447 | $36,689 | $1,200 | 1 yr | $184,647 | 60 / 0 / 39 % | 65 | alternative |
+| White-label | $183,447 | $36,689 | $1,500 | 1 yr | $184,947 | 60 / 0 / 39 % | 65 | alternative |
+| Managed service | $183,447 | $36,689 | $2,700 | 3 yr | $191,547 | 60 / 0 / 39 % | 65 | alternative |
 
-Confirmed = price seen on a vendor or distributor listing on the date in the BOM; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 5 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
+Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 5 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $183,497 | $2,700 | $186,197 |
-| 3 years | $183,497 | $8,100 | $191,597 |
-| 5 years | $183,497 | $13,500 | $196,997 |
+| 1 year | $183,447 | $2,700 | $186,147 |
+| 3 years | $183,447 | $8,100 | $191,547 |
+| 5 years | $183,447 | $13,500 | $196,947 |
 
 Payment milestones for the proposed option (Hardware only, capital $177,569):
 
@@ -161,7 +161,7 @@ Long-lead items (ordered at engineering release):
 
 | Code | Item | Vendor | Qty | Lead time (weeks) |
 |---|---|---|---|---|
-| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit 5.8 kW, 400/480 V 3-ph | DigiKey (UK listing) | 2 ea | 8 |
+| CLG-CABAC | Blue e+ wall-mounted enclosure cooling unit 5.8 kW, 400/480 V 3-ph | DigiKey (UK site, USD display) | 2 ea | 8 |
 | STR-CAB24U | Outdoor NEMA 4X / IP66 24U cabinet, aluminium (UL 50E Type 4X), 300 mm plinth, two side cut-outs for cabinet coolers, compression-gasket door with 3-point latch (shell for BEN 5) | DDB Unlimited / Radiogagas (reseller) | 1 ea | 8 |
 | SITE-FIBER | Fiber drop, handhole, 24-strand SM to demarc | local | 1 lot | 8 |
 | SITE-PERMIT | Building/electrical/fire permits, plan review, inspections | local | 1 lot | 6 |
@@ -169,17 +169,17 @@ Long-lead items (ordered at engineering release):
 
 ## 8. Drawings and documents delivered
 
-Issue-for-construction drawing set for the BEN 5, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. Issue for construction set regenerated from the frozen configuration at engineering release (index not readable at proposal time)
+Issue-for-construction drawing set for the BEN 5, regenerated from the frozen configuration at engineering release and re-issued as built after SAT. ISSUED FOR REVIEW — not for construction until checked — Rev B, 2026-11-08. Drawn: BEN Engine generator; Checked: blank (requires a checker before the set is re-issued for construction).
 
 | Sheet | Title | Scale |
 |---|---|---|
-| A-001 | General arrangement | see sheet |
-| A-002 | Interior layout plan | see sheet |
-| A-003 | Envelope section | 1:10 / 1:2 |
-| S-001 | Floor framing and anchoring | see sheet / 1:5 |
-| E-001 | Power one-line | NTS |
-| M-001 | Cooling P&ID | NTS |
-| C-001 | Controls layout | see sheet |
+| A-001 | General arrangement (sheet 1/7) | see sheet |
+| A-002 | Interior layout plan (sheet 2/7) | see sheet |
+| A-003 | Envelope section and hardening (sheet 3/7) | see sheet / 1:2 |
+| S-001 | Floor framing and anchoring (sheet 4/7) | see sheet / 1:5 |
+| E-001 | Power one-line (sheet 5/7) | NTS |
+| M-001 | Cooling P&ID (sheet 6/7) | NTS |
+| C-001 | Controls layout (sheet 7/7) | see sheet |
 
 Document set (indexed binder, encrypted USB in the BEN Controller panel pocket, and the edge computer share, per docs/TURNOVER.md):
 
@@ -357,7 +357,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
 - Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost
-- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 13 lists editions not verified on the proposal date)
+- Permit fees, utility fees, taxes and duties are excluded; AHJ edition of each code applies (docs/COMPLIANCE.md section 16 lists editions not verified on the proposal date)
 - Compute hardware prices are reseller listings on the BOM date; GPU server availability can move lead times
 - Not included: site civil, utility service, permits, fiber circuits, customer IT software, generator fuel, insurance after set-down, spare parts beyond the turnover kit, decommissioning (quoted separately)
 

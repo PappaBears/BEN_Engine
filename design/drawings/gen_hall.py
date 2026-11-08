@@ -261,6 +261,8 @@ def sheet_a001(lay, out, ctx: Ctx, n):
                 ["Hardening envelope adder", f"{d['envelope_area_m2']} m2 x {lay.hardening['mass_kg_m2']} kg/m2 = {d['envelope_area_m2'] * lay.hardening['mass_kg_m2']:,.0f}"]]
         y = sh.table(x, y, ["WEIGHT TABLE", "kg"], rows, [RW * 0.72, RW * 0.28], title="WEIGHTS")
         y -= 8
+        y = sh.revision_table(x, y, RW)
+        y -= 8
         notes = ["All dimensions in millimetres unless noted. Do not scale from this drawing; use figured dimensions.",
                  "Enclosure: " + d["enclosure"] + f". Hardening {d['hardening_label']}: {d['hardening_rating']}; coating {d['hardening_coating']}.",
                  "Each bay arrives as three factory-finished road sections (12.2 x 3.66 x 4.2 m); sections are set on grade beams, aligned, bolted at the splice plates and sealed with the two-stage gasket (CTP-J1 HOLD).",

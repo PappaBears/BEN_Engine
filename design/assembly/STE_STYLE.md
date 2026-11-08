@@ -1,7 +1,7 @@
 # BEN Engine — Simplified Technical English (ASD-STE100) writing rules
 
 One page. Every assembly, maintenance and commissioning document for BEN Engine obeys these rules.
-Issue A, 2026-11-07. Source: ASD-STE100 Issue 8 writing rules and dictionary, applied to BEN Engine.
+Issue B, 2026-11-08 (generation-2 vocabulary). Source: ASD-STE100 Issue 8 writing rules and dictionary, applied to BEN Engine.
 
 ## Sentences
 
@@ -28,7 +28,8 @@ Issue A, 2026-11-07. Source: ASD-STE100 Issue 8 writing rules and dictionary, ap
     - perform / carry out / conduct → use the action verb itself ("test", "measure")
     - approximately → **about**; prior to → **before**; subsequent to → **after**; in order to → **to**
     - check (as a verb) → **examine** or **make sure**. "Check:" is permitted as a heading only.
-11. Use the same word for the same thing in every document. Rack, not cabinet or enclosure, for an IT rack. Cooling unit, not CRAC or AC, for an in-row unit. Node, not sensor board. Gateway, not controller.
+    `design/assembly/gen_assembly.py` reads this list and stops with an error when a generated document uses one of these words or has a step sentence over 20 words (rule 2). `scripts/audit.py` A10 repeats the check on the written files.
+11. Use the same word for the same thing in every document. Rack, not cabinet or enclosure, for an IT rack (the BEN 5 outdoor housing is "the cabinet"). Cooling unit, not CRAC or AC, for an in-row unit; cabinet air conditioner for the BEN 5 unit. Pod (BEN Pod), not node, sensor board or sensor module. BEN Controller panel, not gateway or controller cabinet, for the controls panel; PLC for the PLCnext (Pro) and RevPi for the Lite controller; edge computer for the OnLogic computer that runs `ben_engine`. Never write node or gateway.
 12. Technical names from the drawings and the protocol are permitted as written, even when they are not in the dictionary: tags (R1, CU2, PNL-M), channel names (T_in_r1_0.4), item codes (PWR-100), standards (NEC 110.26), and part names from a manufacturer.
 13. Write numbers as digits with the unit: 85 N·m, 914 mm, 30 minutes. Write a tolerance as +/-10 % or +0/-6 mm. Do not write "approximately 1 m".
 14. Do not use slang, idioms, or words with more than one meaning in the same sentence.

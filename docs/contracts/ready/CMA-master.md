@@ -1,7 +1,7 @@
 # Contract Manufacturing Agreement — BEN Engine Build Shop
 
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · Template rev 5c0e57e
+> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · Template rev 9fed473
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Used with the third-party container modification shop, electrical integrator or UL 508A panel shop that builds Units for Schreiber AI (the operator's decision to manufacture with third parties first). Delete this box before signature.
 
 **Agreement ID:** [CM_AGREEMENT_ID]
@@ -41,7 +41,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **Schreiber A
 | 9 | Mechanical fit-out: floor channels, racks, containment, trays, lighting, leak detection rope; Q-04, Q-05 | Manufacturer |
 | 10 | Electrical installation by licensed electrical contractor; H10a, H10b; W10; Q-07 | Manufacturer with Licensed Trade |
 | 11 | Cooling installation by licensed HVAC contractor; H11 pressure test and evacuation; charge; glycol fill; Q-06 | Manufacturer with Licensed Trade |
-| 12 | Controls Kit installation, node addressing, sensor placement, cable labelling; firmware already loaded and signed by Schreiber AI; I/O point-to-point W12; Q-08 | Manufacturer installs; Schreiber AI commissions firmware and calibration |
+| 12 | Controls Kit installation, Pod addressing, sensor placement, cable labelling; firmware already loaded and signed by Schreiber AI; I/O point-to-point W12; Q-08 | Manufacturer installs; Schreiber AI commissions firmware and calibration |
 | — | Fire detection and suppression by licensed fire contractor; door fan test; Q-09 | Manufacturer with Licensed Trade (or Schreiber AI's contractor, per Build Order) |
 | 13 | FAT with the Commissioning Script in factory mode; 24-hour burn-in; H13; Q-10 | Manufacturer provides Unit, shop power, load banks and labour; Schreiber AI commissioning lead runs the script and signs |
 | 14 | Transport preparation, weigh ticket, shock loggers, CSC decision record; Q-11 | Manufacturer |
@@ -111,7 +111,7 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **Schreiber A
 | CTQ-E2 bonding | Every bond ≤ 0.1 Ω | Q-07 |
 | CTQ-E1 working space | NEC 110.26 clearances; vestibule 1.1 m (BEN 150/500) | Q-07 |
 | CTQ-K3 sensor placement and calibration check | Within ±0.25 °C after correction; `cal_id` stored | Q-08 |
-| CTP-K1 life-safety isolation | Dry contacts only to node; releasing circuit independent | Q-09 |
+| CTP-K1 life-safety isolation | Dry contacts only to the BEN Controller / BEN Pod; releasing circuit independent | Q-09 |
 | CTP-F1 hold time | ≥ 10 min at design concentration; certificate | Q-09 |
 | CTQ-E3 EPO | All IT power off < 1 s | Q-10 |
 | CTQ-A3 gross mass | Drawing value + 10 % max; weigh ticket | Q-11 |
@@ -125,9 +125,9 @@ This Contract Manufacturing Agreement ("**Agreement**") is between **Schreiber A
 
 ## 6. Factory acceptance test
 
-6.1 **Readiness.** Manufacturer declares FAT readiness when Q-01 to Q-09 are closed with no open Nonconformance, the Unit is energised from shop power at the Configuration voltage, load banks totalling [IT_KW] kW are connected in the racks, condensers or dry cooler are operating, and the Controls Kit reports every node online. Readiness is declared at least 5 Business Days before the FAT date to allow End Customer notice under the MSA.
+6.1 **Readiness.** Manufacturer declares FAT readiness when Q-01 to Q-09 are closed with no open Nonconformance, the Unit is energised from shop power at the Configuration voltage, load banks totalling [IT_KW] kW are connected in the racks, condensers or dry cooler are operating, and the Controls Kit reports every Pod online. Readiness is declared at least 5 Business Days before the FAT date to allow End Customer notice under the MSA.
 
-6.2 **Execution.** Schreiber AI's commissioning lead runs `commissioning.py --mode factory` through the ten steps (pre-power checklist; node discovery and firmware; sensor sanity at idle; I/O point-to-point; power chain meter vs PDU sum within 3 %; cooling sequential start and failover; load step 20 → 100 % within the ASHRAE class; utility loss ride-through; alarm verification; CSV export with SHA-256 and signed report), plus E7 filter clog, E11 24-hour burn-in and E12 cyber scan, the door fan test and the fire contractor's acceptance. Manufacturer provides labour, shop power, load banks, thermography camera access, a manometer and a safe test area for the duration, including the 24-hour burn-in.
+6.2 **Execution.** Schreiber AI's commissioning lead runs `commissioning.py --mode factory` through the ten steps (pre-power checklist; Pod discovery and firmware; sensor sanity at idle; I/O point-to-point; power chain meter vs PDU sum within 3 %; cooling sequential start and failover; load step 20 → 100 % within the ASHRAE class; utility loss ride-through; alarm verification; CSV export with SHA-256 and signed report), plus E7 filter clog, E11 24-hour burn-in and E12 cyber scan, the door fan test and the fire contractor's acceptance. Manufacturer provides labour, shop power, load banks, thermography camera access, a manometer and a safe test area for the duration, including the 24-hour burn-in.
 
 6.3 **Result.** A step FAIL for a Manufacturer cause is a Nonconformance under Section 7; Manufacturer corrects it and the step is re-run at Manufacturer's cost (including Schreiber AI's re-attendance at [COMMISSIONING_DAY_RATE] per day plus travel if the re-run cannot be done during the same visit). A FAIL for a Schreiber AI cause (firmware, calibration references, Consigned Material defect, drawing error) is Schreiber AI's cost. A FAIL for an OEM component defect is handled under the OEM warranty, with Manufacturer performing the swap at Schreiber AI's cost unless Manufacturer's handling caused it.
 
