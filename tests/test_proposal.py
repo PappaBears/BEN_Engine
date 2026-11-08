@@ -80,7 +80,12 @@ def test_schedule_derived_from_bom_lead_times(built):
         assert len(p.long_lead) <= 5
         release = next(m["week"] for m in p.milestones if m["hold"] == "H4")
         fat = next(m["week"] for m in p.milestones if "H13" in m["hold"])
-        assert fat - release >= max_lead
+        setdown = next(m["week"] for m in p.milestones if "H18" in m["hold"])
+        if Config.from_dict(p.config).derived()["kind"] == "hall":
+            # BEN 2000: modules are FAT-tested while MV gear / generators ship direct to site; set-down waits for them
+            assert setdown - release >= max_lead and fat < setdown
+        else:
+            assert fat - release >= max_lead
         crit = [m["week"] for m in p.milestones if m["path"] == "critical"]
         assert crit == sorted(crit)
         if tier == "ben150" and opt == "hardware_controls":

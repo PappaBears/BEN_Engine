@@ -102,7 +102,7 @@ SCHEDULE_TIER = {
     "ben500": {"survey": 4, "release": 3, "short_lead": 3, "factory": 12, "cool_ctl": 4, "fat": 2, "ship": 2, "hookup": 1, "sat": 1, "permits": 10, "civil": 8, "ref_total": "32-36 weeks"},
     # BEN 2000: long-lead items (MV pad-mount transformers, 2 MW UPS strings, generators) typically 40 weeks from release;
     # site works (slab, MV service, yard) run 20 weeks in parallel; order-to-service about 52 weeks.
-    "ben2000": {"survey": 4, "release": 8, "short_lead": 12, "factory": 20, "cool_ctl": 4, "fat": 2, "ship": 3, "hookup": 4, "sat": 2, "permits": 12, "civil": 20, "long_lead_typical": 40, "ref_total": "about 52 weeks"},
+    "ben2000": {"survey": 4, "release": 8, "short_lead": 12, "factory": 20, "cool_ctl": 4, "fat": 2, "ship": 3, "hookup": 4, "sat": 2, "permits": 12, "civil": 20, "long_lead_typical": 40, "ref_total": "about 52 weeks with 40-week long-lead items (MV transformers, 2 MW UPS); longer when generator or utility lead times run to 52 weeks"},
 }
 
 COMMISSIONING_STEPS = [
@@ -331,14 +331,27 @@ def _schedule(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, A
     max_lead = max((r["lead_time_weeks"] or 0) for r in rows) if rows else 0
     long_lead = [{"code": r["code"], "name": r["name"], "lead_time_weeks": r["lead_time_weeks"], "qty": r["qty"], "unit": r["unit"],
                   "ext_price_usd": r["ext_price_usd"], "vendor": r["vendor"]} for r in leads[:5]]
+    hall = TIER_GEOMETRY[cfg.tier]["kind"] == "hall"
     w_h3 = s["survey"]
     w_h4 = w_h3 + s["release"]
     w_container = w_h4 + s["short_lead"]
-    procurement_done = w_h4 + max(max_lead, s["short_lead"] + s["factory"])
-    w_fit_out_done = max(w_container + s["factory"], procurement_done)
-    w_fat = w_fit_out_done + s["cool_ctl"] + s["fat"]
-    w_ship = w_fat + s["ship"]
-    w_setdown = w_ship + s["hookup"]
+    if hall:
+        # BEN 2000: the wide-body modules are built and FAT-tested in the factory while the long-lead site gear
+        # (MV transformers, switchgear, generators, MV interconnect) ships straight to site; SAT waits for both.
+        site_leads = [r for r in rows if r.get("lead_time_weeks") and (r["code"].startswith("PWR-MV") or r["code"].startswith("PWR-GEN") or r["code"].startswith("PWR-LV-SWGR") or r["code"].startswith("SITE-"))]
+        factory_lead = max([(r["lead_time_weeks"] or 0) for r in rows if r not in site_leads] + [0])
+        site_lead = max([(r["lead_time_weeks"] or 0) for r in site_leads] + [s.get("long_lead_typical", 40)])
+        procurement_done = w_h4 + max(factory_lead, s["short_lead"] + s["factory"])
+        w_fit_out_done = max(w_container + s["factory"], procurement_done)
+        w_fat = w_fit_out_done + s["cool_ctl"] + s["fat"]
+        w_ship = w_fat + s["ship"]
+        w_setdown = max(w_ship, w_h4 + site_lead) + s["hookup"]
+    else:
+        procurement_done = w_h4 + max(max_lead, s["short_lead"] + s["factory"])
+        w_fit_out_done = max(w_container + s["factory"], procurement_done)
+        w_fat = w_fit_out_done + s["cool_ctl"] + s["fat"]
+        w_ship = w_fat + s["ship"]
+        w_setdown = w_ship + s["hookup"]
     w_sat = w_setdown + s["sat"]
     w_turnover = w_sat + 1
     w_permits = w_h4 + s["permits"]
@@ -347,13 +360,13 @@ def _schedule(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, A
         {"week": 0, "milestone": "Order and risk acknowledgement signed", "owner": "Customer + Schreiber AI", "hold": "-", "path": "critical"},
         {"week": w_h3, "milestone": "Site survey and site requirements sign-off", "owner": "Customer + ENG", "hold": "H3", "path": "critical"},
         {"week": w_h4, "milestone": "Engineering release: configuration frozen, IFC drawings, BOM; long-lead purchase orders placed", "owner": "ENG", "hold": "H4", "path": "critical"},
-        {"week": w_container, "milestone": "Container / cabinet received and inspected; structural and envelope work starts", "owner": "FAC", "hold": "W6, H7, W8", "path": "critical"},
+        {"week": w_container, "milestone": ("Wide-body module shells received and inspected; structural and envelope work starts (per module)" if hall else "Container / cabinet received and inspected; structural and envelope work starts"), "owner": "FAC", "hold": "W6, H7, W8", "path": "critical"},
         {"week": w_permits, "milestone": "Permits issued (building, electrical, mechanical, fire plan review)", "owner": "Customer / AHJ", "hold": "-", "path": "parallel"},
-        {"week": w_fit_out_done, "milestone": f"Longest-lead item on the floor ({max_lead} weeks from release); mechanical and electrical fit-out complete", "owner": "FAC + SUB", "hold": "H10", "path": "critical"},
+        {"week": w_fit_out_done, "milestone": (f"Longest-lead factory item on the floor ({factory_lead} weeks from release); module mechanical and electrical fit-out complete; site gear (MV transformers, switchgear, generators) ships direct to site at {site_lead} weeks" if hall else f"Longest-lead item on the floor ({max_lead} weeks from release); mechanical and electrical fit-out complete"), "owner": "FAC + SUB", "hold": "H10", "path": "critical"},
         {"week": w_civil, "milestone": "Site pad, grounding and utility feeder complete and surveyed", "owner": "Customer civil", "hold": "H16", "path": "parallel"},
         {"week": w_fat, "milestone": "Cooling, controls and firmware complete; factory acceptance test incl. 24 h burn-in", "owner": "FAC + ENG; customer witness", "hold": "H11, W12, H13", "path": "critical"},
         {"week": w_ship, "milestone": "Transport prep and shipping", "owner": "LOG", "hold": "-", "path": "critical"},
-        {"week": w_setdown, "milestone": "Set-down, hook-up and pre-energisation check", "owner": "LOG + SUB + AHJ", "hold": "W17, H18", "path": "critical"},
+        {"week": w_setdown, "milestone": ("Modules set and site-joined, power module and MV gear set, hook-up and pre-energisation check (long-lead site gear on site)" if hall else "Set-down, hook-up and pre-energisation check"), "owner": "LOG + SUB + AHJ", "hold": "W17, H18", "path": "critical"},
         {"week": w_sat, "milestone": "Site acceptance test and fire marshal acceptance", "owner": "ENG + customer + AHJ", "hold": "H19", "path": "critical"},
         {"week": w_turnover, "milestone": "Training and turnover; unit in service", "owner": "ENG + customer", "hold": "W20", "path": "critical"},
     ]

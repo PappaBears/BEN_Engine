@@ -232,7 +232,7 @@
     },
     {
       "week": 24,
-      "milestone": "Container / cabinet received and inspected; structural and envelope work starts",
+      "milestone": "Wide-body module shells received and inspected; structural and envelope work starts (per module)",
       "owner": "FAC",
       "hold": "W6, H7, W8",
       "path": "critical"
@@ -246,48 +246,48 @@
     },
     {
       "week": 44,
+      "milestone": "Longest-lead factory item on the floor (26 weeks from release); module mechanical and electrical fit-out complete; site gear (MV transformers, switchgear, generators) ships direct to site at 52 weeks",
+      "owner": "FAC + SUB",
+      "hold": "H10",
+      "path": "critical"
+    },
+    {
+      "week": 44,
       "milestone": "Site pad, grounding and utility feeder complete and surveyed",
       "owner": "Customer civil",
       "hold": "H16",
       "path": "parallel"
     },
     {
-      "week": 64,
-      "milestone": "Longest-lead item on the floor (52 weeks from release); mechanical and electrical fit-out complete",
-      "owner": "FAC + SUB",
-      "hold": "H10",
-      "path": "critical"
-    },
-    {
-      "week": 70,
+      "week": 50,
       "milestone": "Cooling, controls and firmware complete; factory acceptance test incl. 24 h burn-in",
       "owner": "FAC + ENG; customer witness",
       "hold": "H11, W12, H13",
       "path": "critical"
     },
     {
-      "week": 73,
+      "week": 53,
       "milestone": "Transport prep and shipping",
       "owner": "LOG",
       "hold": "-",
       "path": "critical"
     },
     {
-      "week": 77,
-      "milestone": "Set-down, hook-up and pre-energisation check",
+      "week": 68,
+      "milestone": "Modules set and site-joined, power module and MV gear set, hook-up and pre-energisation check (long-lead site gear on site)",
       "owner": "LOG + SUB + AHJ",
       "hold": "W17, H18",
       "path": "critical"
     },
     {
-      "week": 79,
+      "week": 70,
       "milestone": "Site acceptance test and fire marshal acceptance",
       "owner": "ENG + customer + AHJ",
       "hold": "H19",
       "path": "critical"
     },
     {
-      "week": 80,
+      "week": 71,
       "milestone": "Training and turnover; unit in service",
       "owner": "ENG + customer",
       "hold": "W20",
@@ -305,19 +305,19 @@
       "milestone": "Factory acceptance test (H13)",
       "share": 0.4,
       "amount_usd": 22090107.06,
-      "week": 70
+      "week": 50
     },
     {
       "milestone": "Site acceptance test (H19)",
       "share": 0.25,
       "amount_usd": 13806316.91,
-      "week": 79
+      "week": 70
     },
     {
       "milestone": "Turnover (W20)",
       "share": 0.05,
       "amount_usd": 2761263.38,
-      "week": 80
+      "week": 71
     }
   ],
   "long_lead": [
@@ -464,7 +464,7 @@
         },
         {
           "kind": "p",
-          "text": "Order to in-service: about 80 weeks, set by the longest-lead item (52 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.",
+          "text": "Order to in-service: about 71 weeks, set by the longest-lead item (52 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.",
           "items": [],
           "headers": [],
           "rows": []
@@ -1011,19 +1011,19 @@
               "Factory acceptance test (H13)",
               "40 %",
               "$22,090,107",
-              "70"
+              "50"
             ],
             [
               "Site acceptance test (H19)",
               "25 %",
               "$13,806,317",
-              "79"
+              "70"
             ],
             [
               "Turnover (W20)",
               "5 %",
               "$2,761,263",
-              "80"
+              "71"
             ]
           ]
         },
@@ -1042,7 +1042,7 @@
       "blocks": [
         {
           "kind": "p",
-          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 2000 (reference order-to-service about 52 weeks) and the longest lead time in this bill of materials (52 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
+          "text": "Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 2000 (reference order-to-service about 52 weeks with 40-week long-lead items (MV transformers, 2 MW UPS); longer when generator or utility lead times run to 52 weeks) and the longest lead time in this bill of materials (52 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.",
           "items": [],
           "headers": [],
           "rows": []
@@ -1082,7 +1082,7 @@
             ],
             [
               "24",
-              "Container / cabinet received and inspected; structural and envelope work starts",
+              "Wide-body module shells received and inspected; structural and envelope work starts (per module)",
               "FAC",
               "W6, H7, W8",
               "critical"
@@ -1096,48 +1096,48 @@
             ],
             [
               "44",
+              "Longest-lead factory item on the floor (26 weeks from release); module mechanical and electrical fit-out complete; site gear (MV transformers, switchgear, generators) ships direct to site at 52 weeks",
+              "FAC + SUB",
+              "H10",
+              "critical"
+            ],
+            [
+              "44",
               "Site pad, grounding and utility feeder complete and surveyed",
               "Customer civil",
               "H16",
               "parallel"
             ],
             [
-              "64",
-              "Longest-lead item on the floor (52 weeks from release); mechanical and electrical fit-out complete",
-              "FAC + SUB",
-              "H10",
-              "critical"
-            ],
-            [
-              "70",
+              "50",
               "Cooling, controls and firmware complete; factory acceptance test incl. 24 h burn-in",
               "FAC + ENG; customer witness",
               "H11, W12, H13",
               "critical"
             ],
             [
-              "73",
+              "53",
               "Transport prep and shipping",
               "LOG",
               "-",
               "critical"
             ],
             [
-              "77",
-              "Set-down, hook-up and pre-energisation check",
+              "68",
+              "Modules set and site-joined, power module and MV gear set, hook-up and pre-energisation check (long-lead site gear on site)",
               "LOG + SUB + AHJ",
               "W17, H18",
               "critical"
             ],
             [
-              "79",
+              "70",
               "Site acceptance test and fire marshal acceptance",
               "ENG + customer + AHJ",
               "H19",
               "critical"
             ],
             [
-              "80",
+              "71",
               "Training and turnover; unit in service",
               "ENG + customer",
               "W20",

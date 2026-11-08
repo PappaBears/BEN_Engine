@@ -150,9 +150,13 @@ def hero_hall(g, d):
     L, Wd, Hh = g["ext_l_m"], g["ext_w_m"], g["ext_h_m"]
     modules = g["modules"]
     yard_y = Wd + 4.0
-    total_x, total_y = L + 22, yard_y + 3.5
-    scale = min(9.0, 600 / ((total_x + total_y) * COS30))
-    c = Canvas(scale=scale, ox=W / 2 + 60, oy=H / 2 + 20 - ((total_x + total_y) * SIN30 * scale) / 2 + 40)
+    # world extents: x from the MV yard (-17) to the vestibule (L + 3), y from the generators (-5.5) to the dry coolers (yard_y + 3)
+    xmin, xmax, ymin, ymax = -17.0, L + 3.0, -5.5, yard_y + 3.0
+    scale = min(8.0, (W - 40) / ((xmax - xmin + ymax - ymin) * COS30))
+    # screen x spans (xmin - ymax) .. (xmax - ymin); centre it, and centre the vertical extent too
+    sx_min, sx_max = (xmin - ymax) * COS30 * scale, (xmax - ymin) * COS30 * scale
+    sy_min, sy_max = (xmin + ymin) * SIN30 * scale - Hh * scale, (xmax + ymax) * SIN30 * scale
+    c = Canvas(scale=scale, ox=W / 2 - (sx_min + sx_max) / 2, oy=H / 2 - (sy_min + sy_max) / 2 + 24)
     # slab-on-grade for everything
     c.slab(-17, -3.0, L + 20, yard_y + 6.5, fill="#16213a")
     # plant yard fence (north yard: generators), MV yard west
@@ -191,9 +195,9 @@ def hero_hall(g, d):
     # generators (N+1) in the north yard (negative y is "behind" the hall in this projection, so put them at -y)
     for k in range(d["generators_total"]):
         gx = 3.0 + k * 7.5
-        c.box(gx, -3.0 - 2.4, 0, 6.0, 2.4, 3.0, side="#3b4656", end="#2d3745", top="#4a5667", sw=0.8)
-        c.box(gx + 4.6, -3.0 - 2.3, 0.4, 1.4, 2.2, 1.2, side="#5b6878", end="#4a5667", top="#6b7a90", sw=0.6)
-        cx, cy = c.P(gx + 1.2, -3.0 - 1.2, 3.0)
+        c.box(gx, -2.0 - 2.4, 0, 6.0, 2.4, 3.0, side="#3b4656", end="#2d3745", top="#4a5667", sw=0.8)
+        c.box(gx + 4.6, -2.0 - 2.3, 0.4, 1.4, 2.2, 1.2, side="#5b6878", end="#4a5667", top="#6b7a90", sw=0.6)
+        cx, cy = c.P(gx + 1.2, -2.0 - 1.2, 3.0)
         c.out.append(f'<rect x="{cx - 2:.1f}" y="{cy - 12:.1f}" width="4" height="12" fill="#3a4a60"/>')
     # adiabatic dry coolers in the south plant yard (+y side), on grade
     n_dc = d["cooling_units_total"]
@@ -210,7 +214,7 @@ def hero_hall(g, d):
         a, b = c.P(L + 0.6 + off, Wd, 0.35), c.P(L + 0.6 + off, yard_y + 1.0, 0.35)
         c.out.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" stroke="{col}" stroke-width="2"/>')
     # brand on the hall's south face
-    c.out.append(c.brand(1.0, Wd, Hh * 0.68, 30, g["label"], f"SCHREIBER AI · {g['label']} · {modules} MODULES · POWER MODULE · PLANT YARD"))
+    c.out.append(c.brand(1.0, Wd, Hh * 0.7, 20, g["label"], f"SCHREIBER AI · {g['label']} · {modules} MODULES"))
     return c
 
 

@@ -29,7 +29,7 @@ The unit arrives finished and factory-tested. It needs a pad, a 3000 A 12.47 kV 
 
 Price for the white-label option: $55,225,268 capital ($34,516 per kW IT) plus $112,500 per year (White-label licence under the Northwind Partners brand). 73 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 27 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
-Order to in-service: about 80 weeks, set by the longest-lead item (52 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
+Order to in-service: about 71 weeks, set by the longest-lead item (52 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
 ## 3. Mission profile and what it means
 
@@ -132,30 +132,30 @@ Payment milestones for the proposed option (White-label, capital $55,225,268):
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
 | Engineering release (H4) | 30 % | $16,567,580 | 12 |
-| Factory acceptance test (H13) | 40 % | $22,090,107 | 70 |
-| Site acceptance test (H19) | 25 % | $13,806,317 | 79 |
-| Turnover (W20) | 5 % | $2,761,263 | 80 |
+| Factory acceptance test (H13) | 40 % | $22,090,107 | 50 |
+| Site acceptance test (H19) | 25 % | $13,806,317 | 70 |
+| Turnover (W20) | 5 % | $2,761,263 | 71 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
 ## 7. Schedule
 
-Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 2000 (reference order-to-service about 52 weeks) and the longest lead time in this bill of materials (52 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
+Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the BEN 2000 (reference order-to-service about 52 weeks with 40-week long-lead items (MV transformers, 2 MW UPS); longer when generator or utility lead times run to 52 weeks) and the longest lead time in this bill of materials (52 weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.
 
 | Week | Milestone | Owner | Hold / witness point | Path |
 |---|---|---|---|---|
 | 0 | Order and risk acknowledgement signed | Customer + Schreiber AI | - | critical |
 | 4 | Site survey and site requirements sign-off | Customer + ENG | H3 | critical |
 | 12 | Engineering release: configuration frozen, IFC drawings, BOM; long-lead purchase orders placed | ENG | H4 | critical |
-| 24 | Container / cabinet received and inspected; structural and envelope work starts | FAC | W6, H7, W8 | critical |
+| 24 | Wide-body module shells received and inspected; structural and envelope work starts (per module) | FAC | W6, H7, W8 | critical |
 | 24 | Permits issued (building, electrical, mechanical, fire plan review) | Customer / AHJ | - | parallel |
+| 44 | Longest-lead factory item on the floor (26 weeks from release); module mechanical and electrical fit-out complete; site gear (MV transformers, switchgear, generators) ships direct to site at 52 weeks | FAC + SUB | H10 | critical |
 | 44 | Site pad, grounding and utility feeder complete and surveyed | Customer civil | H16 | parallel |
-| 64 | Longest-lead item on the floor (52 weeks from release); mechanical and electrical fit-out complete | FAC + SUB | H10 | critical |
-| 70 | Cooling, controls and firmware complete; factory acceptance test incl. 24 h burn-in | FAC + ENG; customer witness | H11, W12, H13 | critical |
-| 73 | Transport prep and shipping | LOG | - | critical |
-| 77 | Set-down, hook-up and pre-energisation check | LOG + SUB + AHJ | W17, H18 | critical |
-| 79 | Site acceptance test and fire marshal acceptance | ENG + customer + AHJ | H19 | critical |
-| 80 | Training and turnover; unit in service | ENG + customer | W20 | critical |
+| 50 | Cooling, controls and firmware complete; factory acceptance test incl. 24 h burn-in | FAC + ENG; customer witness | H11, W12, H13 | critical |
+| 53 | Transport prep and shipping | LOG | - | critical |
+| 68 | Modules set and site-joined, power module and MV gear set, hook-up and pre-energisation check (long-lead site gear on site) | LOG + SUB + AHJ | W17, H18 | critical |
+| 70 | Site acceptance test and fire marshal acceptance | ENG + customer + AHJ | H19 | critical |
+| 71 | Training and turnover; unit in service | ENG + customer | W20 | critical |
 
 Long-lead items (ordered at engineering release):
 

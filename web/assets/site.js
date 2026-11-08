@@ -100,17 +100,19 @@ function writeForm() {
     const o = document.createElement('option'); o.value = k; o.textContent = v.label; cs.appendChild(o);
   }
   cs.value = c.cooling; $('#redundancy').value = c.redundancy; $('#ups_minutes').value = c.ups_minutes; $('#generator').checked = c.generator;
-  $('#hardening').value = c.hardening;
+  $('#hardeningSel').value = c.hardening;
   document.querySelectorAll('.sub').forEach(x => x.checked = c.subsystems.includes(x.value));
   $('#white_label').checked = c.white_label; $('#brand').value = c.brand;
   const hero = $('#heroImg'); hero.src = `assets/hero-${c.tier}.svg`;
+  const cap = hero.closest('figure') && hero.closest('figure').querySelector('figcaption');
+  if (cap) cap.textContent = `${t.label} · ${t.enclosure} · up to ${fmt(t.it_kw_max)} kW IT · generated from the configuration model`;
   hero.alt = t.kind === 'hall' ? `Isometric illustration of the ${t.label} prefabricated data hall: three joined modules, a power module and a plant yard with dry coolers and generators` : `Isometric illustration of a ${t.label} ${t.kind === 'cabinet' ? 'outdoor cabinet' : 'container data center'} with the Schreiber AI mark on the side`;
 }
 function readForm() {
   const c = state.cfg;
   c.tier = $('#tier').value; c.it_kw = +$('#it_kw').value; c.racks = +$('#racks').value; c.cooling = $('#cooling').value;
   c.redundancy = $('#redundancy').value; c.ups_minutes = +$('#ups_minutes').value; c.generator = $('#generator').checked;
-  c.hardening = $('#hardening').value || c.hardening || 'H1';
+  c.hardening = $('#hardeningSel').value || c.hardening || 'H1';
   c.subsystems = [...document.querySelectorAll('.sub:checked')].map(x => x.value);
   c.white_label = $('#white_label').checked; c.brand = $('#brand').value || 'Schreiber AI';
   c.profile = state.profile; c.climate = state.climate;
@@ -164,13 +166,13 @@ async function main() {
   PRICING = await load('assets/pricing.json', null);
   buildTiers(); buildProfiles(); buildRisks();
   const ts = $('#tier'); for (const [k, t] of Object.entries(CAT.tiers)) { const o = document.createElement('option'); o.value = k; o.textContent = t.label; ts.appendChild(o); }
-  const hs = $('#hardening'); for (const [k, h] of Object.entries(CAT.hardening || {})) { const o = document.createElement('option'); o.value = k; o.textContent = `${h.label} — ${h.rating}`; hs.appendChild(o); }
+  const hs = $('#hardeningSel'); for (const [k, h] of Object.entries(CAT.hardening || {})) { const o = document.createElement('option'); o.value = k; o.textContent = h.label; o.title = h.rating; hs.appendChild(o); }
   const urlCfg = new URLSearchParams(location.search).get('config');
   if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.cfg.tier = canonicalTier(state.cfg.tier, CAT); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset('ben150'); } }
   else setPreset('ben150');
   ts.onchange = () => setPreset(ts.value);
   $('#it_kw').oninput = () => { $('#itOut').value = $('#it_kw').value; recompute(); };
-  for (const id of ['#racks', '#cooling', '#redundancy', '#ups_minutes', '#generator', '#hardening', '#white_label', '#brand']) $(id).onchange = recompute;
+  for (const id of ['#racks', '#cooling', '#redundancy', '#ups_minutes', '#generator', '#hardeningSel', '#white_label', '#brand']) $(id).onchange = recompute;
   document.querySelectorAll('.sub').forEach(x => x.onchange = recompute);
   $('#dlCfg').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(state.cfg, null, 2)], { type: 'application/json' })); a.download = `ben-config-${state.cfg.tier}.json`; a.click(); };
 }
