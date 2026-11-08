@@ -28,7 +28,7 @@ Calibration budgets computed (k = 2): DS18B20 ±0.17 K, SHT45 T ±0.14 K, SHT45 
 
 ## 3. Dashboard (Playwright, Chromium, software WebGL)
 
-<!-- E2E_RESULT -->
+`bash tests/e2e/run_e2e.sh` (2026-11-08): **22/22 checks passed, exit 0**, about 13 minutes under software WebGL. Checks: server up with modules; WebSocket live; BEN 20 scene 5 racks / 27 sensors; selector to BEN 40 rebuilds twin and scene (10 racks); invalid configuration shows inline error and disables Apply; BEN Micro renders one cabinet; walkthrough eye height 1.70 m stays inside; cooling fault via UI raises alarm, click selects the unit in 3-D, clear via UI; sweep run and CSV download (105 lines); every panel renders; calibration demo points give gain/offset/U95; guided tour 24 frames with captions; **proposal panel generates a proposal from the current configuration and the HTML is served**; 390 px layout stacks with no horizontal scroll; 0 uncaught page errors.
 
 Screenshots inspected by eye: `docs/media/screens/desktop-exterior-iso.png`, `interior-walkthrough.png`, `alarms.png`, `sweeps.png`, `selector-micro.png`, `selector-ben40.png`, `narrow-390.png`, `live-hot-aisle.png`, `proposal-panel.png`, `web-hero.png`, `web-configure.png`, `web-narrow.png`, `proposal-1.png`, `proposal-2.png`. Fixes made from looking are listed in `docs/PROJECT_NOTES.md`.
 

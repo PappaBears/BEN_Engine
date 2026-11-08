@@ -203,3 +203,7 @@ table.data td.num { font-family: var(--mono); text-align: right; }
   #st-step { display: none; }
   .statusbar { gap: 10px; }
 }
+
+/* proposal panel price table */
+.panel table.kv td, .panel table.kv th { padding: 4px 10px 4px 0; white-space: nowrap; text-align: left; }
+.panel table.kv td:first-child { white-space: normal; }
