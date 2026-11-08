@@ -54,3 +54,6 @@ All decisions are reversible unless marked. The operator asked for no questions,
 - Dashboard (by the dashboard agent): exterior framing, lighting/exposure, cutaway transparency, power-bay layout, hot-aisle pipe sizing, sensor sphere and particle size, Micro presets, status strip at 390 px, sweeps panel re-render.
 - Drawings (by the drawings agent): leader overlaps on A-003, north arrow collision, leak-rope item painting over C-001, step numbering, Micro node placement, M-001 label collisions, sensor dimension stacking.
 - Proposal: blank "proposed" marker column became a Status column.
+
+## D32 — Controls hardware replaced with an industrial platform (2026-11-08)
+Operator rejected the Raspberry Pi gateway. Decision: PLC (Phoenix Contact PLCnext AXC F 2152 + Axioline I/O, UL 508A panel) for control and interlocks; industrial edge computer (OnLogic Karbon 400, TPM 2.0, −40…70 °C) for the twin, dashboard and history; sensing by industrial transmitters on the PLC plus **BEN Pod** on **BEN Mesh** (Thread/IPv6 on Silicon Labs EFR32MG24 / MGM240P with Secure Vault High, our PCB, our PKI). ESP32 and Olimex removed. Rationale and the BEN Care differentiators in `docs/CONTROLS_HARDWARE_DECISION.md`.
