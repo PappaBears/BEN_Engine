@@ -27,7 +27,7 @@ Northline Compute Cooperative needs 700 kW of IT capacity for a AI training pod 
 
 The unit arrives finished and factory-tested. It needs a pad, a 1200 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the managed service option: $32,332,916 capital ($46,190 per kW IT) plus $378,000 per year (Managed service at $45/kW-month x 700 kW IT). 2 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 98 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the managed service option: $32,336,416 capital ($46,195 per kW IT) plus $378,000 per year (Managed service at $45/kW-month x 700 kW IT). 2 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 98 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 48 weeks, set by the longest-lead item (26 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -76,12 +76,12 @@ What this means for you: the environmental class sets the alarm limits your IT w
 | Compute module | included | 5 lines | $30,018,724 |
 | Controls module | included | 30 lines | $27,312 |
 | Structure (container / cabinet) | included | 18 lines | $131,064 |
-| Envelope (insulation, liner, coatings) | included | 18 lines | $32,159 |
+| Envelope (insulation, liner, coatings) | included | 20 lines | $35,659 |
 | Fire detection and suppression | included | 7 lines | $65,503 |
 | Site kit (anchors, embeds, signage) | included | 8 lines | $100,556 |
 | Build labour, FAT, logistics | included | 9 lines | $81,160 |
 
-Top 15 lines of the 117-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
+Top 15 lines of the 119-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
@@ -114,27 +114,27 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $32,305,603 | $46,151 | - | 1 yr | $32,305,603 | 2 / 0 / 98 % | 87 | alternative |
-| Hardware + BEN Controls | $32,332,916 | $46,190 | $54,000 | 1 yr | $32,386,916 | 2 / 0 / 98 % | 117 | alternative |
-| White-label | $32,332,916 | $46,190 | $67,500 | 1 yr | $32,400,416 | 2 / 0 / 98 % | 117 | alternative |
-| Managed service | $32,332,916 | $46,190 | $378,000 | 3 yr | $33,466,916 | 2 / 0 / 98 % | 117 | PROPOSED |
+| Hardware only | $32,309,103 | $46,156 | - | 1 yr | $32,309,103 | 2 / 0 / 98 % | 89 | alternative |
+| Hardware + BEN Controls | $32,336,416 | $46,195 | $54,000 | 1 yr | $32,390,416 | 2 / 0 / 98 % | 119 | alternative |
+| White-label | $32,336,416 | $46,195 | $67,500 | 1 yr | $32,403,916 | 2 / 0 / 98 % | 119 | alternative |
+| Managed service | $32,336,416 | $46,195 | $378,000 | 3 yr | $33,470,416 | 2 / 0 / 98 % | 119 | PROPOSED |
 
 Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 700 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $32,332,916 | $378,000 | $32,710,916 |
-| 3 years | $32,332,916 | $1,134,000 | $33,466,916 |
-| 5 years | $32,332,916 | $1,890,000 | $34,222,916 |
+| 1 year | $32,336,416 | $378,000 | $32,714,416 |
+| 3 years | $32,336,416 | $1,134,000 | $33,470,416 |
+| 5 years | $32,336,416 | $1,890,000 | $34,226,416 |
 
-Payment milestones for the proposed option (Managed service, capital $32,332,916):
+Payment milestones for the proposed option (Managed service, capital $32,336,416):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $9,699,875 | 8 |
-| Factory acceptance test (H13) | 40 % | $12,933,166 | 41 |
-| Site acceptance test (H19) | 25 % | $8,083,229 | 47 |
-| Turnover (W20) | 5 % | $1,616,646 | 48 |
+| Engineering release (H4) | 30 % | $9,700,925 | 8 |
+| Factory acceptance test (H13) | 40 % | $12,934,566 | 41 |
+| Site acceptance test (H19) | 25 % | $8,084,104 | 47 |
+| Turnover (W20) | 5 % | $1,616,821 | 48 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -225,7 +225,7 @@ Baseline matrix lines that apply to every unit:
 
 ## 10. Risks disclosed up front
 
-These are the risks that apply to the ai training pod profile, from the product risk register (docs/RISK_REGISTER.md, web/assets/risks.json). Each line says what the design covers and what remains the customer's decision or duty. Please read them before accepting the price.
+These are the risks that apply to the ai training pod profile on a BEN 700, from the product risk register (docs/RISK_REGISTER.md, web/assets/risks.json). Each line says what the design covers and what remains the customer's decision or duty. Please read them before accepting the price.
 
 | ID | Risk | Severity | What can happen | Covered by the design | Customer owns |
 |---|---|---|---|---|---|
@@ -233,9 +233,7 @@ These are the risks that apply to the ai training pod profile, from the product 
 | R05 | Cooling stops when power is lost | high | If cooling is not on UPS, inlet temperature in a small container rises several degrees per minute at full load. | Ride-through measured in test E5 and published; option to put fans and pumps on UPS; generator start in 10 s; load-shed hooks. | Choose: accept a few minutes, add cooling to UPS, or add a generator. |
 | R15 | Permit delay or unexpected AHJ requirement | high | The local authority may classify the container as a building, ask for a field evaluation or more fire protection, and take longer than the build. | Pre-application package, code summary, field-evaluation budget line, site requirements signed before build, parallel permit path in the schedule. | Pulling permits (or authorising us), zoning, neighbour relations. |
 | R18 | Long-lead parts slip | high | UPS, switchgear, cooling units and transformers can take months and slip. | Long-lead orders at engineering release, approved alternates, stocked controls hardware. | Early deposit and configuration freeze; no late changes. |
-| R27 | Medium-voltage utility service lead time (BEN 2000) | high | A new 12.47 kV service with primary metering and two pad-mount transformers is utility work on the utility's schedule, typically 26 to 52 weeks. | Interconnection application filed at order, utility window carried on the critical path, load letter and single-line ready at kick-off, temporary 480 V service for commissioning where allowed. | The utility contract and fees, land for utility equipment, easements. |
-| R30 | Construction permit for a building (BEN 2000) | high | The hall is a building (IBC Group B or F-1), not an equipment enclosure: plan review, state modular approval and inspections take 8 to 16 weeks before civil works can start. | Stamped permit set from the engineering release, state modular label on each module, pre-application meeting, civil package starts after permit, both occupancy classifications budgeted. | Zoning, land use, easements, neighbour notice, permit fees. |
-| R52 | Long lead times for large electrical gear (dense tiers) | high | 1,600 to 2,000 A switchboards, large UPS frames, row CDUs and megawatt-class dry coolers have the longest lead times in the catalog, stretched by AI demand. | Long-lead orders at engineering release, frame agreements and reserved slots, approved alternates, long-lead items and dates named in the quote. | Early deposit and early configuration freeze. |
+| R52 | Long lead times for large electrical gear (dense tiers) | high | 1,200 A switchboards (2,000 A on the BEN 2000 power module), 500 kVA UPS frames, row CDUs and 700 kW-class dry coolers have the longest lead times in the catalog, stretched by AI demand. | Long-lead orders at engineering release, frame agreements and reserved slots, approved alternates, long-lead items and dates named in the quote. | Early deposit and early configuration freeze. |
 | R02 | Arc flash or electrical fault | medium | A fault while a panel is open or a component failure can injure someone and damage equipment. | Arc-flash study and labels, selective coordination, listed dead-front gear, lockout points, NFPA 70E training at turnover. | Only qualified electricians work on it and the labels are followed. |
 | R04 | Rack inlets run hot | medium | Hot days, a failed cooling unit or more load than planned push inlet temperatures up; IT throttles or trips. | N+1 cooling, climate derate built into sizing, inlet sensors at three heights per rack with ASHRAE alarms, load-step and failover tests. | Keep IT load inside the configured kW, keep filters and coils clean, do not block containment. |
 | R06 | Fire inside the container | medium | A cable, battery or power supply fire would mean loss of IT, an agent discharge and downtime. | Very-early smoke detection, clean agent with 10-minute hold, HVAC shutdown, EPO, non-combustible liner, battery separation. | Fire marshal relationship, agent recharge contract, no combustible storage inside, insurance. |
@@ -246,11 +244,9 @@ These are the risks that apply to the ai training pod profile, from the product 
 | R20 | Site costs above quote | medium | Civil works, permits and utility connection can cost more than the allowance. | Firm box price after engineering release; site works quoted after survey; utility costs identified at survey. | Utility fees, civil works, permits, taxes, and changes after freeze. |
 | R21 | Energy cost higher than expected | medium | Cooling energy rises in hot climates and with high utilisation. | Honest PUE estimate from the configuration, measured at SAT (test E9), economizer and variable-speed fans. | Electricity tariff and IT utilisation. |
 | R24 | Heat and noise in the hot aisle | medium | Technicians can face heat stress and noise above 85 dBA behind high-density racks. | Work limits in the O&M manual, hearing protection signage, cold-aisle work position for most tasks. | Work-rest cycles and PPE. |
-| R28 | Water availability for adiabatic cooling (BEN 2000) | medium | Hot-day make-up water is 2 to 8 cubic metres a day per 1,000 kW; drought rules or a weak supply can force the coolers to run dry and lose capacity on the hottest days. | Dry mode below 28 C, chilled-water option for hot climates, water quantity and drain confirmed at site survey, storage tank option, water management plan per ASHRAE 188. | Water supply contract, drought-rule compliance, sewer discharge permit for bleed water. |
-| R29 | Module joint leakage (BEN 2000) | medium | The three hall modules are sealed on site; the seams are the one part of the IP66 envelope not finished in the factory. | Factory compression gaskets and field EPDM cover strips with a drained cavity, joint seal hose test E15 at SAT and after any relocation, leak rope under each joint, semi-annual seal inspection. | Keep the roof clear of debris and snow beyond design, respond to alarms. |
 | R37 | CDU pump failure on a high-density liquid loop | medium | At 100–250 kW per rack the cold plates have seconds of margin, not minutes. | Pumps N+1 per row CDU with automatic failover, monthly proof, commissioning step 6 and experiment E18; low-flow critical alarm. | Choosing N+1 CDUs where the load justifies it. |
-| R48 | One rack is a large share of the unit (dense tiers) | medium | On BEN 300 a single 132 to 155 kW liquid rack can be half or all of the IT. A fault in that rack, its manifold branch or its tap-off takes most of the unit's capacity with it. | Per-rack isolation valves and tap-off breakers, N+1 CDUs and pumps, failure domain (kW lost per single fault) printed in the proposal, BEN 1000 spreads load over more racks. | Decide whether the workload tolerates one failure domain or needs two units. |
-| R49 | CDU or pump failure at full liquid load (dense tiers) | medium | Liquid is the default on BEN 300 and BEN 1000, so a CDU or pump failure applies to every unit. Cold plates at 130 to 250 kW per rack have seconds of margin. | N+1 CDUs as the default, automatic failover, monthly proof of redundancy (BEN Care), test E18 at FAT and SAT, CDUs and pumps on UPS. | Keep the BEN Care proof running or do the monthly failover test. |
+| R48 | One rack is a large share of the unit (dense tiers) | medium | On BEN 300 a single 132 to 155 kW liquid rack can be half or all of the IT. A fault in that rack, its manifold branch or its tap-off takes most of the unit's capacity with it. | Per-rack isolation valves and tap-off breakers, N+1 CDUs and pumps, failure domain (kW lost per single fault) printed in the proposal, BEN 700 spreads load over more racks. | Decide whether the workload tolerates one failure domain or needs two units. |
+| R49 | CDU or pump failure at full liquid load (dense tiers) | medium | Liquid is the default on BEN 300 and BEN 700, so a CDU or pump failure applies to every unit. Cold plates at 130 to 250 kW per rack have seconds of margin. | N+1 CDUs as the default, automatic failover, monthly proof of redundancy (BEN Care), test E18 at FAT and SAT, CDUs and pumps on UPS. | Keep the BEN Care proof running or do the monthly failover test. |
 | R50 | Coolant quality drifts (dense tiers) | medium | Warm-water loops grow biofilm and scale faster; filters clog and cold plates lose margin over months. | Coolant to the OCP water-based spec or PG25, side-stream filtration, quarterly coolant sampling and filter changes on pressure drop, loop flow and temperature trended by the twin (E20). | Water analysis contract if not under BEN Care; never top up with tap water. |
 | R51 | Weight on the 20 ft floor (dense tiers) | medium | A current liquid AI rack weighs about 1.4 to 1.6 t. Two of them plus CDUs, UPS and batteries load a 20 ft frame close to its rating, and rack feet exceed what a container floor is built for. | Steel sub-floor spreading the load, PE structural check for the selected racks, racks set in at site when gross mass would exceed the frame rating, weighed at transport prep. | Crane and site access for setting racks in at site where needed. |
 | R03 | Site fault current differs from assumption | low | Until the utility gives its fault current and voltage, arc-flash labels and some ratings are provisional. | Labels marked provisional until SAT; study updated with utility data; panel SCCR at least 65 kA. | Provide utility fault current and voltage before the unit ships. |
@@ -264,12 +260,12 @@ The full form (docs/SITE_REQUIREMENTS.md) is signed by the customer and by us at
 
 | Item | Value |
 |---|---|
-| Pad plan size | unit footprint + 1.0 m apron all round + equipment yard |
-| Pad type | reinforced slab or piers at corner castings to frost depth; PE-stamped drawing supplied |
-| Anchor points | twist-lock bases or weld plates at the corner castings (ISO 1161 pattern) |
+| Pad plan size | 14.5 × 4.5 m + heat-rejection skid 4.8 × 2.6 m set 1.5 m off the blind end (unit + gap + skid about 18.5 × 2.6 m = 48.1 m², docs/DENSITY.md) + battery enclosure pad where the NFPA 855 spacing requires it (COMPLIANCE.md §19) |
+| Pad type | 250 mm slab or 6–8 piers; corner loads from the gross mass 19.3 t (19,300 kg preset); PE-stamped per site soil |
+| Anchor points | 6–8 twist-lock bases / weld plates |
 | Gross mass to set | 19,987 kg (crane sized for this mass at the required radius) |
-| Utility service | 480 V 3ph; customer disconnect rated 1200 A for this configuration (tier range: 1200 A) |
-| Feeder conductors (customer side) | per NEC 310.16 for the breaker rating |
+| Utility service | 480Y/277 V, 3φ, 4-wire + ground (MV service and a customer transformer are common at this size: tell us at survey); customer disconnect rated 1200 A for this configuration (tier range: Rated 1,200 A from the configuration (1,186 A calculated at 700 kW; ground-fault protection and arc-energy reduction apply at this rating, COMPLIANCE.md §19)) |
+| Feeder conductors (customer side) | Per NEC 310.16 75 °C Cu for the breaker rating, parallel sets or bus duct |
 | Fault current | utility available fault current and voltage required before shipping; unit SCCR 65 kA |
 | Generator | not in this configuration |
 | Grounding electrode | Ground ring (≥ 6 m of 2 AWG bare copper, 750 mm deep around the pad) or two 3 m rods ≥ 1.8 m apart, bonded to the building electrode system if one exists (NEC 250.50) |

@@ -3948,7 +3948,7 @@ z
    </g>
    <g id="text_42">
     <!-- SWBD1 — 480 V SWITCHBOARD SECTION 1200 A (main + maintenance bypass), 915 W x 610 D -->
-    <g style="fill: #0b1a31" transform="translate(85.03937 328.251969) scale(0.059524 -0.059524)">
+    <g style="fill: #0b1a31" transform="translate(181.417323 328.251969) scale(0.059524 -0.059524)">
      <defs>
       <path id="IBMPlexSans-Bold-1e" d="M 493 0 
 L 493 4467 
@@ -5122,7 +5122,7 @@ z
    </g>
    <g id="text_69">
     <!-- Battery: 4 cabinets x 32.6 kWh = 130.4 kWh, 10.1 min at IT load; one cabinet per NFPA 855 group (CTQ-E9 HOLD) -->
-    <g style="fill: #4a5d7a" transform="translate(153.070866 589.606299) scale(0.05102 -0.05102)">
+    <g style="fill: #4a5d7a" transform="translate(521.574803 549.92126) scale(0.05102 -0.05102)">
      <defs>
       <path id="IBMPlexSans-Regular-7c" d="M 3411 2381 
 L 429 2381 
@@ -5289,7 +5289,7 @@ z
    </g>
    <g id="text_70">
     <!-- CRITICAL BUS 480 V (UPS output, 724 kW): racks + CDU pumps ride through on the UPS -->
-    <g style="fill: #0b1a31" transform="translate(85.03937 623.055118) scale(0.056689 -0.056689)">
+    <g style="fill: #0b1a31" transform="translate(442.204724 623.055118) scale(0.056689 -0.056689)">
      <defs>
       <path id="IBMPlexSans-Bold-11" d="M 1805 -77 
 Q 1312 -77 960 137 
@@ -6391,7 +6391,7 @@ z
    </g>
    <g id="text_115">
     <!-- EPO -->
-    <g style="fill: #c8323a" transform="translate(85.03937 1309.606299) scale(0.085034 -0.085034)">
+    <g style="fill: #c8323a" transform="translate(85.03937 805.03937) scale(0.085034 -0.085034)">
      <use xlink:href="#IBMPlexSans-Bold-21"/>
      <use xlink:href="#IBMPlexSans-Bold-2c" transform="translate(60.703125 0)"/>
      <use xlink:href="#IBMPlexSans-Bold-2b" transform="translate(126.296875 0)"/>
@@ -6399,7 +6399,7 @@ z
    </g>
    <g id="text_116">
     <!-- Recessed in the door-end frame (interior, at the exit) + exterior station on SVC: shunt-trips UPS output breakers and the mechanical main; CDU pumps stop only after the leak / isolation logic (M-001). Hard-wired, monitored by a controller DI (CTQ-E3, CTP-K1). -->
-    <g style="fill: #0b1a31" transform="translate(85.03937 1323.779528) scale(0.053855 -0.053855)">
+    <g style="fill: #0b1a31" transform="translate(85.03937 819.212598) scale(0.053855 -0.053855)">
      <defs>
       <path id="IBMPlexSans-Regular-27" d="M 3251 0 
 L 1766 2195 
@@ -6683,7 +6683,7 @@ z
    </g>
    <g id="text_117">
     <!-- GROUNDING AND BONDING (NEC 250) -->
-    <g style="fill: #0b1a31" transform="translate(85.03937 1388.976378) scale(0.085034 -0.085034)">
+    <g style="fill: #0b1a31" transform="translate(85.03937 878.740157) scale(0.085034 -0.085034)">
      <use xlink:href="#IBMPlexSans-Bold-23"/>
      <use xlink:href="#IBMPlexSans-Bold-2e" transform="translate(71.90625 0)"/>
      <use xlink:href="#IBMPlexSans-Bold-2b" transform="translate(138.3125 0)"/>
@@ -6719,7 +6719,7 @@ z
    </g>
    <g id="text_118">
     <!-- • 2 ground rods + pad Ufer (GES), TMGB in SVC -->
-    <g style="fill: #0b1a31" transform="translate(96.377953 1403.149606) scale(0.053855 -0.053855)">
+    <g style="fill: #0b1a31" transform="translate(96.377953 892.913386) scale(0.053855 -0.053855)">
      <defs>
       <path id="IBMPlexSans-Regular-80" d="M 1267 1190 
 Q 838 1190 662 1382 
@@ -6784,7 +6784,7 @@ z
    </g>
    <g id="text_119">
     <!-- • Module frame bonded at 2 corners (exothermic) -->
-    <g style="fill: #0b1a31" transform="translate(96.377953 1412.220472) scale(0.053855 -0.053855)">
+    <g style="fill: #0b1a31" transform="translate(96.377953 901.984252) scale(0.053855 -0.053855)">
      <use xlink:href="#IBMPlexSans-Regular-80"/>
      <use xlink:href="#IBMPlexSans-Regular-106" transform="translate(39.59375 0)"/>
      <use xlink:href="#IBMPlexSans-Regular-29" transform="translate(63.1875 0)"/>
@@ -6836,7 +6836,7 @@ z
    </g>
    <g id="text_120">
     <!-- • Rack / tray ground bus, 6 AWG per rack -->
-    <g style="fill: #0b1a31" transform="translate(96.377953 1421.291339) scale(0.053855 -0.053855)">
+    <g style="fill: #0b1a31" transform="translate(96.377953 911.055118) scale(0.053855 -0.053855)">
      <use xlink:href="#IBMPlexSans-Regular-80"/>
      <use xlink:href="#IBMPlexSans-Regular-106" transform="translate(39.59375 0)"/>
      <use xlink:href="#IBMPlexSans-Regular-2e" transform="translate(63.1875 0)"/>
@@ -6881,7 +6881,7 @@ z
    </g>
    <g id="text_121">
     <!-- • CDU, manifold and dry-cooler skid bonded -->
-    <g style="fill: #0b1a31" transform="translate(96.377953 1430.362205) scale(0.053855 -0.053855)">
+    <g style="fill: #0b1a31" transform="translate(96.377953 920.125984) scale(0.053855 -0.053855)">
      <use xlink:href="#IBMPlexSans-Regular-80"/>
      <use xlink:href="#IBMPlexSans-Regular-106" transform="translate(39.59375 0)"/>
      <use xlink:href="#IBMPlexSans-Regular-1f" transform="translate(63.1875 0)"/>
@@ -6928,7 +6928,7 @@ z
    </g>
    <g id="text_122">
     <!-- • Battery cabinets bonded per UL 9540 -->
-    <g style="fill: #0b1a31" transform="translate(96.377953 1439.433071) scale(0.053855 -0.053855)">
+    <g style="fill: #0b1a31" transform="translate(96.377953 929.19685) scale(0.053855 -0.053855)">
      <use xlink:href="#IBMPlexSans-Regular-80"/>
      <use xlink:href="#IBMPlexSans-Regular-106" transform="translate(39.59375 0)"/>
      <use xlink:href="#IBMPlexSans-Regular-1e" transform="translate(63.1875 0)"/>
@@ -6970,7 +6970,7 @@ z
    </g>
    <g id="text_123">
     <!-- • Aisle-wall liner ENV-LINER-NC: NOT bonded (non-conductive, EN-001) -->
-    <g style="fill: #0b1a31" transform="translate(96.377953 1448.503937) scale(0.053855 -0.053855)">
+    <g style="fill: #0b1a31" transform="translate(96.377953 938.267717) scale(0.053855 -0.053855)">
      <use xlink:href="#IBMPlexSans-Regular-80"/>
      <use xlink:href="#IBMPlexSans-Regular-106" transform="translate(39.59375 0)"/>
      <use xlink:href="#IBMPlexSans-Regular-1d" transform="translate(63.1875 0)"/>
@@ -7043,7 +7043,7 @@ z
    </g>
    <g id="text_124">
     <!-- Interference / code checks for this sheet: I-D5 (gear working space 1,067), I-D7 (second entrance), I-D12 (UPS), I-D13 (battery power), I-D14 (NFPA 855 groups), I-D19 (PNL-D working space). -->
-    <g style="fill: #4a5d7a" transform="translate(85.03937 1474.015748) scale(0.05102 -0.05102)">
+    <g style="fill: #4a5d7a" transform="translate(85.03937 958.110236) scale(0.05102 -0.05102)">
      <use xlink:href="#IBMPlexSans-Regular-25"/>
      <use xlink:href="#IBMPlexSans-Regular-10" transform="translate(40 0)"/>
      <use xlink:href="#IBMPlexSans-Regular-16" transform="translate(96.796875 0)"/>

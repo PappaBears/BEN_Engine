@@ -27,7 +27,7 @@ Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Aust
 
 The unit arrives finished and factory-tested. It needs a pad, a 100 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the managed service option: $1,848,193 capital ($36,964 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 62 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 38 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the managed service option: $1,849,943 capital ($36,999 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 62 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 38 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 34 weeks, set by the longest-lead item (20 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -76,12 +76,12 @@ What this means for you: the environmental class sets the alarm limits your IT w
 | Compute module | included | 5 lines | $1,072,379 |
 | Controls module | included | 30 lines | $26,575 |
 | Structure (container / cabinet) | included | 17 lines | $55,729 |
-| Envelope (insulation, liner, coatings) | included | 18 lines | $23,148 |
+| Envelope (insulation, liner, coatings) | included | 20 lines | $24,898 |
 | Fire detection and suppression | included | 7 lines | $38,339 |
 | Site kit (anchors, embeds, signage) | included | 9 lines | $34,028 |
 | Build labour, FAT, logistics | included | 9 lines | $51,694 |
 
-Top 15 lines of the 116-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
+Top 15 lines of the 118-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
@@ -113,27 +113,27 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $1,821,618 | $36,432 | - | 1 yr | $1,821,618 | 62 / 0 / 38 % | 86 | alternative |
-| Hardware + BEN Controls | $1,848,193 | $36,964 | $12,000 | 1 yr | $1,860,193 | 62 / 0 / 38 % | 116 | alternative |
-| White-label | $1,848,193 | $36,964 | $15,000 | 1 yr | $1,863,193 | 62 / 0 / 38 % | 116 | alternative |
-| Managed service | $1,848,193 | $36,964 | $27,000 | 3 yr | $1,929,193 | 62 / 0 / 38 % | 116 | PROPOSED |
+| Hardware only | $1,823,368 | $36,467 | - | 1 yr | $1,823,368 | 62 / 0 / 38 % | 88 | alternative |
+| Hardware + BEN Controls | $1,849,943 | $36,999 | $12,000 | 1 yr | $1,861,943 | 62 / 0 / 38 % | 118 | alternative |
+| White-label | $1,849,943 | $36,999 | $15,000 | 1 yr | $1,864,943 | 62 / 0 / 38 % | 118 | alternative |
+| Managed service | $1,849,943 | $36,999 | $27,000 | 3 yr | $1,930,943 | 62 / 0 / 38 % | 118 | PROPOSED |
 
 Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $1,848,193 | $27,000 | $1,875,193 |
-| 3 years | $1,848,193 | $81,000 | $1,929,193 |
-| 5 years | $1,848,193 | $135,000 | $1,983,193 |
+| 1 year | $1,849,943 | $27,000 | $1,876,943 |
+| 3 years | $1,849,943 | $81,000 | $1,930,943 |
+| 5 years | $1,849,943 | $135,000 | $1,984,943 |
 
-Payment milestones for the proposed option (Managed service, capital $1,848,193):
+Payment milestones for the proposed option (Managed service, capital $1,849,943):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $554,458 | 6 |
-| Factory acceptance test (H13) | 40 % | $739,277 | 30 |
-| Site acceptance test (H19) | 25 % | $462,048 | 33 |
-| Turnover (W20) | 5 % | $92,410 | 34 |
+| Engineering release (H4) | 30 % | $554,983 | 6 |
+| Factory acceptance test (H13) | 40 % | $739,977 | 30 |
+| Site acceptance test (H19) | 25 % | $462,486 | 33 |
+| Turnover (W20) | 5 % | $92,497 | 34 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -224,28 +224,19 @@ Baseline matrix lines that apply to every unit:
 
 ## 10. Risks disclosed up front
 
-These are the risks that apply to the healthcare (hipaa) profile, from the product risk register (docs/RISK_REGISTER.md, web/assets/risks.json). Each line says what the design covers and what remains the customer's decision or duty. Please read them before accepting the price.
+These are the risks that apply to the healthcare (hipaa) profile on a BEN 150, from the product risk register (docs/RISK_REGISTER.md, web/assets/risks.json). Each line says what the design covers and what remains the customer's decision or duty. Please read them before accepting the price.
 
 | ID | Risk | Severity | What can happen | Covered by the design | Customer owns |
 |---|---|---|---|---|---|
 | R01 | Utility power loss | high | The grid fails for seconds to days. IT shuts down when the battery runs out and cooling stops at once unless it is on UPS or generator. | UPS ride-through (default 10 min), generator option with ATS, measured cooling ride-through (test E5), N+1/2N per profile. | Whether to buy the generator and fuel, the utility contract, and whether cooling is put on UPS. |
 | R15 | Permit delay or unexpected AHJ requirement | high | The local authority may classify the container as a building, ask for a field evaluation or more fire protection, and take longer than the build. | Pre-application package, code summary, field-evaluation budget line, site requirements signed before build, parallel permit path in the schedule. | Pulling permits (or authorising us), zoning, neighbour relations. |
 | R18 | Long-lead parts slip | high | UPS, switchgear, cooling units and transformers can take months and slip. | Long-lead orders at engineering release, approved alternates, stocked controls hardware. | Early deposit and configuration freeze; no late changes. |
-| R27 | Medium-voltage utility service lead time (BEN 2000) | high | A new 12.47 kV service with primary metering and two pad-mount transformers is utility work on the utility's schedule, typically 26 to 52 weeks. | Interconnection application filed at order, utility window carried on the critical path, load letter and single-line ready at kick-off, temporary 480 V service for commissioning where allowed. | The utility contract and fees, land for utility equipment, easements. |
-| R30 | Construction permit for a building (BEN 2000) | high | The hall is a building (IBC Group B or F-1), not an equipment enclosure: plan review, state modular approval and inspections take 8 to 16 weeks before civil works can start. | Stamped permit set from the engineering release, state modular label on each module, pre-application meeting, civil package starts after permit, both occupancy classifications budgeted. | Zoning, land use, easements, neighbour notice, permit fees. |
 | R02 | Arc flash or electrical fault | medium | A fault while a panel is open or a component failure can injure someone and damage equipment. | Arc-flash study and labels, selective coordination, listed dead-front gear, lockout points, NFPA 70E training at turnover. | Only qualified electricians work on it and the labels are followed. |
 | R06 | Fire inside the container | medium | A cable, battery or power supply fire would mean loss of IT, an agent discharge and downtime. | Very-early smoke detection, clean agent with 10-minute hold, HVAC shutdown, EPO, non-combustible liner, battery separation. | Fire marshal relationship, agent recharge contract, no combustible storage inside, insurance. |
 | R07 | Lithium battery thermal runaway | medium | A battery cell failure can release flammable gas and start a fire that spreads if not contained. | LFP chemistry, UL 1973/9540 listed cabinets with UL 9540A data, BMS alarms, gas detection and venting above 20 kWh, capped battery size on smaller tiers; BEN 2000 battery rooms with 2-hour separation and gas detection. | No unapproved batteries, keep BMS firmware updated, respond to BMS alarms. |
 | R11 | Intrusion into the controls network | medium | An attacker who reaches the controls LAN could change setpoints or stop cooling. | IEC 62443 zones, isolated controls LAN, signed firmware, no inbound ports, outbound-only remote support that can be disabled, hardwired life safety. | The firewall between BEN controls and the customer LAN (unless managed), password handover, patch windows. |
 | R14 | Sensor drift gives false comfort | medium | A drifted sensor can make the dashboard look fine while the room is not. | Redundant sensors, idle cross-check (test E1), drift detection, 12-month or trigger-based recalibration. | Allow calibration visits, do not move sensors. |
 | R20 | Site costs above quote | medium | Civil works, permits and utility connection can cost more than the allowance. | Firm box price after engineering release; site works quoted after survey; utility costs identified at survey. | Utility fees, civil works, permits, taxes, and changes after freeze. |
-| R28 | Water availability for adiabatic cooling (BEN 2000) | medium | Hot-day make-up water is 2 to 8 cubic metres a day per 1,000 kW; drought rules or a weak supply can force the coolers to run dry and lose capacity on the hottest days. | Dry mode below 28 C, chilled-water option for hot climates, water quantity and drain confirmed at site survey, storage tank option, water management plan per ASHRAE 188. | Water supply contract, drought-rule compliance, sewer discharge permit for bleed water. |
-| R29 | Module joint leakage (BEN 2000) | medium | The three hall modules are sealed on site; the seams are the one part of the IP66 envelope not finished in the factory. | Factory compression gaskets and field EPDM cover strips with a drained cavity, joint seal hose test E15 at SAT and after any relocation, leak rope under each joint, semi-annual seal inspection. | Keep the roof clear of debris and snow beyond design, respond to alarms. |
-| R42 | Circuit overload trips the breaker (BEN 1) | medium | A cab12 at full load uses most of a 20 A circuit. A heater, printer or coffee machine on the same circuit trips the breaker; the UPS carries the IT for a few minutes and then shuts it down. | Dedicated circuit required (15 A rack10, 20 A cab12), load limited to 80 % of the circuit in the configuration, clean shutdown on UPS input loss, input current measured at handover (E22). | Have the dedicated circuit installed and keep other loads and power strips off it. |
-| R44 | Someone walks off with it (BEN 1) | medium | A mini rack is small enough to carry and it holds your data. | Lockable cabinet (cab12) or cable-lock point (rack10), disk encryption on by default with the key held off the box, door-contact alarm through the BEN Pod, remote wipe of controller credentials. | Keep it in a lockable room, keep the recovery key safe, insure the equipment. |
-| R45 | Consumer-grade gear creeps in (BEN 1) | medium | Someone adds a gaming PC, a cheap switch or an unlisted power strip because it fits. The unit runs hotter, louder and less reliably and may hold a part nobody can support. | Shipped full and labelled, additions by change order with a fit, heat and power check, only UL 62368-1 listed parts on the BEN 1 catalog, BEN Care flags unknown devices. | Ask before adding equipment; no extra power strips. |
-| R46 | Backups not tested, restore fails (BEN 1) | medium | Small sites often have a backup job that has silently stopped. When a disk fails or ransomware hits, the restore does not work. | Backup to a second target set up at handover, BEN Care reports every failed backup, quarterly restore test on the maintenance list and checked remotely. | Keep the second backup target and do the quarterly restore test (or let BEN Care do it). |
-| R47 | UPS battery wears out (BEN 1) | medium | Lithium UPS batteries last about 3 to 5 years. An old battery holds the IT for seconds, so a short power blip becomes a hard shutdown. | Quarterly UPS self-test reported by BEN Care, battery-health alarm, replacement pack shipped before end of life with a prepaid recycling return, runtime measured at handover (E23). | Swap the battery when it arrives (about 10 minutes) or book the visit. |
 | R03 | Site fault current differs from assumption | low | Until the utility gives its fault current and voltage, arc-flash labels and some ratings are provisional. | Labels marked provisional until SAT; study updated with utility data; panel SCCR at least 65 kA. | Provide utility fault current and voltage before the unit ships. |
 | R09 | Transport or lifting damage | low | A bad lift or rough transport can twist the frame or crack a weld. | Corner-casting lifts with spreader, PE-checked frame, shock loggers, set-down inspection, freight insurance; BEN 2000 modules lifted on engineered lugs with a 100 t crane and a certified lift plan. | Crane access, competent rigger, route survey for the high-cube height. |
 | R19 | Component discontinued or listing changes | low | A specified part may be discontinued or lose its listing before or after build. | Approved alternates in the BOM, configuration freeze per unit, FAT repeats affected tests. | None. |
@@ -254,7 +245,6 @@ These are the risks that apply to the healthcare (hipaa) profile, from the produ
 | R25 | No Uptime Tier certification is claimed | low | We design with TIA-942 Rated-2/3 concepts but do not hold a Tier certificate; an insurer or auditor may ask. | Design-basis statement, FAT/SAT evidence, optional third-party audit at cost. | Deciding if a certification is required and paying for it. |
 | R31 | Flood above the pad | low | A flood above the pad puts water in the enclosure and takes the unit out for a long time. | Pad 0.3 m above base flood elevation on every tier; hardening H2 and H3 add a 600 mm flood plinth with sealed penetrations, and the IP66 envelope holds against splash and standing water; flood alarm on the plinth. | Site selection outside the floodway, true flood zone data, choosing H2 where the map says so. |
 | R32 | Ballistic or forced-entry attack | low | Gunfire or a break-in can destroy IT, injure people or take data-bearing equipment. | H1: steel skin, keyed access, door contacts. H3: UL 752 ballistic panels (level 3 to 8), ASTM F3038 forced-entry doors, IK10, mantrap vestibule, two-factor access, tamper detection on the PLC and an audit trail in BEN Care. | Threat assessment and choice of level, guard force and response, perimeter. |
-| R43 | Noisier than expected (BEN 1) | low | Fans speed up when the AI box works hard, which can annoy a small office and lead to the unit being moved somewhere worse. | Sound-damped cabinet (cab12), low-speed fans, target 45 dBA or less at 1 m at full load, measured at handover (E21). | Place it away from desks where possible and keep the cabinet door closed. |
 
 ## 11. Site requirements summary
 
