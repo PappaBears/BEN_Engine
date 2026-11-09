@@ -99,3 +99,19 @@ Every sheet carries the title block (Schreiber AI · BEN Engine · tier · drawi
 - The generator is a drafting aid, not a CAD model: there are no hidden-line views and no 3D-derived sections. Details are schematic and dimensioned by rule, not by part drawings.
 - Breaker sizes, conductor sizes, refrigerant line sizes and the cylinder size are preliminary and say so on the sheets; a licensed engineer / technician completes them.
 - "Checked" is blank while `design/REVISION.json` has no `checker`. A person checks the set, their name goes into that file, and the set is regenerated as IFC before it is used for construction.
+
+## Rev 2 drawing set (Rev 2.A)
+
+Record: `design/rev2/REVISION.json` (product revision 2, drawing set Rev 2.A, change register R2-01..R2-04). `design/revision.py` loads it when a generator runs with `--lineup rev2`; without the flag every generator reads `design/REVISION.json` exactly as before, so Rev 1 regenerates byte-identically.
+
+```bash
+python design/drawings/gen_drawings_rev2.py --lineup rev2     # design/drawings/rev2/<tier>/ (BEN 1: rev2/ben1/rack10|cab12/, A-001 E-001 C-001 I-001)
+PYTHONPATH=software python design/gen_design_basis.py --lineup rev2   # design/rev2/DESIGN_BASIS.md (run after the drawings)
+python design/renders/gen_renders.py --lineup rev2           # design/renders/rev2/<tier>/
+python design/assembly/gen_assembly.py --lineup rev2         # design/assembly/rev2/ASSEMBLY-<tier>.md (fails on an STE violation)
+python design/gen_sqam.py --lineup rev2                      # docs/rev2/SQAM.md + design/assembly/rev2/CTQ-CARD-<tier>.md
+python design/specs/wiring/gen_wiring.py --lineup rev2       # design/specs/wiring/rev2/
+PYTHONPATH=software python -m ben_engine.bom --all --lineup rev2      # purchasing/rev2/, docs/rev2/BOM*.md
+```
+
+Title blocks follow `brand/v2/titleblock-spec.md` (lockup-deep master embedded as vector on white, Archivo / IBM Plex TTFs, data plate band inside the 260 x 58 mm envelope so no Rev 1 layout moves, legal line under the frame). Index of the set: `design/drawings/rev2/INDEX.md`; engineering notice EN-001 (working space / aisle-wall liner): `docs/audit/EN-001_working_space_liner.md`.

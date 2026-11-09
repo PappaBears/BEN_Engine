@@ -8,7 +8,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 | Check | Command | Observed |
 | --- | --- | --- |
-| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **262 passed** in 41.1 s on 2026-11-09 (Rev 2; adds the Rev 1 frozen fixture and the Rev 2 lineup tests, §9). Generation 2 on 2026-11-08: 198 passed in 20.3 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2, forward architecture dc800 / dlc_hd incl. JS parity, BOM filters, twin faults, sweeps, commissioning steps 10–11, forward layout and drawings) |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **263 passed** in 43.4 s on 2026-11-09 (Rev 2; adds the Rev 1 frozen fixture and the Rev 2 lineup tests, §9). Generation 2 on 2026-11-08: 198 passed in 20.3 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2, forward architecture dc800 / dlc_hd incl. JS parity, BOM filters, twin faults, sweeps, commissioning steps 10–11, forward layout and drawings) |
 | Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
 | Build contract | `build_control.py run` (skill helper) | eight checks: python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500, sim-e2e-pytest, links, audit-mechanical. Commands carry their own `PYTHONPATH` so they run from a clean clone (audit F-01). Latest report stored at `docs/audit/evidence/build-report.json` |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |
@@ -90,7 +90,7 @@ Rev 2 adds BEN 1 (rack10, cab12), BEN 300 and BEN 700 (planned as BEN 1000, rena
 
 | Check | Command | Observed |
 | --- | --- | --- |
-| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **262 collected, 262 passed** in 41.1 s |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **263 collected, 263 passed** in 43.4 s |
 | Rev 1 frozen | `tests/test_rev1_frozen.py` against `tests/fixtures/rev1_presets.json` | **267 Rev 1 configurations** (config, derived values byte-identical and BOM totals identical) recompute exactly under the Rev 2 code; Rev 1 sample-proposal configs reproduce; the `rev1` lineup rejects Rev 2 tiers; `lineup` missing or `rev1` loads as Rev 1 (`docs/REVISION_POLICY.md` rule 3) |
 | Rev 2 lineup | `tests/test_rev2_lineup.py` (18 test functions, parametrised) | every Rev 2 preset valid for every profile and climate; `ben1000` → `ben700` alias and lineup loading; BEN 1 forms and sizing; dense tiers fit with real footprints and names follow power; dense validation rules; Rev 2 BOM totals and lines; `docs/DENSITY.md` current; sweeps, twin faults, CFD within 60 s, commissioning and proposals on the new tiers. 2N step-down observed by CLI: BEN 300 155 kW, BEN 700 400 kW |
 | Sweeps | `python -m ben_engine.sweeps --tier ben1` / `ben300` / `ben700` | BEN 1 3/3 PASS (load step, utility-loss ride-through 12.5 min vs 10 min configured, outdoor sweep); BEN 300 7/7 PASS; BEN 700 7/7 PASS (incl. CDU pump failover: standby within 6 s, loop ΔT peak 10.1 K vs 10 K design) |
