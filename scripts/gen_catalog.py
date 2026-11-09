@@ -3,17 +3,20 @@ import json, sys, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
 from ben_engine.config import TIER_GEOMETRY, COOLING_LIBRARY, PROFILE_DEFAULTS, CLIMATE_DESIGN, CONTROLS_TIERS, CONTROLS_PRO_PROFILES, HARDENING, TIER_ALIASES, POWER_ARCHITECTURES, DLC_HD_TIERS, DC_CONVENTIONS
+from ben_engine.config import TIERS_BY_LINEUP, LINEUPS, DENSE_FOOTPRINTS, DENSE_RULES, MINIRACK
 schema = {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "https://schreiberai.com/schemas/ben-config.schema.json",
  "title": "BEN Engine configuration", "type": "object", "additionalProperties": False,
  "required": ["tier", "profile", "it_kw", "racks", "cooling", "redundancy", "climate"],
  "properties": {
-  "tier": {"enum": list(TIER_GEOMETRY) + list(TIER_ALIASES), "description": "Tier by nominal maximum IT kW (ben5/ben30/ben150/ben500/ben2000); generation-1 keys micro/ben10/ben20/ben40 are accepted as aliases"},
+  "tier": {"enum": list(TIER_GEOMETRY) + list(TIER_ALIASES), "description": "Tier by nominal maximum IT kW. Rev 1: ben5/ben30/ben150/ben500/ben2000; Rev 2 adds ben1 (mini rack), ben300 and ben700 (liquid-first). Generation-1 keys micro/ben10/ben20/ben40 and the Rev 2 working name ben1000 (= ben700) are accepted as aliases"},
+  "lineup": {"enum": list(LINEUPS), "default": "rev2", "description": "Product lineup. A saved configuration without this key is Rev 1 and reproduces exactly (docs/REVISION_POLICY.md rule 3)"},
+  "form": {"enum": ["", "rack10", "cab12"], "default": "", "description": "BEN 1 only: rack10 = 10-inch 8U desk / shelf rack (<= 0.6 kW), cab12 = 19-inch 12U sound-damped cabinet (<= 1.5 kW)"},
   "profile": {"enum": list(PROFILE_DEFAULTS)},
   "it_kw": {"type": "number", "minimum": min(g["it_kw_min"] for g in TIER_GEOMETRY.values()), "maximum": max(g["it_kw_max"] for g in TIER_GEOMETRY.values())},
   "racks": {"type": "integer", "minimum": 1, "maximum": max(g["max_racks"] for g in TIER_GEOMETRY.values())},
-  "hardening": {"enum": list(HARDENING), "description": "Enclosure hardening level: H1 standard IP66, H2 severe environment, H3 hardened/government"},
+  "hardening": {"enum": list(HARDENING), "description": "Enclosure hardening level: H1 standard IP66, H2 severe environment, H3 hardened/government; IND = BEN 1 indoor (no hardening levels)"},
   "cooling": {"enum": list(COOLING_LIBRARY)},
   "redundancy": {"enum": ["N", "N+1", "2N"]},
   "climate": {"enum": list(CLIMATE_DESIGN)},
@@ -29,12 +32,15 @@ schema = {
  "x-cooling-limits": {c: {"max_rack_kw": v["max_rack_kw"], "medium": v["medium"]} for c, v in COOLING_LIBRARY.items()},
  "x-power-architectures": {k: {"tiers": list(v["tiers"])} for k, v in POWER_ARCHITECTURES.items()},
  "x-dlc-hd-tiers": list(DLC_HD_TIERS),
+ "x-tiers-by-lineup": TIERS_BY_LINEUP,
 }
 json.dump(schema, open(os.path.join(ROOT, "spec/ben-config.schema.json"), "w"), indent=2)
 tiers = {t: {**g, "rows": g.get("rows", 1)} for t, g in TIER_GEOMETRY.items()}  # every tier carries kind/modules/rows
 json.dump({"tiers": tiers, "tier_aliases": dict(TIER_ALIASES), "hardening": HARDENING, "cooling": COOLING_LIBRARY, "profiles": PROFILE_DEFAULTS,
            "climates": CLIMATE_DESIGN, "controls_tiers": CONTROLS_TIERS, "controls_pro_profiles": list(CONTROLS_PRO_PROFILES),
            "power_architectures": {k: {**v, "tiers": list(v["tiers"]), "busway_frames_a": list(v.get("busway_frames_a", []))} for k, v in POWER_ARCHITECTURES.items()},
-           "dlc_hd_tiers": list(DLC_HD_TIERS), "dc_conventions": DC_CONVENTIONS},
+           "dlc_hd_tiers": list(DLC_HD_TIERS), "dc_conventions": DC_CONVENTIONS,
+           # Rev 2 (docs/REV2_DECISION.md §2): lineups, BEN 1 forms and constants, dense-tier footprints and rules
+           "lineups": list(LINEUPS), "tiers_by_lineup": TIERS_BY_LINEUP, "dense_footprints": DENSE_FOOTPRINTS, "dense_rules": DENSE_RULES, "minirack": MINIRACK},
           open(os.path.join(ROOT, "web/assets/catalog.json"), "w"), indent=1)
 print("schema + catalog regenerated")

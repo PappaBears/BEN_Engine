@@ -38,6 +38,7 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Res
 from fastapi.staticfiles import StaticFiles
 
 from .config import (CLIMATE_DESIGN, COOLING_LIBRARY, PROFILE_DEFAULTS, TIER_GEOMETRY, TIER_ALIASES, HARDENING, CONTROLS_TIERS, Config, canonical_tier)
+from .config import TIERS_BY_LINEUP, LINEUPS, DENSE_FOOTPRINTS, DENSE_RULES, MINIRACK, POWER_ARCHITECTURES, DLC_HD_TIERS
 from .twin import Twin, TwinParams
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -683,10 +684,13 @@ async def validate_config(body: Dict[str, Any]):
 
 
 @app.get("/api/presets")
-async def presets():
+async def presets(lineup: str = "rev2", form: Optional[str] = None):
+    """Presets of ``lineup`` (rev2 default: BEN 1 ... BEN 2000; rev1: the frozen five). ``form`` picks the BEN 1 form."""
+    if lineup not in LINEUPS:
+        raise HTTPException(status_code=400, detail=f"unknown lineup {lineup}")
     out = {}
-    for t in TIER_GEOMETRY:
-        cfg = Config.preset(t)
+    for t in TIERS_BY_LINEUP[lineup]:
+        cfg = Config.preset(t, lineup=lineup, form=form if TIER_GEOMETRY[t]["kind"] == "minirack" else None)
         out[t] = {"config": cfg.to_dict(), "derived": {k: v for k, v in _jsonable(cfg.derived()).items() if k not in ("geometry", "climate")}}
     return out
 
@@ -695,7 +699,10 @@ async def presets():
 async def catalog():
     return {"tiers": TIER_GEOMETRY, "tier_aliases": TIER_ALIASES, "hardening": HARDENING, "controls_tiers": CONTROLS_TIERS,
             "profiles": PROFILE_DEFAULTS, "cooling": COOLING_LIBRARY, "climates": CLIMATE_DESIGN,
-            "redundancy": ["N", "N+1", "2N"], "subsystems": ["power", "cooling", "compute", "controls"], "faults": list(Twin.FAULTS)}
+            "redundancy": ["N", "N+1", "2N"], "subsystems": ["power", "cooling", "compute", "controls"], "faults": list(Twin.FAULTS),
+            # Rev 2: lineups, dense-tier footprints / rules, BEN 1 constants, power-architecture tier lists, dlc_hd tiers
+            "lineups": list(LINEUPS), "tiers_by_lineup": TIERS_BY_LINEUP, "dense_footprints": DENSE_FOOTPRINTS, "dense_rules": DENSE_RULES, "minirack": MINIRACK,
+            "power_architectures": {k: {"tiers": list(v["tiers"]), "label": v["label"]} for k, v in POWER_ARCHITECTURES.items()}, "dlc_hd_tiers": list(DLC_HD_TIERS)}
 
 
 @app.get("/api/sensors")

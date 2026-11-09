@@ -870,7 +870,7 @@ def main():
     used_by_tier = {}
     banned = ste_banned_words()
     violations, tot_steps, tot_sent = [], 0, 0
-    for t in L.TIER_GEOMETRY:
+    for t in L.TIERS_BY_LINEUP["rev1"]:
         lay = L.resolve(t)
         doc = generate(lay)
         lines, used = reconcile(doc.lines, lay)
@@ -888,10 +888,10 @@ def main():
             print("  ", v)
         raise SystemExit(f"gen_assembly.py: fix the step text in generate() ({len(violations)} STE violations)")
     print(f"  STE check: 0 banned-word hits, 0 step sentences over {MAX_STEP_WORDS} words "
-          f"({tot_steps} numbered steps, {tot_sent} step sentences, {len(banned)} banned words from STE_STYLE.md rule 10, {len(L.TIER_GEOMETRY)} documents)")
+          f"({tot_steps} numbered steps, {tot_sent} step sentences, {len(banned)} banned words from STE_STYLE.md rule 10, {len(L.TIERS_BY_LINEUP["rev1"])} documents)")
     # ------------------------------------------------------------ reconciled item code register
     drawing_codes = {}
-    for t in L.TIER_GEOMETRY:
+    for t in L.TIERS_BY_LINEUP["rev1"]:
         for i in L.resolve(t).items:
             drawing_codes.setdefault(i.code, set()).add(t)
     all_codes = set(drawing_codes) | {c for u in used_by_tier.values() for c in u}

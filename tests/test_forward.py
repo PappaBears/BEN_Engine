@@ -10,7 +10,7 @@ import pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
 sys.path.insert(0, os.path.join(ROOT, "design"))
-from ben_engine.config import Config, TIER_GEOMETRY, PRESETS, COOLING_LIBRARY, POWER_ARCHITECTURES, DC_CONVENTIONS
+from ben_engine.config import Config, TIER_GEOMETRY, TIERS_BY_LINEUP, PRESETS, COOLING_LIBRARY, POWER_ARCHITECTURES, DC_CONVENTIONS
 from ben_engine.bom import load_catalog, generate_bom, totals, rule_variables
 from ben_engine.twin import Twin
 from ben_engine import sweeps as sw
@@ -30,7 +30,7 @@ def forward():
 
 # --------------------------------------------------------------------------- config
 def test_options_default_off_and_presets_unchanged():
-    for t in TIER_GEOMETRY:
+    for t in TIERS_BY_LINEUP["rev1"]:   # Rev 2 liquid-first tiers default to dlc_hd (tests/test_rev2_lineup.py)
         c = PRESETS[t]
         assert c.power_architecture == "ac480" and c.cooling != "dlc_hd" and c.dc_convention == "bipolar_400"
         d = c.derived()
@@ -93,7 +93,7 @@ def test_cli_json_exposes_dc_and_loop():
     assert j["config"]["power_architecture"] == "dc800" and j["derived"]["dc_busway_a"] == 400 and j["derived"]["loop_flow_lpm"] == 193.8
     assert j["derived"]["dc_bus_v_pole"] == 800 and "isolated" in j["derived"]["dc_grounding"]
     cat = json.load(open(os.path.join(ROOT, "web/assets/catalog.json")))
-    assert "dlc_hd" in cat["cooling"] and cat["power_architectures"]["dc800"]["tiers"] == ["ben150", "ben500", "ben2000"]
+    assert "dlc_hd" in cat["cooling"] and cat["power_architectures"]["dc800"]["tiers"][:3] == ["ben150", "ben500", "ben2000"]   # Rev 2 adds ben300, ben700
     assert set(cat["dc_conventions"]) == {"bipolar_400", "unipolar_800"}
     schema = json.load(open(os.path.join(ROOT, "spec/ben-config.schema.json")))
     assert schema["properties"]["power_architecture"]["enum"] == ["ac480", "dc800"] and "dlc_hd" in schema["properties"]["cooling"]["enum"]
@@ -113,7 +113,7 @@ def test_bom_power_and_cooling_filters(catalog):
     assert {"PWR-UPS-GVS150", "PWR-BATT-LI", "PWR-XFMR", "PWR-PDU", "PWR-UPS-GVL500", "PWR-BATT-ROOM"} <= ac_codes
     assert {"CLG-CDU-HD", "CLG-MANIFOLD-HD", "CLG-DRYCOOLER-W45", "CLG-LEAK-RACK", "CLG-ISOVALVE-ROW", "CLG-HRX"} <= hd_codes
     # the AC presets never see a DC or dlc_hd line
-    for t in TIER_GEOMETRY:
+    for t in TIERS_BY_LINEUP["rev1"]:
         codes = {r["code"] for r in generate_bom(PRESETS[t], catalog)}
         assert not codes & dc_codes and not codes & hd_codes, t
     rows = {r["code"]: r for r in generate_bom(forward(), catalog)}

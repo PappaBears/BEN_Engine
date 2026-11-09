@@ -17,7 +17,7 @@ DATE = REV["issue_date"]   # design/REVISION.json
 
 
 def main():
-    lays = {t: L.resolve(t) for t in L.TIER_GEOMETRY}
+    lays = {t: L.resolve(t) for t in L.TIERS_BY_LINEUP["rev1"]}   # Rev 1 design basis is frozen; Rev 2 tiers: docs/DENSITY.md
     o = []
     A = o.append
     A("# BEN Engine — Engineering design basis")

@@ -110,8 +110,8 @@ SCHEDULE_TIER = {
     # Rev 2. BEN 1: assembled and shipped by Schreiber AI in 2-3 weeks (no contract manufacturer, no pad, no SAT: setup and handover).
     "ben1": {"survey": 0, "release": 0, "short_lead": 1, "factory": 1, "cool_ctl": 0, "fat": 1, "ship": 1, "hookup": 0, "sat": 0, "permits": 0, "civil": 0, "ref_total": "2-3 weeks with customer-furnished or in-stock compute"},
     # Liquid-first dense tiers: CDUs, Galaxy VL frames and the skid gear set the path (catalog lead times); FAT adds the loop pressure / flush test.
-    "ben300": {"survey": 3, "release": 3, "short_lead": 3, "factory": 10, "cool_ctl": 4, "fat": 2, "ship": 1, "hookup": 2, "sat": 1, "permits": 8, "civil": 6, "ref_total": "about 30-34 weeks, set by the CDU, UPS and compute lead times"},
-    "ben700": {"survey": 4, "release": 4, "short_lead": 3, "factory": 14, "cool_ctl": 5, "fat": 2, "ship": 2, "hookup": 2, "sat": 2, "permits": 10, "civil": 8, "ref_total": "about 36-40 weeks, set by the switchboard, UPS, CDU and compute lead times"},
+    "ben300": {"survey": 3, "release": 3, "short_lead": 3, "factory": 10, "cool_ctl": 4, "fat": 2, "ship": 1, "hookup": 2, "sat": 1, "permits": 8, "civil": 6, "ref_total": "about 40-44 weeks at catalog lead times (26-week rack-scale compute, CDUs and UPS frames); shorter with customer-furnished compute"},
+    "ben700": {"survey": 4, "release": 4, "short_lead": 3, "factory": 14, "cool_ctl": 5, "fat": 2, "ship": 2, "hookup": 2, "sat": 2, "permits": 10, "civil": 8, "ref_total": "about 45-50 weeks at catalog lead times (switchboard, UPS, CDU and 26-week rack-scale compute); shorter with customer-furnished compute"},
     "ben2000": {"survey": 4, "release": 8, "short_lead": 12, "factory": 20, "cool_ctl": 4, "fat": 2, "ship": 3, "hookup": 4, "sat": 2, "permits": 12, "civil": 20, "long_lead_typical": 40, "ref_total": "52 weeks when the utility energises inside 40 weeks and transformers are ordered at engineering release; 60–72 weeks at today's catalog lead times (48–52 weeks for pad-mount transformers and 1,250 kW generators), which is what this schedule shows"},
 }
 
@@ -623,7 +623,11 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
         + (f" plus {_usd(headline.recurring_usd_per_year)} per year ({headline.recurring_label.split(' (')[0]})" if headline.recurring_usd_per_year else "")
         + f". {headline.confirmed_pct:.0f} % of the underlying cost is at confirmed vendor prices, {headline.list_pct:.0f} % at manufacturer list price and {headline.estimate_pct:.0f} % is engineering estimate; "
           f"the price is firm at engineering release, when the configuration is frozen.")
-    s.p(f"Order to in-service: about {weeks_in_service} weeks, set by the longest-lead item ({long_lead[0]['lead_time_weeks'] if long_lead else 0} weeks) and the permit cycle. "
+    if mini:
+        s.p(f"Order to in-service: about {weeks_in_service} weeks: Schreiber AI assembles BEN 1 from stock kits, burns it in, ships it and sets it up "
+            f"(compute bought by us can add its own lead time, see section 7). No permits are needed for a plug-in unit; risks are disclosed in section 10.")
+    else:
+      s.p(f"Order to in-service: about {weeks_in_service} weeks, set by the longest-lead item ({long_lead[0]['lead_time_weeks'] if long_lead else 0} weeks) and the permit cycle. "
         f"Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.")
     sections.append(s)
 
@@ -1297,12 +1301,14 @@ def main(argv=None) -> int:
     ap.add_argument("--fill-sow", help="SOW template with [FIELD] tokens"); ap.add_argument("--out-sow", help="pre-filled SOW path")
     ap.add_argument("--fill-change-order", help="change order template"); ap.add_argument("--out-change-order", help="pre-headed change order path")
     ap.add_argument("--field", action="append", default=[], help="extra NAME=value for contract fill (e.g. GOVERNING_STATE=Texas)")
+    ap.add_argument("--lineup", default="rev2", choices=["rev1", "rev2"], help="product lineup of the preset (Rev 1 samples: rev1)")
+    ap.add_argument("--form", choices=["rack10", "cab12"], help="BEN 1 form")
     a = ap.parse_args(argv)
 
     if a.config:
         cfg = Config.from_dict(json.loads(Path(a.config).read_text(encoding="utf-8")))
     else:
-        cfg = Config.preset(a.tier, a.profile, a.climate)
+        cfg = Config.preset(a.tier, a.profile, a.climate, lineup=a.lineup, form=a.form)
     for k in ("it_kw", "racks", "cooling", "redundancy"):
         v = getattr(a, k)
         if v is not None:

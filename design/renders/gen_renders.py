@@ -352,7 +352,7 @@ def main(argv=None):
     ap.add_argument("--tier", choices=list(L.TIER_GEOMETRY) + list(L.TIER_ALIASES), action="append")
     ap.add_argument("--stage", type=int, action="append")
     a = ap.parse_args(argv)
-    for t in [L.canonical_tier(x) for x in a.tier] if a.tier else list(L.TIER_GEOMETRY):
+    for t in [L.canonical_tier(x) for x in a.tier] if a.tier else list(L.TIERS_BY_LINEUP["rev1"]):
         lay = L.resolve(t)
         out = os.path.join(HERE, t)
         os.makedirs(out, exist_ok=True)

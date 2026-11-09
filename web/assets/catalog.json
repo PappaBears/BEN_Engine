@@ -104,13 +104,128 @@
    "default_cooling": "dlc_cdu",
    "voltage": "12.47 kV MV service \u2192 480 V 3ph",
    "tare_kg": 60000
+  },
+  "ben1": {
+   "label": "BEN 1",
+   "enclosure": "Indoor mini rack: 10-inch 8U desk / shelf rack or 19-inch 12U sound-damped office cabinet",
+   "kind": "minirack",
+   "modules": 1,
+   "positioning": "core",
+   "lineup": "rev2",
+   "indoor": true,
+   "ext_l_m": 0.688,
+   "ext_w_m": 0.952,
+   "ext_h_m": 0.744,
+   "int_l_m": 0.48,
+   "int_w_m": 0.55,
+   "int_h_m": 0.53,
+   "max_racks": 1,
+   "rack_u": 12,
+   "it_kw_min": 0.2,
+   "it_kw_max": 1.5,
+   "default_cooling": "office_air",
+   "voltage": "120 V 1ph 15/20 A plug-in",
+   "voltage_option": "230 V 1ph 10/16 A (IEC C14 / C20 inlet) option for export; same UPS family in the 230 V (I) variant",
+   "tare_kg": 75,
+   "default_form": "cab12",
+   "forms": {
+    "rack10": {
+     "label": "10-inch 8U desk / shelf mini rack (open or semi-enclosed)",
+     "rack_in": 10,
+     "usable_depth_mm": 200,
+     "ext_l_m": 0.281,
+     "ext_w_m": 0.26,
+     "ext_h_m": 0.451,
+     "int_l_m": 0.222,
+     "int_w_m": 0.2,
+     "int_h_m": 0.356,
+     "rack_u": 8,
+     "it_kw_max": 0.6,
+     "tare_kg": 4,
+     "insertion_loss_db": 0.0,
+     "noise_source": "desktop",
+     "door": false,
+     "reference": "DeskPi RackMate T1 (10-inch 8U)"
+    },
+    "cab12": {
+     "label": "19-inch 12U sound-damped office cabinet",
+     "rack_in": 19,
+     "usable_depth_mm": 550,
+     "ext_l_m": 0.688,
+     "ext_w_m": 0.952,
+     "ext_h_m": 0.744,
+     "int_l_m": 0.48,
+     "int_w_m": 0.55,
+     "int_h_m": 0.53,
+     "rack_u": 12,
+     "it_kw_max": 1.5,
+     "tare_kg": 75,
+     "insertion_loss_db": 18.5,
+     "noise_source": "rack",
+     "door": true,
+     "reference": "APC NetShelter CX Mini 12U (AR4000MVX431)"
+    }
+   },
+   "rows": 1
+  },
+  "ben300": {
+   "label": "BEN 300",
+   "enclosure": "20 ft high-cube ISO-frame module, liquid-first, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
+   "positioning": "core",
+   "lineup": "rev2",
+   "liquid_first": true,
+   "ext_l_m": 6.058,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 5.75,
+   "int_w_m": 2.2,
+   "int_h_m": 2.49,
+   "max_racks": 2,
+   "rack_u": 48,
+   "it_kw_min": 150,
+   "it_kw_max": 300,
+   "max_rack_kw": 155,
+   "default_cooling": "dlc_hd",
+   "voltage": "480 V 3ph",
+   "tare_kg": 2600,
+   "ups_minutes_default": 5,
+   "rows": 1
+  },
+  "ben700": {
+   "label": "BEN 700",
+   "enclosure": "40 ft high-cube ISO-frame module, liquid-first, all-in-one, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
+   "positioning": "core",
+   "lineup": "rev2",
+   "liquid_first": true,
+   "ext_l_m": 12.192,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 11.85,
+   "int_w_m": 2.2,
+   "int_h_m": 2.49,
+   "max_racks": 5,
+   "rack_u": 48,
+   "it_kw_min": 400,
+   "it_kw_max": 700,
+   "max_rack_kw": 155,
+   "default_cooling": "dlc_hd",
+   "voltage": "480 V 3ph",
+   "tare_kg": 4300,
+   "ups_minutes_default": 5,
+   "target_note": "Rev 2 decision target BEN 1000 (500-1,000 kW, up to 7 racks); verified maximum 705 kW in 5 racks, sold as BEN 700",
+   "rows": 1
   }
  },
  "tier_aliases": {
   "micro": "ben5",
   "ben10": "ben30",
   "ben20": "ben150",
-  "ben40": "ben500"
+  "ben40": "ben500",
+  "ben1000": "ben700"
  },
  "hardening": {
   "H1": {
@@ -154,6 +269,21 @@
     "secure vestibule / mantrap",
     "two-factor access, tamper detection, audit trail in BEN Care",
     "CMMC / NIST 800-171 controls pack"
+   ]
+  },
+  "IND": {
+   "label": "Indoor (no hardening levels)",
+   "rating": "UL 62368-1 listed parts, IP20 indoor, NEMA 12 option for dusty closets",
+   "coating": "powder coat, indoor",
+   "wind_ms_min": 0,
+   "mass_kg_m2": 0.0,
+   "features": [
+    "listed IT, UPS and PDU parts (UL 62368-1)",
+    "IP20 indoor; NEMA 12 gasketed option for dusty closets",
+    "lockable door (cab12)"
+   ],
+   "tiers": [
+    "ben1"
    ]
   }
  },
@@ -213,6 +343,19 @@
    "mass_kg": 500,
    "water_class": "W45",
    "air_residual": 0.1
+  },
+  "office_air": {
+   "label": "Office air: filtered, sound-damped extraction path (no refrigerant)",
+   "unit_kw": 1.6,
+   "cop": 40.0,
+   "medium": "air",
+   "max_rack_kw": 1.5,
+   "width_mm": 0,
+   "mass_kg": 2,
+   "refrigerant": null,
+   "noise_dba": 45,
+   "design_rise_k": 10.0,
+   "indoor": true
   }
  },
  "profiles": {
@@ -338,7 +481,18 @@
     "ben30",
     "ben150",
     "ben500",
-    "ben2000"
+    "ben2000",
+    "ben300",
+    "ben700"
+   ]
+  },
+  "mini": {
+   "label": "BEN Controls Mini",
+   "controller": "none: 2 BEN Pods (Pod W) on the BEN Mesh, hardware watchdog in the Pod",
+   "edge": "BEN Care agent on the customer's own box, or a small fanless edge (OnLogic CL210-class or RevPi Connect S)",
+   "panel": "none (Pods clip to the rack rails)",
+   "for": [
+    "ben1"
    ]
   }
  },
@@ -355,7 +509,10 @@
     "ben30",
     "ben150",
     "ben500",
-    "ben2000"
+    "ben2000",
+    "ben1",
+    "ben300",
+    "ben700"
    ],
    "busway_frames_a": []
   },
@@ -364,7 +521,9 @@
    "tiers": [
     "ben150",
     "ben500",
-    "ben2000"
+    "ben2000",
+    "ben300",
+    "ben700"
    ],
    "bus_v_nominal": 800,
    "bus_v_min": 760,
@@ -397,7 +556,9 @@
  "dlc_hd_tiers": [
   "ben150",
   "ben500",
-  "ben2000"
+  "ben2000",
+  "ben300",
+  "ben700"
  ],
  "dc_conventions": {
   "bipolar_400": {
@@ -414,5 +575,143 @@
    "imd_arrangement": "two-pole insulation monitoring device (positive and return to earth) per rectifier section, with fault location on the tap-offs",
    "spec": "OCP LVDC SST specification v0.3 (800 VDC unipolar, effective 2026-06-22); Diablo 400 800 VDC two-wire option"
   }
+ },
+ "lineups": [
+  "rev1",
+  "rev2"
+ ],
+ "tiers_by_lineup": {
+  "rev1": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "rev2": [
+   "ben1",
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben700",
+   "ben2000"
+  ]
+ },
+ "dense_footprints": {
+  "rack": {
+   "w": 600,
+   "d": 1068,
+   "h": 2236,
+   "kg": 1500,
+   "kw_max": 155,
+   "label": "GB300 NVL72-class liquid rack, 48U MGX, 600 x 1068 x 2236 mm",
+   "src": "Supermicro / Cisco GB300 NVL72 datasheet 600 W x 1068 D x 2236 H mm; ~1.36-1.5 t loaded (GPU Smith, HPE). Vertiv SmartIT for GB300 is 600 x 1200 D with its rear extension and 2286 mm high: that depth leaves an 800 mm aisle behind a 200 mm plenum in a 2.2 m module and is not used"
+  },
+  "cdu": {
+   "w": 600,
+   "d": 1200,
+   "h": 2000,
+   "kg": 550,
+   "kw": 600,
+   "label": "Row CDU 600 kW (Vertiv CoolChip CDU 600 class), W45 secondary",
+   "src": "Vertiv CoolChip CDU 600 product page / brochure: 2000 H x 600 W x 1200 D mm, 480 kg dry / 550 kg wet, 600 kW at 4 K approach"
+  },
+  "fancoil": {
+   "w": 300,
+   "d": 1070,
+   "h": 2000,
+   "kg": 170,
+   "kw": 20,
+   "label": "In-row chilled-water fan coil 300 mm, 20 kW on the 18 \u00b0C trim loop",
+   "src": "300 mm in-row chilled-water class (Schneider InRow RC / Vertiv CRV CW); 20 kW at 18 \u00b0C water is a design value, NOT verified. W45 water cannot cool room air, so the residual-air coils run on a trim loop from the skid chiller"
+  },
+  "ups": {
+   "w": 850,
+   "d": 925,
+   "h": 1970,
+   "kg": 900,
+   "kva": 500,
+   "label": "Galaxy VL UPS frame up to 500 kW, internal N+1 power modules",
+   "src": "Schneider Galaxy VL brochure footprint 850 W x 925 D mm (GVL200K500DS max depth 925 mm); mass not read (900 kg assumed)"
+  },
+  "batt": {
+   "w": 600,
+   "d": 1000,
+   "h": 2000,
+   "kg": 650,
+   "kwh": 32.6,
+   "kw": 200,
+   "label": "Galaxy Lithium-ion battery cabinet, 16 x 2.04 kWh",
+   "src": "32.6 kWh per cabinet (catalog PWR-BATT-LI); 200 kW per cabinet from Schneider's Galaxy VL 2000 kW system = 10 cabinets; 600 x 1000 mm footprint and 650 kg not read from the manual (Rev 1 layout value)"
+  },
+  "swbd": {
+   "w": 915,
+   "d": 610,
+   "h": 2286,
+   "kg": 600,
+   "a_per_section": 1200,
+   "label": "480 V switchboard section 36 in W x 24 in D (Square D QED-2 class), main + maintenance bypass",
+   "src": "QED-2 bid specification: 36 in wide x 24 in deep sections; one section to 1,200 A, two sections to 2,500 A (ABB Emax 2000 A needs 60 in depth)"
+  },
+  "rect": {
+   "w": 600,
+   "d": 1000,
+   "h": 2000,
+   "kg": 400,
+   "label": "AC/DC front-end cabinet 800 VDC (4 x 100 kW)",
+   "src": "Rev 1 forward study value"
+  },
+  "batt800": {
+   "w": 600,
+   "d": 1000,
+   "h": 2000,
+   "kg": 650,
+   "kwh": 32.6,
+   "kw": 200,
+   "label": "800 V class battery cabinet on the bus",
+   "src": "Rev 1 forward study value"
+  }
+ },
+ "dense_rules": {
+  "end_zone_mm": 350,
+  "rear_plenum_mm": 200,
+  "panelboard_max_a": 600,
+  "rack_top_min_mm": 250,
+  "trim_loop_c": 18.0
+ },
+ "minirack": {
+  "office_design_c": 23.0,
+  "office_max_c": 30.0,
+  "aux_kw": 0.015,
+  "ups_eff": 0.97,
+  "design_rise_k": 10.0,
+  "ups_models": [
+   {
+    "va": 1000,
+    "w": 800,
+    "wh": 104,
+    "model": "APC SMTL1000RM2UC (1000 VA / 800 W, 2U, LiFePO4, 5-15P)",
+    "plug": "NEMA 5-15P"
+   },
+   {
+    "va": 2200,
+    "w": 1920,
+    "wh": 192,
+    "model": "APC SMTL2200RM2UC (2200 VA / 1920 W, 2U, Li-ion, 5-20P)",
+    "plug": "NEMA 5-20P"
+   }
+  ],
+  "ups_headroom": 1.25,
+  "noise_src_dba": {
+   "desktop": 38.0,
+   "rack": 52.0
+  },
+  "noise_target_dba": {
+   "rack10": 50.0,
+   "cab12": 45.0
+  },
+  "kg_per_kw_it": 30.0
  }
 }

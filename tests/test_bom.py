@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from ben_engine.config import Config, TIER_GEOMETRY
+from ben_engine.config import Config, TIER_GEOMETRY, TIERS_BY_LINEUP
 from ben_engine.bom import (load_catalog, generate_bom, totals, eval_qty_rule, rule_variables,
                             QtyRuleError, to_csv, to_markdown, subsystem_of, STATUSES, CATALOG_PATH)
 
-TIERS = list(TIER_GEOMETRY)
+TIERS = list(TIERS_BY_LINEUP["rev1"])   # Rev 1 lineup (frozen artifacts); Rev 2 tiers: tests/test_rev2_lineup.py
 
 
 @pytest.fixture(scope="module")
@@ -25,13 +25,13 @@ def test_catalog_loads_and_has_required_fields(catalog):
         assert p["code"].split("-")[0] in ("STR", "ENV", "PWR", "CLG", "CMP", "CTL", "FS", "SITE", "SVC"), p["code"]
         assert p["price_status"] in STATUSES
         assert p["unit_price_usd"] > 0
-        assert set(p["applies_to_tiers"]) <= set(TIERS)  # empty = catalogued alternate, not in any preset
+        assert set(p["applies_to_tiers"]) <= set(TIER_GEOMETRY)  # empty = catalogued alternate, not in any preset
         if p["price_status"] == "confirmed":
-            assert p["price_checked"] in ("2026-11-07", "2026-11-08"), p["code"]
+            assert p["price_checked"] in ("2026-11-07", "2026-11-08", "2026-11-09"), p["code"]   # 2026-11-09: Rev 2 lines
             assert p["vendor_url"].startswith("http"), f"{p['code']} confirmed price needs the URL it was seen on"
         elif p["price_status"] == "list":
             # audit F-05: list lines carry the date the manufacturer price was seen (or None if never checked)
-            assert p["price_checked"] in (None, "2026-11-07", "2026-11-08"), p["code"]
+            assert p["price_checked"] in (None, "2026-11-07", "2026-11-08", "2026-11-09"), p["code"]
             assert p["price_source_note"], f"{p['code']} list needs a basis note"
         else:
             assert p["price_checked"] is None, p["code"]

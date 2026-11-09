@@ -27,6 +27,10 @@ Steps (each records values and PASS/FAIL):
 10  liquid loop: leak-to-isolation time (dlc_hd; skipped with the reason stated otherwise)
 11  DC bus: insulation monitoring and ground-fault alarm (dc800; skipped with the reason stated otherwise)
 12  export CSV + signed markdown report with SHA-256 of the data file and a signature block
+
+Rev 2 BEN 1 (indoor mini rack): the checklist is the bench / handover list (no pad, no container), and every step or sub-check that
+needs hardware BEN 1 does not have (leak loop, generator, DC bus, liquid loop; door and fans on the open 10-inch rack) is skipped with
+the reason written into the report (Twin.not_applicable_reason).
 """
 from __future__ import annotations
 
@@ -55,6 +59,16 @@ CHECKLIST = [
     "Racks anchored, blanking panels fitted, containment doors close and latch",
     "Controls LAN isolated: no route to the internet from the gateway",
     "Fiber and copper uplinks labelled at both ends",
+]
+
+
+CHECKLIST_MINIRACK = [
+    "Rack / cabinet on a level desk, shelf or floor; 300 mm clear front and back; cabinet castors locked",
+    "UPS input on a dedicated outlet of the rating in the order (NEMA 5-15R 15 A or 5-20R 20 A); no extension cord or power strip",
+    "IT devices seated on shelves / rails, cables dressed, nothing blocking the IT intakes",
+    "Two BEN Pods fitted (inlet front rail, exhaust rear rail) and joined to the BEN Mesh",
+    "BEN Care agent enrolled (customer box or edge computer); controls traffic outbound HTTPS only",
+    "Room can take the stated heat (room note in the order); closet vent or grille fitted where the order requires it",
 ]
 
 
@@ -139,9 +153,17 @@ class Commissioning:
         return sr
 
     # ------------------------------------------------------------ steps
+    def _skip(self, sr: StepResult, what: str, fault: str) -> bool:
+        """True (and the reason noted) when ``fault`` cannot be exercised on this unit."""
+        if fault in self.twin.applicable_faults():
+            return False
+        sr.values.setdefault("skipped_checks", []).append({"check": what, "reason": self.twin.not_applicable_reason(fault)})
+        sr.notes.append(f"{what} skipped: not applicable — {self.twin.not_applicable_reason(fault)}")
+        return True
+
     def step1_checklist(self, sr: StepResult):
         answers = {}
-        for item in CHECKLIST:
+        for item in (CHECKLIST_MINIRACK if self.twin.mini else CHECKLIST):
             a = self.ask(f"    [{item}] done? (y/n) ").strip().lower()
             answers[item] = a
             if a not in ("y", "yes"):
@@ -204,6 +226,8 @@ class Commissioning:
         # contacts: door and leak must read 0, then 1 when forced, then 0
         room = self.fleet.nodes[0]
         for fault, ch in (("door_open", "door"), ("leak", "leak")):
+            if self._skip(sr, f"{ch} contact", fault):
+                continue
             seq = []
             for forced in (False, True, False):
                 if forced:
@@ -228,7 +252,7 @@ class Commissioning:
         p = self.twin.p
         meter = st["power"]["utility_kw"]
         pdu_sum = sum(st["power"]["pdu_kw"])
-        house = 0.5 + 0.02 * self.cfg.it_kw
+        house = self.twin.house_kw()
         cooling = st["cooling_kw_elec"]
         ups_loss = st["power"]["ups_kw"] * (1 - p.ups_eff) / p.ups_eff if p.ups_eff else 0.0
         # the UPS output meter should see pdu_sum / pdu_eff; main meter = IT + losses + cooling + house
@@ -243,6 +267,9 @@ class Commissioning:
         sr.notes.append(f"meter {meter:.1f} kW, PDUs {pdu_sum:.1f} kW, reconciled within {err_pct:.2f} %")
 
     def step6_cooling(self, sr: StepResult):
+        if self._skip(sr, "cooling unit start and failover", "cooling_unit_fail"):
+            sr.values["skipped"] = True
+            return
         # sequential start: every healthy unit must report running when asked (standby included)
         start_log = []
         for i, u in enumerate(self.twin.cooling_units):
@@ -355,9 +382,12 @@ class Commissioning:
         st = self.twin.state()
         delta = a_max - min(st["rack_inlet_c"]) + 1.0
         ok = expect("rack", "sensor_drift", {}, delta_c=delta)
-        ok &= expect("leak", "leak", {})
-        ok &= expect("door_open", "door_open", {})
-        ok &= expect("cool1_fail", "cooling_unit_fail", {"unit": 0}, unit=0)
+        if not self._skip(sr, "leak alarm", "leak"):
+            ok &= expect("leak", "leak", {})
+        if not self._skip(sr, "door alarm", "door_open"):
+            ok &= expect("door_open", "door_open", {})
+        if not self._skip(sr, "cooling-fail alarm", "cooling_unit_fail"):
+            ok &= expect("cool1_fail", "cooling_unit_fail", {"unit": 0}, unit=0)
         ok &= expect("utility_loss", "utility_loss", {}, wait_s=10.0)
         st = self._run(300.0)
         residual = [a["id"] for a in st["alarms"] if a["id"] not in pre_existing]
@@ -651,8 +681,10 @@ def main(argv=None):
     ap.add_argument("--operator", default="unsigned")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--fast", action="store_true", help="shorter holds (tests)")
+    ap.add_argument("--lineup", default="rev2", choices=["rev1", "rev2"])
+    ap.add_argument("--form", default=None, choices=["rack10", "cab12"], help="BEN 1 form")
     a = ap.parse_args(argv)
-    cfg = Config.preset(a.tier, a.profile, a.climate)
+    cfg = Config.preset(a.tier, a.profile, a.climate, lineup=a.lineup, form=a.form)
     cfg.site_name = a.site
     if a.live:
         rep = run_live(a.url, cfg, a.out)

@@ -100,7 +100,7 @@ try {
   await shot(page, `${SCREENS}/desktop-exterior-iso.png`);
 
   // ---------------------------------------------------------------------------------------------- selector -> BEN 500
-  await step('selector: five tier presets and a hardening select', async () => {
+  await step('selector: tier presets of the lineup and a hardening select', async () => {
     await page.click('#tabs button[data-id="selector"]');
     await page.waitForSelector('#btn-apply-config');
     const labels = await page.$$eval('.panel-body[data-panel="selector"] .row button', bs => bs.map(b => b.textContent.trim()));
@@ -205,6 +205,58 @@ try {
     await page.waitForTimeout(1200);
     await shot(page, `${SCREENS}/selector-ben150-forward.png`);
     return `rectifier + DC busway + battery, 2 row CDUs, 2 manifolds; bus ${st.v.toFixed(0)} V, IMD ${st.imd.toFixed(0)} kΩ, loop ${st.flow.toFixed(0)} L/min; tooltip: ${tip.slice(0, 60).replace(/\s+/g, ' ')}`;
+  });
+
+  // ---------------------------------------------------------------------------------------------- Rev 2: BEN 1 mini rack (both forms)
+  await step(`selector: ${L('ben1')} builds the office-corner mini rack (rack10, then cab12)`, async () => {
+    await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben1')}")`);
+    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben1');
+    const hz = await page.$$eval('select[name=hardening] option', os => os.map(o => o.value));
+    if (hz.join(',') !== 'IND') throw new Error('BEN 1 hardening options ' + hz.join(','));
+    await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
+    await page.click('#btn-apply-config');
+    await page.waitForFunction(() => window.__ben.store.config.tier === 'ben1' && window.__ben.scene.rev2Objects().mini && window.__ben.scene.rackCount() === 1, null, { timeout: 15000, polling: 200 });
+    const a = await page.evaluate(() => ({ o: window.__ben.scene.rev2Objects(), d: window.__ben.store.derived, cfg: window.__ben.store.config }));
+    if (a.cfg.form !== 'rack10' || !a.o.desk || a.o.aiBoxes < 1 || a.o.pods !== 2 || a.o.ups !== 1) throw new Error('rack10 scene ' + JSON.stringify(a.o));
+    const txt = await page.textContent('.panel-body[data-panel="selector"]');
+    if (!/Outlet/.test(txt) || !/Noise/.test(txt) || !/Heat to the room/.test(txt) || !/Density/.test(txt)) throw new Error('BEN 1 derived rows missing');
+    if (!(await page.evaluate(() => window.__ben.scene.setHoverByKey('ai_box')))) throw new Error('ai box not hoverable');
+    await page.waitForFunction(() => { const t = document.getElementById('tip'); return t && !t.hidden && /AI/.test(t.textContent); }, null, { timeout: 5000, polling: 200 });
+    await page.evaluate(() => window.__ben.scene.clearHover());
+    await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true)); await page.waitForTimeout(1000);
+    await shot(page, `${SCREENS}/selector-ben1-rack10.png`);
+    // the 12U sound-damped cabinet
+    await page.evaluate(() => { const s = document.querySelector('select[name=form]'); s.value = 'cab12'; s.dispatchEvent(new Event('change')); });
+    await page.waitForFunction(() => document.querySelector('select[name=form]') && document.querySelector('select[name=form]').value === 'cab12' && !document.querySelector('#btn-apply-config').disabled, null, { timeout: 8000, polling: 200 });
+    await page.click('#btn-apply-config');
+    await page.waitForFunction(() => window.__ben.store.config.form === 'cab12' && window.__ben.scene.rev2Objects().fans >= 2, null, { timeout: 15000, polling: 200 });
+    const b = await page.evaluate(() => ({ o: window.__ben.scene.rev2Objects(), d: window.__ben.store.derived }));
+    if (b.o.fans !== b.d.cooling_units_total || b.o.desk !== true) throw new Error('cab12 scene ' + JSON.stringify(b.o));
+    await page.waitForTimeout(800);
+    await shot(page, `${SCREENS}/selector-ben1-cab12.png`);
+    return `rack10: ${a.o.aiBoxes} AI box(es), UPS beside, ${a.d.outlet_circuit_a} A outlet, ${a.d.noise_dba_est} dBA; cab12: ${b.o.fans} extraction fans, ${b.d.ups_va} VA UPS, ${b.d.noise_dba_est} dBA`;
+  });
+
+  // ---------------------------------------------------------------------------------------------- Rev 2: BEN 1000 target -> BEN 700 (liquid-first 40 ft)
+  await step(`selector: ben1000 loads as ${L('ben700')} and builds liquid racks, CDU row, fan coils, in-row power gear and the skid`, async () => {
+    const alias = await page.evaluate(async () => { const r = await fetch('/api/config/validate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ tier: 'ben1000', lineup: 'rev2', it_kw: 700, racks: 5, cooling: 'dlc_hd', hardening: 'H1', generator: false, form: '', redundancy: 'N+1', profile: 'ai_training', climate: 'temperate', controls_tier: 'auto', power_architecture: 'ac480' }) }); return r.json(); });
+    if (!alias.config || alias.config.tier !== 'ben700' || alias.errors.length) throw new Error('ben1000 alias ' + JSON.stringify(alias.errors || alias));
+    await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben700')}")`);
+    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben700');
+    await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
+    await page.click('#btn-apply-config');
+    await page.waitForFunction(() => window.__ben.store.config.tier === 'ben700' && window.__ben.scene.rev2Objects().dense && window.__ben.scene.rackCount() === window.__ben.store.config.racks, null, { timeout: 20000, polling: 200 });
+    const i = await page.evaluate(() => ({ o: window.__ben.scene.rev2Objects(), d: window.__ben.store.derived, racks: window.__ben.scene.rackCount() }));
+    if (i.o.fancoils !== i.d.fancoils_total || i.o.cdus !== i.d.cooling_units_total || i.o.ups !== i.d.ups_frames || i.o.batteries !== i.d.battery_cabinets || i.o.switchgear !== i.d.swbd_sections || !i.o.skid)
+      throw new Error('dense scene ' + JSON.stringify({ o: i.o, d: [i.d.fancoils_total, i.d.cooling_units_total, i.d.ups_frames, i.d.battery_cabinets, i.d.swbd_sections] }));
+    const txt = await page.textContent('.panel-body[data-panel="selector"]');
+    if (!/Row \(door end first\)/.test(txt) || !/Residual air/.test(txt) || !/Liquid loop/.test(txt)) throw new Error('dense derived rows missing');
+    if (!(await page.evaluate(() => window.__ben.scene.setHoverByKey('fancoil1')))) throw new Error('fan coil not hoverable');
+    await page.waitForFunction(() => { const t = document.getElementById('tip'); return t && !t.hidden && /fan coil/i.test(t.textContent); }, null, { timeout: 5000, polling: 200 });
+    await page.evaluate(() => window.__ben.scene.clearHover());
+    await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true)); await page.waitForTimeout(1200);
+    await shot(page, `${SCREENS}/selector-ben700.png`);
+    return `${i.racks} GB300-class racks, ${i.o.cdus} CDUs, ${i.o.fancoils} fan coils, ${i.o.ups} UPS + ${i.o.batteries} Li + ${i.o.switchgear} switchboard; row ${i.d.row_length_mm} mm`;
   });
 
   // back to the default tier for the rest

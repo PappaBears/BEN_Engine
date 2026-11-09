@@ -141,13 +141,14 @@ def layout_unit_count(cfg: Config) -> Tuple[int, int]:
 def lattice_speed(tier: str) -> float:
     """Max lattice speed per tier (the BEN 5 cabinet's tiny compressed layout needs a lower Mach number)."""
     tier = canonical_tier(tier)
-    return 0.04 if tier == "ben5" else U_LAT
+    return 0.04 if tier in ("ben5", "ben1") else U_LAT
 
 
 def grid_dx(tier: str) -> float:
     """Cell size per tier chosen so a default run finishes in well under a minute (hall: 100 mm cells per row bay)."""
     tier = canonical_tier(tier)
-    return {"ben5": 0.02, "ben30": 0.025, "ben150": 0.025, "ben500": 0.05, "ben2000": 0.10}.get(tier, 0.025)
+    return {"ben5": 0.02, "ben30": 0.025, "ben150": 0.025, "ben500": 0.05, "ben2000": 0.10,
+            "ben1": 0.02, "ben300": 0.025, "ben700": 0.05}.get(tier, 0.025)   # Rev 2: BEN 1 tiny grid; dense tiers as their container size
 
 
 def build_layout(cfg: Config, containment: bool = True, dx: Optional[float] = None) -> Layout:
@@ -166,7 +167,14 @@ def build_layout(cfg: Config, containment: bool = True, dx: Optional[float] = No
     if d["kind"] == "cabinet" and containment:
         containment = False
         notes.append("BEN 5 cabinet has no aisle containment; doors treated as open")
-    if COOLING_LIBRARY[cfg.cooling]["medium"] == "liquid":
+    if d["kind"] == "minirack":
+        containment = False
+        notes.append(f"BEN 1 {cfg.form}: plan view of the mini rack interior (front intake to rear exhaust); no aisle containment"
+                     + ("; open frame, the rack's fans are the IT devices' own" if cfg.form == "rack10" else "; cabinet extraction fans N+1"))
+    if g.get("liquid_first"):
+        notes.append(f"Liquid-first tier (Rev 2): CDUs move no room air; air side modelled with one in-row air unit per 2 racks + 1 standby standing in for the "
+                     f"{d['fancoils_total']} trim-loop fan coils that carry the {COOLING_LIBRARY[cfg.cooling].get('air_residual', 0.1):.0%} residual air-side heat")
+    elif COOLING_LIBRARY[cfg.cooling]["medium"] == "liquid":
         notes.append("DLC tier: CDUs move no room air; air side modelled with one in-row air unit per 2 racks + 1 standby "
                      "handling the 30 % residual air-side heat")
     nx, ny = int(round(L / dx)) + 2, int(round(W / dx)) + 2   # +2 for wall cells
@@ -508,7 +516,7 @@ def steady_scalar(solver: "LBMSolver", source: float, dirichlet_value: float, di
 def default_steps(tier: str) -> int:
     """Upper bound on lattice steps for the flow field (stops earlier on convergence)."""
     tier = canonical_tier(tier)
-    return {"ben5": 3000, "ben30": 4000, "ben150": 5000, "ben500": 5000, "ben2000": 3000}.get(tier, 4000)
+    return {"ben5": 3000, "ben30": 4000, "ben150": 5000, "ben500": 5000, "ben2000": 3000, "ben1": 2000, "ben300": 5000, "ben700": 5000}.get(tier, 4000)
 
 
 def run_cfd(cfg: Config, containment: bool = True, steps: Optional[int] = None, out_png: Optional[str] = None,

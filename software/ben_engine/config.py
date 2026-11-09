@@ -348,6 +348,8 @@ class Config:
                 self.form = "rack10" if self.it_kw <= TIER_GEOMETRY[self.tier]["forms"]["rack10"]["it_kw_max"] else "cab12"
             if self.hardening == "H1":      # the dataclass default; BEN 1 is indoor and has no hardening levels
                 self.hardening = "IND"
+        else:
+            self.form = ""                  # forms exist on BEN 1 only
 
     # ------------------------------------------------------------ geometry (BEN 1 forms replace the tier dimensions)
     def geometry(self) -> Dict[str, Any]:

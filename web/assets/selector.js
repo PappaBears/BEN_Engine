@@ -16,8 +16,44 @@ function dlcHdTiers(cat) { return cat.dlc_hd_tiers || ['ben150', 'ben500', 'ben2
 export function powerArchitectures(cat) { return cat.power_architectures || { ac480: { label: '480 V AC → UPS → 208/415 V AC PDUs (today)', tiers: ['ben5', 'ben30', 'ben150', 'ben500', 'ben2000'] }, dc800: { ...FALLBACK_DC, label: '800 VDC bus (forward option)' } }; }
 
 // Generation-1 keys (container-length names) are accepted everywhere and normalised to the power-based keys.
-export const TIER_ALIASES = { micro: 'ben5', ben10: 'ben30', ben20: 'ben150', ben40: 'ben500' };
+// Rev 2: "ben1000" was the working name of the 40 ft liquid-first flagship; with real footprints it is BEN 700.
+export const TIER_ALIASES = { micro: 'ben5', ben10: 'ben30', ben20: 'ben150', ben40: 'ben500', ben1000: 'ben700' };
 export function canonicalTier(t, cat) { return ((cat && cat.tier_aliases) || TIER_ALIASES)[t] ?? t; }
+
+// ---------------------------------------------------------------- Rev 2 (docs/REV2_DECISION.md §2, config.py TIERS_BY_LINEUP)
+export const TIERS_BY_LINEUP = {
+  rev1: ['ben5', 'ben30', 'ben150', 'ben500', 'ben2000'],
+  rev2: ['ben1', 'ben5', 'ben30', 'ben150', 'ben300', 'ben500', 'ben700', 'ben2000'],
+};
+export function tiersByLineup(cat) { return (cat && cat.tiers_by_lineup) || TIERS_BY_LINEUP; }
+// A saved configuration without a lineup is Rev 1 when its tier is a Rev 1 tier (config.Config.from_dict)
+export function lineupOf(cfg, cat) {
+  if (cfg.lineup) return cfg.lineup;
+  return tiersByLineup(cat).rev1.includes(canonicalTier(cfg.tier, cat)) ? 'rev1' : 'rev2';
+}
+// Python round(): half to even (used where config.py rounds a value that can land on .5)
+export function pyRound(x) {
+  const f = Math.floor(x), r = x - f;
+  if (Math.abs(r - 0.5) < 1e-9) return f % 2 === 0 ? f : f + 1;
+  return Math.round(x);
+}
+const isMini = (g) => (g.kind ?? 'module') === 'minirack';
+export function geometry(cfg, cat) {
+  const tier = canonicalTier(cfg.tier, cat);
+  const g = cat.tiers[tier];
+  if (!isMini(g)) return g;
+  const f = g.forms[cfg.form] || g.forms[g.default_form];
+  const out = { ...g };
+  delete out.forms;
+  for (const k of ['ext_l_m', 'ext_w_m', 'ext_h_m', 'int_l_m', 'int_w_m', 'int_h_m', 'rack_u', 'tare_kg']) out[k] = f[k];
+  Object.assign(out, { form: cfg.form, form_label: f.label, it_kw_max_form: f.it_kw_max, rack_in: f.rack_in, door: f.door, insertion_loss_db: f.insertion_loss_db, reference: f.reference });
+  return out;
+}
+function densityOf(cfg, g) {
+  const fp = g.ext_l_m * g.ext_w_m, vol = fp * g.ext_h_m;
+  return { lineup: 'rev2', kw_per_rack: +(cfg.it_kw / cfg.racks).toFixed(2), footprint_m2: +fp.toFixed(3), volume_m3: +vol.toFixed(3),
+    kw_per_m2_footprint: +(cfg.it_kw / fp).toFixed(2), kw_per_m3_volume: +(cfg.it_kw / vol).toFixed(2) };
+}
 
 export const SEVERE_CLIMATES = ['coastal', 'hot_arid', 'cold', 'high_altitude', 'hot_humid'];
 export function hardeningRecommended(profile, climate) {
@@ -36,7 +72,8 @@ function hardeningTable(cat) { return cat.hardening ?? FALLBACK_HARDENING; }
 export function controlsTierResolved(cfg, cat) {
   const ct = cfg.controls_tier ?? 'auto';
   const tier = canonicalTier(cfg.tier, cat);
-  if (ct === 'lite' || ct === 'pro') return ct;
+  if (ct === 'lite' || ct === 'pro' || ct === 'mini') return ct;
+  if (cat.tiers[tier] && isMini(cat.tiers[tier])) return 'mini';
   if (tier === 'ben5') return 'lite';
   if (tier === 'ben30') return (cat.controls_pro_profiles ?? ['healthcare', 'public_sector', 'ai_training']).includes(cfg.profile) ? 'pro' : 'lite';
   return 'pro';
@@ -66,17 +103,168 @@ export function validate(cfg, cat) {
   const hz = cfg.hardening ?? 'H1';
   if (!hardeningTable(cat)[hz]) errs.push(`unknown hardening ${hz}`);
   const ct = cfg.controls_tier ?? 'auto';
-  if (!['auto', 'lite', 'pro'].includes(ct)) errs.push(`unknown controls_tier ${ct}`);
+  if (!['auto', 'lite', 'pro', 'mini'].includes(ct)) errs.push(`unknown controls_tier ${ct}`);
   else if (ct === 'lite' && (tier === 'ben150' || tier === 'ben500' || tier === 'ben2000')) errs.push('BEN Controls Lite is for BEN 5 and BEN 30 only; BEN 150 and up use BEN Controls Pro');
-  if (!errs.length && tier !== 'ben5') {
+  errs.push(...validateRev2(cfg, cat));
+  if (!errs.length && tier !== 'ben5' && !isMini(g)) {
     const d = derived(cfg, cat);
     if (!d.row_fits) errs.push(`${d.rows} row(s) of ${d.racks_per_row} racks + cooling units is ${d.row_length_mm} mm per row, exceeds interior ${Math.round(g.int_l_m * 1000)} mm; use fewer racks, rear-door or liquid cooling`);
   }
   return errs;
 }
 
+// Rev 2 rules (config.Config._validate_rev2); none of them can fire on a valid Rev 1 configuration
+function validateRev2(cfg, cat) {
+  const errs = [];
+  const tier = canonicalTier(cfg.tier, cat);
+  const g = cat.tiers[tier];
+  const lineup = lineupOf(cfg, cat), byL = tiersByLineup(cat);
+  const hz = cfg.hardening ?? 'H1', ct = cfg.controls_tier ?? 'auto';
+  if (!byL[lineup]) errs.push(`unknown lineup ${lineup}`);
+  else if (!byL[lineup].includes(tier)) errs.push(`${g.label} is not in lineup ${lineup}`);
+  if (hz === 'IND' && !isMini(g)) errs.push('hardening IND (indoor) is for BEN 1 only');
+  if (ct === 'mini' && !isMini(g)) errs.push('BEN Controls Mini is for BEN 1 only');
+  if (cfg.cooling === 'office_air' && !isMini(g)) errs.push('office_air cooling is for BEN 1 only');
+  if (isMini(g)) {
+    const f = g.forms[cfg.form];
+    if (!f) errs.push(`unknown BEN 1 form ${cfg.form} (rack10 or cab12)`);
+    else if (cfg.it_kw > f.it_kw_max) errs.push(`BEN 1 ${cfg.form} carries up to ${f.it_kw_max} kW IT, got ${cfg.it_kw}; use cab12`);
+    if (cfg.cooling !== 'office_air') errs.push('BEN 1 uses office_air cooling only (no dc800, no dlc_hd; liquid only inside the IT device)');
+    if ((cfg.power_architecture ?? 'ac480') !== 'ac480') errs.push('BEN 1 is a 120 V plug-in unit: dc800 does not apply');
+    if (hz !== 'IND') errs.push('BEN 1 is indoor: hardening levels H1-H3 do not apply (IND)');
+    if (cfg.generator) errs.push('BEN 1 has no generator (plug-in UPS only)');
+    if (cfg.redundancy === '2N') errs.push('BEN 1 has one UPS; for 2N use two BEN 1 units');
+    if (ct === 'lite' || ct === 'pro') errs.push('BEN 1 uses BEN Controls Mini (2 BEN Pods + BEN Care agent)');
+    if (!errs.length && f && miniPower(cfg, cat).amps > 16.0) errs.push(`BEN 1 draws ${miniPower(cfg, cat).amps.toFixed(1)} A at 120 V, above the 16 A continuous limit of a 20 A circuit; use the 230 V option`);
+  }
+  if (g.liquid_first) {
+    if (cfg.cooling !== 'dlc_hd') errs.push(`${g.label} is liquid-first: dlc_hd only`);
+    const pr = cfg.it_kw / Math.max(cfg.racks, 1);
+    if (pr > g.max_rack_kw) errs.push(`${pr.toFixed(1)} kW/rack exceeds the ${g.max_rack_kw} kW GB300 NVL72-class rack limit of ${g.label}`);
+    if (ct === 'lite') errs.push(`BEN Controls Lite is for BEN 5 and BEN 30 only; ${g.label} uses BEN Controls Pro`);
+  }
+  return errs;
+}
+
+function miniPower(cfg, cat) {
+  const M = cat.minirack, cl = cat.cooling.office_air;
+  const cool = cfg.it_kw / cl.cop;
+  const total = cfg.it_kw + cool + M.aux_kw + cfg.it_kw * (1 / M.ups_eff - 1);
+  const kva = total / 0.95;
+  return { cool, total, kva, amps: kva * 1000 / 120 };
+}
+
+// BEN 1 sizing (config.Config._derived_minirack): 120 V plug-in, lithium line-interactive UPS, office-air extraction
+function derivedMinirack(cfg, cat) {
+  const tier = canonicalTier(cfg.tier, cat);
+  const g = geometry(cfg, cat), M = cat.minirack;
+  const f = cat.tiers[tier].forms[cfg.form] || cat.tiers[tier].forms.cab12;
+  const cl = cat.cooling[cfg.cooling] || cat.cooling.office_air;
+  const clim = cat.climates[cfg.climate];
+  const hzKey = cfg.hardening ?? 'IND', hz = hardeningTable(cat)[hzKey] || hardeningTable(cat).IND;
+  const pw = miniPower(cfg, cat);
+  const itW = cfg.it_kw * 1000;
+  const nUnits = Math.ceil(cfg.it_kw * 1.05 / cl.unit_kw);
+  const nTotal = cfg.redundancy === 'N+1' ? nUnits + 1 : cfg.redundancy === '2N' ? 2 * nUnits : nUnits;
+  const amps = pw.amps;
+  let brk, outlet;
+  if (amps <= 12) { brk = 15; outlet = 'NEMA 5-15R on a dedicated 15 A, 120 V circuit (12 A continuous at 80 %)'; }
+  else if (amps <= 16) { brk = 20; outlet = 'NEMA 5-20R on a dedicated 20 A, 120 V circuit (16 A continuous at 80 %)'; }
+  else { brk = 30; outlet = 'exceeds a 120 V 20 A circuit: use the 230 V option'; }
+  const needW = itW * M.ups_headroom;
+  const ups = M.ups_models.find(u => u.w >= needW) || M.ups_models[M.ups_models.length - 1];
+  const runtime = ups.wh / Math.max(itW, 1) * 60;
+  const upsMin = cfg.ups_minutes ?? 10;
+  const packs = runtime >= upsMin ? 0 : Math.ceil((upsMin * itW / 60 - ups.wh) / ups.wh);
+  const batteryKwh = cfg.it_kw * upsMin / 60 / 0.9;
+  const src = M.noise_src_dba[f.noise_source] + 15 * Math.log10(Math.max(itW, 50) / 200);
+  const inside = src - f.insertion_loss_db;
+  const noise = 10 * Math.log10(10 ** (inside / 10) + 10 ** (28 / 10));
+  const target = M.noise_target_dba[cfg.form] ?? M.noise_target_dba.cab12;
+  const heatW = pw.total * 1000;
+  const ventCfm = heatW / (1.18 * 1006 * 5) / 0.000471947;
+  const airflow = itW / (1.18 * 1006 * (cl.design_rise_k ?? 10)) / 0.000471947;
+  const area = 2 * (g.ext_l_m * g.ext_h_m + g.ext_w_m * g.ext_h_m) + g.ext_l_m * g.ext_w_m;
+  const upsKg = ups.va <= 1000 ? 16 : 28;
+  const payload = cfg.it_kw * M.kg_per_kw_it + upsKg * (1 + packs);
+  const ct = controlsTierResolved(cfg, cat);
+  const prof = cat.profiles[cfg.profile].ashrae;
+  return {
+    power_architecture: 'ac480', power_architecture_label: '120 V plug-in → line-interactive lithium UPS → rack PDU (BEN 1)', dc_ready: false,
+    tier_label: g.label, enclosure: `${g.form_label} (${g.reference} class)`, form: cfg.form, form_label: g.form_label,
+    per_rack_kw: +(cfg.it_kw / cfg.racks).toFixed(2), cooling_label: cl.label, cooling_units_n: nUnits, cooling_units_total: nTotal,
+    cooling_unit_kw_derated: +cl.unit_kw.toFixed(1), cooling_derate: 1.0, cooling_elec_kw: +pw.cool.toFixed(3),
+    total_kw: +pw.total.toFixed(3), total_kva: +pw.kva.toFixed(3), voltage: g.voltage, voltage_option: g.voltage_option,
+    service_amps_calc: pyRound(amps / 0.8), service_breaker_a: brk, outlet_amps: +amps.toFixed(1), outlet_circuit: outlet, outlet_circuit_a: brk,
+    ups_modules: 1, ups_kva_each: ups.va / 1000, ups_va: ups.va, ups_w: ups.w, ups_model: ups.model, ups_plug: ups.plug,
+    ups_runtime_min_est: +runtime.toFixed(1), ups_battery_packs: packs, battery_kwh: +batteryKwh.toFixed(3),
+    airflow_cfm: Math.round(airflow), payload_kg: Math.round(payload), gross_kg: Math.round(payload + g.tare_kg),
+    envelope_gain_kw: 0.0, pue_estimate: +(pw.total / cfg.it_kw).toFixed(3),
+    row_length_mm: Math.trunc(g.ext_l_m * 1000), row_fits: true, rows: 1, racks_per_row: 1, nfpa_855_scope: batteryKwh >= 20,
+    mv_service: false, transformer_kva: 0, transformers_total: 0, generators_total: 0, generator_kw_each: 0, modules: 1, kind: 'minirack',
+    hardening: hzKey, hardening_label: hz.label, hardening_rating: hz.rating, hardening_coating: hz.coating, hardening_recommended: 'IND',
+    envelope_area_m2: +area.toFixed(2), ashrae_class: prof === 'A1' ? 'A2' : prof, ashrae_profile_class: prof,
+    controls_tier_resolved: ct, controls_label: (cat.controls_tiers ?? {})[ct]?.label ?? 'BEN Controls Mini', pods: 2,
+    noise_dba_est: +noise.toFixed(1), noise_dba_target: target, noise_ok: noise <= target,
+    noise_quiet_up_to_kw: +(200 * 10 ** ((target - M.noise_src_dba[f.noise_source] + f.insertion_loss_db) / 15) / 1000).toFixed(2),
+    heat_to_room_w: Math.round(heatW), heat_to_room_btu_h: Math.round(heatW * 3.412), closet_vent_cfm: Math.round(ventCfm),
+    office_design_c: M.office_design_c, office_max_c: M.office_max_c, climate: clim, geometry: g,
+    ...densityOf(cfg, g),
+  };
+}
+
+// Dense row order (config.Config.dense_row_items): switchboard, power (battery / UPS interleaved), CDUs, racks with fan coils between
+export function denseRowItems(cfg, d) {
+  const items = Array(d.swbd_sections).fill('swbd');
+  if ((cfg.power_architecture ?? 'ac480') === 'dc800') {
+    items.push(...Array(d.rectifier_cabinets).fill('rect'), ...Array(d.battery_cabinets).fill('batt800'));
+  } else {
+    let b = d.battery_cabinets, u = d.ups_frames;
+    while (b || u) { if (b) { items.push('batt'); b--; } if (u) { items.push('ups'); u--; } }
+  }
+  items.push(...Array(d.cooling_units_total).fill('cdu'));
+  const nr = cfg.racks, nf = d.fancoils_total;
+  const slots = new Set();
+  for (let i = 0; i < nf; i++) slots.add(pyRound((i + 0.5) * (nr + nf) / nf - 0.5));
+  let ri = 0, fi = 0;
+  for (let k = 0; k < nr + nf; k++) {
+    if ((slots.has(k) && fi < nf) || ri >= nr) { items.push('fancoil'); fi++; } else { items.push('rack'); ri++; }
+  }
+  return items;
+}
+
+function applyDense(cfg, cat, out, upsKvaN, area, hz, dc) {
+  const tier = canonicalTier(cfg.tier, cat);
+  const g = cat.tiers[tier], F = cat.dense_footprints, R = cat.dense_rules;
+  const mult = cfg.redundancy === '2N' ? 2 : 1;
+  const resid = cat.cooling[cfg.cooling].air_residual ?? 0.10;
+  const fcN = Math.ceil(resid * cfg.it_kw * 1.05 / F.fancoil.kw);
+  const fcTotal = cfg.redundancy === 'N+1' ? fcN + 1 : fcN * mult;
+  const dc800 = (cfg.power_architecture ?? 'ac480') === 'dc800';
+  const battNeed = dc800 ? dc.battery_on_bus_kwh : out.battery_kwh;
+  const battCab = Math.max(Math.ceil(battNeed / F.batt.kwh), Math.ceil(cfg.it_kw / F.batt.kw)) * mult;
+  let framesN = 0, frames = 0, kvaEach = 0;
+  if (!dc800) { framesN = Math.ceil(upsKvaN / F.ups.kva); frames = framesN * mult; kvaEach = pyRound(upsKvaN / framesN); }
+  const brk = out.service_breaker_a;
+  const swbd = brk <= R.panelboard_max_a ? 0 : (brk <= F.swbd.a_per_section ? 1 : (brk <= 2500 ? 2 : 3));
+  Object.assign(out, { ups_modules: frames, ups_kva_each: kvaEach, ups_frames: frames, ups_frames_n: framesN,
+    fancoils_n: fcN, fancoils_total: fcTotal, fancoil_kw: F.fancoil.kw, trim_loop_kw: +(resid * cfg.it_kw * 1.1).toFixed(1), trim_loop_c: R.trim_loop_c,
+    battery_cabinets: battCab, battery_kwh_installed: +(battCab * F.batt.kwh).toFixed(1),
+    battery_minutes_installed: +(battCab * F.batt.kwh * 0.9 * 60 / cfg.it_kw).toFixed(1),
+    swbd_sections: swbd, panelboard_wall: swbd === 0, liquid_first: true, rack_envelope_mm: [F.rack.w, F.rack.d, F.rack.h], rack_kw_max: g.max_rack_kw });
+  const items = denseRowItems(cfg, out);
+  const rowMm = items.reduce((a, k) => a + F[k].w, 0) + R.end_zone_mm;
+  const rect = dc800 ? (out.rectifier_cabinets ?? 0) : 0;
+  const payload = cfg.racks * F.rack.kg + out.cooling_units_total * F.cdu.kg + fcTotal * F.fancoil.kg + frames * F.ups.kg + battCab * F.batt.kg
+    + swbd * F.swbd.kg + rect * F.rect.kg + area * hz.mass_kg_m2;
+  Object.assign(out, { row_items: items, row_length_mm: Math.trunc(rowMm), row_fits: rowMm <= g.int_l_m * 1000,
+    row_budget_mm: Math.trunc(g.int_l_m * 1000 - R.end_zone_mm), end_zone_mm: R.end_zone_mm,
+    payload_kg: Math.round(payload), gross_kg: Math.round(payload + g.tare_kg), nfpa_855_scope: battCab * F.batt.kwh >= 20 });
+}
+
 export function derived(cfg, cat) {
   const tier = canonicalTier(cfg.tier, cat);
+  if (cat.tiers[tier] && isMini(cat.tiers[tier])) return derivedMinirack(cfg, cat);
   const g = cat.tiers[tier], cl = cat.cooling[cfg.cooling], clim = cat.climates[cfg.climate];
   const hzKey = cfg.hardening ?? 'H1';
   const hz = hardeningTable(cat)[hzKey];
@@ -162,7 +350,7 @@ export function derived(cfg, cat) {
   const nfpa855 = batteryKwh >= 20;
   const ct = controlsTierResolved(cfg, cat);
   const pods = tier === 'ben5' ? 3 : cfg.racks * 2 + 2 * modules;
-  return {
+  const out = {
     tier_label: g.label, enclosure: g.enclosure, per_rack_kw: +perRack.toFixed(2),
     cooling_label: cl.label, cooling_units_n: nUnits, cooling_units_total: nTotal,
     cooling_unit_kw_derated: +unitKw.toFixed(1), cooling_derate: +derate.toFixed(3), cooling_elec_kw: +coolElec.toFixed(2),
@@ -183,10 +371,54 @@ export function derived(cfg, cat) {
     controls_label: (cat.controls_tiers ?? {})[ct]?.label ?? (ct === 'pro' ? 'BEN Controls Pro' : 'BEN Controls Lite'),
     pods,
   };
+  if (g.liquid_first) applyDense(cfg, cat, out, upsN, area, hz, dc);
+  if (lineupOf(cfg, cat) === 'rev2') Object.assign(out, densityOf(cfg, g));
+  return out;
 }
 
-export function preset(tier, profile = 'ai_inference', climate = 'temperate', cat, hardening = null) {
+// Rev 2 presets (config.Config._preset_minirack / _preset_dense); carried tiers use the frozen Rev 1 rule in both lineups
+function presetMinirack(tier, profile, climate, lineup, form) {
+  form = form || (['ai_training', 'healthcare', 'public_sector'].includes(profile) ? 'cab12' : 'rack10');
+  const it = form === 'cab12' ? (profile === 'ai_training' ? 1.1 : 1.0) : (profile === 'ai_inference' ? 0.6 : 0.4);
+  return { tier, profile, it_kw: it, racks: 1, cooling: 'office_air', redundancy: form === 'rack10' ? 'N' : 'N+1', climate,
+    subsystems: ['power', 'cooling', 'compute', 'controls'], white_label: false, brand: 'Schreiber AI', ups_minutes: 10, generator: false,
+    site_name: 'Demo site', controls_tier: 'auto', hardening: 'IND', power_architecture: 'ac480', dc_convention: 'bipolar_400', lineup, form };
+}
+
+function presetDense(tier, profile, climate, cat, hardening, lineup) {
+  const g = cat.tiers[tier], p = cat.profiles[profile];
+  const it0 = ['ai_training', 'ai_inference'].includes(profile) ? g.it_kw_max : 0.8 * g.it_kw_max;
+  if (hardening == null) hardening = hardeningRecommended(profile, climate);
+  const cfg = { tier, profile, it_kw: pyRound(it0), racks: g.max_racks, cooling: 'dlc_hd', redundancy: p.redundancy, climate,
+    subsystems: ['power', 'cooling', 'compute', 'controls'], white_label: false, brand: 'Schreiber AI', ups_minutes: g.ups_minutes_default ?? 5,
+    generator: ['healthcare', 'public_sector', 'off_grid'].includes(profile), site_name: 'Demo site', controls_tier: 'auto', hardening,
+    power_architecture: 'ac480', dc_convention: 'bipolar_400', lineup, form: '' };
+  for (let racks = g.max_racks; racks >= 1; racks--) {
+    let it = Math.min(pyRound(it0), racks * g.max_rack_kw);
+    while (it >= g.it_kw_min) {
+      cfg.racks = racks; cfg.it_kw = it;
+      if (!validate(cfg, cat).length) return cfg;
+      it -= 10;
+    }
+  }
+  cfg.racks = g.max_racks; cfg.it_kw = pyRound(it0);
+  return cfg;
+}
+
+export function preset(tier, profile = 'ai_inference', climate = 'temperate', cat, hardening = null, lineup = 'rev2', form = null) {
   tier = canonicalTier(tier, cat);
+  const byL = tiersByLineup(cat);
+  if (!byL[lineup] || !byL[lineup].includes(tier)) throw new Error(`${tier} is not in lineup ${lineup}`);
+  const g0 = cat.tiers[tier];
+  if (isMini(g0)) return presetMinirack(tier, profile, climate, lineup, form);
+  if (g0.liquid_first) return presetDense(tier, profile, climate, cat, hardening, lineup);
+  const cfg = presetRev1(tier, profile, climate, cat, hardening);
+  cfg.lineup = lineup;
+  cfg.form = '';
+  return cfg;
+}
+
+function presetRev1(tier, profile, climate, cat, hardening) {
   const g = cat.tiers[tier], p = cat.profiles[profile];
   let itKw = Math.min(g.it_kw_max, Math.max(g.it_kw_min, p.rack_kw * g.max_racks * 0.8));
   if ((g.kind ?? 'module') === 'hall') itKw = 0.8 * g.it_kw_max;  // a 2 MW center is sold near its nominal size

@@ -21,12 +21,33 @@
         "ben150",
         "ben500",
         "ben2000",
+        "ben1",
+        "ben300",
+        "ben700",
         "micro",
         "ben10",
         "ben20",
-        "ben40"
+        "ben40",
+        "ben1000"
       ],
-      "description": "Tier by nominal maximum IT kW (ben5/ben30/ben150/ben500/ben2000); generation-1 keys micro/ben10/ben20/ben40 are accepted as aliases"
+      "description": "Tier by nominal maximum IT kW. Rev 1: ben5/ben30/ben150/ben500/ben2000; Rev 2 adds ben1 (mini rack), ben300 and ben700 (liquid-first). Generation-1 keys micro/ben10/ben20/ben40 and the Rev 2 working name ben1000 (= ben700) are accepted as aliases"
+    },
+    "lineup": {
+      "enum": [
+        "rev1",
+        "rev2"
+      ],
+      "default": "rev2",
+      "description": "Product lineup. A saved configuration without this key is Rev 1 and reproduces exactly (docs/REVISION_POLICY.md rule 3)"
+    },
+    "form": {
+      "enum": [
+        "",
+        "rack10",
+        "cab12"
+      ],
+      "default": "",
+      "description": "BEN 1 only: rack10 = 10-inch 8U desk / shelf rack (<= 0.6 kW), cab12 = 19-inch 12U sound-damped cabinet (<= 1.5 kW)"
     },
     "profile": {
       "enum": [
@@ -42,7 +63,7 @@
     },
     "it_kw": {
       "type": "number",
-      "minimum": 2,
+      "minimum": 0.2,
       "maximum": 2000
     },
     "racks": {
@@ -54,9 +75,10 @@
       "enum": [
         "H1",
         "H2",
-        "H3"
+        "H3",
+        "IND"
       ],
-      "description": "Enclosure hardening level: H1 standard IP66, H2 severe environment, H3 hardened/government"
+      "description": "Enclosure hardening level: H1 standard IP66, H2 severe environment, H3 hardened/government; IND = BEN 1 indoor (no hardening levels)"
     },
     "cooling": {
       "enum": [
@@ -65,7 +87,8 @@
         "inrow_dx_300",
         "rdhx_drycooler",
         "dlc_cdu",
-        "dlc_hd"
+        "dlc_hd",
+        "office_air"
       ]
     },
     "redundancy": {
@@ -120,7 +143,8 @@
       "enum": [
         "auto",
         "lite",
-        "pro"
+        "pro",
+        "mini"
       ],
       "description": "BEN Controls tier: auto (by size and profile), lite (Revolution Pi + Pods) or pro (PLCnext + UL 508A panel + edge computer + Pods)"
     },
@@ -181,13 +205,38 @@
       "kind": "hall",
       "modules": 3,
       "rows": 4
+    },
+    "ben1": {
+      "it_kw_min": 0.2,
+      "it_kw_max": 1.5,
+      "max_racks": 1,
+      "kind": "minirack",
+      "modules": 1,
+      "rows": 1
+    },
+    "ben300": {
+      "it_kw_min": 150,
+      "it_kw_max": 300,
+      "max_racks": 2,
+      "kind": "module",
+      "modules": 1,
+      "rows": 1
+    },
+    "ben700": {
+      "it_kw_min": 400,
+      "it_kw_max": 700,
+      "max_racks": 5,
+      "kind": "module",
+      "modules": 1,
+      "rows": 1
     }
   },
   "x-tier-aliases": {
     "micro": "ben5",
     "ben10": "ben30",
     "ben20": "ben150",
-    "ben40": "ben500"
+    "ben40": "ben500",
+    "ben1000": "ben700"
   },
   "x-cooling-limits": {
     "cabinet_dx": {
@@ -213,6 +262,10 @@
     "dlc_hd": {
       "max_rack_kw": 250,
       "medium": "liquid"
+    },
+    "office_air": {
+      "max_rack_kw": 1.5,
+      "medium": "air"
     }
   },
   "x-power-architectures": {
@@ -222,20 +275,46 @@
         "ben30",
         "ben150",
         "ben500",
-        "ben2000"
+        "ben2000",
+        "ben1",
+        "ben300",
+        "ben700"
       ]
     },
     "dc800": {
       "tiers": [
         "ben150",
         "ben500",
-        "ben2000"
+        "ben2000",
+        "ben300",
+        "ben700"
       ]
     }
   },
   "x-dlc-hd-tiers": [
     "ben150",
     "ben500",
-    "ben2000"
-  ]
+    "ben2000",
+    "ben300",
+    "ben700"
+  ],
+  "x-tiers-by-lineup": {
+    "rev1": [
+      "ben5",
+      "ben30",
+      "ben150",
+      "ben500",
+      "ben2000"
+    ],
+    "rev2": [
+      "ben1",
+      "ben5",
+      "ben30",
+      "ben150",
+      "ben300",
+      "ben500",
+      "ben700",
+      "ben2000"
+    ]
+  }
 }

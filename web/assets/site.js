@@ -1,4 +1,4 @@
-import { validate, derived, preset, canonicalTier, hardeningRecommended, powerArchitectures, dcConventions } from './selector.js';
+import { validate, derived, preset, canonicalTier, hardeningRecommended, powerArchitectures, dcConventions, tiersByLineup, lineupOf } from './selector.js';
 
 const $ = (s) => document.querySelector(s);
 const fmt = (n) => n.toLocaleString('en-US');
@@ -28,14 +28,19 @@ const FALLBACK_RISKS = [
 ];
 
 let CAT, RISKS, PRICING;
-let state = { profile: 'ai_inference', climate: 'temperate', cfg: null };
+let state = { profile: 'ai_inference', climate: 'temperate', cfg: null, lineup: 'rev2' };
+let PRICING_BY_LINEUP = {};
+// Rev 2 (docs/REV2_DECISION.md §2): tiers shown follow the lineup; BEN 1 has a form; hero art for tiers without their own image
+const HERO_FALLBACK = { ben300: 'ben150', ben700: 'ben500' };
+const lineupTiers = () => tiersByLineup(CAT)[state.lineup];
 
 async function load(url, fallback) { try { const r = await fetch(url); if (!r.ok) throw 0; return await r.json(); } catch { return fallback; } }
 
 function buildTiers() {
   const g = $('#tierGrid'); g.innerHTML = '';
-  for (const [k, t] of Object.entries(CAT.tiers)) {
-    const d = derived(preset(k, state.profile, state.climate, CAT), CAT);
+  for (const k of lineupTiers()) {
+    const t = CAT.tiers[k];
+    const d = derived(preset(k, state.profile, state.climate, CAT, null, state.lineup), CAT);
     const el = document.createElement('article'); el.className = 'card';
     const service = d.mv_service ? `${t.voltage}; ${d.transformers_total} × ${fmt(d.transformer_kva)} kVA transformers at preset` : `${t.voltage}, ${d.service_breaker_a} A at preset`;
     const racks = (t.rows ?? 1) > 1 ? `up to ${t.max_racks} × ${t.rack_u}U in ${t.rows} rows` : `up to ${t.max_racks} × ${t.rack_u}U`;
@@ -77,9 +82,25 @@ function buildRisks() {
   }
 }
 
-function setPreset(tier) {
-  state.cfg = preset(canonicalTier(tier, CAT), state.profile, state.climate, CAT);
+function setPreset(tier, form = null) {
+  tier = canonicalTier(tier, CAT);
+  if (!lineupTiers().includes(tier)) tier = 'ben150';
+  state.cfg = preset(tier, state.profile, state.climate, CAT, null, state.lineup, form);
   writeForm(); recompute();
+}
+function buildTierSelect() {
+  const ts = $('#tier'); ts.innerHTML = '';
+  for (const k of lineupTiers()) { const o = document.createElement('option'); o.value = k; o.textContent = CAT.tiers[k].label; ts.appendChild(o); }
+}
+// Lineup and BEN 1 form controls are created here (no markup change needed); they use the same label/select pattern as the form
+function addRev2Controls() {
+  const tierLbl = $('#tier').closest('label');
+  const mk = (id, text) => { const l = document.createElement('label'); l.id = id + 'Lbl'; l.append(text + ' '); const sel = document.createElement('select'); sel.id = id; l.appendChild(sel); return l; };
+  const ll = mk('lineupSel', 'Lineup');
+  for (const [k, t] of [['rev2', 'Rev 2 (current)'], ['rev1', 'Rev 1 (frozen, existing quotes)']]) { const o = document.createElement('option'); o.value = k; o.textContent = t; ll.querySelector('select').appendChild(o); }
+  const fl = mk('formSel', 'Form');
+  for (const [k, f] of Object.entries(CAT.tiers.ben1?.forms || {})) { const o = document.createElement('option'); o.value = k; o.textContent = f.label; fl.querySelector('select').appendChild(o); }
+  tierLbl.before(ll); tierLbl.after(fl);
 }
 function hardeningNote() {
   const rec = hardeningRecommended(state.profile, state.climate);
@@ -91,14 +112,22 @@ function writeForm() {
   const c = state.cfg; c.tier = canonicalTier(c.tier, CAT); const t = CAT.tiers[c.tier];
   if (!c.hardening) c.hardening = hardeningRecommended(c.profile || state.profile, c.climate || state.climate);
   $('#tier').value = c.tier;
-  const it = $('#it_kw'); it.min = t.it_kw_min; it.max = t.it_kw_max; it.value = c.it_kw; $('#itOut').value = c.it_kw;
+  const mini = t.kind === 'minirack';
+  if ($('#lineupSel')) $('#lineupSel').value = state.lineup;
+  if ($('#formSel')) { $('#formLbl').hidden = !mini; if (mini) $('#formSel').value = c.form; }
+  const itMax = mini ? (t.forms[c.form]?.it_kw_max ?? t.it_kw_max) : t.it_kw_max;
+  const it = $('#it_kw'); it.step = mini ? 0.1 : 1; it.min = t.it_kw_min; it.max = itMax; it.value = c.it_kw; $('#itOut').value = c.it_kw;
   $('#racks').max = t.max_racks; $('#racks').value = c.racks;
+  for (const o of $('#hardeningSel').options) o.hidden = mini ? o.value !== 'IND' : o.value === 'IND';
+  $('#hardeningSel').disabled = mini; $('#generator').disabled = mini;
   const cs = $('#cooling'); cs.innerHTML = '';
   for (const [k, v] of Object.entries(CAT.cooling)) {
+    if (mini !== (k === 'office_air')) continue;
     if ((c.tier === 'ben5') !== (k === 'cabinet_dx')) continue;
+    if (t.liquid_first && k !== 'dlc_hd') continue;
     if (t.kind === 'hall' && k !== 'dlc_cdu' && k !== 'dlc_hd') continue;
     if (k === 'dlc_hd' && !(CAT.dlc_hd_tiers || ['ben150', 'ben500', 'ben2000']).includes(c.tier)) continue;
-    const o = document.createElement('option'); o.value = k; o.textContent = v.label + (k === 'dlc_hd' ? ' — forward option, study' : ''); cs.appendChild(o);
+    const o = document.createElement('option'); o.value = k; o.textContent = v.label + (k === 'dlc_hd' && !t.liquid_first ? ' — forward option, study' : ''); cs.appendChild(o);
   }
   cs.value = c.cooling;
   const ps = $('#powerArch'); ps.innerHTML = '';
@@ -117,7 +146,8 @@ function writeForm() {
   $('#hardeningSel').value = c.hardening;
   document.querySelectorAll('.sub').forEach(x => x.checked = c.subsystems.includes(x.value));
   $('#white_label').checked = c.white_label; $('#brand').value = c.brand;
-  const hero = $('#heroImg'); hero.src = `assets/hero-${c.tier}.svg`;
+  const hero = $('#heroImg'); hero.src = `assets/hero-${HERO_FALLBACK[c.tier] || c.tier}.svg`;
+  const fig = hero.closest('figure'); if (fig) fig.hidden = mini;   // no hero art for the indoor mini rack yet
   const cap = hero.closest('figure') && hero.closest('figure').querySelector('figcaption');
   if (cap) cap.textContent = `${t.label} · ${t.enclosure} · up to ${fmt(t.it_kw_max)} kW IT · generated from the configuration model`;
   hero.alt = t.kind === 'hall' ? `Isometric illustration of the ${t.label} prefabricated data hall: three joined modules, a power module and a plant yard with dry coolers and generators` : `Isometric illustration of a ${t.label} ${t.kind === 'cabinet' ? 'outdoor cabinet' : 'container data center'} with the Schreiber AI mark on the side`;
@@ -132,6 +162,10 @@ function readForm() {
   c.subsystems = [...document.querySelectorAll('.sub:checked')].map(x => x.value);
   c.white_label = $('#white_label').checked; c.brand = $('#brand').value || 'Schreiber AI';
   c.profile = state.profile; c.climate = state.climate;
+  c.lineup = state.lineup;
+  const mini = CAT.tiers[canonicalTier(c.tier, CAT)]?.kind === 'minirack';
+  c.form = mini ? ($('#formSel')?.value || c.form || 'rack10') : '';
+  if (mini) { c.hardening = 'IND'; c.generator = false; }
 }
 function recompute() {
   readForm();
@@ -154,6 +188,18 @@ function recompute() {
   } else {
     rows.push(['UPS', `${d.ups_modules} × ${fmt(d.ups_kva_each)} kVA, ${state.cfg.ups_minutes} min → ${fmt(d.battery_kwh)} kWh LFP`]);
   }
+  if (d.kind === 'minirack') {
+    rows.push(['Outlet', `${d.outlet_circuit}; draws ${d.outlet_amps} A at 120 V (${d.ups_plug}). ${d.voltage_option}`]);
+    rows.push(['UPS', `${d.ups_model}; est. ${d.ups_runtime_min_est} min at full load${d.ups_battery_packs ? ` + ${d.ups_battery_packs} battery pack(s)` : ''}`]);
+    rows.push(['Heat to the room', `${fmt(d.heat_to_room_w)} W (${fmt(d.heat_to_room_btu_h)} BTU/h): ${d.room_cooling_note}`]);
+    rows.push(['Noise at 1 m (estimate)', `${d.noise_dba_est} dBA (target ${d.noise_dba_target})${d.noise_ok ? '' : ` — meets the target up to ${d.noise_quiet_up_to_kw} kW`}`]);
+  }
+  if (d.liquid_first) {
+    rows.push(['Row (door end first)', `${d.row_items.join(' · ')} — ${fmt(d.row_length_mm)} of ${fmt(Math.round(d.geometry.int_l_m * 1000))} mm`]);
+    rows.push(['Power gear inside', `${d.ups_frames} UPS frame(s), ${d.battery_cabinets} lithium cabinet(s) ${fmt(d.battery_kwh_installed)} kWh (${d.battery_minutes_installed} min), ${d.swbd_sections ? d.swbd_sections + ' switchboard section(s)' : '600 A panelboard on the end wall'}`]);
+    rows.push(['Residual air', `${d.fancoils_total} in-row fan coils on an ${d.trim_loop_c} °C trim loop (${fmt(d.trim_loop_kw)} kW trim chiller on the skid)`]);
+  }
+  if (d.lineup === 'rev2') rows.push(['Density', `${d.kw_per_rack} kW/rack · ${d.kw_per_m2_footprint} kW/m² footprint · ${d.kw_per_m3_volume} kW/m³`]);
   if (state.cfg.cooling === 'dlc_hd') {
     rows.push(['Liquid loop', `${d.loop_water_class} warm water, ${d.loop_supply_design_c}/${d.loop_return_design_c} °C, ${fmt(d.loop_flow_lpm)} L/min at ΔT ${d.loop_dt_design_k} K`]);
     rows.push(['Heat reuse available', `${fmt(d.heat_reuse_kw_available)} kW at the return (${Math.round(d.air_residual * 100)} % of IT heat stays on the air side)`]);
@@ -169,6 +215,7 @@ function recompute() {
 }
 function renderPrice(d) {
   const p = $('#price');
+  PRICING = PRICING_BY_LINEUP[state.lineup] || PRICING_BY_LINEUP.rev1;
   if (!PRICING || !PRICING[state.cfg.tier]) { p.innerHTML = '<h3>Indicative price</h3><p class="muted">Pricing table not published yet. The bill of materials in the repository (docs/BOM.md) is the source.</p>'; return; }
   const t = PRICING[state.cfg.tier];
   // scale by selected subsystems and by IT kW relative to preset (compute scales, rest step-wise)
@@ -193,14 +240,19 @@ async function main() {
   CAT = await load('assets/catalog.json', null);
   if (!CAT) { document.body.insertAdjacentHTML('afterbegin', '<p class="errors">Could not load the catalog. Serve this folder over HTTP.</p>'); return; }
   RISKS = await load('assets/risks.json', FALLBACK_RISKS);
-  PRICING = await load('assets/pricing.json', null);
+  PRICING_BY_LINEUP = { rev1: await load('assets/pricing.json', null), rev2: await load('assets/pricing-rev2.json', null) };
+  PRICING = PRICING_BY_LINEUP.rev2 || PRICING_BY_LINEUP.rev1;
+  addRev2Controls();
   buildTiers(); buildProfiles(); buildRisks();
-  const ts = $('#tier'); for (const [k, t] of Object.entries(CAT.tiers)) { const o = document.createElement('option'); o.value = k; o.textContent = t.label; ts.appendChild(o); }
+  buildTierSelect();
+  const ts = $('#tier');
   const hs = $('#hardeningSel'); for (const [k, h] of Object.entries(CAT.hardening || {})) { const o = document.createElement('option'); o.value = k; o.textContent = h.label; o.title = h.rating; hs.appendChild(o); }
   const urlCfg = new URLSearchParams(location.search).get('config');
-  if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.cfg.tier = canonicalTier(state.cfg.tier, CAT); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset('ben150'); } }
+  if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.cfg.tier = canonicalTier(state.cfg.tier, CAT); state.lineup = lineupOf(state.cfg, CAT); state.cfg.lineup = state.lineup; buildTierSelect(); buildTiers(); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset('ben150'); } }
   else setPreset('ben150');
   ts.onchange = () => setPreset(ts.value);
+  $('#lineupSel').onchange = () => { state.lineup = $('#lineupSel').value; buildTierSelect(); buildTiers(); setPreset(state.cfg?.tier || 'ben150'); };
+  $('#formSel').onchange = () => setPreset('ben1', $('#formSel').value);
   $('#it_kw').oninput = () => { $('#itOut').value = $('#it_kw').value; recompute(); };
   for (const id of ['#racks', '#cooling', '#redundancy', '#ups_minutes', '#generator', '#hardeningSel', '#white_label', '#brand']) $(id).onchange = recompute;
   $('#powerArch').onchange = () => { readForm(); writeForm(); recompute(); };

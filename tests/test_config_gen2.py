@@ -2,7 +2,7 @@
 import math, os, sys, pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
-from ben_engine.config import Config, TIER_GEOMETRY, TIER_ALIASES, HARDENING, canonical_tier, PRESETS
+from ben_engine.config import Config, TIER_GEOMETRY, TIER_ALIASES, HARDENING, canonical_tier, PRESETS, TIERS_BY_LINEUP
 
 
 @pytest.mark.parametrize("old,new", list(TIER_ALIASES.items()))
@@ -15,7 +15,8 @@ def test_aliases_resolve_everywhere(old, new):
 
 
 def test_canonical_keys_are_the_only_geometry_keys():
-    assert list(TIER_GEOMETRY) == ["ben5", "ben30", "ben150", "ben500", "ben2000"]
+    assert list(TIER_GEOMETRY)[:5] == TIERS_BY_LINEUP["rev1"] == ["ben5", "ben30", "ben150", "ben500", "ben2000"]   # Rev 1 entries first, frozen
+    assert set(TIER_GEOMETRY) == set(TIERS_BY_LINEUP["rev2"])
     assert not set(TIER_ALIASES) & set(TIER_GEOMETRY)
     for t in TIER_GEOMETRY:
         assert not PRESETS[t].validate(), (t, PRESETS[t].validate())
@@ -77,7 +78,7 @@ def test_hardening_default_by_climate_and_profile(profile, climate, expect):
 
 
 def test_hardening_table_and_mass_adder():
-    assert list(HARDENING) == ["H1", "H2", "H3"]
+    assert list(HARDENING) == ["H1", "H2", "H3", "IND"]   # IND: Rev 2 BEN 1 (indoor, no hardening levels)
     base = Config.preset("ben500", "ai_inference", "temperate", "H1").derived()
     h2 = Config.preset("ben500", "ai_inference", "temperate", "H2").derived()
     h3 = Config.preset("ben500", "ai_inference", "temperate", "H3").derived()

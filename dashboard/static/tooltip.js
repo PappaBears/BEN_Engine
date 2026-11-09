@@ -6,9 +6,9 @@ let bomRows = [], bomCfgKey = '', bomLoaded = false, tipEl = null, store = null,
 
 // Catalog code preferences per component type; the first code present in /api/bom wins.
 const CODES = {
-  container: ['STR-CONT40', 'STR-CONT20', 'STR-CONT10', 'STR-CAB24U'],
+  container: ['STR-CONT40', 'STR-CONT20', 'STR-CONT10', 'STR-CAB24U', 'STR-MINICAB-12', 'STR-MINIRACK-10'],
   doors: ['STR-MANDOOR', 'STR-CAB24U'],
-  rack: ['STR-RACK48', 'STR-RACK42', 'STR-CAB24U'],
+  rack: ['STR-RACK48', 'STR-RACK42', 'STR-RACK-MGX', 'STR-CAB24U', 'STR-MINICAB-12', 'STR-MINIRACK-10'],
   cooling_inrow: ['CLG-INROW', 'CLG-INROW-DX', 'CLG-'],
   cooling_cabinet: ['CLG-CABAC', 'CLG-'],
   cooling_rdhx: ['CLG-RDHX', 'CLG-'],
@@ -17,11 +17,11 @@ const CODES = {
   dc_busway: ['PWR-DC-BUSWAY', 'PWR-DC-TAPOFF', 'PWR-DC-'],
   manifold: ['CLG-MANIFOLD-HD', 'CLG-MANIFOLD', 'CLG-'],
   drycooler: ['CLG-DRYCOOLER', 'CLG-'],
-  ups: ['PWR-UPS-GVS150', 'PWR-UPS-SRT6K', 'PWR-UPS-'],
-  battery: ['PWR-BATT-800V', 'PWR-BATT-', 'PWR-UPS-SRT6K-XBP', 'PWR-UPS-'],
+  ups: ['PWR-UPS-GVS150', 'PWR-UPS-GVL500', 'PWR-UPS-MINI-2200', 'PWR-UPS-MINI-1000', 'PWR-UPS-SRT6K', 'PWR-UPS-'],
+  battery: ['PWR-BATT-800V', 'PWR-BATT-', 'PWR-UPS-MINI-XBP', 'PWR-UPS-SRT6K-XBP', 'PWR-UPS-'],
   ats: ['PWR-ATS', 'PWR-MAIN-BKR', 'PWR-LOADCTR'],
-  panel: ['PWR-PANEL-ILINE', 'PWR-PANEL', 'PWR-LOADCTR'],
-  utility: ['PWR-METER', 'PWR-XFMR', 'PWR-FEEDER'],
+  panel: ['PWR-PANEL-ILINE', 'PWR-PANEL-600', 'PWR-SWBD-SECTION', 'PWR-PANEL', 'PWR-PDU-10IN', 'PWR-LOADCTR'],
+  utility: ['PWR-METER', 'PWR-XFMR', 'PWR-FEEDER', 'PWR-UPS-MINI-1000', 'PWR-UPS-MINI-2200'],
   generator: ['PWR-GEN', 'PWR-ATS'],
   controller: ['CTL-CTRL', 'CTL-PLC', 'CTL-REVPI', 'CTL-EDGE', 'CTL-GW-PI5', 'CTL-GW'],
   pod: ['CTL-POD', 'CTL-NODE-MCU', 'CTL-NODE'],
@@ -38,7 +38,19 @@ const CODES = {
   hall: ['STR-MODULE-WB', 'STR-HALL', 'STR-MODULE', 'STR-CONT40'],
   powermodule: ['STR-POWERMOD', 'STR-MODULE-WB', 'PWR-SWGR'],
   transformer: ['PWR-XFMR-2500', 'PWR-XFMR', 'PWR-MV'],
-  switchgear: ['PWR-SWGR', 'PWR-MV-SWGR', 'PWR-PANEL-ILINE', 'PWR-MAIN-BKR'],
+  switchgear: ['PWR-SWBD-SECTION', 'PWR-SWGR', 'PWR-MV-SWGR', 'PWR-PANEL-ILINE', 'PWR-MAIN-BKR'],
+  // Rev 2: liquid-first dense tiers and the BEN 1 mini rack
+  fancoil: ['CLG-FANCOIL-CW20', 'CLG-AIR-RESID-HD', 'CLG-'],
+  trim_chiller: ['CLG-TRIM-CHILLER', 'CLG-'],
+  skid: ['CLG-SKID-DENSE', 'CLG-DRYCOOLER-W45'],
+  ai_box: ['CMP-AI-DGXSPARK', 'CMP-AI-2U-RTXPRO', 'CMP-MINIPC', 'CMP-MINI-1U', 'CMP-'],
+  nas: ['CMP-NAS-RS422', 'CMP-NAS-DS224'],
+  switch: ['CMP-SW-MINI'],
+  pdu: ['PWR-PDU-10IN', 'STR-MINICAB-12'],
+  edge: ['CTL-EDGE-MINI', 'CTL-EDGE'],
+  desk: [],
+  patch: ['CTL-PATCH', 'CTL-CAT6A'],
+  cooling_office: ['STR-MINICAB-12'],
   fanwall: ['CLG-FANWALL', 'CLG-AHU', 'CLG-INROW'],
   drycooler_adiabatic: ['CLG-DRYCOOLER-ADIA', 'CLG-DRYCOOLER', 'CLG-'],
   plinth: ['HRD-PLINTH', 'HRD-H2', 'STR-PLINTH'],
@@ -78,13 +90,17 @@ function describe(hv) {
     case 'rack': {
       const i = hv.index, tin = st.rack_inlet_c[i], tout = st.rack_outlet_c[i], kw = p.pdu_kw[i];
       name = `Rack ${i + 1}`; tag = 'compute'; codes = CODES.rack;
-      desc = `${d.geometry.rack_u}U server rack: ${d.per_rack_kw} kW design load, fed by a metered rack PDU; inlet air from the cold aisle${water ? ', rear-door heat exchanger on the back' : liquid ? ', direct liquid cooled via manifold' : ''}.`;
+      desc = kind === 'minirack' ? `${d.form_label} (${d.geometry.reference || ''}): ${cfg.it_kw} kW IT, office air in at the front; estimated ${d.noise_dba_est} dBA at 1 m (target ${d.noise_dba_target}).`
+        : d.liquid_first ? `GB300 NVL72-class liquid rack, 600 x 1068 mm 48U MGX: ${d.per_rack_kw} kW (limit ${d.rack_kw_max}), cold plates on the W45 loop through the rear manifold, ${Math.round((d.air_residual || 0.1) * 100)} % residual air to the fan coils.`
+        : `${d.geometry.rack_u}U server rack: ${d.per_rack_kw} kW design load, fed by a metered rack PDU; inlet air from the cold aisle${water ? ', rear-door heat exchanger on the back' : liquid ? ', direct liquid cooled via manifold' : ''}.`;
       L('inlet max', `${fmt.num(tin)} °C`, tin > aMax ? 'bad' : tin > aMax - 2 ? 'warn' : 'ok'); L('outlet', `${fmt.num(tout)} °C`); L('load', `${fmt.num(kw)} kW`);
+      if (st.mini) L('noise', `${fmt.num(st.mini.noise_dba, 1)} dBA`, st.mini.noise_dba > d.noise_dba_target + 3 ? 'warn' : 'ok');
       break;
     }
     case 'cooling': {
       const i = hv.index, u = st.cooling_units[i] || {};
       if (water) { name = `RDHx door ${i + 1}`; tag = 'cooling'; codes = CODES.cooling_rdhx; desc = `Rear-door heat exchanger: removes ~${d.cooling_unit_kw_derated} kW per rack door into the glycol loop; air leaves the rack near room temperature.`; }
+      else if (cool === 'office_air') { name = `Extraction fan ${i + 1}`; tag = 'cooling · office air'; codes = CODES.cooling_office; desc = `Filtered, sound-damped extraction fan (N+1 pair) in the 12U cabinet: carries the IT exhaust out to the room; ${d.cooling_unit_kw_derated} kW at a 10 K rise, no refrigerant. The room's own air conditioning removes the heat.`; }
       else if (cool === 'cabinet_dx') { name = `Cabinet AC ${i + 1}`; tag = 'cooling'; codes = CODES.cooling_cabinet; desc = `Side-mounted DX air conditioner: ${d.cooling_unit_kw_derated} kW sensible, closed-loop so no outdoor air enters the cabinet.`; }
       else { name = `In-row cooling unit ${i + 1}`; tag = 'cooling'; codes = CODES.cooling_inrow; desc = `In-row DX unit: draws hot-aisle air, rejects ${d.cooling_unit_kw_derated} kW to the roof condenser and supplies the cold aisle; fans modulate on return temperature.`; }
       L('status', !u.ok ? 'FAILED' : u.on ? 'running' : 'standby', !u.ok ? 'bad' : u.on ? 'ok' : ''); L('cooling', `${fmt.num(u.kw)} kW`); L('fan', `${fmt.num(u.fan_pct, 0)} %`);
@@ -116,7 +132,9 @@ function describe(hv) {
       L('loop heat', `${fmt.num(st.cooling_units.reduce((s, u) => s + u.kw, 0))} kW`); L('residual air supply', `${fmt.num(st.supply_c)} °C`); L('leak', st.leak ? 'DETECTED' : 'clear', st.leak ? 'bad' : 'ok');
       break;
     case 'ups': name = hall ? `UPS string ${(hv.index || 0) + 1}` : 'UPS'; tag = 'power'; codes = CODES.ups;
-      desc = hall ? `Modular UPS string, ${d.ups_modules} × ${d.ups_kva_each.toLocaleString()} kVA (2N): each string alone carries the IT load; frames are hot-swappable.` : `Double-conversion UPS, ${d.ups_modules} × ${d.ups_kva_each} kVA (${cfg.redundancy}): carries the IT load through utility events until the generator or utility returns.`;
+      desc = kind === 'minirack' ? `${d.ups_model}: line-interactive lithium UPS carrying the IT, fans and Pods for an estimated ${d.ups_runtime_min_est} min at full load${d.ups_battery_packs ? ` plus ${d.ups_battery_packs} battery pack(s)` : ''}; plugs into a ${d.ups_plug} outlet.`
+        : d.liquid_first ? `Galaxy VL UPS frame (850 x 925 mm, up to 500 kW, internal N+1 power modules), ${d.ups_frames} frame(s) at ${d.ups_kva_each} kVA; the CDU pumps and fan coils ride on it too.`
+        : hall ? `Modular UPS string, ${d.ups_modules} × ${d.ups_kva_each.toLocaleString()} kVA (2N): each string alone carries the IT load; frames are hot-swappable.` : `Double-conversion UPS, ${d.ups_modules} × ${d.ups_kva_each} kVA (${cfg.redundancy}): carries the IT load through utility events until the generator or utility returns.`;
       L('state', p.ups_on_battery ? 'ON BATTERY' : 'online', p.ups_on_battery ? 'warn' : 'ok'); L('SoC', `${fmt.num(p.ups_soc_pct, 0)} %`, p.ups_soc_pct < 30 ? 'bad' : ''); L('runtime', `${fmt.num(p.ups_runtime_min, 0)} min`);
       break;
     case 'battery': name = hall ? 'Battery room cabinet' : 'Battery cabinet'; tag = 'power'; codes = CODES.battery;
@@ -143,8 +161,9 @@ function describe(hv) {
       desc = `${(d.transformer_kva || 2500).toLocaleString()} kVA pad-mount transformer, ${d.voltage.split('→')[0].trim()} to 480 V (${cfg.redundancy === 'N' ? 'N' : '2N pair'}); oil-filled, loop-feed, in the fenced MV yard.`;
       L('utility', p.utility_ok ? 'OK' : 'LOST', p.utility_ok ? 'ok' : 'bad'); L('load', `${fmt.num(p.utility_kw / Math.max(1, d.transformers_total))} kW each`); L('demand', `${d.total_kva.toLocaleString()} kVA`);
       break;
-    case 'switchgear': name = '480 V switchgear'; tag = 'power'; codes = CODES.switchgear;
-      desc = `Low-voltage switchgear lineup in the power module: transformer mains, tie, generator paralleling and UPS feeders; ${d.service_breaker_a} A frame.`;
+    case 'switchgear': name = d.liquid_first ? `480 V switchboard section ${(hv.index || 0) + 1}` : '480 V switchgear'; tag = 'power'; codes = CODES.switchgear;
+      desc = d.liquid_first ? `UL 891 switchboard section (36 in W x 24 in D) in the row: ${d.service_breaker_a} A main, UPS maintenance bypass and the rack feeds; backed onto the wall so it has >= 1,067 mm of NEC 110.26 condition-2 working space in front.`
+        : `Low-voltage switchgear lineup in the power module: transformer mains, tie, generator paralleling and UPS feeders; ${d.service_breaker_a} A frame.`;
       L('utility', p.utility_ok ? 'OK' : 'LOST', p.utility_ok ? 'ok' : 'bad'); L('import', `${fmt.num(p.utility_kw)} kW`); L('calc demand', `${d.service_amps_calc.toLocaleString()} A`);
       break;
     case 'powermodule': name = 'Power module'; tag = 'power'; codes = CODES.powermodule;
@@ -196,6 +215,25 @@ function describe(hv) {
       L('value', s.unit === 'bool' ? (v ? 'ACTIVE' : 'clear') : `${fmt.num(v, 2)} ${s.unit}${s.u95 ? ` ± ${s.u95}` : ''}`, s.unit === 'bool' && v ? 'warn' : ''); L('pod', s.node); L('updated', fmt.clock(st.wall_ts));
       break;
     }
+    // ---------------------------------------------------------------- Rev 2 parts
+    case 'fancoil': name = `In-row fan coil ${(hv.index || 0) + 1}`; tag = 'cooling · residual air'; codes = CODES.fancoil;
+      desc = `300 mm chilled-water fan coil on the ${d.trim_loop_c} °C trim loop: removes the ${Math.round((d.air_residual || 0.1) * 100)} % of the GB300-class racks' heat that stays in the air (${d.fancoils_total} units, N+1). The W45 loop is too warm to cool room air.`;
+      L('supply', `${fmt.num(st.supply_c)} °C`); L('return', `${fmt.num(st.return_c)} °C`); L('trim chiller', `${d.trim_loop_kw} kW`); break;
+    case 'trim_chiller': name = 'Trim chiller'; tag = 'heat rejection'; codes = CODES.trim_chiller;
+      desc = `Air-cooled chiller on the skid for the ${d.trim_loop_c} °C fan-coil loop (${d.trim_loop_kw} kW, R-454B, GWP 466).`; L('outdoor', `${fmt.num(st.outdoor_c)} °C`); break;
+    case 'skid': name = 'Heat-rejection skid'; tag = 'heat rejection'; codes = CODES.skid;
+      desc = `Skid beside the blind end: W45 dry coolers for ${fmt.num(d.liquid_heat_kw, 0)} kW of liquid heat, the trim chiller and the pipe bridge to the module (all-in-one rule: heat rejection outside).`;
+      L('loop supply', `${fmt.num(loop.supply_c)} °C`); L('outdoor', `${fmt.num(st.outdoor_c)} °C`); break;
+    case 'ai_box': name = cfg.form === 'rack10' ? 'Desktop AI box' : 'GPU server'; tag = 'compute · customer-selectable'; codes = CODES.ai_box;
+      desc = cfg.form === 'rack10' ? 'Desktop AI computer (DGX Spark class, GB10, 128 GB unified memory) on a 2U shelf of the 10-inch rack; the customer may bring their own.' : '2U short-depth server (<= 550 mm) with one RTX PRO 6000 Blackwell; standard-depth GPU servers do not fit the cabinet.';
+      L('load', `${fmt.num(st.it_kw)} kW`); L('inlet', `${fmt.num(st.rack_inlet_c[0])} °C`, st.rack_inlet_c[0] > aMax ? 'bad' : 'ok'); break;
+    case 'nas': name = 'NAS'; tag = 'compute'; codes = CODES.nas; desc = '1U 4-bay NAS (Synology RS422+) for local backup and files.'; L('inlet', `${fmt.num(st.rack_inlet_c[0])} °C`); break;
+    case 'switch': name = 'Managed switch'; tag = 'compute'; codes = CODES.switch; desc = '8-port managed PoE switch: the IT network and the uplink to the customer router; controls traffic is outbound HTTPS only.'; break;
+    case 'pdu': name = '10-inch PDU'; tag = 'power'; codes = CODES.pdu; desc = '1U 10-inch PDU, 4 x NEMA 5-15R, fed from the UPS.'; L('IT now', `${fmt.num(st.it_kw)} kW`); break;
+    case 'edge': name = 'Edge computer (BEN Care agent)'; tag = 'controls · BEN Controls Mini'; codes = CODES.edge; desc = 'Fanless edge computer (OnLogic CL210 class) running the BEN Care agent and the Thread border router for the two Pods; can be the customer\'s own box instead.'; L('mode', st.mode); break;
+    case 'pod': name = `BEN Pod W (${hv.id === 'pod1' ? 'inlet' : 'exhaust'})`; tag = 'controls'; codes = CODES.pod; desc = 'BEN Pod W on the rack rail: two Pt1000 probes, Thread radio, hardware watchdog.'; L('inlet', `${fmt.num(st.rack_inlet_c[0])} °C`); L('outlet', `${fmt.num(st.rack_outlet_c[0])} °C`); break;
+    case 'patch': name = 'Patch panel'; tag = 'compute'; codes = CODES.patch; desc = '1U brush / patch panel for cable dressing.'; break;
+    case 'desk': name = 'Office desk (for scale)'; tag = 'room'; codes = CODES.desk; desc = d.room_cooling_note || ''; L('room', `${fmt.num((st.mini || {}).room_c)} °C`); break;
     case 'aisle_cold': name = 'Cold aisle'; tag = 'cooling'; codes = CODES.containment; desc = 'Supply-air aisle in front of the rack inlets.'; L('supply', `${fmt.num(st.supply_c)} °C`); L('ΔP', `${fmt.num(st.aisle_dp_pa)} Pa`); break;
     case 'aisle_hot': name = 'Hot aisle'; tag = 'cooling'; codes = CODES.containment; desc = 'Contained exhaust aisle behind the racks.'; L('return', `${fmt.num(st.return_c)} °C`); break;
     default: name = d.tier_label; tag = 'enclosure'; codes = hall ? CODES.hall : CODES.container;

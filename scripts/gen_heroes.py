@@ -13,7 +13,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
-from ben_engine.config import TIER_GEOMETRY, Config  # noqa: E402
+from ben_engine.config import TIER_GEOMETRY, TIERS_BY_LINEUP, Config  # noqa: E402
 
 W, H = 640, 420
 BG0, BG1 = "#152234", "#0B1018"
@@ -238,7 +238,7 @@ def render(tier: str) -> str:
 
 def main(argv=None) -> int:
     out_dir = os.path.join(ROOT, "web", "assets")
-    for tier in TIER_GEOMETRY:
+    for tier in TIERS_BY_LINEUP["rev1"]:
         path = os.path.join(out_dir, f"hero-{tier}.svg")
         with open(path, "w") as f:
             f.write(render(tier))

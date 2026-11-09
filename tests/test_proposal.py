@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from ben_engine.config import Config, TIER_GEOMETRY, PROFILE_DEFAULTS
+from ben_engine.config import Config, TIER_GEOMETRY, PROFILE_DEFAULTS, TIERS_BY_LINEUP
 from ben_engine.bom import generate_bom, totals
 from ben_engine import proposal as P
 
 ROOT = Path(__file__).resolve().parents[1]
-TIERS = list(TIER_GEOMETRY)
+TIERS = list(TIERS_BY_LINEUP["rev1"])   # Rev 1 samples are frozen; Rev 2: tests/test_rev2_lineup.py
 OPTIONS = list(P.OPTIONS)
 DATE = "2026-11-08"
 

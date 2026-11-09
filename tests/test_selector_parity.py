@@ -43,6 +43,75 @@ def test_parity(tier, profile, climate, hardening):
     assert abs(js["d"]["pue_estimate"] - py["pue_estimate"]) < 1e-6
 
 
+# Rev 2: the JS port must size BEN 1 (both forms), the liquid-first BEN 300 / BEN 700 and the lineup exactly as config.py does
+REV2_KEYS = PARITY_KEYS + ("lineup", "kw_per_rack", "kw_per_m2_footprint", "kw_per_m3_volume", "footprint_m2", "volume_m3", "pue_estimate")
+MINI_KEYS = ("form", "noise_dba_est", "noise_dba_target", "noise_ok", "outlet_circuit", "outlet_circuit_a", "outlet_amps", "ups_va", "ups_w", "ups_model",
+             "ups_runtime_min_est", "ups_battery_packs", "heat_to_room_w", "heat_to_room_btu_h", "closet_vent_cfm", "cooling_elec_kw", "ashrae_class", "total_kw")
+DENSE_KEYS = ("row_items", "ups_frames", "ups_frames_n", "fancoils_total", "battery_cabinets", "battery_kwh_installed", "battery_minutes_installed",
+              "swbd_sections", "panelboard_wall", "trim_loop_kw", "row_budget_mm", "nfpa_855_scope", "liquid_load")
+
+
+@needs_node
+@pytest.mark.parametrize("tier,profile,climate,form,lineup", [
+    ("ben1", "ai_inference", "temperate", "rack10", "rev2"), ("ben1", "ai_training", "temperate", "cab12", "rev2"),
+    ("ben1", "healthcare", "hot_humid", None, "rev2"), ("ben1", "off_grid", "cold", None, "rev2"), ("ben1", "private_cloud", "temperate", "cab12", "rev2"),
+    ("ben300", "ai_training", "temperate", None, "rev2"), ("ben300", "healthcare", "hot_humid", None, "rev2"), ("ben300", "public_sector", "coastal", None, "rev2"),
+    ("ben700", "ai_training", "hot_arid", None, "rev2"), ("ben700", "private_cloud", "temperate", None, "rev2"), ("ben1000", "healthcare", "temperate", None, "rev2"),
+    # carried tiers under both lineups (Rev 1 numbers are frozen; rev2 adds the density keys)
+    ("ben150", "healthcare", "hot_humid", None, "rev1"), ("ben500", "ai_training", "cold", None, "rev2"), ("ben5", "private_cloud", "temperate", None, "rev1"),
+])
+def test_parity_rev2(tier, profile, climate, form, lineup):
+    cfg = Config.preset(tier, profile, climate, lineup=lineup, form=form)
+    assert not cfg.validate(), cfg.validate()
+    py = json.loads(json.dumps(cfg.derived(), default=str))
+    fm = "null" if form is None else f"'{form}'"
+    js = _node(f"""
+    import {{derived, preset, validate}} from '{ROOT}/web/assets/selector.js';
+    import fs from 'fs';
+    const cat = JSON.parse(fs.readFileSync('{ROOT}/web/assets/catalog.json'));
+    const cfg = preset('{tier}','{profile}','{climate}', cat, null, '{lineup}', {fm});
+    console.log(JSON.stringify({{cfg, d: derived(cfg, cat), errs: validate(cfg, cat)}}));
+    """)
+    assert js["errs"] == []
+    for k in ("tier", "it_kw", "racks", "cooling", "redundancy", "hardening", "generator", "ups_minutes", "lineup", "form"):
+        assert js["cfg"][k] == getattr(cfg, k), (k, js["cfg"][k], getattr(cfg, k))
+    keys = REV2_KEYS if lineup == "rev2" else PARITY_KEYS
+    keys = keys + (MINI_KEYS if py["kind"] == "minirack" else ()) + (DENSE_KEYS if py.get("liquid_first") else ())
+    for k in keys:
+        if k == "liquid_load":
+            continue
+        if k == "pue_estimate":
+            assert abs(js["d"][k] - py[k]) < 1e-6
+            continue
+        assert js["d"].get(k) == py.get(k), (k, js["d"].get(k), py.get(k))
+    if lineup == "rev1":
+        assert "lineup" not in js["d"] and "lineup" not in py
+
+
+@needs_node
+def test_validate_rules_parity_rev2():
+    """BEN 1 and liquid-first rules: the JS validator rejects what config.py rejects, rule for rule."""
+    cases = [
+        ("ben1", dict(form="rack10", it_kw=1.0)), ("ben1", dict(cooling="dlc_hd")), ("ben1", dict(hardening="H2")), ("ben1", dict(generator=True)),
+        ("ben1", dict(redundancy="2N")), ("ben1", dict(controls_tier="pro")), ("ben1", dict(power_architecture="dc800")), ("ben1", dict(form="rack19")),
+        ("ben300", dict(cooling="dlc_cdu")), ("ben300", dict(racks=1)), ("ben300", dict(controls_tier="lite")), ("ben700", dict(racks=7, it_kw=700.0)),
+        ("ben700", dict(lineup="rev1")), ("ben150", dict(hardening="IND")), ("ben150", dict(controls_tier="mini")), ("ben30", dict(cooling="office_air")),
+    ]
+    for tier, ch in cases:
+        cfg = Config.preset(tier)
+        for k, v in ch.items():
+            setattr(cfg, k, v)
+        py_errs = cfg.validate()
+        assert py_errs, (tier, ch)
+        js = _node(f"""
+        import {{validate}} from '{ROOT}/web/assets/selector.js';
+        import fs from 'fs';
+        const cat = JSON.parse(fs.readFileSync('{ROOT}/web/assets/catalog.json'));
+        console.log(JSON.stringify(validate({json.dumps(cfg.to_dict())}, cat)));
+        """)
+        assert len(js) == len(py_errs), (tier, ch, js, py_errs)
+
+
 @needs_node
 def test_controls_tier_override_parity():
     for tier, ct in (("ben30", "pro"), ("ben30", "lite"), ("ben5", "lite"), ("ben2000", "pro")):

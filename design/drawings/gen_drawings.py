@@ -1643,7 +1643,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     if a.forward:
         return main_forward(a)
-    tiers = [L.canonical_tier(t) for t in a.tier] if a.tier else list(L.TIER_GEOMETRY)
+    tiers = [L.canonical_tier(t) for t in a.tier] if a.tier else list(L.TIERS_BY_LINEUP["rev1"])   # Rev 2 drawings go to design/drawings/rev2/ (not generated yet)
     lays = []
     for t in tiers:
         lay = L.resolve(t)

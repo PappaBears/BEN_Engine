@@ -145,13 +145,15 @@ def build_package(cfg: Config, option: str = "hardware_controls", customer: str 
         _copy_or_fill(f"design/assembly/ASSEMBLY-{tier}.md", "build/ASSEMBLY.md", False, out, prop, extra, manifest)
         _copy_or_fill(f"design/assembly/CTQ-CARD-{tier}.md", "quality/CTQ-CARD.md", False, out, prop, extra, manifest)
         _copy_or_fill("design/assembly/STE_STYLE.md", "build/STE_STYLE.md", False, out, prop, extra, manifest)
-        bom_csv = ROOT / f"purchasing/bom-{tier}.csv"
+        # Rev 2 configurations take the Rev 2 BOM (purchasing/rev2/); Rev 1 configurations the frozen Rev 1 BOM
+        bom_rel = f"purchasing/rev2/bom-{tier}.csv" if getattr(cfg, "lineup", "rev1") == "rev2" else f"purchasing/bom-{tier}.csv"
+        bom_csv = ROOT / bom_rel
         if bom_csv.exists():
             (out / "purchasing").mkdir(exist_ok=True)
             shutil.copy2(bom_csv, out / "purchasing" / f"bom-{tier}.csv")
-            manifest.append((f"purchasing/bom-{tier}.csv", _sha(bom_csv), "copied (consigned vs CM-supplied split to be marked by purchasing)"))
+            manifest.append((bom_rel, _sha(bom_csv), "copied (consigned vs CM-supplied split to be marked by purchasing)"))
         else:
-            manifest.append((f"purchasing/bom-{tier}.csv", "MISSING", "run python -m ben_engine.bom --all"))
+            manifest.append((bom_rel, "MISSING", "run python -m ben_engine.bom --all" + (" --lineup rev2" if bom_rel.startswith("purchasing/rev2") else "")))
         if include_drawings:
             _copy_tree(f"design/drawings/{tier}", "drawings", out, manifest, patterns=("*.md", "*.png", "*.svg"))
             _copy_tree("design/specs/wiring", "wiring", out, manifest, patterns=("*.svg",))

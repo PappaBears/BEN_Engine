@@ -12,7 +12,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[2] / "software"))
 sys.path.insert(0, str(HERE.parents[1]))
-from ben_engine.config import Config, PROFILE_DEFAULTS, TIER_GEOMETRY, canonical_tier  # noqa: E402
+from ben_engine.config import Config, PROFILE_DEFAULTS, TIER_GEOMETRY, TIERS_BY_LINEUP, canonical_tier  # noqa: E402
 from revision import REV  # noqa: E402  (design/REVISION.json — same rev/date on every sheet)
 
 ISSUE = f"{REV['status_short']} Rev {REV['drawing_rev']} · {REV['issue_date']}"   # e.g. "IFR Rev B · 2026-11-08"
@@ -635,7 +635,7 @@ if __name__ == "__main__":
     controller_pod_wiring()
     # One low-voltage power one-line per cabinet / module tier (generation-2 keys). BEN 2000 is a
     # medium-voltage service and has its own E-001 in design/drawings/ben2000/ (gen_hall.py).
-    for t in [k for k, g in TIER_GEOMETRY.items() if g["kind"] != "hall"]:
+    for t in [k for k in TIERS_BY_LINEUP["rev1"] if TIER_GEOMETRY[k]["kind"] != "hall"]:
         power_one_line(t)
     cooling_air()
     cooling_liquid()
