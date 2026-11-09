@@ -22,7 +22,8 @@ TIER_ALIASES: Dict[str, str] = {"micro": "ben5", "ben10": "ben30", "ben20": "ben
 
 def canonical_tier(t: str) -> str:
     return TIER_ALIASES.get(t, t)
-Cooling = Literal["cabinet_dx", "inrow_dx", "inrow_dx_300", "rdhx_drycooler", "dlc_cdu"]
+Cooling = Literal["cabinet_dx", "inrow_dx", "inrow_dx_300", "rdhx_drycooler", "dlc_cdu", "dlc_hd"]
+PowerArchitecture = Literal["ac480", "dc800"]
 Redundancy = Literal["N", "N+1", "2N"]
 Climate = Literal["temperate", "hot_arid", "hot_humid", "cold", "coastal", "high_altitude"]
 Profile = Literal[
@@ -100,7 +101,31 @@ COOLING_LIBRARY: Dict[str, Dict[str, Any]] = {
     "inrow_dx_300":   {"label": "In-row DX cooling unit (300 mm, 20 kW)", "unit_kw": 20.0, "cop": 3.1, "medium": "air",   "max_rack_kw": 20, "width_mm": 300, "mass_kg": 180},
     "rdhx_drycooler": {"label": "Rear-door heat exchanger + dry cooler", "unit_kw": 35.0, "cop": 8.0, "medium": "water", "max_rack_kw": 40, "width_mm": 0, "mass_kg": 150},
     "dlc_cdu":        {"label": "Direct liquid cooling + CDU + dry cooler", "unit_kw": 300.0, "cop": 12.0, "medium": "liquid", "max_rack_kw": 80, "width_mm": 600, "mass_kg": 400},
+    # Forward architecture (docs/FORWARD_ARCHITECTURE_DECISION.md §1, §3): high-density DLC, warm-water W45 secondary loop,
+    # 600 kW row CDU, 100-250 kW per rack, air-side residual 10 %. Allowed on BEN 150 and up (DLC_HD_TIERS). Option, default off.
+    "dlc_hd":         {"label": "High-density direct liquid cooling (W45 loop, 600 kW row CDU)", "unit_kw": 600.0, "cop": 20.0, "medium": "liquid", "max_rack_kw": 250, "width_mm": 600, "mass_kg": 500,
+                       "water_class": "W45", "air_residual": 0.10},
 }
+DLC_HD_TIERS = ("ben150", "ben500", "ben2000")
+
+# ---------------------------------------------------------------- power architecture (docs/FORWARD_ARCHITECTURE_DECISION.md §1, §2)
+# "ac480" is today's chain (480 V AC -> UPS -> 208/415 V PDUs); "dc800" is the forward option: AC/DC front end (SiC rectifier or
+# solid-state transformer) -> 800 VDC busway (±400 V to ground) -> DC breakers -> racks with DC input; lithium battery on the bus
+# (no double conversion). Every number below is a stated design assumption for the study, not a measurement.
+POWER_ARCHITECTURES: Dict[str, Dict[str, Any]] = {
+    "ac480": {"label": "480 V AC → UPS → 208/415 V AC PDUs (today)", "tiers": ("ben5", "ben30", "ben150", "ben500", "ben2000")},
+    "dc800": {"label": "800 VDC bus: AC/DC front end → DC busway → DC-input racks, battery on bus (forward option)",
+              "tiers": ("ben150", "ben500", "ben2000"),
+              "bus_v_nominal": 800, "bus_v_min": 760, "bus_v_max": 920, "pole_v_to_ground": 400,
+              "rectifier_eff": 0.985,            # assumption: SiC active front end / SST efficiency at design load
+              "rectifier_module_kw": 100,        # assumption: 100 kW rectifier modules, N+1 (2N doubles)
+              "bus_headroom": 1.25,              # bus current carries 25 % headroom over IT at nominal voltage
+              "busway_frames_a": (400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200),
+              "loss_saving_frac": 0.03,          # assumption: 3 % of IT power saved in distribution losses vs ac480 (vendor claims 3-5 %; we will measure)
+              "copper_current_density_a_mm2": 2.0, "ac_feeder_v": 415, "ac_feeder_pf": 0.95, "copper_kg_per_mm2_m": 8.96e-3,
+              "pue_loss_adder": 0.015},          # replaces the 0.03 UPS double-conversion adder in pue_estimate
+}
+DC_BUSWAY_FRAMES = POWER_ARCHITECTURES["dc800"]["busway_frames_a"]
 
 CONTROLS_TIERS: Dict[str, Dict[str, Any]] = {
     # docs/CONTROLS_HARDWARE_DECISION.md §2a. Both tiers run the same ben_engine software, the same BEN Pods on BEN Mesh
@@ -159,6 +184,8 @@ class Config:
     controls_tier: str = "auto"
     # Enclosure hardening level (docs/TIER_AND_ENCLOSURE_DECISION.md §3): H1 standard IP66, H2 severe environment, H3 hardened/government.
     hardening: str = "H1"
+    # Power distribution architecture (docs/FORWARD_ARCHITECTURE_DECISION.md): "ac480" today; "dc800" = 800 VDC bus option on BEN 150+.
+    power_architecture: str = "ac480"
 
     def __post_init__(self):
         self.tier = canonical_tier(self.tier)
@@ -183,8 +210,14 @@ class Config:
             errs.append("BEN 5 uses cabinet_dx cooling only")
         if self.tier != "ben5" and self.cooling == "cabinet_dx":
             errs.append("cabinet_dx is for BEN 5 only")
-        if self.tier == "ben2000" and self.cooling != "dlc_cdu":
+        if self.tier == "ben2000" and self.cooling not in ("dlc_cdu", "dlc_hd"):
             errs.append("BEN 2000 is direct-liquid cooled (dlc_cdu)")
+        if self.cooling == "dlc_hd" and self.tier not in DLC_HD_TIERS:
+            errs.append("High-density DLC (dlc_hd) is for BEN 150 and up")
+        if self.power_architecture not in POWER_ARCHITECTURES:
+            errs.append(f"unknown power_architecture {self.power_architecture}")
+        elif self.tier not in POWER_ARCHITECTURES[self.power_architecture]["tiers"]:
+            errs.append("800 VDC (dc800) is for BEN 150, BEN 500 and BEN 2000 only; BEN 5 and BEN 30 stay 480/208 V AC")
         if self.hardening not in HARDENING:
             errs.append(f"unknown hardening {self.hardening}")
         if self.profile not in PROFILE_DEFAULTS:
@@ -256,6 +289,12 @@ class Config:
         else:
             ups_modules = 1
             ups_kva_each = ups_kva_n
+        dc800 = self.power_architecture == "dc800"
+        dc: Dict[str, Any] = {}
+        if dc800:
+            # no UPS modules: the battery sits on the DC bus; the AC/DC front end replaces the UPS rectifier stage
+            ups_modules, ups_kva_each = 0, 0.0
+            dc = self._derived_dc800(total_kw)
 
         mv_service = g["voltage"].startswith("12.47")
         if mv_service:
@@ -289,19 +328,27 @@ class Config:
         # battery energy for ups_minutes at IT load (lithium, 90 % DoD)
         battery_kwh = self.it_kw * self.ups_minutes / 60 / 0.9
 
-        # airflow: 125 cfm/kW typical at ΔT 12 K (air cooled)
-        airflow_cfm = self.it_kw * 125 if cl["medium"] == "air" else self.it_kw * 40
+        # airflow: 125 cfm/kW typical at ΔT 12 K (air cooled); liquid tiers move only the residual air
+        # (40 cfm/kW for dlc_cdu; dlc_hd: 125 cfm/kW x its stated air_residual)
+        if cl["medium"] == "air":
+            airflow_cfm = self.it_kw * 125
+        elif "air_residual" in cl:
+            airflow_cfm = self.it_kw * 125 * cl["air_residual"]
+        else:
+            airflow_cfm = self.it_kw * 40
 
         # structural: payload (+ hardening envelope mass)
         area_m2 = 2 * (g["ext_l_m"] * g["ext_h_m"] + g["ext_w_m"] * g["ext_h_m"]) + g["ext_l_m"] * g["ext_w_m"]
         hz = HARDENING[self.hardening]
         payload_kg = self.racks * (400 if self.tier == "ben5" else 900) + n_units_total * cl["mass_kg"] + ups_modules * (120 if self.tier == "ben5" else 350) + battery_kwh * 8 + area_m2 * hz["mass_kg_m2"]
+        if dc800:
+            payload_kg += dc["rectifier_cabinets"] * 400   # assumption: 400 kg per 4-module rectifier cabinet (replaces the UPS frames)
         gross_kg = payload_kg + g["tare_kg"]
 
         # envelope solar/transmission gain, R-value 3.5 m2K/W (100 mm PIR), ΔT at design
         envelope_gain_kw = (area_m2 * (clim["t_design_c"] - 22) / 3.5 + 0.3 * clim["solar_w_m2"] * g["ext_l_m"] * g["ext_w_m"] * 0.25) / 1000
 
-        pue_est = round(total_kw / self.it_kw + 0.03, 3)  # +0.03 UPS loss
+        pue_est = round(total_kw / self.it_kw + (POWER_ARCHITECTURES["dc800"]["pue_loss_adder"] if dc800 else 0.03), 3)  # +0.03 UPS loss (ac480) / +0.015 rectifier loss (dc800)
         # row length check per row (racks 600 mm + in-row/CDU units + 500 mm end zone) vs interior length
         rows = g.get("rows", 1)
         racks_per_row = math.ceil(self.racks / rows)
@@ -314,8 +361,20 @@ class Config:
         pods = 3 if self.tier == "ben5" else self.racks * 2 + 2 * g["modules"]
         # hardening and climate: H2 forced for severe climates unless the user chose H3
         hardening_recommended = "H3" if self.profile == "public_sector" else ("H2" if self.climate in ("coastal", "hot_arid", "cold", "high_altitude", "hot_humid") else "H1")
+        # high-density liquid loop (dlc_hd): W45 secondary loop, ΔT 10 K design; flow in L/min from Q = m·cp·ΔT with water
+        # (cp 4.18 kJ/kg·K, 1 kg/L); 90 % of IT heat to liquid (air_residual 0.10), all of it available for heat reuse at the return
+        loop: Dict[str, Any] = {}
+        if self.cooling == "dlc_hd":
+            liquid_frac = 1.0 - cl["air_residual"]
+            liquid_kw = self.it_kw * liquid_frac
+            loop = {"loop_water_class": cl["water_class"], "loop_dt_design_k": 10.0, "loop_supply_design_c": 40.0, "loop_return_design_c": 50.0,
+                    "liquid_heat_kw": round(liquid_kw, 1), "loop_flow_lpm": round(liquid_kw / (4.18 * 10.0) * 60.0, 1),
+                    "heat_reuse_kw_available": round(liquid_kw, 1), "air_residual": cl["air_residual"]}
 
         return {
+            "power_architecture": self.power_architecture, "power_architecture_label": POWER_ARCHITECTURES[self.power_architecture]["label"],
+            "dc_ready": self.tier in POWER_ARCHITECTURES["dc800"]["tiers"],
+            **dc, **loop,
             "tier_label": g["label"], "enclosure": g["enclosure"],
             "per_rack_kw": round(per_rack_kw, 2),
             "cooling_label": cl["label"], "cooling_units_n": n_units, "cooling_units_total": n_units_total,
@@ -336,6 +395,44 @@ class Config:
             "controls_tier_resolved": ct, "controls_label": CONTROLS_TIERS[ct]["label"],
             "pods": pods,
             "climate": clim, "geometry": g,
+        }
+
+    # ------------------------------------------------------------ 800 VDC sizing (forward option)
+    def _derived_dc800(self, total_kw: float) -> Dict[str, Any]:
+        """Sizing of the 800 VDC option (docs/FORWARD_ARCHITECTURE_DECISION.md). Stated assumptions, see POWER_ARCHITECTURES["dc800"]:
+        front-end kW = total_kw / rectifier efficiency; bus current = IT kW / 800 V with 25 % headroom, rounded up to a standard DC busway
+        frame; rectifier modules of 100 kW with the configured redundancy; one insulation monitoring device per module; a 3 % distribution
+        loss saving; copper by the simple area-ratio method (same current density, 2 DC conductors vs 3 AC phase conductors at 415 V)."""
+        pa = POWER_ARCHITECTURES["dc800"]
+        v = pa["bus_v_nominal"]
+        front_end_kw = total_kw / pa["rectifier_eff"]
+        bus_a = self.it_kw * 1000.0 / v * pa["bus_headroom"]
+        busway_a = next((f for f in pa["busway_frames_a"] if f >= bus_a), pa["busway_frames_a"][-1])
+        n_rect = math.ceil(front_end_kw / pa["rectifier_module_kw"])
+        if self.redundancy == "N+1":
+            n_rect_total = n_rect + 1
+        elif self.redundancy == "2N":
+            n_rect_total = 2 * n_rect
+        else:
+            n_rect_total = n_rect
+        # copper: area ∝ current at a fixed density; mass = conductors x area x length x 8.96e-3 kg/(mm²·m); length = row length + 5 m to the bus
+        g = TIER_GEOMETRY[self.tier]
+        length_m = g["int_l_m"] + 5.0
+        i_dc = self.it_kw * 1000.0 / v
+        i_ac = self.it_kw * 1000.0 / (math.sqrt(3) * pa["ac_feeder_v"] * pa["ac_feeder_pf"])
+        cu_dc = 2 * (i_dc / pa["copper_current_density_a_mm2"]) * length_m * pa["copper_kg_per_mm2_m"]
+        cu_ac = 3 * (i_ac / pa["copper_current_density_a_mm2"]) * length_m * pa["copper_kg_per_mm2_m"]
+        battery_kwh = self.it_kw * self.ups_minutes / 60 / 0.9
+        return {
+            "ac_dc_front_end_kw": round(front_end_kw, 1), "rectifier_eff": pa["rectifier_eff"],
+            "dc_bus_v_nominal": v, "dc_bus_v_pole": pa["pole_v_to_ground"], "dc_bus_v_min": pa["bus_v_min"], "dc_bus_v_max": pa["bus_v_max"],
+            "dc_bus_current_a": round(bus_a), "dc_busway_a": busway_a,
+            "rectifier_module_kw": pa["rectifier_module_kw"], "rectifier_modules_n": n_rect, "rectifier_modules": n_rect_total,
+            "rectifier_cabinets": math.ceil(n_rect_total / 4), "imd_count": n_rect_total,
+            "battery_on_bus_kwh": round(battery_kwh, 1), "battery_string_v": "800 V class",
+            "dc_loss_saving_kw": round(self.it_kw * pa["loss_saving_frac"], 1), "dc_loss_saving_frac": pa["loss_saving_frac"],
+            "copper_kg_dc_bus": round(cu_dc, 1), "copper_kg_ac_feeders": round(cu_ac, 1),
+            "copper_saving_pct": round(100.0 * (1.0 - cu_dc / cu_ac), 1), "copper_method": "area ratio: same current density, 2 DC conductors at 800 V vs 3 AC phase conductors at 415 V, same run length",
         }
 
     # ------------------------------------------------------------ io
@@ -395,10 +492,12 @@ def main(argv=None):
     ap.add_argument("--redundancy", choices=["N", "N+1", "2N"])
     ap.add_argument("--controls-tier", dest="controls_tier", choices=list(CONTROLS_TIERS))
     ap.add_argument("--hardening", choices=list(HARDENING))
+    ap.add_argument("--power-architecture", dest="power_architecture", choices=list(POWER_ARCHITECTURES),
+                    help="ac480 (default, today) or dc800 (800 VDC bus option, BEN 150 and up)")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args(argv)
     cfg = Config.preset(a.tier, a.profile, a.climate)
-    for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier", "hardening"):
+    for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier", "hardening", "power_architecture"):
         v = getattr(a, k)
         if v is not None:
             setattr(cfg, k, v)
@@ -413,8 +512,12 @@ def main(argv=None):
         print(f"{d['tier_label']} — {PROFILE_DEFAULTS[cfg.profile]['label']} — {cfg.it_kw} kW IT in {cfg.racks} racks")
         for k in ("per_rack_kw", "cooling_label", "cooling_units_total", "total_kw", "voltage", "service_breaker_a",
                   "ups_modules", "ups_kva_each", "battery_kwh", "airflow_cfm", "gross_kg", "pue_estimate", "row_length_mm", "row_fits", "nfpa_855_scope",
-                  "controls_tier_resolved", "pods", "hardening_label", "transformers_total", "generators_total"):
+                  "controls_tier_resolved", "pods", "hardening_label", "transformers_total", "generators_total", "power_architecture"):
             print(f"  {k:24s} {d[k]}")
+        for k in ("ac_dc_front_end_kw", "dc_bus_v_nominal", "dc_bus_current_a", "dc_busway_a", "rectifier_modules", "imd_count", "battery_on_bus_kwh",
+                  "dc_loss_saving_kw", "copper_saving_pct", "loop_flow_lpm", "heat_reuse_kw_available"):
+            if k in d:
+                print(f"  {k:24s} {d[k]}")
     return 0
 
 

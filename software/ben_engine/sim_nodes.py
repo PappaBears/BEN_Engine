@@ -6,7 +6,9 @@ real node would publish and ``command(dict)`` returns the ack a real node would 
 ``paho-mqtt`` is importable, ``MqttPublisher`` can push the same payloads to a real broker.
 
 Node assignment: ``node1`` is the room node (supply/return reference, RH, aisle ΔP, leak, door,
-4–20 mA meter input, S0 pulse counter, relays). ``node2..`` each carry two racks
+4–20 mA meter input, S0 pulse counter, relays; on the forward architecture also the DC bus channels
+``V_bus_pos``, ``V_bus_neg``, ``I_bus``, ``IMD_kohm``, ``dc_gf`` and the loop channels ``T_loop_sup``,
+``T_loop_ret``, ``F_loop``, ``cdu_pumpN``, ``loop_iso``). ``node2..`` each carry two racks
 (``T_in_1/2`` = rack A inlet at two heights, ``T_in_3/4`` = rack B, ``T_out_1..4`` likewise).
 
 Raw values follow the sensor interfaces: DS18B20 raw is 1/16 °C counts, SHT45 raw is the 16-bit
@@ -119,6 +121,25 @@ class SimNode:
             ch["leak"] = raw["leak"]
             ch["door"] = raw["door"]
             ch["ai0_mA"] = round(self._apply_cal("ai0_mA", raw["ai0_mA"] * ADS_LSB_V / SHUNT_OHM * 1000.0), 4)
+            # forward architecture channels on the room Pod / PLC (spec/PROTOCOL.md "Forward architecture channels"): present only
+            # when the twin state carries them (dc800 bus and dlc_hd loop); raw = engineering value x 10 (0-10 V / 4-20 mA transmitters)
+            dc = state.get("dc")
+            if dc:
+                for src, name in (("v_bus_pos", "V_bus_pos"), ("v_bus_neg", "V_bus_neg"), ("i_bus", "I_bus"), ("imd_kohm", "IMD_kohm")):
+                    raw[name] = int(round(dc[src] * 10.0))
+                    ch[name] = round(self._apply_cal(name, raw[name] / 10.0), 2)
+                raw["dc_gf"] = int(bool(dc.get("ground_fault")))
+                ch["dc_gf"] = raw["dc_gf"]
+            loop = state.get("loop")
+            if loop:
+                for src, name in (("supply_c", "T_loop_sup"), ("return_c", "T_loop_ret"), ("flow_lpm", "F_loop")):
+                    raw[name] = int(round(loop[src] * 10.0))
+                    ch[name] = round(self._apply_cal(name, raw[name] / 10.0), 2)
+                for i, pp in enumerate(loop.get("pumps", [])):
+                    raw[f"cdu_pump{i+1}"] = int(bool(pp["on"] and pp["ok"]))
+                    ch[f"cdu_pump{i+1}"] = raw[f"cdu_pump{i+1}"]
+                raw["loop_iso"] = int(bool(loop.get("leak_isolated")))
+                ch["loop_iso"] = raw["loop_iso"]
             # S0 pulse counter: 1 pulse per Wh of utility energy
             t = state.get("t", 0.0)
             if self._last_t is not None and t > self._last_t:

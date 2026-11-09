@@ -12,10 +12,13 @@ const CODES = {
   cooling_inrow: ['CLG-INROW', 'CLG-INROW-DX', 'CLG-'],
   cooling_cabinet: ['CLG-CABAC', 'CLG-'],
   cooling_rdhx: ['CLG-RDHX', 'CLG-'],
-  cdu: ['CLG-CDU', 'CLG-CDU-RDHX', 'CLG-'],
+  cdu: ['CLG-CDU-HD', 'CLG-CDU', 'CLG-CDU-RDHX', 'CLG-'],
+  rectifier: ['PWR-DC-RECT-100', 'PWR-DC-RECT-CAB', 'PWR-DC-'],
+  dc_busway: ['PWR-DC-BUSWAY', 'PWR-DC-TAPOFF', 'PWR-DC-'],
+  manifold: ['CLG-MANIFOLD-HD', 'CLG-MANIFOLD', 'CLG-'],
   drycooler: ['CLG-DRYCOOLER', 'CLG-'],
   ups: ['PWR-UPS-GVS150', 'PWR-UPS-SRT6K', 'PWR-UPS-'],
-  battery: ['PWR-BATT-', 'PWR-UPS-SRT6K-XBP', 'PWR-UPS-'],
+  battery: ['PWR-BATT-800V', 'PWR-BATT-', 'PWR-UPS-SRT6K-XBP', 'PWR-UPS-'],
   ats: ['PWR-ATS', 'PWR-MAIN-BKR', 'PWR-LOADCTR'],
   panel: ['PWR-PANEL-ILINE', 'PWR-PANEL', 'PWR-LOADCTR'],
   utility: ['PWR-METER', 'PWR-XFMR', 'PWR-FEEDER'],
@@ -65,7 +68,8 @@ function describe(hv) {
   const st = store.state, cfg = store.config, d = store.derived; if (!st || !cfg) return null;
   const p = st.power;
   const aMax = { A1: 27, A2: 35, A3: 40, A4: 45 }[d.ashrae_class] || 35;
-  const cool = cfg.cooling, liquid = cool === 'dlc_cdu', water = cool === 'rdhx_drycooler';
+  const cool = cfg.cooling, liquid = cool === 'dlc_cdu' || cool === 'dlc_hd', water = cool === 'rdhx_drycooler', hd = cool === 'dlc_hd', dc800 = (cfg.power_architecture || 'ac480') === 'dc800';
+  const dc = st.dc || {}, loop = st.loop || {};
   const kind = d.kind || (cfg.tier === 'ben5' ? 'cabinet' : 'module'), cabinet = kind === 'cabinet', hall = kind === 'hall';
   const live = [];
   const L = (k, v, cls) => live.push([k, v, cls]);
@@ -93,7 +97,20 @@ function describe(hv) {
       L('status', !u.ok ? 'FAILED' : u.on ? 'running' : 'standby', !u.ok ? 'bad' : u.on ? 'ok' : ''); L('heat rejected', `${fmt.num(u.kw)} kW`); L('fan', `${fmt.num(u.fan_pct, 0)} %`); L('outdoor', `${fmt.num(st.outdoor_c)} °C`);
       break;
     }
-    case 'cdu': name = hall ? `CDU ${(hv.index || 0) + 1}` : 'CDU'; tag = 'liquid cooling'; codes = CODES.cdu;
+    case 'rectifier': name = 'AC/DC front end'; tag = 'power · 800 VDC'; codes = CODES.rectifier;
+      desc = `SiC rectifier / SST modules, ${d.rectifier_modules} × ${d.rectifier_module_kw} kW (${cfg.redundancy}) feeding the ±${d.dc_bus_v_pole} V DC bus at an assumed ${Math.round((d.rectifier_eff || 0.985) * 1000) / 10} % efficiency; no UPS double conversion, the battery sits on the bus. Forward architecture study.`;
+      L('bus', `${fmt.num(dc.v_bus, 0)} V`, dc.v_bus < d.dc_bus_v_min || dc.v_bus > d.dc_bus_v_max ? 'warn' : 'ok'); L('front end', `${fmt.num(p.ups_kw)} kW`); L('IMD', `${fmt.num(dc.imd_kohm, 0)} kΩ`, dc.imd_kohm < 100 ? 'bad' : ''); break;
+    case 'dc_busway': name = 'DC busway'; tag = 'power · 800 VDC'; codes = CODES.dc_busway;
+      desc = `800 VDC busway rated ${d.dc_busway_a} A (bus ${d.dc_bus_current_a} A with 25 % headroom), ±400 V to ground with a high-resistance midpoint; DC tap-off breaker per rack, insulation monitoring and DC arc detection on every section.`;
+      L('V+ / V−', `${fmt.num(dc.v_bus_pos, 0)} / ${fmt.num(dc.v_bus_neg, 0)} V`, dc.ground_fault ? 'bad' : 'ok'); L('I bus', `${fmt.num(dc.i_bus, 0)} A`); L('IMD', `${fmt.num(dc.imd_kohm, 0)} kΩ`, dc.imd_kohm < 100 ? 'bad' : (dc.imd_kohm < 500 ? 'warn' : 'ok')); break;
+    case 'manifold': name = `Rack manifold ${(hv.index || 0) + 1}`; tag = 'liquid cooling'; codes = CODES.manifold;
+      desc = `Supply/return manifold with UQD quick-disconnect drops to the cold plates of rack ${(hv.index || 0) + 1}; leak sensor in the drip tray closes the row isolation valves (leak-to-isolation time is measured, E19).`;
+      L('supply', `${fmt.num(loop.supply_c)} °C`); L('ΔT', `${fmt.num(loop.dt_k)} K`); L('isolated', loop.leak_isolated ? 'YES' : 'no', loop.leak_isolated ? 'bad' : 'ok'); break;
+    case 'cdu': name = hall ? `CDU ${(hv.index || 0) + 1}` : (hd ? `Row CDU ${(hv.index || 0) + 1}` : 'CDU'); tag = 'liquid cooling'; codes = CODES.cdu;
+      if (hd) {
+        desc = `600 kW class row CDU on the W45 warm-water loop (${d.loop_supply_design_c}/${d.loop_return_design_c} °C design, ${d.loop_flow_lpm} L/min), pumps N+1 with failover (E18); ${d.heat_reuse_kw_available} kW of heat available for reuse at the return.`;
+        L('flow', `${fmt.num(loop.flow_lpm, 0)} L/min`, loop.flow_low ? 'bad' : 'ok'); L('supply / return', `${fmt.num(loop.supply_c)} / ${fmt.num(loop.return_c)} °C`); L('pumps', `${(loop.pumps || []).filter(x => x.on && x.ok).length}/${(loop.pumps || []).length} running`, (loop.pumps || []).some(x => !x.ok) ? 'warn' : 'ok'); break;
+      }
       if (hall) { const u = st.cooling_units[hv.index] || {}; L('status', !u.ok ? 'FAILED' : u.on ? 'running' : 'standby', !u.ok ? 'bad' : u.on ? 'ok' : ''); L('to liquid', `${fmt.num(u.kw)} kW`); }
       desc = liquid ? 'Coolant distribution unit: pumps and isolates the rack coolant loop from the facility glycol loop; ~70 % of IT heat goes to liquid.' : 'Coolant distribution unit for the rear-door heat exchangers: pumps, heat exchanger and leak-safe isolation from the dry-cooler loop.';
       L('loop heat', `${fmt.num(st.cooling_units.reduce((s, u) => s + u.kw, 0))} kW`); L('residual air supply', `${fmt.num(st.supply_c)} °C`); L('leak', st.leak ? 'DETECTED' : 'clear', st.leak ? 'bad' : 'ok');
@@ -103,7 +120,7 @@ function describe(hv) {
       L('state', p.ups_on_battery ? 'ON BATTERY' : 'online', p.ups_on_battery ? 'warn' : 'ok'); L('SoC', `${fmt.num(p.ups_soc_pct, 0)} %`, p.ups_soc_pct < 30 ? 'bad' : ''); L('runtime', `${fmt.num(p.ups_runtime_min, 0)} min`);
       break;
     case 'battery': name = hall ? 'Battery room cabinet' : 'Battery cabinet'; tag = 'power'; codes = CODES.battery;
-      desc = hall ? `Lithium battery room per NFPA 855 (2-hour separation, gas detection, UL 9540A data): ${d.battery_kwh.toLocaleString()} kWh for ${cfg.ups_minutes} min of IT load.` : `LFP battery cabinet, ${d.battery_kwh} kWh at 90 % depth of discharge: ${cfg.ups_minutes} min of IT load for the UPS.`;
+      desc = dc800 ? `800 V class LFP battery string directly on the DC bus (no UPS, no double conversion): ${d.battery_on_bus_kwh} kWh for ${cfg.ups_minutes} min of IT load; bus voltage drifts with state of charge on utility loss.` : hall ? `Lithium battery room per NFPA 855 (2-hour separation, gas detection, UL 9540A data): ${d.battery_kwh.toLocaleString()} kWh for ${cfg.ups_minutes} min of IT load.` : `LFP battery cabinet, ${d.battery_kwh} kWh at 90 % depth of discharge: ${cfg.ups_minutes} min of IT load for the UPS.`;
       L('SoC', `${fmt.num(p.ups_soc_pct, 0)} %`, p.ups_soc_pct < 30 ? 'bad' : ''); L('energy', `${d.battery_kwh} kWh`); L('runtime', `${fmt.num(p.ups_runtime_min, 0)} min`);
       break;
     case 'ats': name = hall ? 'Transfer / paralleling section' : 'ATS / main breaker'; tag = 'power'; codes = CODES.ats;

@@ -8,7 +8,10 @@ seeded and nothing here uses wall-clock time except the ``started`` stamp, which
 in.
 
 Sweeps: ``load_step``, ``cooling_unit_failover``, ``utility_loss_ride_through``, ``door_open``,
-``outdoor_temperature_sweep``, ``filter_clog``; ``run_all`` runs them in order on fresh twins.
+``outdoor_temperature_sweep``, ``filter_clog``; ``run_all`` runs them in order on fresh twins. Forward architecture
+(docs/FORWARD_ARCHITECTURE_DECISION.md): ``cdu_pump_failover`` runs only on ``cooling == "dlc_hd"`` and
+``dc_ground_fault_response`` only on ``power_architecture == "dc800"``; ``applicable(name, cfg)`` says which apply and
+``run_all`` skips the rest.
 """
 from __future__ import annotations
 
@@ -366,6 +369,106 @@ def filter_clog(twin: Twin, load: float = 1.0, max_s: float = 9000.0, record_eve
     return res
 
 
+def cdu_pump_failover(twin: Twin, load: float = 1.0, fail_s: float = 300.0, recover_s: float = 120.0,
+                      record_every_s: float = 5.0, clock: Optional[str] = None) -> SweepResult:
+    """dlc_hd only: fail each CDU pump in turn at ``load``; the standby must start within the failover time, loop flow must
+    recover to >= 80 % of design and the loop ΔT must stay under 1.5 x design (cold plates do not throttle)."""
+    if not twin.hd:
+        raise ValueError("cdu_pump_failover applies to cooling == dlc_hd only")
+    res = SweepResult("cdu_pump_failover", _now(clock))
+    rec = Recorder(twin, "cdu_pump_failover", record_every_s=record_every_s)
+    twin.set_it_load(load)
+    rec.set_phase("baseline")
+    base = rec.run(600.0)
+    design = base["loop"]["design_flow_lpm"]
+    dt_design = twin.p.loop_dt_design_k
+    pumps = []
+    for u in range(len(twin.cdu_pumps)):
+        rec.set_phase(f"fail_pump_{u+1}")
+        twin.inject("cdu_pump_fail", pump=u)
+        t0 = twin.t
+        min_flow, max_dt, start_t = 1e9, -1e9, None
+
+        def watch(st):
+            nonlocal min_flow, max_dt, start_t
+            lp = st["loop"]
+            min_flow = min(min_flow, lp["flow_lpm"])
+            max_dt = max(max_dt, lp["dt_k"])
+            if start_t is None and any(pp["on"] and pp["ok"] for pp in lp["pumps"]):
+                start_t = st["t"] - t0
+            return False
+
+        last = rec.run(fail_s, until=watch)
+        pumps.append({"pump": u + 1, "standby_started_after_s": start_t, "min_flow_lpm": round(min_flow, 1), "min_flow_pct": round(100 * min_flow / design, 1),
+                      "max_dt_k": round(max_dt, 2), "flow_after_lpm": last["loop"]["flow_lpm"], "alarm_raised": any(a["id"] == f"cdu_pump{u+1}_fail" for a in last["alarms"])})
+        twin.clear("cdu_pump_fail", pump=u)
+        rec.set_phase(f"recover_pump_{u+1}")
+        rec.run(recover_s)
+    worst = max(pumps, key=lambda r: r["max_dt_k"])
+    res.criteria.append(Criterion("standby_pump_started_each_time", all(r["standby_started_after_s"] is not None and r["standby_started_after_s"] <= twin.p.cdu_pump_failover_s + 5 for r in pumps),
+                                  max((r["standby_started_after_s"] or 1e9) for r in pumps), f"<= {twin.p.cdu_pump_failover_s + 5:.0f} s"))
+    res.criteria.append(Criterion("loop_flow_recovered_80pct", all(r["flow_after_lpm"] >= 0.8 * design for r in pumps), min(r["flow_after_lpm"] for r in pumps), round(0.8 * design, 1), "L/min after failover"))
+    res.criteria.append(Criterion("loop_dt_under_1p5x_design", worst["max_dt_k"] <= 1.5 * dt_design, worst["max_dt_k"], 1.5 * dt_design, "K, cold plates do not throttle"))
+    res.criteria.append(Criterion("pump_fail_alarm_raised_each_time", all(r["alarm_raised"] for r in pumps), sum(r["alarm_raised"] for r in pumps), len(pumps)))
+    res.extra.update({"pumps": pumps, "design_flow_lpm": design, "baseline_dt_k": base["loop"]["dt_k"], "baseline_supply_c": base["loop"]["supply_c"]})
+    res.summary = (f"Each of {len(pumps)} CDU pumps failed in turn at {int(load*100)} % load. Standby started within "
+                   f"{max((r['standby_started_after_s'] or 0) for r in pumps):.0f} s; flow fell to {min(r['min_flow_pct'] for r in pumps):.0f} % of design "
+                   f"({design} L/min) and recovered; loop ΔT peaked at {worst['max_dt_k']:.1f} K (design {dt_design:.0f} K).")
+    res.rows = rec.rows
+    return res
+
+
+def dc_ground_fault_response(twin: Twin, load: float = 0.8, fault_kohm: float = 20.0, hold_s: float = 120.0,
+                             record_every_s: float = 2.0, clock: Optional[str] = None) -> SweepResult:
+    """dc800 only: inject a ground fault on each pole; the IMD must drop below 100 kΩ, the critical alarm must raise within
+    10 s, the faulted pole must shift toward 0 V, the IT load must stay up (IT system: first fault is an alarm, not a trip)
+    and the alarm must clear with the fault."""
+    if not twin.dc800:
+        raise ValueError("dc_ground_fault_response applies to power_architecture == dc800 only")
+    res = SweepResult("dc_ground_fault_response", _now(clock))
+    rec = Recorder(twin, "dc_ground_fault_response", record_every_s=record_every_s)
+    twin.set_it_load(load)
+    rec.set_phase("baseline")
+    base = rec.run(300.0)
+    poles = []
+    for pole in ("pos", "neg"):
+        rec.set_phase(f"fault_{pole}")
+        twin.inject("dc_ground_fault", pole=pole, kohm=fault_kohm)
+        t0 = twin.t
+        t_alarm, min_it = None, 1e9
+
+        def watch(st):
+            nonlocal t_alarm, min_it
+            min_it = min(min_it, st["it_kw"])
+            if t_alarm is None and any(a["id"] == "dc_ground_fault" for a in st["alarms"]):
+                t_alarm = st["t"] - t0
+            return False
+
+        last = rec.run(hold_s, until=watch)
+        dc = last["dc"]
+        shifted = abs(dc["v_bus_pos"]) < 0.25 * dc["v_bus"] if pole == "pos" else abs(dc["v_bus_neg"]) < 0.25 * dc["v_bus"]
+        twin.clear("dc_ground_fault")
+        rec.set_phase(f"clear_{pole}")
+        after = rec.run(30.0)
+        poles.append({"pole": pole, "alarm_after_s": t_alarm, "imd_kohm_at_fault": dc["imd_kohm"], "v_pos": dc["v_bus_pos"], "v_neg": dc["v_bus_neg"],
+                      "faulted_pole_shifted": shifted, "it_kw_min_during_fault": round(min_it, 2),
+                      "alarm_cleared": not any(a["id"] == "dc_ground_fault" for a in after["alarms"]), "imd_kohm_after": after["dc"]["imd_kohm"]})
+    res.criteria.append(Criterion("imd_alarm_within_10s_each_pole", all(p["alarm_after_s"] is not None and p["alarm_after_s"] <= 10.0 for p in poles),
+                                  max((p["alarm_after_s"] or 1e9) for p in poles), 10.0, "s from fault to critical alarm"))
+    res.criteria.append(Criterion("imd_reads_fault_resistance", all(p["imd_kohm_at_fault"] < 100.0 for p in poles), max(p["imd_kohm_at_fault"] for p in poles), 100.0, "kΩ"))
+    res.criteria.append(Criterion("faulted_pole_shifted_toward_ground", all(p["faulted_pole_shifted"] for p in poles), sum(p["faulted_pole_shifted"] for p in poles), len(poles)))
+    res.criteria.append(Criterion("it_load_stays_up_on_first_fault", all(p["it_kw_min_during_fault"] >= 0.95 * base["it_kw"] for p in poles),
+                                  min(p["it_kw_min_during_fault"] for p in poles), round(0.95 * base["it_kw"], 2), "kW; an IT (ungrounded) DC system alarms on the first fault and does not trip"))
+    res.criteria.append(Criterion("alarm_clears_with_fault", all(p["alarm_cleared"] for p in poles), sum(p["alarm_cleared"] for p in poles), len(poles)))
+    res.extra.update({"poles": poles, "healthy_imd_kohm": base["dc"]["imd_kohm"], "bus_v_at_baseline": base["dc"]["v_bus"]})
+    res.summary = (f"Ground fault of {fault_kohm:g} kΩ injected on each pole at {int(load*100)} % load: insulation monitor fell from "
+                   f"{base['dc']['imd_kohm']:.0f} to {min(p['imd_kohm_at_fault'] for p in poles):.0f} kΩ, critical alarm after "
+                   f"{max((p['alarm_after_s'] or 0) for p in poles):.0f} s, faulted pole shifted toward ground, IT load held "
+                   f"({min(p['it_kw_min_during_fault'] for p in poles):.1f} kW); alarm cleared on reset.")
+    res.rows = rec.rows
+    return res
+
+
 SWEEPS: Dict[str, Callable[..., SweepResult]] = {
     "load_step": load_step,
     "cooling_unit_failover": cooling_unit_failover,
@@ -373,19 +476,34 @@ SWEEPS: Dict[str, Callable[..., SweepResult]] = {
     "door_open": door_open,
     "outdoor_temperature_sweep": outdoor_temperature_sweep,
     "filter_clog": filter_clog,
+    "cdu_pump_failover": cdu_pump_failover,
+    "dc_ground_fault_response": dc_ground_fault_response,
 }
+# sweeps that need a configuration feature: name -> predicate on Config
+SWEEP_REQUIRES: Dict[str, Callable[[Config], bool]] = {
+    "cdu_pump_failover": lambda cfg: cfg.cooling == "dlc_hd",
+    "dc_ground_fault_response": lambda cfg: cfg.power_architecture == "dc800",
+}
+
+
+def applicable(name: str, cfg: Config) -> bool:
+    """True when ``name`` runs on ``cfg`` (the forward-architecture sweeps need dlc_hd / dc800)."""
+    req = SWEEP_REQUIRES.get(name)
+    return req is None or req(cfg)
 
 
 def run_sweep(name: str, cfg: Config, seed: int = 0, params=None, clock: Optional[str] = None, **kw) -> SweepResult:
     """Run one named sweep on a fresh twin."""
     if name not in SWEEPS:
         raise ValueError(f"unknown sweep {name}; valid: {sorted(SWEEPS)}")
+    if not applicable(name, cfg):
+        raise ValueError(f"sweep {name} does not apply to this configuration (cooling {cfg.cooling}, power {cfg.power_architecture})")
     tw = Twin(cfg, params=params, seed=seed)
     return SWEEPS[name](tw, clock=clock, **kw)
 
 
 def run_all(cfg: Config, seed: int = 0, params=None, clock: Optional[str] = None) -> List[SweepResult]:
-    return [run_sweep(n, cfg, seed=seed, params=params, clock=clock) for n in SWEEPS]
+    return [run_sweep(n, cfg, seed=seed, params=params, clock=clock) for n in SWEEPS if applicable(n, cfg)]
 
 
 def to_csv(result: SweepResult, path: str) -> str:
@@ -417,8 +535,14 @@ def main(argv=None):
     ap.add_argument("--sweep", default="all", choices=["all"] + list(SWEEPS))
     ap.add_argument("--csv-dir", default=None)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--power-architecture", dest="power_architecture", default=None, help="ac480 or dc800 (forward option)")
+    ap.add_argument("--cooling", default=None, help="override the preset cooling (e.g. dlc_hd)")
     a = ap.parse_args(argv)
     cfg = Config.preset(a.tier, a.profile, a.climate)
+    if a.power_architecture:
+        cfg.power_architecture = a.power_architecture
+    if a.cooling:
+        cfg.cooling = a.cooling
     results = run_all(cfg, seed=a.seed) if a.sweep == "all" else [run_sweep(a.sweep, cfg, seed=a.seed)]
     for r in results:
         print(f"[{'PASS' if r.passed else 'FAIL'}] {r.name}: {r.summary}")

@@ -2,7 +2,7 @@
 import { api, h, fmt } from '../util.js';
 
 let catalog = null, draft = null, root = null, errorsEl = null, derivedEl = null, applyBtn = null, timer = null, ctxRef = null;
-const FIELDS = ['tier', 'profile', 'climate', 'it_kw', 'racks', 'cooling', 'redundancy', 'subsystems', 'white_label', 'brand', 'ups_minutes', 'generator', 'site_name', 'hardening', 'controls_tier'];
+const FIELDS = ['tier', 'profile', 'climate', 'it_kw', 'racks', 'cooling', 'redundancy', 'subsystems', 'white_label', 'brand', 'ups_minutes', 'generator', 'site_name', 'hardening', 'controls_tier', 'power_architecture'];
 const SEVERE = ['coastal', 'hot_arid', 'cold', 'high_altitude', 'hot_humid'];
 const recommendHardening = (profile, climate) => profile === 'public_sector' ? 'H3' : (SEVERE.includes(climate) ? 'H2' : 'H1');
 
@@ -50,7 +50,19 @@ function showDerived(d) {
     ['Service', `${d.voltage} · ${d.service_breaker_a.toLocaleString()} A breaker (${d.service_amps_calc.toLocaleString()} A calc)`],
   ];
   if (d.mv_service) rows.push(['Transformers', `${d.transformers_total} × ${d.transformer_kva.toLocaleString()} kVA pad-mount (MV → 480 V)`]);
-  rows.push(['UPS', `${d.ups_modules} × ${d.ups_kva_each.toLocaleString()} kVA · ${d.battery_kwh.toLocaleString()} kWh`]);
+  if (d.power_architecture === 'dc800') {
+    rows.push(['Power architecture', `800 VDC bus, ±${d.dc_bus_v_pole} V to ground (${d.dc_bus_v_min}–${d.dc_bus_v_max} V) — forward option, study`]);
+    rows.push(['AC/DC front end', `${d.ac_dc_front_end_kw.toLocaleString()} kW · ${d.rectifier_modules} × ${d.rectifier_module_kw} kW rectifier modules (${draft.redundancy})`]);
+    rows.push(['DC bus', `${d.dc_bus_current_a.toLocaleString()} A → ${d.dc_busway_a.toLocaleString()} A busway · ${d.imd_count} IMD`]);
+    rows.push(['Battery on bus', `${d.battery_on_bus_kwh.toLocaleString()} kWh (${d.battery_string_v}) · no UPS modules`]);
+    rows.push(['Loss / copper (assumed)', `−${d.dc_loss_saving_kw} kW distribution loss · copper −${d.copper_saving_pct} % (${d.copper_kg_dc_bus} vs ${d.copper_kg_ac_feeders} kg)`]);
+  } else {
+    rows.push(['UPS', `${d.ups_modules} × ${d.ups_kva_each.toLocaleString()} kVA · ${d.battery_kwh.toLocaleString()} kWh`]);
+  }
+  if (d.loop_flow_lpm !== undefined) {
+    rows.push(['Liquid loop', `${d.loop_water_class} · ${d.loop_supply_design_c}/${d.loop_return_design_c} °C · ${d.loop_flow_lpm.toLocaleString()} L/min at ΔT ${d.loop_dt_design_k} K`]);
+    rows.push(['Heat reuse', `${d.heat_reuse_kw_available.toLocaleString()} kW available at the return`]);
+  }
   rows.push(['Generators', d.generators_total ? `${d.generators_total} × ${d.generator_kw_each.toLocaleString()} kW${d.mv_service ? ' (N+1, 48 h fuel)' : ''}` : 'none']);
   rows.push(
     ['Cooling', `${d.cooling_units_total} × ${d.cooling_unit_kw_derated} kW (${d.cooling_units_n} duty, derate ${d.cooling_derate})`],
@@ -72,11 +84,20 @@ function render() {
   const presetRow = h('div', { class: 'row' }, ...Object.entries(tiers).map(([t, tg]) => h('button', { class: 'btn btn-sm' + (draft.tier === t ? ' active' : ''), onClick: async () => { const p = await api('/api/presets'); draft = p[t].config; render(); schedule(); } }, tg.label)));
   if (!draft.hardening) draft.hardening = recommendHardening(draft.profile, draft.climate);
   if (!draft.controls_tier) draft.controls_tier = 'auto';
+  if (!draft.power_architecture) draft.power_architecture = 'ac480';
   const tierSel = sel('tier', Object.entries(tiers).map(([k, v]) => [k, `${v.label} — ${v.enclosure}`]), () => {
     const ng = tiers[draft.tier];
     draft.it_kw = Math.min(ng.it_kw_max, Math.max(ng.it_kw_min, draft.it_kw)); draft.racks = Math.min(ng.max_racks, Math.max(1, draft.racks));
-    draft.cooling = ng.kind === 'hall' ? 'dlc_cdu' : ng.default_cooling; if (ng.kind === 'hall') draft.generator = true; render();
+    draft.cooling = ng.kind === 'hall' ? 'dlc_cdu' : ng.default_cooling; if (ng.kind === 'hall') draft.generator = true;
+    if (draft.power_architecture === 'dc800' && !((catalog.power_architectures?.dc800?.tiers) || ['ben150', 'ben500', 'ben2000']).includes(draft.tier)) draft.power_architecture = 'ac480';
+    render();
   });
+  const paTable = catalog.power_architectures || { ac480: { tiers: ['ben5', 'ben30', 'ben150', 'ben500', 'ben2000'] }, dc800: { tiers: ['ben150', 'ben500', 'ben2000'] } };
+  const paLabel = { ac480: '480 V AC → UPS → AC PDUs (today)', dc800: '800 VDC bus, battery on bus — forward option (study)' };
+  const paNote = h('div', { class: 'muted', style: { fontSize: '12px' } });
+  const updatePaNote = () => { paNote.textContent = draft.power_architecture === 'dc800' ? 'Forward architecture study: AC/DC front end → ±400 V DC busway → DC-input racks; sizing uses stated assumptions (docs/FORWARD_ARCHITECTURE_DECISION.md). Listings to be confirmed in the program.' : ''; };
+  const paSel = sel('power_architecture', Object.entries(paTable).filter(([k, v]) => !v.tiers || v.tiers.includes(draft.tier)).map(([k]) => [k, paLabel[k] || k]), updatePaNote);
+  updatePaNote();
   const hardeningTable = catalog.hardening || { H1: { label: 'H1 Standard', rating: 'NEMA 4X / IP66' }, H2: { label: 'H2 Severe environment', rating: 'IP66 + flood plinth' }, H3: { label: 'H3 Hardened / government', rating: 'IP66 + ballistic + forced-entry + HEMP option' } };
   const hardNote = h('div', { class: 'muted', id: 'hardening-note', style: { fontSize: '12px' } });
   const updateHardNote = () => { const rec = recommendHardening(draft.profile, draft.climate); const hz = hardeningTable[draft.hardening] || {}; hardNote.textContent = `${hz.rating || ''}${hz.coating ? ' · ' + hz.coating : ''} — recommended for this profile and climate: ${rec}${rec !== draft.hardening ? ` (selected ${draft.hardening})` : ''}`; };
@@ -103,7 +124,8 @@ function render() {
     field('Hardening', hardSel), hardNote,
     h('div', { class: 'field' }, h('label', {}, `IT load (${g.it_kw_min}–${g.it_kw_max} kW)`, kwOut), kw),
     h('div', { class: 'field' }, h('label', {}, `Racks (1–${g.max_racks})`, racksOut), racks),
-    field('Cooling', sel('cooling', Object.entries(catalog.cooling).filter(([k]) => g.kind !== 'hall' || k === 'dlc_cdu').map(([k, v]) => [k, `${v.label} (${v.unit_kw} kW/unit, COP ${v.cop})`]))),
+    field('Cooling', sel('cooling', Object.entries(catalog.cooling).filter(([k]) => (g.kind !== 'hall' || k === 'dlc_cdu' || k === 'dlc_hd') && (k !== 'dlc_hd' || (catalog.dlc_hd_tiers || ['ben150', 'ben500', 'ben2000']).includes(draft.tier))).map(([k, v]) => [k, `${v.label} (${v.unit_kw} kW/unit, COP ${v.cop})${k === 'dlc_hd' ? ' — forward option' : ''}`]))),
+    field('Power architecture', paSel), paNote,
     h('div', { class: 'grid2' },
       field('Redundancy', sel('redundancy', catalog.redundancy.map(r => [r, r]))),
       field('UPS minutes', h('input', { type: 'number', min: 2, max: 60, value: draft.ups_minutes, onInput: (e) => { draft.ups_minutes = +e.target.value || 10; schedule(); } }))),

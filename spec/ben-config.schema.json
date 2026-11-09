@@ -64,7 +64,8 @@
         "inrow_dx",
         "inrow_dx_300",
         "rdhx_drycooler",
-        "dlc_cdu"
+        "dlc_cdu",
+        "dlc_hd"
       ]
     },
     "redundancy": {
@@ -122,6 +123,14 @@
         "pro"
       ],
       "description": "BEN Controls tier: auto (by size and profile), lite (Revolution Pi + Pods) or pro (PLCnext + UL 508A panel + edge computer + Pods)"
+    },
+    "power_architecture": {
+      "enum": [
+        "ac480",
+        "dc800"
+      ],
+      "default": "ac480",
+      "description": "Power distribution: ac480 (480 V AC -> UPS -> AC PDUs, today) or dc800 (800 VDC bus, AC/DC front end, battery on bus; BEN 150 and up; docs/FORWARD_ARCHITECTURE_DECISION.md)"
     }
   },
   "x-tier-limits": {
@@ -192,6 +201,33 @@
     "dlc_cdu": {
       "max_rack_kw": 80,
       "medium": "liquid"
+    },
+    "dlc_hd": {
+      "max_rack_kw": 250,
+      "medium": "liquid"
     }
-  }
+  },
+  "x-power-architectures": {
+    "ac480": {
+      "tiers": [
+        "ben5",
+        "ben30",
+        "ben150",
+        "ben500",
+        "ben2000"
+      ]
+    },
+    "dc800": {
+      "tiers": [
+        "ben150",
+        "ben500",
+        "ben2000"
+      ]
+    }
+  },
+  "x-dlc-hd-tiers": [
+    "ben150",
+    "ben500",
+    "ben2000"
+  ]
 }

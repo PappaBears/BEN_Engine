@@ -1,5 +1,12 @@
 // BEN Engine selector — JavaScript port of software/ben_engine/config.py (keep in sync; tests/test_selector_parity.py checks numbers)
 export const FRAMES = [30, 50, 60, 100, 150, 200, 225, 250, 400, 600, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000];
+// forward architecture (docs/FORWARD_ARCHITECTURE_DECISION.md): 800 VDC option and high-density DLC; defaults in cat.power_architectures
+export const DC_BUSWAY_FRAMES = [400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200];
+const FALLBACK_DC = { tiers: ['ben150', 'ben500', 'ben2000'], bus_v_nominal: 800, bus_v_min: 760, bus_v_max: 920, pole_v_to_ground: 400, rectifier_eff: 0.985, rectifier_module_kw: 100,
+  bus_headroom: 1.25, busway_frames_a: DC_BUSWAY_FRAMES, loss_saving_frac: 0.03, copper_current_density_a_mm2: 2.0, ac_feeder_v: 415, ac_feeder_pf: 0.95, copper_kg_per_mm2_m: 8.96e-3, pue_loss_adder: 0.015 };
+function dcTable(cat) { return (cat.power_architectures && cat.power_architectures.dc800) || FALLBACK_DC; }
+function dlcHdTiers(cat) { return cat.dlc_hd_tiers || ['ben150', 'ben500', 'ben2000']; }
+export function powerArchitectures(cat) { return cat.power_architectures || { ac480: { label: '480 V AC → UPS → 208/415 V AC PDUs (today)', tiers: ['ben5', 'ben30', 'ben150', 'ben500', 'ben2000'] }, dc800: { ...FALLBACK_DC, label: '800 VDC bus (forward option)' } }; }
 
 // Generation-1 keys (container-length names) are accepted everywhere and normalised to the power-based keys.
 export const TIER_ALIASES = { micro: 'ben5', ben10: 'ben30', ben20: 'ben150', ben40: 'ben500' };
@@ -43,7 +50,11 @@ export function validate(cfg, cat) {
   }
   if (tier === 'ben5' && cfg.cooling !== 'cabinet_dx') errs.push('BEN 5 uses cabinet_dx cooling only');
   if (tier !== 'ben5' && cfg.cooling === 'cabinet_dx') errs.push('cabinet_dx is for BEN 5 only');
-  if (tier === 'ben2000' && cfg.cooling !== 'dlc_cdu') errs.push('BEN 2000 is direct-liquid cooled (dlc_cdu)');
+  if (tier === 'ben2000' && cfg.cooling !== 'dlc_cdu' && cfg.cooling !== 'dlc_hd') errs.push('BEN 2000 is direct-liquid cooled (dlc_cdu)');
+  if (cfg.cooling === 'dlc_hd' && !dlcHdTiers(cat).includes(tier)) errs.push('High-density DLC (dlc_hd) is for BEN 150 and up');
+  const pa = cfg.power_architecture ?? 'ac480';
+  if (!powerArchitectures(cat)[pa]) errs.push(`unknown power_architecture ${pa}`);
+  else if (!powerArchitectures(cat)[pa].tiers.includes(tier)) errs.push('800 VDC (dc800) is for BEN 150, BEN 500 and BEN 2000 only; BEN 5 and BEN 30 stay 480/208 V AC');
   const hz = cfg.hardening ?? 'H1';
   if (!hardeningTable(cat)[hz]) errs.push(`unknown hardening ${hz}`);
   const ct = cfg.controls_tier ?? 'auto';
@@ -73,7 +84,30 @@ export function derived(cfg, cat) {
   const totalKw = cfg.it_kw + auxKw;
   const pf = 0.95, totalKva = totalKw / pf;
   const upsN = cfg.it_kw / pf * 1.15;
-  const upsModules = cfg.redundancy === 'N' ? 1 : 2;
+  let upsModules = cfg.redundancy === 'N' ? 1 : 2;
+  let upsKvaEach = Math.round(upsN);
+  const dc800 = (cfg.power_architecture ?? 'ac480') === 'dc800';
+  let dc = {};
+  if (dc800) {
+    upsModules = 0; upsKvaEach = 0;
+    const P = dcTable(cat), v = P.bus_v_nominal;
+    const frontEnd = totalKw / P.rectifier_eff;
+    const busA = cfg.it_kw * 1000 / v * P.bus_headroom;
+    const frames = P.busway_frames_a && P.busway_frames_a.length ? P.busway_frames_a : DC_BUSWAY_FRAMES;
+    const buswayA = frames.find(f => f >= busA) ?? frames[frames.length - 1];
+    const nRect = Math.ceil(frontEnd / P.rectifier_module_kw);
+    const nRectTotal = cfg.redundancy === 'N+1' ? nRect + 1 : cfg.redundancy === '2N' ? 2 * nRect : nRect;
+    const lengthM = g.int_l_m + 5.0;
+    const iDc = cfg.it_kw * 1000 / v, iAc = cfg.it_kw * 1000 / (Math.sqrt(3) * P.ac_feeder_v * P.ac_feeder_pf);
+    const cuDc = 2 * (iDc / P.copper_current_density_a_mm2) * lengthM * P.copper_kg_per_mm2_m;
+    const cuAc = 3 * (iAc / P.copper_current_density_a_mm2) * lengthM * P.copper_kg_per_mm2_m;
+    const battKwh = cfg.it_kw * (cfg.ups_minutes ?? 10) / 60 / 0.9;
+    dc = { ac_dc_front_end_kw: +frontEnd.toFixed(1), rectifier_eff: P.rectifier_eff, dc_bus_v_nominal: v, dc_bus_v_pole: P.pole_v_to_ground, dc_bus_v_min: P.bus_v_min, dc_bus_v_max: P.bus_v_max,
+      dc_bus_current_a: Math.round(busA), dc_busway_a: buswayA, rectifier_module_kw: P.rectifier_module_kw, rectifier_modules_n: nRect, rectifier_modules: nRectTotal,
+      rectifier_cabinets: Math.ceil(nRectTotal / 4), imd_count: nRectTotal, battery_on_bus_kwh: +battKwh.toFixed(1), battery_string_v: '800 V class',
+      dc_loss_saving_kw: +(cfg.it_kw * P.loss_saving_frac).toFixed(1), dc_loss_saving_frac: P.loss_saving_frac,
+      copper_kg_dc_bus: +cuDc.toFixed(1), copper_kg_ac_feeders: +cuAc.toFixed(1), copper_saving_pct: +(100 * (1 - cuDc / cuAc)).toFixed(1) };
+  }
   const mvService = g.voltage.startsWith('12.47');
   let serviceAmps;
   if (mvService || g.voltage.startsWith('480')) serviceAmps = totalKva * 1000 / (Math.sqrt(3) * 480) / 0.8;
@@ -95,9 +129,16 @@ export function derived(cfg, cat) {
   }
   const ups_minutes = cfg.ups_minutes ?? 10;
   const batteryKwh = cfg.it_kw * ups_minutes / 60 / 0.9;
-  const airflow = cl.medium === 'air' ? cfg.it_kw * 125 : cfg.it_kw * 40;
+  const airflow = cl.medium === 'air' ? cfg.it_kw * 125 : (cl.air_residual !== undefined ? cfg.it_kw * 125 * cl.air_residual : cfg.it_kw * 40);
   const area = 2 * (g.ext_l_m * g.ext_h_m + g.ext_w_m * g.ext_h_m) + g.ext_l_m * g.ext_w_m;
-  const payload = cfg.racks * (tier === 'ben5' ? 400 : 900) + nTotal * cl.mass_kg + upsModules * (tier === 'ben5' ? 120 : 350) + batteryKwh * 8 + area * hz.mass_kg_m2;
+  let payload = cfg.racks * (tier === 'ben5' ? 400 : 900) + nTotal * cl.mass_kg + upsModules * (tier === 'ben5' ? 120 : 350) + batteryKwh * 8 + area * hz.mass_kg_m2;
+  if (dc800) payload += dc.rectifier_cabinets * 400;
+  let loop = {};
+  if (cfg.cooling === 'dlc_hd') {
+    const liquidKw = cfg.it_kw * (1 - cl.air_residual);
+    loop = { loop_water_class: cl.water_class, loop_dt_design_k: 10, loop_supply_design_c: 40, loop_return_design_c: 50, liquid_heat_kw: +liquidKw.toFixed(1),
+      loop_flow_lpm: +(liquidKw / (4.18 * 10) * 60).toFixed(1), heat_reuse_kw_available: +liquidKw.toFixed(1), air_residual: cl.air_residual };
+  }
   const gross = payload + g.tare_kg;
   const envGain = (area * (clim.t_design_c - 22) / 3.5 + 0.3 * clim.solar_w_m2 * g.ext_l_m * g.ext_w_m * 0.25) / 1000;
   const racksPerRow = Math.ceil(cfg.racks / rows);
@@ -113,9 +154,10 @@ export function derived(cfg, cat) {
     cooling_unit_kw_derated: +unitKw.toFixed(1), cooling_derate: +derate.toFixed(3), cooling_elec_kw: +coolElec.toFixed(2),
     total_kw: +totalKw.toFixed(1), total_kva: +totalKva.toFixed(1), voltage: g.voltage,
     service_amps_calc: Math.round(serviceAmps), service_breaker_a: breaker,
-    ups_modules: upsModules, ups_kva_each: Math.round(upsN), battery_kwh: +batteryKwh.toFixed(1),
+    ups_modules: upsModules, ups_kva_each: upsKvaEach, battery_kwh: +batteryKwh.toFixed(1),
     airflow_cfm: Math.round(airflow), payload_kg: Math.round(payload), gross_kg: Math.round(gross),
-    envelope_gain_kw: +envGain.toFixed(2), pue_estimate: +(totalKw / cfg.it_kw + 0.03).toFixed(3),
+    envelope_gain_kw: +envGain.toFixed(2), pue_estimate: +(totalKw / cfg.it_kw + (dc800 ? dcTable(cat).pue_loss_adder : 0.03)).toFixed(3),
+    power_architecture: cfg.power_architecture ?? 'ac480', dc_ready: dcTable(cat).tiers.includes(tier), ...dc, ...loop,
     row_length_mm: Math.trunc(rowLen), row_fits: rowFits, rows, racks_per_row: racksPerRow, nfpa_855_scope: nfpa855,
     mv_service: mvService, transformer_kva: xfmrKva, transformers_total: xfmrTotal,
     generators_total: gensTotal, generator_kw_each: genKwEach,
@@ -141,7 +183,7 @@ export function preset(tier, profile = 'ai_inference', climate = 'temperate', ca
   const cfg = { tier, profile, it_kw: Math.round(itKw), racks, cooling, redundancy: p.redundancy, climate,
     subsystems: ['power', 'cooling', 'compute', 'controls'], white_label: false, brand: 'Schreiber AI', ups_minutes: 10,
     generator: ['healthcare', 'public_sector', 'off_grid'].includes(profile) || tier === 'ben2000', site_name: 'Demo site',
-    controls_tier: 'auto', hardening };
+    controls_tier: 'auto', hardening, power_architecture: 'ac480' };
   if (tier === 'ben2000') cfg.cooling = 'dlc_cdu';
   else if (tier !== 'ben5') for (const alt of [cooling, 'inrow_dx_300', 'rdhx_drycooler', 'dlc_cdu']) { cfg.cooling = alt; if (!validate(cfg, cat).length) break; }
   return cfg;

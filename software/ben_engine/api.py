@@ -436,7 +436,10 @@ class Runtime:
         mod = _optional("sweeps")
         if mod is not None and isinstance(getattr(mod, "SWEEPS", None), dict):
             items = []
+            applicable = getattr(mod, "applicable", None)
             for name, fn in mod.SWEEPS.items():
+                if applicable is not None and not applicable(name, self.cfg):
+                    continue   # forward-architecture sweeps (dlc_hd / dc800) only when the current configuration has the feature
                 doc = (fn.__doc__ or "").strip().splitlines()
                 items.append({"name": name, "label": name.replace("_", " "), "description": doc[0] if doc else ""})
             return {"source": "ben_engine.sweeps", "sweeps": items, "all": [i["name"] for i in items]}

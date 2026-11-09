@@ -216,7 +216,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     G.bayL = G.micro ? 0 : Math.min(1.2, Math.max(0.9, G.intL * 0.18));
     let inRow = 0, unitW = 0.3;
     if (G.air && !G.micro) inRow = d.cooling_units_total;
-    else if (G.liquid) { inRow = Math.min(2, d.cooling_units_total); unitW = 0.6; }
+    else if (G.liquid) { inRow = G.hd ? d.cooling_units_total : Math.min(2, d.cooling_units_total); unitW = 0.6; }
     else if (G.water) { inRow = 1; unitW = 0.6; }
     const avail = () => G.intL - G.bayL - 0.1;
     while (inRow > 0 && n * G.rackW + inRow * unitW > avail()) inRow--;          // extras go to the wall
@@ -266,7 +266,9 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     G.coldW = G.aisleW + G.zOff; G.hotW = G.aisleW - G.zOff;
     G.pitch = G.intL / (cfg.racks + 1); // twin sensor pitch (twin frame)
     G.subs = new Set(cfg.subsystems);
-    G.liquid = d.cooling_label.toLowerCase().includes('liquid') || cfg.cooling === 'dlc_cdu';
+    G.liquid = d.cooling_label.toLowerCase().includes('liquid') || cfg.cooling === 'dlc_cdu' || cfg.cooling === 'dlc_hd';
+    G.hd = cfg.cooling === 'dlc_hd';            // high-density DLC: every CDU is a 600 mm row CDU, manifold drops on every rack
+    G.dc800 = (cfg.power_architecture || 'ac480') === 'dc800';   // 800 VDC bus: rectifier / SST cabinet + DC busway instead of UPS frames
     G.water = cfg.cooling === 'rdhx_drycooler';
     G.air = !G.liquid && !G.water;
     computeRowLayout(cfg, d);
@@ -639,19 +641,31 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       }
     } else {
       // liquid / water: CDU(s) inside at the far end + dry coolers on the roof; manifold pipes in the hot aisle
-      const nCdu = G.liquid ? Math.min(2, n) : 1;
+      const nCdu = G.liquid ? (G.hd ? n : Math.min(2, n)) : 1;
       for (let k = 0; k < nCdu; k++) {
         const w = G.unitW || 0.6;
         const x = G.unitX[k] !== undefined ? G.unitX[k] : (k === 0 ? G.intL / 2 - 0.4 : -G.intL / 2 + G.bayL + 0.4);
-        const cdu = box(w, G.rackH, G.rackD, MAT.cooling, x, G.floorTop + G.rackH / 2, G.zOff); cdu.userData = { type: 'cdu', id: 'cdu' }; edges(cdu, 0, 0.3); g.add(cdu); pickables.push(cdu);
+        const cdu = box(w, G.rackH, G.rackD, MAT.cooling, x, G.floorTop + G.rackH / 2, G.zOff); cdu.userData = { type: 'cdu', id: G.hd ? `cdu${k + 1}` : 'cdu', index: k }; edges(cdu, 0, 0.3); g.add(cdu); pickables.push(cdu);
         const disp = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.1, 0.25), MAT.led(0x66e3ff)); disp.position.set(0, G.rackH * 0.3, -G.rackD / 2 - 0.003); disp.rotation.y = Math.PI; cdu.add(disp);
+        if (G.hd) { // row CDU: pump pair indicator strip + W45 supply/return stubs on the top
+          const strip = new THREE.Mesh(new THREE.BoxGeometry(w - 0.1, 0.04, 0.02), MAT.led(C.green)); strip.position.set(0, G.rackH / 2 - 0.1, -G.rackD / 2 - 0.012); cdu.add(strip); cdu.userData.strip = strip;
+          cdu.add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 10), MAT.pipeCold).translateY(G.rackH / 2 + 0.15).translateX(-0.12));
+          cdu.add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 10), MAT.pipeHot).translateY(G.rackH / 2 + 0.15).translateX(0.12));
+          objects[`cdu${k + 1}`] = cdu;
+        }
         if (k === 0) objects.cdu = cdu;
       }
-      // manifolds along the hot aisle ceiling with drops to each rack
+      // manifolds along the hot aisle ceiling with drops to each rack (dlc_hd: a pickable manifold + UQD drop pair on every rack)
       const y = G.ceiling - 0.45, z0 = G.zOff + G.rackD / 2 + 0.12;
       for (const [mat, dz] of [[MAT.pipeCold, 0], [MAT.pipeHot, 0.16]]) {
-        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, G.intL - 0.2, 12), mat); pipe.rotation.z = Math.PI / 2; pipe.position.set(0, y - dz, z0 + dz); g.add(pipe);
-        for (const x of G.rackX) { const len = y - dz - (G.floorTop + G.rackH * 0.85); const drop = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, len, 8), mat); drop.position.set(x + (dz ? 0.08 : -0.08), y - dz - len / 2, z0 + dz); g.add(drop); }
+        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.055 : 0.04, G.hd ? 0.055 : 0.04, G.intL - 0.2, 12), mat); pipe.rotation.z = Math.PI / 2; pipe.position.set(0, y - dz, z0 + dz); g.add(pipe);
+        for (const x of G.rackX) { const len = y - dz - (G.floorTop + G.rackH * 0.85); const drop = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.025 : 0.018, G.hd ? 0.025 : 0.018, len, 8), mat); drop.position.set(x + (dz ? 0.08 : -0.08), y - dz - len / 2, z0 + dz); g.add(drop); }
+      }
+      if (G.hd) {
+        G.rackX.forEach((x, i) => {
+          const man = box(0.3, G.rackH - 0.3, 0.08, MAT.coolingDark, x, G.floorTop + G.rackH / 2, z0 + 0.1); man.userData = { type: 'manifold', id: `manifold${i + 1}`, index: i }; edges(man, 0, 0.3); g.add(man); pickables.push(man); objects[`manifold${i + 1}`] = man;
+          for (let u = 0; u < 4; u++) man.add(new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.12, 8), MAT.casting).rotateX(Math.PI / 2).translateY(-0.1).translateX(-0.09 + u * 0.06).translateZ(-(G.rackH - 0.3) / 2 + 0.3 + u * 0.4));
+        });
       }
       // dry coolers on the roof
       const dcW = Math.min(2.2, (G.extL - 0.6) / n - 0.2), dcL = Math.min(1.1, G.extW - 0.6);
@@ -693,7 +707,8 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       // power bay at the door end: floor cabinets along the end wall facing the racks (+x), ATS + panel on the hot wall
       const x0 = -G.intL / 2, zWall = G.intW / 2;
       const nBat = Math.max(1, Math.ceil(d.battery_kwh / 40));
-      const nCab = d.ups_modules + nBat;
+      const nRect = G.dc800 ? Math.max(1, d.rectifier_cabinets || 1) : 0;
+      const nCab = d.ups_modules + nBat + nRect;
       const cabW = Math.max(0.35, Math.min(0.6, (G.intW - 0.15 - 0.05 * (nCab - 1)) / nCab));
       const cabD = Math.min(0.6, G.bayL - 0.45), cabH = Math.min(1.9, G.intH - 0.35);
       const rowW = nCab * cabW + (nCab - 1) * 0.05;
@@ -703,6 +718,15 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
         ups.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.65, 0.16), MAT.led(0x66e3ff)).translateY(0.55).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
         for (let k = 0; k < 3; k++) ups.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.25, cabW * 0.8), MAT.powerDark).translateY(-0.55 + k * 0.3).translateX(cabD / 2 + 0.004));
         if (m === 0) objects.ups = ups;
+        z += cabW + 0.05;
+      }
+      for (let r = 0; r < nRect; r++) {
+        // 800 VDC: SiC rectifier / SST front-end cabinet (4 x 100 kW modules each) in place of the UPS frames
+        const rect = box(cabD, cabH, cabW, MAT.power, x0 + 0.05 + cabD / 2, G.floorTop + cabH / 2, z); rect.userData = { type: 'rectifier', id: 'rectifier', index: r }; edges(rect, 0, 0.35); g.add(rect); pickables.push(rect);
+        for (let k = 0; k < 4; k++) rect.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.3, cabW * 0.8), MAT.powerDark).translateY(-0.6 + k * 0.38).translateX(cabD / 2 + 0.004));
+        for (let k = 0; k < 4; k++) rect.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.03, 0.03), MAT.led(C.green)).translateY(-0.72 + k * 0.38).translateX(cabD / 2 + 0.008).translateZ(cabW * 0.3));
+        rect.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.5, 0.12), MAT.led(0x66e3ff)).translateY(cabH / 2 - 0.2).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
+        if (r === 0) { objects.rectifier = rect; objects.ups = objects.ups || rect; }
         z += cabW + 0.05;
       }
       for (let b = 0; b < nBat; b++) {
@@ -716,6 +740,20 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       ats.add(new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.01), MAT.led(C.green)).translateY(0.3).translateZ(-0.115));
       const panel = box(0.55, 1.0, 0.2, MAT.power, x0 + Math.min(G.bayL - 0.3, 0.85), G.floorTop + 1.5, zWall - 0.1); panel.userData = { type: 'panel', id: 'panel' }; edges(panel, 0, 0.35); g.add(panel); pickables.push(panel); objects.panel = panel;
       for (let k = 0; k < Math.min(cfg.racks + 2, 12); k++) panel.add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.02), MAT.powerDark).translateX(-0.18 + (k % 4) * 0.12).translateY(0.3 - Math.floor(k / 4) * 0.2).translateZ(-0.11));
+      if (G.dc800) {
+        // 800 VDC busway (±400 V) over the rack row with a DC tap-off box per rack, replacing the AC feeders in the power tray
+        const bwY = G.ceiling - 0.42, bwZ = G.zOff - G.rackD / 2 - 0.1, bwLen = G.intL - G.bayL - 0.3;
+        const bw = box(bwLen, 0.16, 0.14, MAT.powerDark, x0 + G.bayL + bwLen / 2, bwY, bwZ); bw.userData = { type: 'dc_busway', id: 'dc_busway' }; edges(bw, C.amber, 0.5); g.add(bw); pickables.push(bw); objects.dc_busway = bw;
+        bw.add(new THREE.Mesh(new THREE.BoxGeometry(bwLen - 0.05, 0.02, 0.02), MAT.led(C.amber)).translateY(-0.09));
+        for (let i = 0; i < G.rackX.length; i++) {
+          const tap = box(0.25, 0.22, 0.2, MAT.powerDark, G.rackX[i], bwY - 0.19, bwZ); tap.userData = { type: 'dc_busway', id: 'dc_busway', index: i }; edges(tap, 0, 0.35); g.add(tap); pickables.push(tap);
+          tap.add(new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.01), MAT.led(C.green)).translateZ(-0.105).translateY(0.05));
+        }
+        // feed from the rectifier cabinet to the busway end
+        const rp = objects.rectifier.getWorldPosition(new THREE.Vector3());
+        const feed = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, Math.hypot(x0 + G.bayL - rp.x, bwY - rp.y - 0.6), 8), MAT.powerDark);
+        feed.position.set((rp.x + x0 + G.bayL) / 2, (rp.y + 0.6 + bwY) / 2, bwZ); feed.rotation.z = Math.atan2(bwY - rp.y - 0.6, x0 + G.bayL - rp.x) - Math.PI / 2; g.add(feed);
+      }
       G.powerEndX = x0 + G.bayL;
     }
     // power flow paths: utility -> ATS -> UPS -> panel -> tray -> racks
@@ -844,6 +882,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       u.userData.strip.material = MAT.led(!cu.ok ? C.red : (cu.on ? C.green : C.muted));
       u.userData.fanPct = cu.ok && cu.on ? cu.fan_pct : 0;
     });
+    if (G.hd && st.loop) for (let k = 0; objects[`cdu${k + 1}`]; k++) { const c = objects[`cdu${k + 1}`]; const pump = (st.loop.pumps || [])[k]; if (c.userData.strip) c.userData.strip.material = MAT.led(pump && !pump.ok ? C.red : (st.loop.flow_low ? C.amber : C.green)); }
     if (G.hall) dryCoolers.forEach((u) => { const cu = st.cooling_units[u.userData.unit]; if (!cu) return; u.userData.strip.material = MAT.led(!cu.ok ? C.red : (cu.on ? C.green : C.muted)); u.userData.fanPct = cu.ok && cu.on ? cu.fan_pct : 0; });
     for (const [id, m] of sensorMeshes) {
       const s = m.userData.spec; let v = null;
@@ -914,7 +953,10 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     if ((m = /^rack(\d+)_/.exec(a.id))) return { type: 'rack', index: +m[1] - 1, id: `rack${m[1]}` };
     if ((m = /^cool(\d+)_/.exec(a.id))) return { type: 'cooling', index: +m[1] - 1, id: `cooling${m[1]}` };
     if (a.id === 'utility_loss') return { type: 'ats', id: 'ats' };
-    if (a.id === 'ups_low') return { type: 'ups', id: 'ups' };
+    if (a.id === 'ups_low') return G.dc800 ? { type: 'battery', id: 'battery' } : { type: 'ups', id: 'ups' };
+    if (a.id === 'dc_ground_fault' || a.id === 'dc_bus_voltage' || a.id === 'dc_arc') return { type: 'dc_busway', id: 'dc_busway' };
+    if (/^cdu_pump\d+_fail$/.test(a.id) || a.id === 'loop_flow_low' || a.id === 'loop_supply_high') return { type: 'cdu', id: G.hd ? 'cdu1' : 'cdu' };
+    if (a.id === 'loop_isolated') return { type: 'manifold', id: 'manifold1', index: 0 };
     if (a.id === 'door_open') return { type: 'doors', id: 'doors' };
     if (a.id === 'leak') return { type: 'sensor', id: 'leak_floor' };
     if (a.id === 'filter_dp') return { type: 'cooling', index: 0, id: 'cooling1' };
@@ -940,6 +982,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     return hit ? { type: hit.object.userData.type, index: hit.object.userData.index, id: hit.object.userData.id, object: hit.object } : null;
   }
   const keyOf = (sel) => sel.type === 'sensor' ? `sensor:${sel.id}` : ((sel.id || sel.type) + (G.hall && sel.index !== undefined && ['ups', 'battery', 'transformer', 'generator', 'cdu', 'drycooler', 'fanwall', 'leak_rope', 'aisle_cold', 'aisle_hot'].includes(sel.type) ? `#${sel.index}` : ''));
+  // cdu<k> / manifold<k> ids (dlc_hd) are already unique per object; dc_busway tap-offs share one key with the busway
   let hoverKey = null, hoverOutline = null, hoverRaf = false, lastPointer = null;
   function setHover(sel, screen, source = 'pointer') {
     const key = sel ? keyOf(sel) : null;
@@ -969,7 +1012,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   function hoverList() {
     const seen = new Set(), out = [];
     for (const o of pickables) { if (!hoverable(o) || !o.userData.type) continue; const k = keyOf(o.userData); if (seen.has(k)) continue; seen.add(k); out.push({ type: o.userData.type, index: o.userData.index, id: o.userData.id, object: o, key: k }); }
-    const order = { container: 0, doors: 1, vestibule: 1.5, rack: 2, cooling: 3, fanwall: 3.5, drycooler: 4, cdu: 5, powermodule: 5.5, transformer: 5.7, switchgear: 5.8, ups: 6, battery: 7, ats: 8, panel: 9, utility: 10, generator: 11, controller: 12, tray: 13, containment: 14, leak_rope: 15, plinth: 15.5, armour: 15.6, sensor: 16 };
+    const order = { container: 0, doors: 1, vestibule: 1.5, rack: 2, cooling: 3, fanwall: 3.5, drycooler: 4, cdu: 5, manifold: 5.2, powermodule: 5.5, transformer: 5.7, switchgear: 5.8, ups: 6, rectifier: 6.1, dc_busway: 6.2, battery: 7, ats: 8, panel: 9, utility: 10, generator: 11, controller: 12, tray: 13, containment: 14, leak_rope: 15, plinth: 15.5, armour: 15.6, sensor: 16 };
     return out.sort((a, b) => (order[a.type] ?? 20) - (order[b.type] ?? 20) || (a.index ?? 0) - (b.index ?? 0) || String(a.id).localeCompare(String(b.id)));
   }
   /** Page coordinates of an object's centre (for tooltips and tests). */

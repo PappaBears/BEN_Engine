@@ -202,6 +202,17 @@
    "max_rack_kw": 80,
    "width_mm": 600,
    "mass_kg": 400
+  },
+  "dlc_hd": {
+   "label": "High-density direct liquid cooling (W45 loop, 600 kW row CDU)",
+   "unit_kw": 600.0,
+   "cop": 20.0,
+   "medium": "liquid",
+   "max_rack_kw": 250,
+   "width_mm": 600,
+   "mass_kg": 500,
+   "water_class": "W45",
+   "air_residual": 0.1
   }
  },
  "profiles": {
@@ -335,5 +346,55 @@
   "healthcare",
   "public_sector",
   "ai_training"
+ ],
+ "power_architectures": {
+  "ac480": {
+   "label": "480 V AC \u2192 UPS \u2192 208/415 V AC PDUs (today)",
+   "tiers": [
+    "ben5",
+    "ben30",
+    "ben150",
+    "ben500",
+    "ben2000"
+   ],
+   "busway_frames_a": []
+  },
+  "dc800": {
+   "label": "800 VDC bus: AC/DC front end \u2192 DC busway \u2192 DC-input racks, battery on bus (forward option)",
+   "tiers": [
+    "ben150",
+    "ben500",
+    "ben2000"
+   ],
+   "bus_v_nominal": 800,
+   "bus_v_min": 760,
+   "bus_v_max": 920,
+   "pole_v_to_ground": 400,
+   "rectifier_eff": 0.985,
+   "rectifier_module_kw": 100,
+   "bus_headroom": 1.25,
+   "busway_frames_a": [
+    400,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3200
+   ],
+   "loss_saving_frac": 0.03,
+   "copper_current_density_a_mm2": 2.0,
+   "ac_feeder_v": 415,
+   "ac_feeder_pf": 0.95,
+   "copper_kg_per_mm2_m": 0.00896,
+   "pue_loss_adder": 0.015
+  }
+ },
+ "dlc_hd_tiers": [
+  "ben150",
+  "ben500",
+  "ben2000"
  ]
 }

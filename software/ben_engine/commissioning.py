@@ -17,12 +17,16 @@ Steps (each records values and PASS/FAIL):
     forced door-open and leak)
  5  power chain: utility meter against the PDU sum within 3 % after subtracting metered
     cooling, house and UPS losses
- 6  cooling unit sequential start and failover (sweeps.cooling_unit_failover)
+ 6  cooling unit sequential start and failover (sweeps.cooling_unit_failover); on dlc_hd also the row CDU pumps
+    (sweeps.cdu_pump_failover)
  7  load step 20→100 % and thermal steady state within the ASHRAE class (sweeps.load_step);
     in real life the IT load is a resistive load bank
- 8  utility loss ride-through (sweeps.utility_loss_ride_through)
+ 8  utility loss ride-through (sweeps.utility_loss_ride_through); on dc800 also the DC bus voltage drift with
+    state of charge (battery on the bus) against the 760–920 V window
  9  alarm verification (inlet high via sensor drift, leak, door, cooling fail, utility loss; all clear)
-10  export CSV + signed markdown report with SHA-256 of the data file and a signature block
+10  liquid loop: leak-to-isolation time (dlc_hd; skipped with the reason stated otherwise)
+11  DC bus: insulation monitoring and ground-fault alarm (dc800; skipped with the reason stated otherwise)
+12  export CSV + signed markdown report with SHA-256 of the data file and a signature block
 """
 from __future__ import annotations
 
@@ -89,7 +93,7 @@ class CommissioningReport:
 
 
 class Commissioning:
-    """Drives the ten commissioning steps on a twin (sim) or a gateway (live placeholder)."""
+    """Drives the twelve commissioning steps on a twin (sim) or a gateway (live placeholder)."""
 
     def __init__(self, cfg: Config, sim: bool = True, yes: bool = False, seed: int = 0, operator: str = "unsigned",
                  ask: Optional[Callable[[str], str]] = None, log: Optional[Callable[[str], None]] = None,
@@ -258,6 +262,25 @@ class Commissioning:
             sr.passed = False
             sr.notes.extend(c.name for c in res.criteria if not c.passed)
         sr.notes.append(res.summary)
+        if self.twin.hd:
+            # high-density liquid: every row CDU pump must run when asked, then each fails in turn with the standby taking over
+            pump_log = []
+            for i, u in enumerate(self.twin.cdu_pumps):
+                u["on"] = True
+                st = self._run(30.0 if not self.fast else 10.0)
+                pp = st["loop"]["pumps"][i]
+                pump_log.append({"pump": i + 1, "on": pp["on"], "ok": pp["ok"], "pct": pp["pct"]})
+                if not (pp["on"] and pp["ok"] and pp["pct"] > 0):
+                    sr.passed = False
+                    sr.notes.append(f"CDU pump {i+1} did not start")
+            sr.values["cdu_pump_start"] = pump_log
+            res2 = _sweeps.cdu_pump_failover(self.twin, load=1.0, fail_s=200.0 if not self.fast else 60.0, recover_s=120.0 if not self.fast else 40.0, clock=self.clock)
+            self._absorb(res2)
+            sr.values["cdu_pump_failover"] = {"summary": res2.summary, "criteria": [asdict(c) for c in res2.criteria], "pumps": res2.extra.get("pumps")}
+            if not res2.passed:
+                sr.passed = False
+                sr.notes.extend(c.name for c in res2.criteria if not c.passed)
+            sr.notes.append(res2.summary)
 
     def step7_load_step(self, sr: StepResult):
         self.twin.set_it_load(0.2)
@@ -286,6 +309,17 @@ class Commissioning:
             sr.passed = False
             sr.notes.extend(c.name for c in res.criteria if not c.passed)
         sr.notes.append(res.summary)
+        if self.twin.dc800:
+            # battery on the bus: the bus voltage must stay inside the 760-920 V window while the battery carries the load
+            vs = [r["dc_v_bus"] for r in res.rows if r.get("phase") == "utility_loss" and r.get("dc_v_bus") is not None and r.get("power_ups_soc_pct", 0) > 5]
+            lo, hi = self.twin.d["dc_bus_v_min"], self.twin.d["dc_bus_v_max"]
+            vmin, vmax = (min(vs), max(vs)) if vs else (None, None)
+            ok = bool(vs) and lo <= vmin and vmax <= hi
+            sr.values.update({"dc_bus_v_min_on_battery": vmin, "dc_bus_v_max_on_battery": vmax, "dc_bus_window_v": [lo, hi], "dc_bus_in_window": ok})
+            if not ok:
+                sr.passed = False
+                sr.notes.append(f"DC bus left the {lo}-{hi} V window on battery ({vmin}-{vmax} V)")
+            sr.notes.append(f"800 VDC bus on battery: {vmin}-{vmax} V while SoC > 5 % (window {lo}-{hi} V); battery on the bus, no UPS double conversion")
 
     def step9_alarms(self, sr: StepResult):
         checks = []
@@ -334,7 +368,54 @@ class Commissioning:
         sr.passed = ok
         sr.notes.append(f"{sum(c['ok'] for c in checks)}/{len(checks)} alarm paths raised and cleared")
 
-    def step10_export(self, sr: StepResult, csv_path: str, report_path: str):
+    def step10_leak_isolation(self, sr: StepResult):
+        """dlc_hd: inject a leak at the rack manifold; the detection + isolation valve must close within 15 s and the loop must
+        be reported isolated. Skipped with the reason when the unit has no high-density liquid loop."""
+        if not self.twin.hd:
+            sr.values["skipped"] = True
+            sr.notes.append(f"skipped: not applicable — cooling is {self.cfg.cooling}, the leak-to-isolation step needs the high-density liquid loop (dlc_hd)")
+            return
+        self.twin.set_it_load(0.6)
+        self._run(60.0 if not self.fast else 20.0)
+        self.twin.inject("leak")
+        t0 = self.twin.t
+        st = self._run(1.0)
+        while st["loop"]["leak_to_isolation_s"] is None and self.twin.t - t0 < 60.0:
+            st = self._run(1.0)
+        t_iso = st["loop"]["leak_to_isolation_s"]
+        alarm = any(a["id"] == "loop_isolated" for a in st["alarms"])
+        flow_after = self._run(30.0)["loop"]["flow_lpm"]
+        self.twin.clear("leak")
+        self._run(60.0 if not self.fast else 20.0)
+        limit_s = 15.0
+        sr.values.update({"leak_to_isolation_s": t_iso, "limit_s": limit_s, "isolated_alarm": alarm, "flow_after_isolation_lpm": flow_after})
+        if t_iso is None or t_iso > limit_s or not alarm or flow_after > 0.05 * self.twin.d["loop_flow_lpm"]:
+            sr.passed = False
+            sr.notes.append(f"leak to valve closed {t_iso} s (limit {limit_s:.0f} s), alarm {alarm}, flow after {flow_after} L/min")
+        sr.notes.append(f"leak injected at the rack manifold: isolation valves closed after {t_iso} s (limit {limit_s:.0f} s), loop flow {flow_after} L/min after isolation, alarm raised; "
+                        "in the field the leak is a wet-finger test on the drip-tray sensor with the valve position switch timed (E19)")
+
+    def step11_dc_bus_imd(self, sr: StepResult):
+        """dc800: insulation monitoring reads healthy, a ground fault on each pole drops it and raises the critical alarm within
+        10 s without tripping the IT load, and the alarm clears. Skipped with the reason on an AC unit."""
+        if not self.twin.dc800:
+            sr.values["skipped"] = True
+            sr.notes.append(f"skipped: not applicable — power architecture is {self.cfg.power_architecture}; the DC bus insulation step needs the 800 VDC option (dc800)")
+            return
+        healthy = self.twin.state()["dc"]["imd_kohm"]
+        res = _sweeps.dc_ground_fault_response(self.twin, load=0.8, hold_s=60.0 if not self.fast else 30.0, clock=self.clock)
+        self._absorb(res)
+        sr.values.update({"imd_healthy_kohm": healthy, "summary": res.summary, "criteria": [asdict(c) for c in res.criteria], **res.extra})
+        if healthy < 500.0:
+            sr.passed = False
+            sr.notes.append(f"insulation resistance {healthy} kΩ before the test is below 500 kΩ")
+        if not res.passed:
+            sr.passed = False
+            sr.notes.extend(c.name for c in res.criteria if not c.passed)
+        sr.notes.append(res.summary)
+        sr.notes.append("In the field the ground fault is a listed test resistor from each pole to the ground bar with the IMD test button; the location function is checked on the faulted tap-off (E17).")
+
+    def step12_export(self, sr: StepResult, csv_path: str, report_path: str):
         self._phase = "export"
         rows = self.buffer.to_rows()
         write_csv(rows, csv_path)
@@ -366,7 +447,9 @@ class Commissioning:
         self._step(7, "Load step to 100 % and thermal steady state", self.step7_load_step)
         self._step(8, "Utility loss ride-through", self.step8_ride_through)
         self._step(9, "Alarm verification", self.step9_alarms)
-        self._step(10, "Export CSV and signed report", lambda sr: self.step10_export(sr, csv_path, out_path))
+        self._step(10, "Liquid loop: leak-to-isolation time", self.step10_leak_isolation)
+        self._step(11, "DC bus: insulation monitoring and ground-fault alarm", self.step11_dc_bus_imd)
+        self._step(12, "Export CSV and signed report", lambda sr: self.step12_export(sr, csv_path, out_path))
         md = render_markdown(self.report)
         with open(out_path, "w") as fh:
             fh.write(md)
@@ -390,7 +473,7 @@ def run_live(url: str, cfg: Optional[Config], out_path: str, log=print) -> Commi
             state = json.loads(r.read().decode())
         rep.cfg = Config.from_dict(cfg_json.get("config", cfg_json))
         sr.values = {"config": rep.cfg.to_dict(), "state_t": state.get("t"), "alarms": state.get("alarms")}
-        sr.notes.append("gateway reachable; live steps 1–10 must be run from the dashboard commissioning page with a person on site")
+        sr.notes.append("gateway reachable; live steps 1–12 must be run from the dashboard commissioning page with a person on site")
     except Exception as e:
         sr.passed = False
         sr.notes.append(f"gateway not reachable: {e}")
@@ -417,8 +500,12 @@ def render_markdown(rep: CommissioningReport) -> str:
     L.append("| --- | --- |")
     for k, v in (("Tier", d["tier_label"]), ("Enclosure", d["enclosure"]), ("Mission profile", PROFILE_DEFAULTS[cfg.profile]["label"]),
                  ("IT load", f"{cfg.it_kw} kW in {cfg.racks} racks ({d['per_rack_kw']} kW/rack)"), ("Cooling", f"{d['cooling_label']}, {d['cooling_units_total']} units ({cfg.redundancy})"),
-                 ("Power", f"{d['voltage']}, {d['service_breaker_a']} A service, UPS {d['ups_modules']} × {d['ups_kva_each']} kVA, battery {d['battery_kwh']} kWh for {cfg.ups_minutes} min"),
+                 ("Power", (f"{d['voltage']} service, {d['service_breaker_a']} A; 800 VDC bus (±{d['dc_bus_v_pole']} V, {d['dc_bus_v_min']}–{d['dc_bus_v_max']} V window), AC/DC front end {d['ac_dc_front_end_kw']} kW "
+                            f"({d['rectifier_modules']} × {d['rectifier_module_kw']} kW), busway {d['dc_busway_a']} A, battery on bus {d['battery_on_bus_kwh']} kWh for {cfg.ups_minutes} min — forward architecture study")
+                           if cfg.power_architecture == "dc800" else
+                           f"{d['voltage']}, {d['service_breaker_a']} A service, UPS {d['ups_modules']} × {d['ups_kva_each']} kVA, battery {d['battery_kwh']} kWh for {cfg.ups_minutes} min"),
                  ("Climate", f"{CLIMATE_DESIGN[cfg.climate]['label']}, design {CLIMATE_DESIGN[cfg.climate]['t_design_c']} C"), ("ASHRAE class", d["ashrae_class"]),
+                 *([("Liquid loop", f"{d['loop_water_class']} warm water, {d['loop_supply_design_c']:.0f}/{d['loop_return_design_c']:.0f} C, {d['loop_flow_lpm']} L/min at ΔT {d['loop_dt_design_k']:.0f} K, heat reuse {d['heat_reuse_kw_available']} kW available")] if cfg.cooling == "dlc_hd" else []),
                  ("Twin seed", rep.seed)):
         L.append(f"| {k} | {v} |")
     L.append("")
@@ -458,6 +545,8 @@ def render_markdown(rep: CommissioningReport) -> str:
              "the hardware. Live commissioning repeats every step on the real unit with a resistive load bank.")
     L.append("- Temperatures are read from calibrated DS18B20 strings (U95 ±0.25 K per spec/PROTOCOL.md); pass/fail margins smaller than that are not meaningful.")
     L.append("- The ride-through result is the time to the ASHRAE allowable limit with cooling off; battery minutes are the UPS runtime at the tested load.")
+    L.append("- Steps 10 and 11 belong to the forward architecture (docs/FORWARD_ARCHITECTURE_DECISION.md); on a unit without the high-density liquid loop or the 800 VDC bus "
+             "they are recorded as skipped with the reason and count as passed.")
     L.append("")
     L.append("## Signature")
     L.append("")
@@ -475,7 +564,8 @@ def _key_values(s: StepResult) -> str:
     v = s.values
     keep = {}
     for k in ("inlet_spread_k", "rh_pct", "dp_after_tare_pa", "n_points", "n_failed", "disagreement_pct", "utility_meter_kw", "pdu_sum_kw",
-              "minutes_to_ashrae_max", "minutes_to_ups_empty", "rows", "expected_nodes", "ashrae_max_c"):
+              "minutes_to_ashrae_max", "minutes_to_ups_empty", "rows", "expected_nodes", "ashrae_max_c", "skipped", "leak_to_isolation_s",
+              "imd_healthy_kohm", "dc_bus_v_min_on_battery", "dc_bus_v_max_on_battery"):
         if k in v:
             keep[k] = v[k]
     if "nodes" in v:
@@ -518,6 +608,12 @@ def _detail_table(s: StepResult) -> List[str]:
     if "sequential_start" in v:
         out += ["| Unit | On | OK | kW | Fan % |", "| --- | --- | --- | --- | --- |"]
         out += [f"| {u['unit']} | {u['on']} | {u['ok']} | {u['kw']} | {u['fan_pct']} |" for u in v["sequential_start"]]
+    if "cdu_pump_failover" in v and v["cdu_pump_failover"].get("pumps"):
+        out += ["", "| CDU pump failed | Standby start s | Min flow % | Max ΔT K | Alarm |", "| --- | --- | --- | --- | --- |"]
+        out += [f"| {u['pump']} | {u['standby_started_after_s']} | {u['min_flow_pct']} | {u['max_dt_k']} | {'yes' if u['alarm_raised'] else 'no'} |" for u in v["cdu_pump_failover"]["pumps"]]
+    if "poles" in v:
+        out += ["| Pole | Alarm after s | IMD kΩ at fault | V+ | V− | IT kW held | Cleared |", "| --- | --- | --- | --- | --- | --- | --- |"]
+        out += [f"| {p['pole']} | {p['alarm_after_s']} | {p['imd_kohm_at_fault']} | {p['v_pos']} | {p['v_neg']} | {p['it_kw_min_during_fault']} | {'yes' if p['alarm_cleared'] else 'NO'} |" for p in v["poles"]]
     return out
 
 

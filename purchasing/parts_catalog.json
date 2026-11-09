@@ -493,7 +493,10 @@
   "applies_to_tiers": [
    "ben5"
   ],
-  "qty_rule": "ups_modules"
+  "qty_rule": "ups_modules",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-UPS-SRT6K-XBP",
@@ -513,7 +516,10 @@
   "applies_to_tiers": [
    "ben5"
   ],
-  "qty_rule": "ups_modules"
+  "qty_rule": "ups_modules",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-UPS-93PM50",
@@ -531,7 +537,10 @@
   "availability_note": "Configured-to-order; several AVENDOR SKUs at 0 stock. Quote required (see email queue). ALTERNATE ONLY: two 93PM 50 kW towers (495 mm each) do not fit the 10 ft row (interference check I-C21); BEN 30 preset uses PWR-UPS-RM20 rack-mount modules in R1. Kept in catalog for sites that place the UPS in an exterior electrical enclosure.",
   "moq": 1,
   "applies_to_tiers": [],
-  "qty_rule": "ups_modules"
+  "qty_rule": "ups_modules",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-UPS-GVS100",
@@ -549,7 +558,10 @@
   "availability_note": "Factory order; 8-12 wk typical. Modular 50 kW power modules inside the frame give N+1 within the frame. Qty rule: frames to carry the IT load at 100 kW each, plus one redundant frame for N+1/2N (2N customers get a second full string via the proposal option). Internal-module N+1 within a 150 kW frame is requested in email 09 and would reduce frame count. ALTERNATE: replaced in presets by PWR-UPS-GVS150 single frame with internal N+1 power modules (interference check I-C21: per-frame N+1 does not fit the 20 ft row).",
   "moq": 1,
   "applies_to_tiers": [],
-  "qty_rule": "ceil(ups_kva_each/100) + (1 if ups_modules > 1 else 0)"
+  "qty_rule": "ceil(ups_kva_each/100) + (1 if ups_modules > 1 else 0)",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-UPS-GVS150",
@@ -570,7 +582,10 @@
    "ben150",
    "ben500"
   ],
-  "qty_rule": "max(1, ceil(ups_kva_each/150))"
+  "qty_rule": "max(1, ceil(ups_kva_each/150))",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-BATT-LI",
@@ -591,7 +606,10 @@
    "ben150",
    "ben500"
   ],
-  "qty_rule": "0 if battery_kwh <= 20 else max(1, ceil(battery_kwh/32.6))"
+  "qty_rule": "0 if battery_kwh <= 20 else max(1, ceil(battery_kwh/32.6))",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-XFMR",
@@ -611,7 +629,10 @@
   "applies_to_tiers": [
    "ben150"
   ],
-  "qty_rule": "ups_modules"
+  "qty_rule": "ups_modules",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-XFMR-300",
@@ -631,7 +652,10 @@
   "applies_to_tiers": [
    "ben500"
   ],
-  "qty_rule": "ups_modules"
+  "qty_rule": "ups_modules",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-PANEL-ILINE",
@@ -884,7 +908,10 @@
    "ben150",
    "ben500"
   ],
-  "qty_rule": "racks*2"
+  "qty_rule": "racks*2",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-METER",
@@ -3240,7 +3267,10 @@
   "applies_to_tiers": [
    "ben30"
   ],
-  "qty_rule": "ceil(ups_kva_each/20)+1"
+  "qty_rule": "ceil(ups_kva_each/20)+1",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-UPS-RM20-XBP",
@@ -3260,7 +3290,10 @@
   "applies_to_tiers": [
    "ben30"
   ],
-  "qty_rule": "max(1, ceil(battery_kwh/6))"
+  "qty_rule": "max(1, ceil(battery_kwh/6))",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-SVC-ENCL",
@@ -3305,7 +3338,10 @@
    "ben150",
    "ben500"
   ],
-  "qty_rule": "racks*2"
+  "qty_rule": "racks*2",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "SITE-TRANSPORT-KIT",
@@ -3546,7 +3582,10 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "rows*2"
+  "qty_rule": "rows*2",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-PDU-HD",
@@ -3566,7 +3605,10 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "racks*2"
+  "qty_rule": "racks*2",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-XFMR-ROW",
@@ -3586,7 +3628,10 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "rows*2"
+  "qty_rule": "rows*2",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-MV-SWGR",
@@ -3666,7 +3711,10 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "ups_modules * ceil(ups_kva_each/500)"
+  "qty_rule": "ups_modules * ceil(ups_kva_each/500)",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-UPS-PARALLEL",
@@ -3686,7 +3734,10 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "ups_modules"
+  "qty_rule": "ups_modules",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-BATT-ROOM",
@@ -3706,7 +3757,10 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "ceil(battery_kwh) * ups_modules"
+  "qty_rule": "ceil(battery_kwh) * ups_modules",
+  "applies_to_power": [
+   "ac480"
+  ]
  },
  {
   "code": "PWR-GEN-1250",
@@ -4567,6 +4621,479 @@
   "qty_rule": "1",
   "applies_to_hardening": [
    "H3"
+  ]
+ },
+ {
+  "code": "PWR-DC-RECT-100",
+  "name": "SiC rectifier / solid-state-transformer front-end module 100 kW, 480 V AC in, 800 VDC out (±400 V), hot-swappable, Modbus TCP (Delta / Vertiv / Eaton / ABB class)",
+  "manufacturer": "Delta Electronics / Vertiv / Eaton / ABB (to be qualified)",
+  "mpn": "800 VDC rectifier module 100 kW class",
+  "vendor": "RFQ to all four",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 35000.0,
+  "price_status": "estimate",
+  "price_source_note": "Sampling 2026: no public list price exists; vendors have announced 800 VDC portfolios for H2 2026 and we have no quote. Estimate $350/kW from the SemiAnalysis sidecar benchmark (~$500k/MW for a complete 800 VDC power sidecar, Oct 2025) less switchgear and battery; vendor claim 98.5 % efficiency is the sizing assumption, to be measured on the test cell (docs/FORWARD_ARCHITECTURE_DECISION.md §5).",
+  "price_checked": null,
+  "lead_time_weeks": 30,
+  "availability_note": "Vertiv 800 VDC portfolio announced for H2 2026; Delta and Eaton showing modules at OCP; ABB SST pilot stage. Qualify two sources.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "rectifier_modules",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-RECT-CAB",
+  "name": "Rectifier cabinet 800 VDC for 4 x 100 kW modules: AC input breaker, DC output switch-disconnector, pre-charge, midpoint high-resistance grounding reference, IP20 indoor, 600 x 1000 x 2000",
+  "manufacturer": "Delta Electronics / Vertiv / Eaton (to be qualified)",
+  "mpn": "Rectifier frame 400 kW class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 14000.0,
+  "price_status": "estimate",
+  "price_source_note": "Sampling 2026: no public list price exists; vendors have announced 800 VDC portfolios for H2 2026 and we have no quote. Estimate from modular UPS frame pricing (Galaxy VS 100 kW frame without modules ~$12k) plus DC-side switching.",
+  "price_checked": null,
+  "lead_time_weeks": 26,
+  "availability_note": "With the modules.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "rectifier_cabinets",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-BUSWAY",
+  "name": "800 VDC busway, Cu, rated to the derived dc_busway_a (400-3200 A frames), 1000 VDC insulation class, end-feed unit, joint kits, hangers; per metre of row (Starline / Eaton / Vertiv DC busway class)",
+  "manufacturer": "Starline (Legrand) / Eaton / Vertiv (to be qualified)",
+  "mpn": "DC track busway 1000 VDC class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "m",
+  "unit_price_usd": 1100.0,
+  "price_status": "estimate",
+  "price_source_note": "Sampling 2026: no public list price exists; vendors have announced 800 VDC portfolios for H2 2026 and we have no quote. Estimate $1,100/m from AC track busway at 800 A (~$900/m installed-equivalent) plus 20 % for 1000 VDC insulation and DC-rated joints; UL 857 DC listing to be confirmed (COMPLIANCE.md forward section).",
+  "price_checked": null,
+  "lead_time_weeks": 24,
+  "availability_note": "AC busway vendors are listing DC variants for 2026; DC listing status differs by vendor.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(tier_len_m * rows)",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-TAPOFF",
+  "name": "DC busway tap-off box per rack with 2-pole DC MCCB / fuse-switch 1000 VDC (ABB Tmax XT DC / Eaton / Schneider ComPacT DC class), 250 A frame, auxiliary contacts to the controller",
+  "manufacturer": "ABB / Eaton / Schneider Electric (breaker); busway vendor (box)",
+  "mpn": "DC tap-off 250 A, 1000 VDC",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 3200.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: 2-pole 1000 VDC MCCB 250 A list ~$1,800-2,400 (ABB Tmax XT4 DC class) plus tap-off housing and plug; no DC tap-off product priced publicly.",
+  "price_checked": null,
+  "lead_time_weeks": 20,
+  "availability_note": "DC MCCBs are stock items (PV / traction); the tap-off housing is engineered.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "racks",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-MAIN-SW",
+  "name": "DC main switch-disconnector / MCCB 1000 VDC at the bus and at the battery string: bus main (dc_busway_a frame) + battery disconnect with pre-charge contactor (ABB / Eaton / Schneider DC class)",
+  "manufacturer": "ABB / Eaton / Schneider Electric",
+  "mpn": "DC MCCB 1000 VDC, 630-1600 A",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 7500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: 1000 VDC MCCB 800-1600 A frame list $6-9k (ABB Emax / Tmax DC, Schneider ComPacT DC) plus pre-charge resistor and contactor for the battery string.",
+  "price_checked": null,
+  "lead_time_weeks": 16,
+  "availability_note": "Stock to 8 weeks at electrical distributors.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "2",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-IMD",
+  "name": "Insulation monitoring device for the IT (ungrounded / high-resistance midpoint) 800 VDC bus, 0-1000 V, Modbus TCP, one per rectifier module section (Bender ISOMETER iso685-D-P class)",
+  "manufacturer": "Bender",
+  "mpn": "iso685-D-P (B91067040 class)",
+  "vendor": "Bender distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 2900.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $2,900: industry-electronics.com (DE) lists the sensor variant iso685-S + FP200 display at EUR 2,440.80 net (seen 2026-11-09); the -D-P display variant was not priced on any vendor page; US list to be confirmed with Bender Inc.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "Stock item at Bender and distributors.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "imd_count",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-AFD",
+  "name": "DC arc-fault detection unit (series and parallel arc, 800 VDC class) per rack tap and per rectifier cabinet, trip output to the tap-off breaker and alarm to the controller",
+  "manufacturer": "Bender / ABB / Littelfuse / SMA-class AFD (to be qualified)",
+  "mpn": "DC AFD 1000 V class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1400.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,400: PV DC AFCI modules list $300-700 (UL 1699B); data-center 800 VDC class units at higher current are engineering samples in 2026, priced at 2x. Method caveat: UL 1699B is a PV standard; see COMPLIANCE.md forward section.",
+  "price_checked": null,
+  "lead_time_weeks": 20,
+  "availability_note": "Sampling 2026.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "racks + rectifier_cabinets",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-BATT-800V",
+  "name": "Lithium (LFP) battery string, 800 V class, directly on the DC bus (no DC/DC), UL 9540 / UL 9540A data, BMS with Modbus TCP, string disconnect and fuses, cabinet IP20; per kWh installed",
+  "manufacturer": "CATL / Samsung SDI / LG ES / EnerSys (to be qualified)",
+  "mpn": "800 V class LFP string, UL 9540A",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "kWh",
+  "unit_price_usd": 650.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $650/kWh: UL 9540 lithium UPS cabinets price at $900-1,700/kWh installed in small quantities (catalog PWR-BATT-LI $55k / 32.6 kWh = $1,690/kWh); an 800 V string without the UPS DC/DC stage and in a larger module is expected lower; stationary LFP cells are < $120/kWh. No vendor quote.",
+  "price_checked": null,
+  "lead_time_weeks": 24,
+  "availability_note": "800 V class strings exist for EV charging buffers and OCP sidecars; UL 9540A test data must be on file before order.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(battery_on_bus_kwh)",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-RACK-BUS",
+  "name": "DC-input rack busbar kit (±400 V, 800 VDC, 48U, with rack-level disconnect and fused whips to the DC busway tap-off), OCP ORv3 / Kyber-class interface",
+  "manufacturer": "Rittal / Vertiv / nVent / OCP supplier (to be qualified)",
+  "mpn": "Rack DC busbar 800 V class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1900.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: OCP ORv3 48 V busbar kits list $600-900; 800 V class with insulation, finger-safe covers and fused whips at 2x.",
+  "price_checked": null,
+  "lead_time_weeks": 16,
+  "availability_note": "OCP 800 VDC rack busbars are at specification stage (Mt. Diablo); interface may change.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "racks",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "PWR-DC-METER",
+  "name": "DC energy meter / shunt with 1000 V input, class 0.5, Modbus RTU, on the bus main and on the battery string",
+  "manufacturer": "Janitza / Socomec / Carlo Gavazzi",
+  "mpn": "DC meter 1000 V class",
+  "vendor": "Electrical distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 650.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: Socomec DIRIS / Janitza UMG DC variants list $450-900.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "2",
+  "applies_to_power": [
+   "dc800"
+  ]
+ },
+ {
+  "code": "CLG-CDU-HD",
+  "name": "Row CDU 600 kW class liquid-to-liquid, W45 secondary loop, N+1 pumps with VFDs, plate HX, filtration, leak tray, Modbus TCP (Vertiv XDU / CoolIT CHx / Motivair class)",
+  "manufacturer": "Vertiv / CoolIT / Motivair (to be qualified)",
+  "mpn": "Row CDU 600 kW class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 185000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $185k: catalog CLG-CDU (450-750 kW DLC CDU) is $150k; 600 kW W45 class with N+1 pumps and heat-reuse port at +20 %. No quote.",
+  "price_checked": null,
+  "lead_time_weeks": 26,
+  "availability_note": "Lead times 20-30 weeks reported for 2026 CDUs.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "cooling_units_total",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-MANIFOLD-HD",
+  "name": "Rack coolant manifold pair (supply/return, DN40) with UQD04 / UQDB quick-disconnect hose kit for cold plates, drip tray with leak sensor pocket (1 per rack)",
+  "manufacturer": "Staubli / Parker / CPC (UQD), rack vendor (manifold)",
+  "mpn": "UQD04 / UQDB hose kit + manifold pair",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 6500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $6,500: catalog CLG-MANIFOLD (QD hose kit, 80 kW class) is $4,500; 250 kW/rack class with larger bore and more UQD pairs at +45 %.",
+  "price_checked": null,
+  "lead_time_weeks": 14,
+  "availability_note": "UQD connectors are stock at Staubli and Parker; manifolds are made to order.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "racks",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-DRYCOOLER-W45",
+  "name": "W45 dry cooler bank (V-type, EC fans, 45 C water supply class, no chiller), glycol or treated water, per kW of liquid heat at design ambient (x 1.15 fouling and margin)",
+  "manufacturer": "Guntner / Alfa Laval / Evapco",
+  "mpn": "Dry cooler W45 class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "kW",
+  "unit_price_usd": 95.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $95/kW: catalog CLG-DRYCOOLER (RDHx / DLC dry cooler) is $110/kW at lower water temperatures; W45 approach is larger so the coil is smaller per kW.",
+  "price_checked": null,
+  "lead_time_weeks": 18,
+  "availability_note": "Standard product.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(liquid_heat_kw * 1.15)",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-LEAK-RACK",
+  "name": "Leak detection per rack: sensing rope in the manifold drip tray + spot sensor under the UQD drops, wired to the leak controller zone (1 per rack)",
+  "manufacturer": "RLE Technologies / nVent (TraceTek)",
+  "mpn": "LD-RA / SeaHawk rack kit class",
+  "vendor": "Distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 450.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: RLE spot detectors $120-180 and 3 m sensing cable $150-250 per rack, plus zone wiring.",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "racks",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-ISOVALVE-ROW",
+  "name": "Motorised isolation valve pair (supply + return, DN65, spring-return, position feedback) per row manifold, closes on leak within the leak-to-isolation time (E19)",
+  "manufacturer": "Belimo / Siemens",
+  "mpn": "Belimo R6065 + spring-return actuator class",
+  "vendor": "Distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 4200.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: Belimo DN65 ball valve with spring-return actuator and feedback $1,600-2,100 each, two per row.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "rows",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-HRX",
+  "name": "Heat-reuse plate heat exchanger on the W45 return (option): sized to the derived heat_reuse_kw_available, with 3-way diverting valve, BTU meter and isolation; per kW",
+  "manufacturer": "Alfa Laval / SWEP / Danfoss",
+  "mpn": "Brazed / gasketed PHE, 50/45 C side",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "kW",
+  "unit_price_usd": 38.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $38/kW for a PHE with valves and a BTU meter at 100-500 kW; the customer-side loop is excluded. Option: priced in the forward BOM, deleted if no heat sink exists.",
+  "price_checked": null,
+  "lead_time_weeks": 10,
+  "availability_note": "Standard product.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(heat_reuse_kw)",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-PIPING-HD",
+  "name": "W45 secondary loop piping inside the module: DN65-DN80 stainless or PP-R headers, isolation and balancing valves, strainers, air separator, expansion tank, make-up with RPZ, insulation (per m module length)",
+  "manufacturer": "Local mechanical contractor",
+  "mpn": "Lot",
+  "vendor": "Mechanical contractor",
+  "vendor_url": "",
+  "unit": "m",
+  "unit_price_usd": 1600.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: catalog CLG-PIPING (glycol loop, RDHx / DLC) is $1,200/m; larger bore and stainless headers for W45 at +33 %.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "Site / shop labour.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500"
+  ],
+  "qty_rule": "ceil(tier_len_m)",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-WATER-TREAT-HD",
+  "name": "Loop fluid and treatment for the W45 loop: inhibited treated water (25 % propylene glycol where t_min < 0 C), biocide, side-stream filter, fill and flush; per kW IT",
+  "manufacturer": "Chemical supplier / Dow (glycol)",
+  "mpn": "Lot",
+  "vendor": "Mechanical contractor",
+  "vendor_url": "",
+  "unit": "kW",
+  "unit_price_usd": 6.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $6/kW IT from catalog CLG-GLYCOL (25 % PG at $35/gal, 0.8 gal/kW) plus treatment and filter.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Stock.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "ceil(it_kw)",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-AIR-RESID-HD",
+  "name": "In-row fan-coil unit on the W45 loop for the 10 % residual air load (chilled-water in-row, 300 mm, 20 kW class, EC fans, ePM1 filter), one per row + 1",
+  "manufacturer": "Vertiv / Schneider Electric (Uniflair / InRow CW class)",
+  "mpn": "In-row CW 300 mm 20 kW class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 9500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: chilled-water in-row units list $8-11k at 20 kW; the W45 supply limits sensible capacity, derated 40 % and still above the 10 % residual.",
+  "price_checked": null,
+  "lead_time_weeks": 16,
+  "availability_note": "Standard product.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500"
+  ],
+  "qty_rule": "rows + 1",
+  "applies_to_cooling": [
+   "dlc_hd"
   ]
  }
 ]

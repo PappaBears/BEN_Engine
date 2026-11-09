@@ -15,6 +15,9 @@ and BEN Controls Pro (PLCnext + UL 508A panel + edge computer + Pods) lines foll
 (docs/CONTROLS_HARDWARE_DECISION.md §2a). A part may carry ``applies_to_hardening`` (``["H2"]``, ``["H3"]``,
 ``["H2", "H3"]``) so the severe-environment and hardened/government add-ons follow ``Config.hardening``
 (docs/TIER_AND_ENCLOSURE_DECISION.md §3); lines without it apply at every level (H1 baseline is IP66 everywhere).
+A part may carry ``applies_to_power`` (``["ac480"]`` or ``["dc800"]``) so the AC UPS / PDU / transformer chain and the 800 VDC chain
+(rectifier front end, DC busway, DC breakers, insulation monitoring, battery on the bus; docs/FORWARD_ARCHITECTURE_DECISION.md) do not
+appear together; lines without it apply to both architectures.
 
 Decision (recorded here and in purchasing/SOURCING_NOTES.md): FS lines are *not* excluded for
 BEN 5. Instead the catalog carries BEN 5-specific FS parts (aerosol unit, E-stop) and the
@@ -174,6 +177,8 @@ def load_catalog(path: Path | str = CATALOG_PATH) -> List[Dict[str, Any]]:
             del p["applies_to_controls"]
         if "applies_to_hardening" in p and not p["applies_to_hardening"]:
             del p["applies_to_hardening"]
+        if "applies_to_power" in p and not p["applies_to_power"]:
+            del p["applies_to_power"]
     return cat
 
 
@@ -217,6 +222,18 @@ def rule_variables(cfg: Config) -> Dict[str, float]:
         "wall_area_m2": round(2 * (g["ext_l_m"] * g["ext_h_m"] + g["ext_w_m"] * g["ext_h_m"]), 1),
         "footprint_m2": round(g["ext_l_m"] * g["ext_w_m"], 1),
         "int_volume_m3": round(g["int_l_m"] * g["int_w_m"] * g["int_h_m"], 1),
+        # forward architecture (docs/FORWARD_ARCHITECTURE_DECISION.md): 800 VDC chain and the high-density liquid loop; zero when not selected
+        "dc800": 1 if cfg.power_architecture == "dc800" else 0,
+        "rectifier_modules": d.get("rectifier_modules", 0),
+        "rectifier_cabinets": d.get("rectifier_cabinets", 0),
+        "dc_busway_a": d.get("dc_busway_a", 0),
+        "dc_bus_current_a": d.get("dc_bus_current_a", 0),
+        "imd_count": d.get("imd_count", 0),
+        "battery_on_bus_kwh": d.get("battery_on_bus_kwh", 0),
+        "dlc_hd": 1 if cfg.cooling == "dlc_hd" else 0,
+        "liquid_heat_kw": d.get("liquid_heat_kw", 0),
+        "loop_flow_lpm": d.get("loop_flow_lpm", 0),
+        "heat_reuse_kw": d.get("heat_reuse_kw_available", 0),
     }
 
 
@@ -244,6 +261,9 @@ def generate_bom(cfg: Config, catalog: List[Dict[str, Any]] | None = None) -> Li
             continue
         hardening_filter = p.get("applies_to_hardening")
         if hardening_filter and cfg.hardening not in hardening_filter:
+            continue
+        power_filter = p.get("applies_to_power")
+        if power_filter and cfg.power_architecture not in power_filter:
             continue
         prefix = p["code"].split("-", 1)[0]
         sub = subsystem_of(p["code"])
@@ -343,10 +363,16 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
         out.append(f"# {title}\n")
     if cfg is not None:
         d = cfg.derived()
+        if cfg.power_architecture == "dc800":
+            power_txt = (f"{d['voltage']} service · {d['service_breaker_a']} A · **800 VDC bus** (±400 V, {d['dc_bus_v_min']}–{d['dc_bus_v_max']} V window): "
+                         f"AC/DC front end {d['ac_dc_front_end_kw']} kW, {d['rectifier_modules']} × {d['rectifier_module_kw']} kW rectifier modules ({cfg.redundancy}), "
+                         f"bus {d['dc_bus_current_a']} A → {d['dc_busway_a']} A busway, {d['imd_count']} insulation monitors · battery on bus {d['battery_on_bus_kwh']} kWh (800 V class, no UPS)")
+        else:
+            power_txt = f"{d['voltage']} · {d['service_breaker_a']} A service · UPS {d['ups_modules']} × {d['ups_kva_each']} kVA · battery {d['battery_kwh']} kWh"
+        loop_txt = (f" · W45 loop {d['loop_flow_lpm']} L/min at ΔT {d['loop_dt_design_k']:.0f} K, heat reuse {d['heat_reuse_kw_available']} kW available"
+                    if cfg.cooling == "dlc_hd" else "")
         out.append(f"**Configuration:** {d['tier_label']} · {cfg.profile} · {d['hardening_label']} · {cfg.it_kw:.0f} kW IT in {cfg.racks} rack(s) · "
-                   f"{d['cooling_label']} ({d['cooling_units_total']} units, {cfg.redundancy}) · {d['voltage']} · "
-                   f"{d['service_breaker_a']} A service · UPS {d['ups_modules']} × {d['ups_kva_each']} kVA · "
-                   f"battery {d['battery_kwh']} kWh · generator {'yes' if cfg.generator else 'no'} · controls: {d['controls_label']} "
+                   f"{d['cooling_label']} ({d['cooling_units_total']} units, {cfg.redundancy}){loop_txt} · {power_txt} · generator {'yes' if cfg.generator else 'no'} · controls: {d['controls_label']} "
                    f"({d['pods']} BEN Pods) · subsystems: {', '.join(cfg.subsystems)}\n")
     out.append(f"**Total: ${t['total_usd']:,.2f}** across {t['items']} lines — "
                f"${t['by_status']['confirmed']:,.0f} {CONFIRMED_LABEL} ({t['confirmed_pct']}%), "
@@ -423,7 +449,7 @@ def summary_markdown(presets: Dict[str, Config], boms: Dict[str, List[Dict[str, 
 # ----------------------------------------------------------------------------- CLI
 def main(argv=None) -> int:
     import argparse
-    from .config import PROFILE_DEFAULTS, CLIMATE_DESIGN
+    from .config import PROFILE_DEFAULTS, CLIMATE_DESIGN, POWER_ARCHITECTURES, COOLING_LIBRARY
 
     ap = argparse.ArgumentParser(description="BEN Engine BOM generator")
     ap.add_argument("--tier", default="ben150", choices=list(TIER_GEOMETRY) + list(TIER_ALIASES))
@@ -432,6 +458,12 @@ def main(argv=None) -> int:
     ap.add_argument("--subsystems", default="power,cooling,compute,controls", help="comma list")
     ap.add_argument("--generator", action="store_true")
     ap.add_argument("--hardening", choices=list(HARDENING), help="enclosure hardening level (default: preset rule)")
+    ap.add_argument("--power-architecture", dest="power_architecture", choices=list(POWER_ARCHITECTURES), help="ac480 (default) or dc800 (forward option)")
+    ap.add_argument("--cooling", choices=list(COOLING_LIBRARY), help="override the preset cooling (e.g. dlc_hd)")
+    ap.add_argument("--it-kw", dest="it_kw", type=float, help="override the preset IT load")
+    ap.add_argument("--racks", type=int, help="override the preset rack count")
+    ap.add_argument("--redundancy", choices=["N", "N+1", "2N"], help="override the preset redundancy")
+    ap.add_argument("--title", help="Markdown title override (single-config mode)")
     ap.add_argument("--csv", help="write CSV to this path")
     ap.add_argument("--md", help="write Markdown to this path")
     ap.add_argument("--json", action="store_true", help="print rows + totals as JSON")
@@ -465,13 +497,16 @@ def main(argv=None) -> int:
         cfg.generator = True
     if a.hardening:
         cfg.hardening = a.hardening
+    for k in ("power_architecture", "cooling", "it_kw", "racks", "redundancy"):
+        if getattr(a, k) is not None:
+            setattr(cfg, k, getattr(a, k))
     rows = generate_bom(cfg, catalog)
     t = totals(rows)
     if a.csv:
         to_csv(rows, a.csv)
     if a.md:
         Path(a.md).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.md).write_text(to_markdown(rows, cfg, f"BEN Engine BOM — {cfg.derived()['tier_label']}"), encoding="utf-8")
+        Path(a.md).write_text(to_markdown(rows, cfg, a.title or f"BEN Engine BOM — {cfg.derived()['tier_label']}"), encoding="utf-8")
     if a.json:
         print(json.dumps({"rows": rows, "totals": t}, indent=2))
     else:

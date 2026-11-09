@@ -10,7 +10,7 @@ Make BEN Engine the first sealed, relocatable 150–500 kW module that integrato
 
 | WS | Workstream | Deliverables | Gate (go / no-go evidence) |
 | --- | --- | --- | --- |
-| A | **800 VDC power architecture** | Design basis for ±400 VDC distribution in a module; AC/DC front end selection (SiC rectifier vs solid-state transformer); DC busway, protection, insulation monitoring and arc detection; battery-on-bus; grounding and arc-flash method; drawings E-001-DC | G1 (M4): paper design reviewed by an outside PE; G3 (M9): 150 kW test-cell bus energised, ground-fault and arc tests passed, efficiency measured |
+| A | **800 VDC power architecture** | Design basis for DC distribution in a module covering **both** conventions (OCP Diablo 400 ±400 VDC bipolar with midpoint ground; NVIDIA/OCP 800 VDC unipolar) with a voltage-programmable front end; AC/DC front end selection (SiC rectifier vs solid-state transformer); DC busway, protection, insulation monitoring and arc detection; battery-on-bus; grounding and arc-flash method; drawings E-001-DC | G1 (M4): paper design reviewed by an outside PE; G3 (M9): 150 kW test-cell bus energised, ground-fault and arc tests passed, efficiency measured |
 | B | **High-density liquid cooling** | Row CDU selection, manifold and quick-disconnect standard, W45 loop design, leak-to-isolation design, dry-cooler and heat-reuse interface, M-001-HD drawings; immersion and two-phase as a written study | G2 (M6): 200 kW loop running on the test cell at W45 with measured ΔT, flow and leak-to-isolation time |
 | C | **Controls, twin and BEN Care for DC and liquid** | DC-bus twin (voltage, IMD, arc events), loop twin (flow, ΔT, pump failover), new sweeps and commissioning steps, Pod channels, dashboard objects, calibration budgets for flow and ΔT | G2/G3: twin predictions within stated intervals against test-cell data |
 | D | **Standards, listings and partnerships** | NEC 2026 DC article mapping with an AHJ, UL 508A panel for DC, field-evaluation plan for DC gear, OCP participation, two component partners (power, cooling) under NDA/MSA, insurer review | G4 (M12): written path to a listed/field-evaluated DC distribution in a BEN 150; partner agreements signed |
@@ -35,7 +35,8 @@ Cash timing: 35 % in months 1–6 (team, test-cell orders), 40 % in months 7–1
 | Month | Milestone |
 | --- | --- |
 | 0 | Funding; hires; test-cell long-lead orders (front end, CDU, DC breakers, IMD) placed |
-| 2 | Research baseline frozen (`STATE_OF_THE_ART_2026.md`); design basis drafts for WS A and B |
+| 1 | Primary specifications read in full (OCP Diablo 400, OCP LVDC SST v0.3, NVIDIA 800 VDC white paper, Schneider WP219/WP220, Lenovo GB300 liquid guide, OCP UQD v2.0.0 and Leak Detection & Intervention); research baseline corrected and frozen |
+| 2 | Design basis drafts for WS A and B; AHJ and NRTL pre-meetings booked (field-evaluation route per NFPA 791 assumed until NEC 2029) |
 | 4 | **G1** external PE review of the 800 VDC design basis; AHJ pre-meeting held |
 | 6 | **G2** liquid loop running at W45 on the test cell; leak-to-isolation time measured |
 | 9 | **G3** DC bus energised at 150 kW; ground-fault, arc and efficiency tests passed; twin validated against the cell |
@@ -50,7 +51,7 @@ Cash timing: 35 % in months 1–6 (team, test-cell orders), 40 % in months 7–1
 | --- | --- | --- |
 | End-to-end electrical efficiency, utility to rack input, at 50–100 % load | ≥ 2 points better than the AC baseline module | Test-cell power analysers both sides, same load bank |
 | DC ground-fault detection and isolation | Detected ≤ 1 s, isolated per design basis, no nuisance trips in 30-day burn-in | Injected faults on the cell (E17) |
-| Liquid loop | 75 kW per rack at W45 supply with rack ΔT in the design band; leak-to-isolation ≤ 10 s | E18–E20 |
+| Liquid loop | 75 kW per rack at W45 supply with rack ΔT in the design band and pumps sized for W45 flow (about 3× the 25 °C flow per vendor tables); leak-to-isolation ≤ 10 s, published as a benchmark because none exists | E18–E20 |
 | Twin accuracy | Bus voltage, loop ΔT and ride-through predictions inside their stated 95 % intervals | Commissioning data vs `analysis.py` |
 | Cost | Forward BEN 150 infrastructure price per kW within 10 % of the AC BEN 150 | BOM at prototype close-out |
 | Safety | Zero recordable incidents; arc-flash labels and procedures signed by a PE | Program safety log |
@@ -60,7 +61,7 @@ Cash timing: 35 % in months 1–6 (team, test-cell orders), 40 % in months 7–1
 | Risk | Mitigation |
 | --- | --- |
 | Listed 800 VDC distribution gear not available at 150 kW scale in time | Field evaluation path (NFPA 791) with the NRTL agreed at G1; design the bus so AC fallback racks remain possible |
-| GPU vendors change the DC spec (voltage window, connector) | Follow OCP and the published Kyber/Rubin spec; keep the front end voltage-programmable; no single-vendor connector |
+| Two DC conventions (±400 V bipolar vs 800 V unipolar) and unpublished 2027 rack power/water figures | Front end and grounding designed for both conventions; module sized for one or two current liquid racks; re-baseline at G1 when primary specs are read |
 | DC arc-flash methods immature | Conservative PPE and remote racking; third-party arc-flash study; test-cell energisation behind barriers only |
 | Liquid in a sealed module | Leak-to-isolation designed and measured; drip trays and sump; coolant chosen for non-conductive residual (study immersion only as a paper option) |
 | Program scope creep | Gates release money; anything not on the deliverable list goes to the roadmap |
