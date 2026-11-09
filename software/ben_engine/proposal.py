@@ -341,9 +341,11 @@ def _schedule_minirack(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Di
     leads = sorted([r for r in rows if r.get("lead_time_weeks")], key=lambda r: (-(r["lead_time_weeks"] or 0), -r["ext_price_usd"]))
     long_lead = [{"code": r["code"], "name": r["name"], "lead_time_weeks": r["lead_time_weeks"], "qty": r["qty"], "unit": r["unit"],
                   "ext_price_usd": r["ext_price_usd"], "vendor": r["vendor"]} for r in leads[:5]]
-    # BEN Pods, their enclosures, the Thread radio and labels are Schreiber AI stock items for BEN 1 (built ahead in Pod production batches)
-    stock = ("CTL-POD", "CTL-POD-ENCL", "CTL-RCP", "CTL-LABELS", "ENV-DATAPLATE-MINI")
-    infra = max([(r["lead_time_weeks"] or 0) for r in rows if r["subsystem"] != "compute" and r["code"] not in stock] + [1])
+    # BEN 1 kits (rack or cabinet, UPS, PDU, switch, edge computer) and the BEN Pods are Schreiber AI stock items: the catalog lead time is the
+    # restock time, not the order lead time. Lines that are not kit items keep their catalog lead time.
+    kit = ("CTL-", "STR-MINI", "PWR-UPS-MINI-1000", "PWR-UPS-MINI-2200", "PWR-PDU-10IN", "CMP-SW-MINI", "ENV-DATAPLATE-MINI")
+    restock = max([(r["lead_time_weeks"] or 0) for r in rows if r["subsystem"] != "compute" and r["code"].startswith(kit)] + [0])
+    infra = max([(r["lead_time_weeks"] or 0) for r in rows if r["subsystem"] != "compute" and not r["code"].startswith(kit)] + [1])
     comp = max([(r["lead_time_weeks"] or 0) for r in rows if r["subsystem"] == "compute"] + [0])
     w_parts = max(1, infra)
     w_burn = w_parts + 1
@@ -352,7 +354,7 @@ def _schedule_minirack(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Di
     w_hand = w_ship + 1
     ms = [
         {"week": 0, "milestone": "Order confirmation: form (10-inch rack or 12U cabinet), compute (customer-furnished or bought by us), outlet and room checked against section 11", "owner": "Customer + Schreiber AI", "hold": "H4", "path": "critical"},
-        {"week": w_parts, "milestone": f"Parts on the bench (longest non-compute lead {infra} weeks; BEN Pods from Schreiber AI stock)", "owner": "Schreiber AI", "hold": "-", "path": "critical"},
+        {"week": w_parts, "milestone": f"Kit pulled from Schreiber AI stock (restock lead {restock} weeks); non-kit parts on the bench (longest {infra} weeks)", "owner": "Schreiber AI", "hold": "-", "path": "critical"},
         {"week": w_burn, "milestone": "Assembled, imaged and 24 h burn-in test passed (commissioning script in factory mode)", "owner": "Schreiber AI; customer may witness remotely", "hold": "H13", "path": "critical"},
         {"week": w_ship, "milestone": "Shipped (parcel for the 10-inch rack, LTL with liftgate for the 12U cabinet)", "owner": "Schreiber AI", "hold": "-", "path": "critical"},
         {"week": w_hand, "milestone": "Setup and handover at the customer (or remote): placement, outlet check, network, BEN Care enrolment, room-heat check; in service", "owner": "Schreiber AI + customer", "hold": "H19, W20", "path": "critical"},
