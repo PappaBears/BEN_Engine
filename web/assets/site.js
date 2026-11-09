@@ -33,6 +33,8 @@ let PRICING_BY_LINEUP = {};
 // Rev 2 (docs/REV2_DECISION.md §2): tiers shown follow the lineup; BEN 1 has a form; hero art for tiers without their own image
 // Rev 2 heroes live in assets/rev2/hero-<tier>.svg (design agent); Rev 1 configurations and missing Rev 2 files fall back to
 // the Rev 1 art in assets/hero-<tier>.svg (HERO_FALLBACK maps the new tiers onto the nearest Rev 1 drawing).
+// The page opens on the flagship dense all-in-one box (docs/REV2_DECISION.md §2b); BEN 150 stays one click away.
+const OPENING_TIER = 'ben700';
 const HERO_FALLBACK = { ben300: 'ben150', ben700: 'ben500' };
 function heroSources(tier, lineup) {
   const rev1 = `assets/hero-${HERO_FALLBACK[tier] || tier}.svg`;
@@ -261,8 +263,8 @@ async function main() {
   const ts = $('#tier');
   const hs = $('#hardeningSel'); for (const [k, h] of Object.entries(CAT.hardening || {})) { const o = document.createElement('option'); o.value = k; o.textContent = h.label; o.title = h.rating; hs.appendChild(o); }
   const urlCfg = new URLSearchParams(location.search).get('config');
-  if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.cfg.tier = canonicalTier(state.cfg.tier, CAT); state.lineup = lineupOf(state.cfg, CAT); state.cfg.lineup = state.lineup; buildTierSelect(); buildTiers(); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset('ben150'); } }
-  else setPreset('ben150');
+  if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.cfg.tier = canonicalTier(state.cfg.tier, CAT); state.lineup = lineupOf(state.cfg, CAT); state.cfg.lineup = state.lineup; buildTierSelect(); buildTiers(); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset(OPENING_TIER); } }
+  else setPreset(OPENING_TIER);
   ts.onchange = () => setPreset(ts.value);
   $('#lineupSel').onchange = () => { state.lineup = $('#lineupSel').value; buildTierSelect(); buildTiers(); setPreset(state.cfg?.tier || 'ben150'); };
   $('#formSel').onchange = () => setPreset('ben1', $('#formSel').value);

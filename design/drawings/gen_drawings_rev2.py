@@ -120,8 +120,7 @@ class SheetV2(DK.Sheet):
         self.line(x + pw, yb, x + pw, y + h, c=V2["deep"], lw=0.9, z=10)
         lock_h = 7.0
         lock_w = lock_h * 6.527
-        self.lockup_slot = (x + 5, y + h - 4 - lock_h, lock_w, lock_h)
-        self.ax.add_patch(Rectangle((self.lockup_slot[0], self.lockup_slot[1]), lock_w, lock_h, fill=False, lw=0, gid="bv2-lockup-slot", zorder=11))
+        self.add_master("lockup-deep", x + 5, y + h - 4 - lock_h, lock_h)
         ty = y + h - 4 - lock_h - 5.2
         self._t(x + 5, ty, "BEN ENGINE", 3.0, V2["ink"], P_DISPLAY, bold=True)
         self._t(x + 5, ty - 8.6, self.tier_label.upper(), 5.0, V2["ink"], P_TIER, bold=True)
@@ -185,32 +184,63 @@ class SheetV2(DK.Sheet):
         return self.table(x, y, ["REV", "DATE", "DESCRIPTION", "CHECKED"], rows, [w * 0.08, w * 0.13, w * 0.61, w * 0.18], h=1.9, rowh=4.0,
                           title=f"REVISIONS ({REV['path']})")
 
+    def add_master(self, name, x, y, h):
+        """Reserve a slot (sheet mm, bottom-left x, y, height h) for a brand/v2 master; placed as vector in the SVG, raster in the PNG."""
+        slots = self.__dict__.setdefault("slots", [])
+        w = h * _aspect(name)
+        gid = f"bv2-slot-{len(slots)}"
+        self.ax.add_patch(Rectangle((x, y), w, h, fill=False, lw=0, gid=gid, zorder=11))
+        slots.append((gid, name, x, y, w, h))
+        return w
+
     def save(self, path_base, dpi=110):
         svg = path_base + ".svg"
         self.fig.savefig(svg, format="svg", facecolor=DK.PAPER, metadata={"Date": None})
-        slot = getattr(self, "lockup_slot", None)
-        if slot:
-            _embed_lockup(svg, slot)
-            png = os.path.join(REPO, "brand", "v2", "png", "lockup-deep-2000.png")
-            if os.path.exists(png):
-                self.ax.imshow(plt.imread(png), extent=(slot[0], slot[0] + slot[2], slot[1], slot[1] + slot[3]), zorder=12, interpolation="antialiased")
-                self.ax.set_xlim(0, DK.SHEET_W); self.ax.set_ylim(0, DK.SHEET_H)
+        slots = getattr(self, "slots", [])
+        if slots:
+            _embed_masters(svg, slots)
+            for gid, name, x, y, w, h in slots:
+                png = os.path.join(REPO, "brand", "v2", "png", PNG_MASTER.get(name, name + ".png"))
+                if os.path.exists(png):
+                    self.ax.imshow(plt.imread(png), extent=(x, x + w, y, y + h), zorder=12, interpolation="antialiased")
+            self.ax.set_xlim(0, DK.SHEET_W); self.ax.set_ylim(0, DK.SHEET_H)
         self.fig.savefig(path_base + ".png", format="png", dpi=dpi, facecolor=DK.PAPER, metadata={"Software": None})
         plt.close(self.fig)
 
 
-def _embed_lockup(svg_path, slot):
-    """Route 1 of titleblock-spec §4: replace the placeholder with the vector master brand/v2/lockup-deep.svg (never redrawn)."""
+PNG_MASTER = {"lockup-deep": "lockup-deep-2000.png", "lockup-signal": "lockup-signal-2000.png", "lockup-white": "lockup-white-2000.png",
+              "mark-deep": "mark-deep-512.png", "mark-signal": "mark-signal-512.png", "stack-deep": "stack-deep-1600.png"}
+
+
+def _aspect(name):
+    import brandlib
+    return brandlib.master_aspect(name)
+
+
+def _embed_masters(svg_path, slots):
+    """Route 1 of titleblock-spec §4: replace each placeholder with the vector master from brand/v2/ (never redrawn)."""
     import brandlib
     k = 72.0 / 25.4
-    x, y, w, h = slot
     t = open(svg_path, encoding="utf-8").read()
-    g = brandlib.embed("lockup-deep", x * k, (DK.SHEET_H - y - h) * k, h * k, prefix="tb_")
-    t2, n = re.subn(r'<g id="bv2-lockup-slot">.*?</g>', g, t, count=1, flags=re.S)
-    if n != 1:
-        raise RuntimeError(f"lockup slot not found in {svg_path}")
+    for i, (gid, name, x, y, w, h) in enumerate(slots):
+        g = brandlib.embed(name, x * k, (DK.SHEET_H - y - h) * k, h * k, prefix=f"m{i}_")
+        t, n = re.subn(rf'<g id="{gid}">.*?</g>', lambda m: g, t, count=1, flags=re.S)
+        if n != 1:
+            raise RuntimeError(f"{gid} not found in {svg_path}")
     with open(svg_path, "w", encoding="utf-8") as f:
-        f.write(t2)
+        f.write(t)
+
+
+def _serial(tier):
+    import json as _j
+    try:
+        m = _j.load(open(os.path.join(REPO, "brand", "v2", "livery", "MANIFEST.json")))
+        for e in m["files"]:
+            if e["tier"] == tier and e.get("serial_sample"):
+                return e["serial_sample"]
+    except Exception:
+        pass
+    return f"{tier.upper()}-2646-0001"
 
 
 # ====================================================================== helpers
@@ -270,17 +300,27 @@ def _livery(v, lay, x0, x1, z0, z1, rail=118.0, lockup_frac=0.165):
     v.rect(bx0, z0 + rail + 40, bx1, z0 + rail + 40 + bh, fc=V2["night"], ec=V2["border"], lw=0.5, z=3)
     d = lay.d
     rated = f"RATED {lay.cfg.it_kw:g} kW IT"
-    fields = ["SCHREIBER AI", "BEN ENGINE", d["tier_label"].upper(), "S/N ...", rated, d["voltage"].split(" →")[-1].replace("3ph", "3PH").replace("1ph", "1PH").upper(), "IP66", "REV 2"]
+    fields = ["SCHREIBER AI", "BEN ENGINE", d["tier_label"].upper(), "S/N " + _serial(lay.tier), rated, d["voltage"].split(" →")[-1].replace("3ph", "3PH").replace("1ph", "1PH").upper(), "IP66", "REV 2"]
     k = (bx1 - bx0) / sum(len(f) + 4 for f in fields)
     xx = bx0 + 60
     for i, f in enumerate(fields):
         v.text(xx, z0 + rail + 40 + bh / 2, f, h=min(1.8, bh / v.k * 0.55), c=V2["signal"] if i == 0 else V2["fog"], va="center", mono=True, bold=True, z=4)
         xx += (len(f) + 4) * k
-    lh = eh * lockup_frac
-    lw_ = lh * 6.527
+    # lockup-deep master: mark height = min(16.5 % of the side height, fit) per brand/v2/livery (MANIFEST / gen_livery.py)
+    asp = _aspect("lockup-deep")
+    lh = min(eh * lockup_frac, el * 0.42 / asp)
+    lw_ = lh * asp
     lx = x0 + (el - lw_) / 2 if not (lay.is_container or lay.is_hall) else x0 + el * 0.08
-    v.rect(lx, z1 - eh * 0.2 - lh, lx + lw_, z1 - eh * 0.2, fc="none", ec=V2["deep"], lw=0.6, ls="--", z=3)
-    v.text(lx + lw_ / 2, z1 - eh * 0.2 - lh / 2, "LOCKUP-DEEP MASTER + 'BEN ENGINE' product line", h=1.6, ha="center", va="center", c=V2["deep"], z=4)
+    lz = z1 - eh * 0.14 - lh
+    sx, sy = v.p(lx, lz)
+    v.s.add_master("lockup-deep", sx, sy, lh / v.k)
+    # product line "BEN ENGINE": cap height 0.38 x mark, 0.30 x mark below the wordmark baseline, left-aligned to the wordmark
+    wx = lx + lh * 1.30
+    cap = 0.38 * lh
+    tx, ty = v.p(wx, lz - 0.30 * lh - cap)
+    v.s.ax.text(tx, ty, "BEN ENGINE", fontproperties=_fp(P_DISPLAY, cap / v.k / 0.72) if P_DISPLAY else None, color=V2["ink"], zorder=6,
+                **({} if P_DISPLAY else {"fontsize": DK.pt(cap / v.k / 0.72), "fontweight": "bold"}))
+    v.leader(lx + lw_ + lh * 0.25, lz + lh / 2, 14, 6, f"Artwork: brand/v2/livery/{lay.tier}-side.svg (production file)", h=1.6)
     v.text(x1 - (el * 0.06 if el > 3000 else 80), z0 + rail + 60 + bh + eh * 0.05, d["tier_label"].upper(), h=min(4.0, eh / v.k * 0.12), ha="right", c=V2["ink"], bold=True, z=4)
     v.text(x0 + el / 2, z0 - 60, f"Livery: Shop White #F4F7FB body, Night Navy data plate band with QR; production art brand/v2/livery/{lay.tier}-side.svg (masters never redrawn)",
            h=1.6, ha="center", va="top", c=V2["slate"], z=4)
@@ -556,8 +596,18 @@ def _ben1_front(sh, lay, ox, oy, s, labels=True):
         v.rect(x0 + 8, it.z0, x1 - 8, it.z1, fc=DK.FILL.get(kind, "#FFFFFF"), ec=DK.EDGE.get(kind, V2["ink"]), lw=0.5)
         if labels:
             v.text((x0 + x1) / 2, (it.z0 + it.z1) / 2, f"{it.tag}  {it.label.split(' (')[0][:40]}", h=1.6, ha="center", va="center")
-    # data plate band along the bottom of the bezel / door
-    v.rect(0, 4, lay.ext_l, 4 + max(18.0, lay.ext_h * 0.06), fc="#0F2342", ec=V2["border"], lw=0.4)
+    # data plate band along the bottom of the bezel / door (S2 ground indoors), with the livery sample serial
+    bh = max(18.0, lay.ext_h * 0.06)
+    v.rect(0, 4, lay.ext_l, 4 + bh, fc="#0F2342", ec=V2["border"], lw=0.4)
+    v.text(lay.ext_l * 0.03, 4 + bh / 2, f"SCHREIBER AI · BEN ENGINE · BEN 1 · S/N {_serial('ben1')} · 120 V · REV 2", h=min(1.5, bh / v.k * 0.6), c=V2["fog"], va="center", mono=True, z=6)
+    # lockup-signal master (indoor Night Navy body) in the top margin of the bezel / door
+    mh = min(30.0, (lay.ext_h - lay.L * 0 - (lay.ext_h - 40)) * 0.8) if False else 26.0
+    lw_ = mh * _aspect("lockup-signal")
+    if lw_ > lay.ext_l * 0.9:
+        mh = lay.ext_l * 0.9 / _aspect("lockup-signal"); lw_ = lay.ext_l * 0.9
+    sx, sy = v.p((lay.ext_l - lw_) / 2, lay.ext_h - 8 - mh)
+    sh.add_master("lockup-signal", sx, sy, mh / v.k)
+    sh.leader(sx + lw_ / v.k, sy + mh / v.k / 2, sx + lw_ / v.k + 12, sy + mh / v.k / 2 + 8, f"Artwork: brand/v2/livery/ben1-{'bezel-10in' if lay.cfg.form == 'rack10' else 'door-12u'}.svg (production file)", h=1.6)
     return v
 
 

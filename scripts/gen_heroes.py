@@ -266,39 +266,89 @@ def _brandlib():
     return brandlib
 
 
-def _face_group(c: "Canvas", x, y, z, inner: str) -> str:
-    """Group skewed onto the +y face (front-left) at world point (x, y, z): local u along +x, v downward (screen px)."""
+def _face_group(c: "Canvas", x, y, z, inner: str, clip=None) -> str:
+    """Group skewed onto the +y face (front-left) at world point (x, y, z): local u along +x, v downward.
+
+    One metre along x is c.scale * COS30 local u units (skewY(30) keeps u as the screen x offset), one metre
+    up is c.scale / COS30 local v units (the 0.866 vertical scale). ``clip`` = (u0, v0, u1, v1) in local units
+    keeps everything inside the face, so no lettering can ever run past the box edge.
+    """
     sx, sy = c.P(x, y, z)
+    if clip:
+        _face_group.n += 1
+        cid = f"fc{_face_group.n}"
+        u0, v0, u1, v1 = clip
+        inner = (f'<clipPath id="{cid}"><rect x="{u0:.1f}" y="{v0:.1f}" width="{u1 - u0:.1f}" height="{v1 - v0:.1f}"/></clipPath>'
+                 f'<g clip-path="url(#{cid})">{inner}</g>')
     return f'<g transform="translate({sx:.1f},{sy:.1f}) skewY(30) scale(1,0.866)">{inner}</g>'
+
+
+_face_group.n = 0
+MONO_EM = 0.62      # IBM Plex Mono advance (0.6 em) plus a margin for the monospace fallback
+CAPS_EM = 0.78      # Archivo / Inter heavy caps, widest of the fallbacks
+
+
+def _mono_w(text: str, fs: float, ls: float) -> float:
+    return len(text) * (fs * MONO_EM + ls)
+
+
+def _fit_band(fields, avail, fs_max, fs_min=3.6, drop=(3, 1)):
+    """Font size and the fields that fit ``avail`` local units: shrink first, then drop the optional fields
+    (rated, then BEN ENGINE) like the .opt cells of the web data plate band. Returns (fs, ls, gap, fields)."""
+    fields = list(fields)
+    order = list(drop)
+    while True:
+        fs = fs_max
+        while fs >= fs_min:
+            ls, gap = fs * 0.16, fs * 1.6
+            need = sum(_mono_w(f, fs, ls) for f in fields) + gap * (len(fields) - 1) + fs * 2.4
+            if need <= avail:
+                return fs, ls, gap, fields
+            fs -= 0.2
+        if not order:
+            return fs_min, fs_min * 0.16, fs_min * 1.6, fields[:1]
+        i = order.pop(0)
+        fields = [f for j, f in enumerate(fields) if j != i] if i < len(fields) else fields
+        order = [j - (1 if j > i else 0) for j in order]
+
+
+def _band_parts(fields, u0, avail, bh, fs_max, ground, lead="#4C9DFF", text="#B2C1D8"):
+    fs, ls, gap, fields = _fit_band(fields, avail, fs_max)
+    parts = [f'<rect x="{u0:.1f}" y="{-bh:.1f}" width="{avail:.1f}" height="{bh:.1f}" fill="{ground}" stroke="#24406B" stroke-width="0.6"/>']
+    ux = u0 + fs * 1.2
+    for i, f in enumerate(fields):
+        parts.append(f'<text x="{ux:.1f}" y="{-bh / 2 + fs * 0.36:.1f}" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="{fs:.1f}" letter-spacing="{ls:.2f}" fill="{lead if i == 0 else text}">{f}</text>')
+        ux += _mono_w(f, fs, ls) + gap
+    return parts
 
 
 def livery_side(c: "Canvas", x0, y0, L, Wd, Hh, label, rated, mark="mark-deep", band_frac=0.066, outdoor=True):
     """Data plate band along the bottom of the +y face, v2 mark, product line and tier number (brand/v2/livery side art)."""
     bl = _brandlib()
-    k = c.scale / COS30           # screen px per metre along x on the skewed face
-    u_len = L * k
-    bh = max(Hh * band_frac * c.scale, 7.0)
+    ku = c.scale * COS30          # local u units per metre along x on the skewed face
+    kv = c.scale / COS30          # local v units per metre up the face
+    u_len, v_len = L * ku, Hh * kv
+    clip = (0.0, -v_len, u_len, 0.0)        # the whole face, origin at the bottom-left corner
+    bh = max(Hh * band_frac * kv, 7.0)
     band_ground = "#06101F" if outdoor else "#0F2342"
     z_band = 0.18 if outdoor else 0.02
     fields = ["SCHREIBER AI", "BEN ENGINE", label.upper(), rated, "REV 2"]
-    fs = max(4.2, min(7.0, bh * 0.52))
-    parts = [f'<rect x="{0.04 * u_len:.1f}" y="{-bh:.1f}" width="{0.92 * u_len:.1f}" height="{bh:.1f}" fill="{band_ground}" stroke="#24406B" stroke-width="0.6"/>']
-    ux = 0.04 * u_len + fs * 1.2
-    for i, f in enumerate(fields):
-        parts.append(f'<text x="{ux:.1f}" y="{-bh / 2 + fs * 0.36:.1f}" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="{fs:.1f}" letter-spacing="{fs * 0.16:.2f}" fill="{"#4C9DFF" if i == 0 else "#B2C1D8"}">{f}</text>')
-        ux += (len(f) + 2.4) * fs * 0.62
-    out = [_face_group(c, x0, y0 + Wd, z_band, "".join(parts))]
-    mh = min(Hh * 0.30 * c.scale, 34)
+    parts = _band_parts(fields, 0.04 * u_len, 0.92 * u_len, bh, max(4.2, min(7.0, bh * 0.52)), band_ground)
+    vb = z_band * kv
+    face = [f'<g transform="translate(0,{-vb:.1f})">{"".join(parts)}</g>']
     ink = "#0B1A31" if outdoor else "#EEF4FC"
     sub = "#4A5D7A" if outdoor else "#B2C1D8"
-    inner = (bl.embed(mark, 0, -mh, mh, prefix=f"hm{abs(hash(label)) % 997}_") +
-             f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.52:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="800" font-size="{mh * 0.36:.1f}" letter-spacing="0.6" fill="{ink}">SCHREIBER AI</text>'
-             f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.08:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="700" font-size="{mh * 0.24:.1f}" letter-spacing="1.2" fill="{sub}">BEN ENGINE</text>')
-    out.append(_face_group(c, x0 + 0.06 * L, y0 + Wd, Hh * 0.86, inner))
-    tz = Hh * 0.42
-    tsize = min(Hh * 0.22 * c.scale, 30)
-    out.append(_face_group(c, x0 + 0.60 * L, y0 + Wd, tz, f'<text x="0" y="0" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="900" font-size="{tsize:.1f}" fill="{ink}">{label.upper()}</text>'))
-    return "\n".join(out)
+    # lockup top-left: mark + SCHREIBER AI / BEN ENGINE, no wider than 46 % of the face
+    lock_em = 1.28 + len("SCHREIBER AI") * 0.36 * CAPS_EM + 0.36 * 0.6 / 34 * 12
+    mh = min(Hh * 0.30 * kv, 34, 0.46 * u_len / lock_em)
+    vl = 0.93 * v_len - mh       # baseline of the lockup row: its top sits 7 % below the roof edge
+    face.append(f'<g transform="translate({0.06 * u_len:.1f},{-vl:.1f})">' + bl.embed(mark, 0, -mh, mh, prefix=f"hm{abs(hash(label)) % 997}_") +
+                f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.52:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="800" font-size="{mh * 0.36:.1f}" letter-spacing="0.6" fill="{ink}">SCHREIBER AI</text>'
+                f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.08:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="700" font-size="{mh * 0.24:.1f}" letter-spacing="1.2" fill="{sub}">BEN ENGINE</text></g>')
+    # tier number right-aligned on the face, no wider than 40 % of it
+    tsize = min(Hh * 0.22 * kv, 30, 0.40 * u_len / (len(label) * CAPS_EM))
+    face.append(f'<text x="{0.94 * u_len:.1f}" y="{-Hh * 0.42 * kv:.1f}" text-anchor="end" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="900" font-size="{tsize:.1f}" fill="{ink}">{label.upper()}</text>')
+    return _face_group(c, x0, y0 + Wd, 0.0, "".join(face), clip=clip)
 
 
 def heat_plume(c: "Canvas", x, y, z, h=1.6, w=0.5):
@@ -315,7 +365,15 @@ def hero_v2_module(g, d, cfg):
     skid_l = (2.6 if cfg.it_kw <= 300 else 5.0) if dense else 0.0
     span = L + (skid_l + 1.2 if dense else 0)
     scale = min(28.0, 520 / ((span + Wd + 2) * COS30))
-    c = Canvas(scale=scale, ox=W / 2 - (span - Wd) * COS30 * scale / 2 + 20, oy=H / 2 + 40 - ((span + Wd) * SIN30 * scale) / 2)
+    while True:                  # fit between the header (y 72) and the bottom edge, roof to skid pad
+        c = Canvas(scale=scale, ox=W / 2 - (span - Wd) * COS30 * scale / 2 + 20, oy=H / 2 + 40 - ((span + Wd) * SIN30 * scale) / 2)
+        top = min(c.P(0, 0, Hh)[1], c.P(0, Wd, Hh)[1])
+        if top < 72:
+            c.oy += 72 - top
+        bottom = c.P(span + 0.5, Wd + 0.6, 0)[1]
+        if bottom <= H - 10:
+            break
+        scale *= 0.96
     n_dc = 0 if (dense or g["default_cooling"].startswith("inrow") or g["default_cooling"] == "cabinet_dx") else (2 if L < 8 else 3)
     Canvas.brand = lambda self, *a, **k: ""
     draw_module(c, 0, 0, L, Wd, Hh, g["label"], 0, dry_coolers=n_dc)
@@ -375,7 +433,7 @@ def hero_v2_ben1(g, d, cfg):
     fm = g["forms"]["cab12"]
     L, Wd, Hh = fm["ext_l_m"], fm["ext_w_m"], fm["ext_h_m"]
     desk_l, desk_w, desk_h = 1.6, 1.0, 0.74
-    c = Canvas(scale=150, ox=W / 2 - 40, oy=96)
+    c = Canvas(scale=128, ox=W / 2 - 30, oy=172)
     bl = _brandlib()
     # floor
     c.slab(-0.4, -0.3, desk_l + 0.9, desk_w + 0.7, fill="#0F2342")
@@ -399,20 +457,19 @@ def hero_v2_ben1(g, d, cfg):
         a, b = P(cx0 + 0.12, yf, zz), P(cx0 + L - 0.12, yf, zz)
         c.out.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" stroke="#16305A" stroke-width="2"/>')
     # band (S2) and the signal mark on the door
-    k = c.scale / COS30
-    bh = 0.07 * c.scale
+    ku, kv = c.scale * COS30, c.scale / COS30
+    u_len, v_len = L * ku, Hh * kv
+    bh = 0.07 * kv
     fields = ["SCHREIBER AI", "BEN ENGINE", "BEN 1", "120 V", "REV 2"]
-    band = [f'<rect x="{0.02 * L * k:.1f}" y="{-bh:.1f}" width="{0.96 * L * k:.1f}" height="{bh:.1f}" fill="#0F2342" stroke="#24406B" stroke-width="0.6"/>']
-    ux = 0.05 * L * k
-    for i, f in enumerate(fields):
-        band.append(f'<text x="{ux:.1f}" y="{-bh / 2 + 2:.1f}" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="5.4" letter-spacing="0.8" fill="{"#4C9DFF" if i == 0 else "#B2C1D8"}">{f}</text>')
-        ux += (len(f) + 2) * 3.7
-    c.out.append(_face_group(c, cx0, yf, z0 + 0.06, "".join(band)))
-    mh = 0.16 * c.scale
-    c.out.append(_face_group(c, cx0 + 0.12, yf, z0 + Hh - 0.08, bl.embed("mark-signal", 0, 0, mh, prefix="b1m_") +
-                             f'<text x="{mh * 1.25:.1f}" y="{mh * 0.45:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="800" font-size="{mh * 0.3:.1f}" fill="#EEF4FC">SCHREIBER AI</text>'
-                             f'<text x="{mh * 1.25:.1f}" y="{mh * 0.82:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="700" font-size="{mh * 0.2:.1f}" fill="#B2C1D8" letter-spacing="1">BEN ENGINE</text>'))
-    c.out.append(_face_group(c, cx0 + 0.12, yf, z0 + Hh * 0.42, f'<text x="0" y="0" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="900" font-size="{0.1 * c.scale:.1f}" fill="#EEF4FC">BEN 1</text>'))
+    door = [f'<g transform="translate(0,{-0.06 * kv:.1f})">' + "".join(_band_parts(fields, 0.02 * u_len, 0.96 * u_len, bh, 5.4, "#0F2342", text="#B2C1D8")) + '</g>']
+    lock_em = 1.25 + len("SCHREIBER AI") * 0.3 * CAPS_EM
+    mh = min(0.16 * kv, 0.84 * u_len / lock_em)
+    door.append(f'<g transform="translate({0.08 * u_len:.1f},{-(Hh - 0.08) * kv:.1f})">' + bl.embed("mark-signal", 0, 0, mh, prefix="b1m_") +
+                f'<text x="{mh * 1.25:.1f}" y="{mh * 0.45:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="800" font-size="{mh * 0.3:.1f}" fill="#EEF4FC">SCHREIBER AI</text>'
+                f'<text x="{mh * 1.25:.1f}" y="{mh * 0.82:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="700" font-size="{mh * 0.2:.1f}" fill="#B2C1D8" letter-spacing="1">BEN ENGINE</text></g>')
+    tsize = min(0.1 * kv, 0.6 * u_len / (5 * CAPS_EM))
+    door.append(f'<text x="{0.08 * u_len:.1f}" y="{-Hh * 0.42 * kv:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="900" font-size="{tsize:.1f}" fill="#EEF4FC">BEN 1</text>')
+    c.out.append(_face_group(c, cx0, yf, z0, "".join(door), clip=(0.0, -v_len, u_len, 0.0)))
     # status lamp (Run) and a warm exhaust cue at the rear top
     sx, sy = P(cx0 + L - 0.06, yf, z0 + Hh - 0.07)
     c.out.append(f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="3" fill="#2BB673"/>')
@@ -421,6 +478,18 @@ def hero_v2_ben1(g, d, cfg):
     a = P(desk_l + 0.25, 0.02, 0.35)
     c.out.append(f'<rect x="{a[0] - 5:.1f}" y="{a[1] - 7:.1f}" width="10" height="14" rx="2" fill="#B2C1D8" stroke="#8EA7C8"/>')
     return "\n".join(c.out)
+
+
+def _wrap(text: str, width: int) -> list:
+    """Word-wrap the caption so it stays right of the header lockup (x >= 300 at 10 px) and is never cut."""
+    lines, cur = [], ""
+    for w_ in text.split():
+        if cur and len(cur) + 1 + len(w_) > width:
+            lines.append(cur)
+            cur = w_
+        else:
+            cur = f"{cur} {w_}".strip()
+    return lines + ([cur] if cur else [])
 
 
 def render_v2(tier: str) -> str:
@@ -437,7 +506,7 @@ def render_v2(tier: str) -> str:
         body = hero_v2_module(g, d, cfg)
     bl = _brandlib()
     rng = f"{g['it_kw_min']:,}–{g['it_kw_max']:,} kW IT".replace(".0", "")
-    sub = g["enclosure"][:74]
+    sub_lines = _wrap(g["enclosure"], 52)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="{g["label"]} — BEN Engine, by Schreiber AI, Rev 2 illustration">\n'
             f'<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B1A31"/><stop offset="1" stop-color="#06101F"/></linearGradient></defs>\n'
             f'<rect width="{W}" height="{H}" fill="url(#bg)"/>\n{body}\n'
@@ -445,7 +514,8 @@ def render_v2(tier: str) -> str:
             f'\n<text x="58" y="34" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="10" letter-spacing="1.6" fill="#4C9DFF">SCHREIBER AI</text>'
             f'<text x="58" y="47" font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="1.4" fill="#B2C1D8">BEN ENGINE · REV 2</text>\n'
             f'<text x="616" y="34" text-anchor="end" font-family="IBM Plex Sans,Inter,system-ui,sans-serif" font-weight="600" font-size="13" fill="#EEF4FC">{g["label"]} · {rng}</text>\n'
-            f'<text x="616" y="50" text-anchor="end" font-family="IBM Plex Sans,Inter,system-ui,sans-serif" font-size="10" fill="#B2C1D8">{sub}</text>\n</svg>\n')
+            + "".join(f'<text x="616" y="{50 + 13 * i}" text-anchor="end" font-family="IBM Plex Sans,Inter,system-ui,sans-serif" font-size="10" fill="#B2C1D8">{ln}</text>\n' for i, ln in enumerate(sub_lines))
+            + '</svg>\n')
 
 
 def main(argv=None) -> int:

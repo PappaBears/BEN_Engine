@@ -2,7 +2,7 @@
 
 **Configuration:** BEN 300 · ai_inference · H1 Standard · 300 kW IT in 2 rack(s) · High-density direct liquid cooling (W45 loop, 600 kW row CDU) (2 units, N+1) · W45 loop 387.6 L/min at ΔT 10 K, heat reuse 270.0 kW available · 480 V 3ph · 600 A service · UPS 1 × 363 kVA · battery 27.8 kWh · generator no · controls: BEN Controls Pro (6 BEN Pods) · subsystems: power, cooling, compute, controls
 
-**Total: $9,573,315.01** across 108 lines — $274,036 confirmed listing (2.9%), $39 list price, $9,299,240 estimate. Confirmed-listing share excluding compute servers: 24.6%. Longest lead time in BOM: 26 weeks.
+**Total: $9,574,575.01** across 110 lines — $274,036 confirmed listing (2.9%), $39 list price, $9,300,500 estimate. Confirmed-listing share excluding compute servers: 24.5%. Longest lead time in BOM: 26 weeks.
 
 Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed listing is a price seen on the vendor's or distributor's own product page on the date shown (read from a search-result snippet, not a quote); re-verify before purchase order. Direct vendor pages were not reachable from the build environment. **list** = manufacturer published price (URL or MSRP note); **estimate** = engineering estimate with basis in the note.
 
@@ -11,7 +11,7 @@ Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed l
 | compute | 8,647,510.99 |
 | controls | 14,720.86 |
 | cooling | 523,355.00 |
-| env | 9,724.85 |
+| env | 10,984.85 |
 | fs | 27,604.34 |
 | power | 236,936.02 |
 | site | 43,000.00 |
@@ -128,5 +128,7 @@ Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed l
 | CLG-FANCOIL-CW20 | In-row chilled-water fan coil 300 mm, 20 kW at 18 C water (residual air of the liquid racks, trim loop) | Schneider Electric / Vertiv InRow RC 300 / CRV CW 300 | Vendor quote | 3 | ea | 11,000.00 | 33,000.00 | estimate | — | 14 | — | Estimate $11,000; 20 kW at 18 C water is a design value not read from a datasheet. |
 | CLG-TRIM-CHILLER | Air-cooled trim chiller on the skid for the 18 C residual-air loop (R-454B, GWP 466), per kW | Various TRIM-CH | Vendor quote | 33 | kW | 650.00 | 21,450.00 | estimate | — | 16 | R-454B / 466 | Estimate $650/kW; the W45 loop cannot cool room air, so the fan coils need this colder loop. |
 | CLG-SKID-DENSE | Heat-rejection skid: steel frame, pipe bridge to the module, isolation valves, expansion and fill (dry coolers and trim chiller on it) | Fabricator SKID-DENSE | Fabricator | 1 | ea | 28,000.00 | 28,000.00 | estimate | — | 10 | — | Estimate $28,000. |
+| ENV-LINER-NC | Non-conductive liner panel, aisle wall opposite live parts (EN-001): FRP 0.09 in x 4 ft x 8 ft, ASTM E84 Class A (Crane Composites Fire-X Glasbord class; Kemlite Class A FRP alternate), nylon rivets and FRP adhesive, PVC/FRP trims only (no metal trim) | Crane Composites (Glasbord) / Kemlite Fire-X Glasbord FXE 4x8 (or Kemlite Class A FRP) | FRP distributor (RFQ) | 6 | sheet | 135.00 | 810.00 | estimate | — | 2 | — | Estimate $135/sheet: no published Fire-X Glasbord price found 2026-11-09 (distributor quote only); Class C Crane Sequentia 4x8 seen at $69.99 (ringsend.com) and $99.99 (hillsflatlumber.com); Class A Fire-X carries a premium. Class A (flame spread <= 25, smoke developed <= 450, ASTM E84) is REQUIRED - standard Glasbord / Sequentia Class C panels are not acceptable. Distributor stock item in the US; Class A product must be ordered by name (Fire-X) - confirm the E84 Class A report with the delivery. |
+| ENV-LINER-NC-SUB | Substrate for ENV-LINER-NC: fire-retardant-treated plywood 1/2 in x 4 ft x 8 ft, ASTM E84 Class A (FRT, interior type), fixed to the wall furring; FRP is adhered over it | Lonza / Viance FRT (class) FRT plywood 1/2 in Class A interior | Lumber yard (RFQ) | 6 | sheet | 75.00 | 450.00 | estimate | — | 1 | — | Estimate $75/sheet for 1/2 in interior FRT plywood (regional lumber pricing 2026, not quoted); FRP manufacturers require a solid substrate. Stock at commercial lumber yards. |
 
 Refrigerant / GWP column: every refrigerant-charged line carries `refrigerant` and `gwp` from the catalog; the AIM Act limit for data-center cooling installed from 2027-01-01 is GWP < 700 (`docs/COMPLIANCE.md` §0 finding 2). All lines are below the limit.

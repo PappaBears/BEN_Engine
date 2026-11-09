@@ -23,3 +23,12 @@ git checkout origin/release/rev1 -- <path>   # restore into the working tree
 | Audit and evidence | `docs/audit` | 9 | `325573a4fb7183ae` |
 
 Lineup at Rev 1: BEN 5 (2–5 kW NEMA 4X cabinet), BEN 30 (10 ft), BEN 150 (20 ft), BEN 500 (40 ft), BEN 2000 (2 MW hall, capability example); hardening H1–H3; BEN Controls Lite/Pro; forward options dc800 and dlc_hd as study.
+
+## Notices against Rev 1
+
+Notices raised after the freeze. They do not change any Rev 1 file (Rev 1 drawings are not regenerated); they are recorded here, in the `notices` list of `design/REVISION.json` and in `docs/audit/CAPA_LOG.md`.
+
+| Notice | Date | Subject | Disposition for Rev 1 | Resolved in |
+| --- | --- | --- | --- | --- |
+| [EN-001](../docs/audit/EN-001_working_space_liner.md) | 2026-11-09 | NEC 110.26 working space: the module drawings claim condition 1 (914 mm) with a galvanised steel liner (ENV-LINER, grounded) opposite the row; at 277 V to ground condition 2 needs 1,067 mm and the drawn aisle is 930 mm. Fire releasing panel and EPO sit on the same wall. | **Rev B IFC for BEN 150 and BEN 500 ON HOLD — do not build** until a non-conductive aisle-wall liner and relocated FRP / EPO are issued and checked, or build from Rev 2. BEN 30 (208Y/120 V, 914 mm under every condition), BEN 5 and BEN 2000 not on hold. | Rev 2.A, change R2-04 (`design/rev2/REVISION.json`) |
+| CAPA observation (W45 fan coil) | 2026-11-09 | Forward-study line CLG-AIR-RESID-HD (in-row fan coil, 12 kW on the W45 loop) cannot cool room air: W45 water (40–50 °C) is warmer than the 27 °C rack inlet. | Forward study only (nothing issued for construction); line not to be purchased. | Rev 2 dense tiers use fan coils on an 18 °C trim loop (CLG-FANCOIL-CW20 + CLG-TRIM-CHILLER) |

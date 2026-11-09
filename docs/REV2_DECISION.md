@@ -43,7 +43,7 @@ Names keep the Rev 1 rule: the number is the nominal maximum IT kW.
 | **BEN 300** (new, dense) | 20 ft module, liquid-first | 150–300 kW | Direct liquid W45, row CDU N+1, ≤ 10 % air residual | One or two current liquid racks (GB300 NVL72-class, 132–155 kW) | new |
 | **BEN 500** | 40 ft module | 150–500 kW | DLC + CDU | Rev 1 configuration kept for existing quotes | carried |
 | **BEN 700** (new, flagship dense) — *corrected 2026-11-09, see §2a; recorded at decision as BEN 1000, 500–1,000 kW, six or seven racks* | 40 ft module, liquid-first, all-in-one | 400–700 kW (5 racks; 705 kW is the verified maximum) | Direct liquid W45, CDU N+1, heat-reuse port | Up to five current liquid racks (GB300 NVL72-class, 140 kW each in the preset) with power, UPS/battery, CDUs and controls in one sealed box; heat rejection on an adjacent skid | new |
-| **BEN 2000** | Prefabricated hall | 800–2,000 kW | DLC | Capability example | carried |
+| **BEN 2000** | Prefabricated hall — *Rev 2 target changed 2026-11-09, see §2b: three BEN 700 dense modules, in engineering* | 800–2,000 kW | DLC | Capability example (Rev 1 hall); top of the dense range from §2b | carried |
 
 **All-in-one rule (from the operator, Rev 1):** power, cooling distribution, compute and controls inside one enclosure; heat rejection outside (roof or skid). The dense tiers must pass the existing interference checks (single row, 900 mm egress, NEC 110.26 working space at 480 V) with real footprints, or they are reported as study, not sold. If a target density does not fit, the tier is renamed to the power that does fit.
 
@@ -65,6 +65,17 @@ The §2 rule ("if a target density does not fit, the tier is renamed to the powe
 | 2N profiles (healthcare, public sector) | Drop to **155 kW** on BEN 300 (one rack) and **400 kW** on BEN 700: the preset steps the IT load down until the 2N row fits the single row (`Config._preset_dense`) | `python -m ben_engine.config --tier <t> --profile healthcare` |
 
 Every Rev 2 document, deck and the website use BEN 700 from this date. Open decisions that follow from it are in `docs/rev2/OPEN_QUESTIONS.md`.
+
+## 2b. Amendment (2026-11-09) — The big offer is the dense all-in-one data center, up to 2 MW
+
+**Operator direction (2026-11-09):** "our big offer is doing the data center part all in one and we are shooting for super dense compute - all the way up to 2mw".
+
+| Item | Decision | Status |
+| --- | --- | --- |
+| Lead offer | Dense, liquid-first, all-in-one modules: **BEN 300** (310 kW, 20 ft) and **BEN 700** (705 kW, 40 ft). The product page, sales sheet and decks lead with these; BEN 1 to BEN 150 are the entry range. | Product page hero and opening tier changed to BEN 700 (`web/index.html`, `web/assets/site.js` `OPENING_TIER`). |
+| BEN 2000 | Moves from "capability example" to the top of the dense range. The Rev 2 preset today is still the Rev 1 hall (48 racks × 33 kW, DLC + CDU, 3.97 kW/m²): **not dense**. Proposed Rev 2 BEN 2000: **three BEN 700 modules** (3 × 705 kW = 2,115 kW, sold as up to 2,000 kW) on a shared medium-voltage power and heat-rejection yard. Each module already passes I-D1 to I-D20 on its own. | **In engineering; not quotable** until the cluster preset, yard layout checks (MV switchgear, transformer clearances, skid spacing, egress between modules), BOM and price pass. The page says "in engineering". |
+| Rev 1 BEN 2000 | The Rev 1 hall stays as built for `lineup: rev1` (never delete). | Unchanged. |
+| Budget | Fits the $5 M revamp under the BEN 700 lighthouse line (same module three times; the new work is the yard and the cluster controls). | Program line to be re-cut when the cluster checks run. |
 
 ## 3. Budget: USD 5 M revamp
 

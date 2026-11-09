@@ -2,7 +2,7 @@
 
 **Configuration:** BEN 150 · ai_inference · H1 Standard · 96 kW IT in 5 rack(s) · Rear-door heat exchanger + dry cooler (4 units, N+1) · 480 V 3ph · 200 A service · UPS 2 × 116 kVA · battery 17.8 kWh · generator no · controls: BEN Controls Pro (12 BEN Pods) · subsystems: power, cooling, compute, controls
 
-**Total: $1,889,829.25** across 104 lines — $1,482,445 confirmed listing (78.4%), $78 list price, $407,306 estimate. Confirmed-listing share excluding compute servers: 11.8%. Longest lead time in BOM: 14 weeks.
+**Total: $1,891,089.25** across 106 lines — $1,482,445 confirmed listing (78.4%), $78 list price, $408,566 estimate. Confirmed-listing share excluding compute servers: 11.7%. Longest lead time in BOM: 14 weeks.
 
 Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed listing is a price seen on the vendor's or distributor's own product page on the date shown (read from a search-result snippet, not a quote); re-verify before purchase order. Direct vendor pages were not reachable from the build environment. **list** = manufacturer published price (URL or MSRP note); **estimate** = engineering estimate with basis in the note.
 
@@ -11,7 +11,7 @@ Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed l
 | compute | 1,430,744.98 |
 | controls | 16,333.96 |
 | cooling | 203,305.00 |
-| env | 10,494.85 |
+| env | 11,754.85 |
 | fs | 27,604.34 |
 | power | 111,456.25 |
 | site | 25,000.00 |
@@ -124,3 +124,5 @@ Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed l
 | ENV-DOORGASKET-4X | Compression door gasket kit: EPDM sponge D-profile 20 mm on the frame, 3-point compression latch with padlock hasp, drip edge, per door (UL 50E Type 4X) | Southco / Trelleborg (gasket), EMKA (latch) E3 / 1000-series compression latch | [Southco distributor](https://www.southco.com) | 3 | ea | 180.00 | 540.00 | estimate | — | 3 | Estimate $180 per door: compression latch $60-90 (Southco E3 class), 6 m EPDM sponge D-seal $35, drip edge and hardware $40. Stock items. |
 | SVC-HOSE-TEST | Hose test per UL 50E Type 4X / IEC 60529 IPX6 on every penetration and door (12.5 mm nozzle, 100 L/min, 3 m, 3 min per m2) — witnessed, recorded on Q-03 | Schreiber AI HOSE-HR | internal | 8 | h | 95.00 | 760.00 | estimate | — | 1 | Internal loaded rate; 0.5 h per penetration + 4 h setup and record per unit. |
 | ENV-PRESSURE-FAN | Positive-pressure make-up fan 150 m3/h with ePM10 filter, IP66 weather hood and backdraught damper, per module (keeps the envelope at +10 Pa) | Systemair / Rittal SF-150 class + hood | [HVAC distributor](https://www.systemair.com) | 1 | ea | 650.00 | 650.00 | estimate | — | 4 | Estimate $650: EC fan $280, ePM10 filter box $190, 4X hood + damper $180. Stock. |
+| ENV-LINER-NC | Non-conductive liner panel, aisle wall opposite live parts (EN-001): FRP 0.09 in x 4 ft x 8 ft, ASTM E84 Class A (Crane Composites Fire-X Glasbord class; Kemlite Class A FRP alternate), nylon rivets and FRP adhesive, PVC/FRP trims only (no metal trim) | Crane Composites (Glasbord) / Kemlite Fire-X Glasbord FXE 4x8 (or Kemlite Class A FRP) | FRP distributor (RFQ) | 6 | sheet | 135.00 | 810.00 | estimate | — | 2 | Estimate $135/sheet: no published Fire-X Glasbord price found 2026-11-09 (distributor quote only); Class C Crane Sequentia 4x8 seen at $69.99 (ringsend.com) and $99.99 (hillsflatlumber.com); Class A Fire-X carries a premium. Class A (flame spread <= 25, smoke developed <= 450, ASTM E84) is REQUIRED - standard Glasbord / Sequentia Class C panels are not acceptable. Distributor stock item in the US; Class A product must be ordered by name (Fire-X) - confirm the E84 Class A report with the delivery. |
+| ENV-LINER-NC-SUB | Substrate for ENV-LINER-NC: fire-retardant-treated plywood 1/2 in x 4 ft x 8 ft, ASTM E84 Class A (FRT, interior type), fixed to the wall furring; FRP is adhered over it | Lonza / Viance FRT (class) FRT plywood 1/2 in Class A interior | Lumber yard (RFQ) | 6 | sheet | 75.00 | 450.00 | estimate | — | 1 | Estimate $75/sheet for 1/2 in interior FRT plywood (regional lumber pricing 2026, not quoted); FRP manufacturers require a solid substrate. Stock at commercial lumber yards. |

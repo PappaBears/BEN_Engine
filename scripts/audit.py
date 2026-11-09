@@ -23,6 +23,8 @@ Checks (see docs/audit/AUDIT_CHECKLIST.md for the criterion behind each one):
   A11 secrets scan (API keys, tokens, private keys, passwords) over tracked text files
   A12 every *.json in the repository parses
   A13 document-control marks: drawings INDEX "Checked" not blank (WARN), dated revision marks consistent
+      (A9a/A13a/A13b: Rev 1 record design/REVISION.json; A9c/A13c/A13d/A13e: Rev 2 record design/rev2/REVISION.json and its folders)
+  A14 release history: every file of every area in releases/rev1.json still exists (at its path or under archive/rev1/)
 """
 from __future__ import annotations
 
@@ -258,31 +260,100 @@ def check_test_count() -> None:
 
 
 # ----------------------------------------------------------------------------- A9 drawings
-def check_drawings() -> None:
+def _drawing_record(record_path: str, svg_globs, idx_glob, label: str, date_files):
     import json as _json
-    rev = _json.loads((ROOT / "design/REVISION.json").read_text(encoding="utf-8"))
+    rev = _json.loads((ROOT / record_path).read_text(encoding="utf-8"))
     letter, date, checker = rev["drawing_rev"], rev["issue_date"], rev.get("checker", "")
     status_title = "ISSUE FOR CONSTRUCTION" if checker else "ISSUED FOR REVIEW"
-    svgs = sorted((ROOT / "design/drawings").glob("*/*.svg"))
+    svgs = sorted({p for g in svg_globs for p in (ROOT / "design/drawings").glob(g)})
     bad = []
     for s in svgs:
         t = s.read_text(encoding="utf-8", errors="replace")
-        if status_title not in t or not re.search(rf"Rev {letter}\b", t):
+        if status_title not in t or not re.search(rf"Rev {re.escape(letter)}(?![\w.])", t):
             bad.append(rel(s))
-    record("A9", "PASS" if svgs and not bad else "FAIL", f"Drawing SVG title blocks carry '{status_title}' and 'Rev {letter}' from design/REVISION.json ({len(svgs) - len(bad)}/{len(svgs)})", "; ".join(bad))
-    # document control: checker blank
-    idx = list((ROOT / "design/drawings").glob("*/INDEX.md"))
-    blank = [rel(i) for i in idx if not checker]
-    record("A13a", "WARN" if blank else "PASS", f"Drawing set has a named checker ({'yes' if checker else 'no'}; status {status_title})", "Set stays ISSUED FOR REVIEW until a checker is named in design/REVISION.json" if blank else "")
-    # revision-date consistency between drawings, SQAM, QC forms, assembly and the revision file
-    marks = {"design/REVISION.json": date}
-    for f, pat in (("docs/SQAM.md", rf"Rev {letter} \(([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"), ("design/assembly/QC_FORMS.md", rf"Rev {letter}[^0-9]*([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"),
-                   ("design/assembly/ASSEMBLY-ben150.md", rf"Issue {letter} · ([0-9-]+)"), ("design/drawings/ben150/INDEX.md", rf"Rev {letter}[^0-9]*([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})")):
-        m = re.search(pat, (ROOT / f).read_text(encoding="utf-8"))
+    record(f"A9{label}", "PASS" if svgs and not bad else "FAIL",
+           f"{'Rev 1' if label == 'a' else 'Rev 2'} drawing SVG title blocks carry '{status_title}' and 'Rev {letter}' from {record_path} ({len(svgs) - len(bad)}/{len(svgs)})", "; ".join(bad[:12]))
+    idx = list((ROOT / "design/drawings").glob(idx_glob))
+    record(f"A13{label}", "WARN" if (idx and not checker) else "PASS",
+           f"{'Rev 1' if label == 'a' else 'Rev 2'} drawing set has a named checker ({'yes' if checker else 'no'}; status {status_title}; {len(idx)} INDEX files)",
+           f"Set stays ISSUED FOR REVIEW until a checker is named in {record_path}" if not checker else "")
+    marks = {record_path: date}
+    for f, pat in date_files(letter):
+        fp = ROOT / f
+        m = re.search(pat, fp.read_text(encoding="utf-8")) if fp.exists() else None
         marks[f] = m.group(1) if m else None
     dates = {v for v in marks.values() if v}
     missing = [k for k, v in marks.items() if v is None]
-    record("A13b", "PASS" if len(dates) == 1 and not missing else "WARN", f"Rev {letter} issue dates agree across REVISION.json, SQAM, QC forms, assembly, INDEX", str(marks))
+    record(f"A13{'b' if label == 'a' else 'd'}", "PASS" if len(dates) == 1 and not missing else "WARN",
+           f"Rev {letter} issue dates agree across {record_path}, SQAM, assembly, INDEX", str(marks))
+    return rev
+
+
+def check_drawings() -> None:
+    """A9 / A13 for both design records: Rev 1 (design/REVISION.json, design/drawings/<tier>/) and Rev 2 (design/rev2/REVISION.json,
+    design/drawings/rev2/<tier>/ and rev2/ben1/<form>/)."""
+    _drawing_record("design/REVISION.json", ["*/*.svg"], "*/INDEX.md", "a",
+                    lambda L: (("docs/SQAM.md", rf"Rev {L} \(([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"), ("design/assembly/QC_FORMS.md", rf"Rev {L}[^0-9]*([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"),
+                               ("design/assembly/ASSEMBLY-ben150.md", rf"Issue {L} · ([0-9-]+)"), ("design/drawings/ben150/INDEX.md", rf"Rev {L}[^0-9]*([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})")))
+    if (ROOT / "design/rev2/REVISION.json").exists():
+        rev2 = _drawing_record("design/rev2/REVISION.json", ["rev2/*/*.svg", "rev2/ben1/*/*.svg"], "rev2/**/INDEX.md", "c",
+                               lambda L: (("docs/rev2/SQAM.md", rf"Revision \| {re.escape(L)} — ([0-9-]+)"), ("design/assembly/rev2/ASSEMBLY-ben150.md", rf"Issue {re.escape(L)} · ([0-9-]+)"),
+                                          ("design/assembly/rev2/ASSEMBLY-ben1.md", rf"Issue {re.escape(L)} · ([0-9-]+)"),
+                                          ("design/drawings/rev2/ben700/INDEX.md", rf"Rev {re.escape(L)}, ([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"),
+                                          ("design/rev2/DESIGN_BASIS.md", rf"Issue {re.escape(L)}, ([0-9-]+)")))
+        # every Rev 2 tier (and both BEN 1 forms) has a drawing folder with an INDEX, and the record names no checker it did not get
+        sys.path.insert(0, str(ROOT / "software"))
+        from ben_engine.config import TIERS_BY_LINEUP
+        missing = []
+        for t in TIERS_BY_LINEUP["rev2"]:
+            for sub in (("ben1/rack10", "ben1/cab12") if t == "ben1" else (t,)):
+                for f in (f"design/drawings/rev2/{sub}/INDEX.md", f"design/drawings/rev2/{sub}/A-001.svg"):
+                    if not (ROOT / f).exists():
+                        missing.append(f)
+            for f in (f"design/assembly/rev2/ASSEMBLY-{t}.md",):
+                if not (ROOT / f).exists():
+                    missing.append(f)
+        for f in ("docs/rev2/SQAM.md", "design/rev2/DESIGN_BASIS.md", "design/drawings/rev2/INTERFERENCE_CHECKS.md"):
+            if not (ROOT / f).exists():
+                missing.append(f)
+        record("A13e", "PASS" if not missing else "FAIL", f"Rev 2 design set folders complete for TIERS_BY_LINEUP['rev2'] (drawings, assembly, SQAM, design basis; record {rev2['drawing_rev']})", "; ".join(missing))
+
+
+# ----------------------------------------------------------------------------- A14 release history preserved
+def check_history() -> None:
+    """Every file of every area in releases/rev1.json still exists at its path or under archive/rev1/ (docs/REVISION_POLICY.md rule 5).
+    The file list is read from the release commit with git; without git the area paths and file counts are checked."""
+    rel_path = ROOT / "releases/rev1.json"
+    if not rel_path.exists():
+        record("A14", "WARN", "releases/rev1.json not found", "")
+        return
+    r = json.loads(rel_path.read_text(encoding="utf-8"))
+    commit = r.get("commit", "")
+    missing, notes, checked, mode = [], [], 0, "git"
+    for area, a in r["inventory"].items():
+        files = []
+        try:
+            out = subprocess.run(["git", "ls-tree", "-r", "--name-only", commit, "--", *a["paths"]], cwd=ROOT, capture_output=True, text=True, timeout=60)
+            if out.returncode == 0:
+                files = [f for f in out.stdout.splitlines() if f]
+        except Exception:  # noqa: BLE001
+            files = []
+        if not files:
+            mode = "paths"
+            for pth in a["paths"]:
+                checked += 1
+                if not ((ROOT / pth).exists() or (ROOT / "archive/rev1" / pth).exists()):
+                    missing.append(pth)
+            continue
+        if len(files) != a["files"]:
+            notes.append(f"{area}: release lists {a['files']} files, git tracks {len(files)} at the release commit (untracked files were counted at freeze)")
+        for f in files:
+            checked += 1
+            if not ((ROOT / f).exists() or (ROOT / "archive/rev1" / f).exists()):
+                missing.append(f)
+    record("A14", "FAIL" if missing else ("WARN" if notes else "PASS"),
+           f"Rev 1 release history preserved: every file of releases/rev1.json areas exists at its path or in archive/rev1/ ({checked} checked, {len(missing)} missing, {mode})",
+           "; ".join((missing + notes)[:15]) + (" …" if len(missing) + len(notes) > 15 else ""))
 
 
 # ----------------------------------------------------------------------------- A10 STE
@@ -302,7 +373,7 @@ def ste_banned_words() -> list[str]:
 def check_ste() -> None:
     banned = ste_banned_words()
     hits, long_steps = [], []
-    for p in sorted((ROOT / "design/assembly").glob("ASSEMBLY-*.md")):
+    for p in sorted(list((ROOT / "design/assembly").glob("ASSEMBLY-*.md")) + list((ROOT / "design/assembly/rev2").glob("ASSEMBLY-*.md"))):
         for i, line in enumerate(p.read_text(encoding="utf-8").split("\n"), 1):
             if line.startswith("**Parts:**") or line.startswith("|") or line.startswith("- CTL-") or line.startswith("- STR-"):
                 continue  # part names and the register are permitted technical names (STE rule 12)
@@ -376,7 +447,7 @@ def main() -> int:
     args = ap.parse_args()
     for fn, kw in ((check_brief_artifacts, {}), (check_launch_manifest, {}), (check_build_contract, {"run": args.run}), (check_links, {}),
                    (check_stale, {}), (check_catalog, {}), (check_fields, {}), (check_test_count, {}), (check_drawings, {}),
-                   (check_ste, {}), (check_secrets, {}), (check_json, {})):
+                   (check_history, {}), (check_ste, {}), (check_secrets, {}), (check_json, {})):
         try:
             fn(**kw)
         except Exception as e:  # noqa: BLE001

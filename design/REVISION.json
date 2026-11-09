@@ -41,5 +41,28 @@
       "requested_by": "engineering (forward program)",
       "approved_by": ""
     }
+  ],
+  "notices": [
+    {
+      "id": "EN-001",
+      "date": "2026-11-09",
+      "type": "engineering notice (hold)",
+      "title": "NEC 110.26 working space: condition 1 not justified with the galvanised steel liner ENV-LINER",
+      "affects": [
+        "ben150/A-002",
+        "ben150/A-003",
+        "ben150/E-001",
+        "ben500/A-002",
+        "ben500/A-003",
+        "ben500/E-001",
+        "ben30/A-002 (wording only)",
+        "INTERFERENCE_CHECKS.md I-C5/I-C6",
+        "DESIGN_BASIS.md"
+      ],
+      "disposition": "Rev B IFC for BEN 150 and BEN 500 ON HOLD (do not build) pending a non-conductive aisle-wall liner and relocation of the fire releasing panel and EPO off the aisle wall, or build from the Rev 2 set; re-layout to condition 2/3 is not feasible in the 2.2 m module. BEN 30 (120 V to ground), BEN 5 and BEN 2000 not on hold. Resolved in Rev 2 by change R2-04 (design/rev2/REVISION.json). Rev 1 drawings are not regenerated.",
+      "document": "docs/audit/EN-001_working_space_liner.md",
+      "raised_by": "lineup engineer; confirmed by the design authority",
+      "approved_by": ""
+    }
   ]
 }
