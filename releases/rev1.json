@@ -1,0 +1,80 @@
+{
+ "release": "rev1",
+ "commit": "d9dad54361779c72bc80def65cafda9f556b6e44",
+ "tag": "ben-engine-rev1",
+ "inventory": {
+  "Configuration model and software": {
+   "paths": [
+    "software/ben_engine"
+   ],
+   "files": 16,
+   "sha256": "e2375483b73b330a538c6f7277f7b4200acea9a1f28a50e21e0c9518ee1d1156"
+  },
+  "Drawing set (Rev C, issued for review; Rev B IFC for non-BEN 5 tiers)": {
+   "paths": [
+    "design/drawings"
+   ],
+   "files": 99,
+   "sha256": "71d27340ada39a666edbcd4985a8094f756c7465eaf4e7bb6f3c4bad81797963"
+  },
+  "Renders, STE assembly, SQAM, design basis": {
+   "paths": [
+    "design/renders",
+    "design/assembly",
+    "docs/SQAM.md",
+    "design/DESIGN_BASIS.md"
+   ],
+   "files": 62,
+   "sha256": "44a19760d8e39af9ed7e48225cd393aa2732a7bc36a7eafa4ea099e0b0f7d28c"
+  },
+  "Purchasing (catalog, BOMs, RFQs)": {
+   "paths": [
+    "purchasing"
+   ],
+   "files": 33,
+   "sha256": "43032dd8fd0d384ad457f98365e7ead896366988e8b3608f398e798739323998"
+  },
+  "Contracts and ready set": {
+   "paths": [
+    "docs/contracts"
+   ],
+   "files": 44,
+   "sha256": "f434070524fceffe6d0077775650ac0b11db7a102a4651503c96a751114b50a6"
+  },
+  "Proposals (samples)": {
+   "paths": [
+    "docs/proposals"
+   ],
+   "files": 18,
+   "sha256": "12567126fec7c63bac14bc2ce9ac5987d07627cdd1c411d7853ef3c9a880e4b7"
+  },
+  "Website (also copied to archive/rev1/web)": {
+   "paths": [
+    "web"
+   ],
+   "files": 17,
+   "sha256": "6854dae6354a24e2c19c414ecb641e6c2b62eeaf5c3753e0f1d58d1148ee23b7"
+  },
+  "Dashboard": {
+   "paths": [
+    "dashboard"
+   ],
+   "files": 22,
+   "sha256": "cf6954d2777dc4d3823cab0a7ffe2bead82cd5525075d4333e9343b375d72195"
+  },
+  "Firmware": {
+   "paths": [
+    "firmware"
+   ],
+   "files": 79,
+   "sha256": "3ba72078e3280784371638b22b960af7dec68aa62915a372f1cf5f3dcd48230e"
+  },
+  "Audit and evidence": {
+   "paths": [
+    "docs/audit"
+   ],
+   "files": 9,
+   "sha256": "325573a4fb7183aedf5852c999469a38a3c9b55cbb49dd879e6e39d4b9bb8455"
+  }
+ }
+}

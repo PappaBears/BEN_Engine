@@ -1,0 +1,192 @@
+{
+ "ben5": {
+  "preset_it_kw": 5.0,
+  "preset_cooling_units": 2,
+  "by_subsystem": {
+   "power": {
+    "total": 39845.875,
+    "confirmed": 30602.819444444445,
+    "list": 0.0,
+    "estimate": 9243.055555555557
+   },
+   "cooling": {
+    "total": 25617.555555555555,
+    "confirmed": 0.0,
+    "list": 0.0,
+    "estimate": 25617.555555555555
+   },
+   "compute": {
+    "total": 51802.77777777778,
+    "confirmed": 49997.222222222226,
+    "list": 0.0,
+    "estimate": 1805.5555555555557
+   },
+   "controls": {
+    "total": 5878.583333333333,
+    "confirmed": 3404.972222222222,
+    "list": 872.2222222222223,
+    "estimate": 1601.388888888889
+   },
+   "base": {
+    "total": 60302.65277777779,
+    "confirmed": 583.2083333333333,
+    "list": 0.0,
+    "estimate": 59719.444444444445
+   }
+  },
+  "priced_on": "2026-11-08",
+  "margin": 0.28
+ },
+ "ben30": {
+  "preset_it_kw": 30.0,
+  "preset_cooling_units": 3,
+  "by_subsystem": {
+   "power": {
+    "total": 61806.958333333336,
+    "confirmed": 6813.902777777778,
+    "list": 0.0,
+    "estimate": 54993.055555555555
+   },
+   "cooling": {
+    "total": 100086.0,
+    "confirmed": 68752.66666666667,
+    "list": 0.0,
+    "estimate": 31333.333333333336
+   },
+   "compute": {
+    "total": 637716.6527777778,
+    "confirmed": 636438.875,
+    "list": 0.0,
+    "estimate": 1277.7777777777778
+   },
+   "controls": {
+    "total": 6581.180555555556,
+    "confirmed": 3474.236111111111,
+    "list": 872.2222222222223,
+    "estimate": 2234.722222222222
+   },
+   "base": {
+    "total": 118891.13888888889,
+    "confirmed": 16569.61111111111,
+    "list": 0.0,
+    "estimate": 102321.52777777778
+   }
+  },
+  "priced_on": "2026-11-08",
+  "margin": 0.28
+ },
+ "ben150": {
+  "preset_it_kw": 96.0,
+  "preset_cooling_units": 4,
+  "by_subsystem": {
+   "power": {
+    "total": 154800.34722222222,
+    "confirmed": 18098.958333333336,
+    "list": 0.0,
+    "estimate": 136701.3888888889
+   },
+   "cooling": {
+    "total": 282368.05555555556,
+    "confirmed": 0.0,
+    "list": 0.0,
+    "estimate": 282368.05555555556
+   },
+   "compute": {
+    "total": 1987145.8055555555,
+    "confirmed": 1983951.3611111112,
+    "list": 0.0,
+    "estimate": 3194.4444444444443
+   },
+   "controls": {
+    "total": 22686.055555555555,
+    "confirmed": 12362.444444444443,
+    "list": 108.33333333333334,
+    "estimate": 10215.277777777777
+   },
+   "base": {
+    "total": 177762.58333333334,
+    "confirmed": 44538.972222222226,
+    "list": 0.0,
+    "estimate": 133223.61111111112
+   }
+  },
+  "priced_on": "2026-11-08",
+  "margin": 0.28
+ },
+ "ben500": {
+  "preset_it_kw": 192.0,
+  "preset_cooling_units": 2,
+  "by_subsystem": {
+   "power": {
+    "total": 444780.7361111111,
+    "confirmed": 187037.68055555556,
+    "list": 0.0,
+    "estimate": 257743.05555555556
+   },
+   "cooling": {
+    "total": 542083.3333333334,
+    "confirmed": 0.0,
+    "list": 0.0,
+    "estimate": 542083.3333333334
+   },
+   "compute": {
+    "total": 5552298.388888889,
+    "confirmed": 5545909.5,
+    "list": 0.0,
+    "estimate": 6388.888888888889
+   },
+   "controls": {
+    "total": 27627.722222222223,
+    "confirmed": 14859.666666666666,
+    "list": 108.33333333333334,
+    "estimate": 12659.722222222223
+   },
+   "base": {
+    "total": 287940.69444444444,
+    "confirmed": 33496.944444444445,
+    "list": 0.0,
+    "estimate": 254443.75
+   }
+  },
+  "priced_on": "2026-11-08",
+  "margin": 0.28
+ },
+ "ben2000": {
+  "preset_it_kw": 1600.0,
+  "preset_cooling_units": 7,
+  "by_subsystem": {
+   "power": {
+    "total": 7540615.236111111,
+    "confirmed": 979191.6250000001,
+    "list": 0.0,
+    "estimate": 6561423.611111111
+   },
+   "cooling": {
+    "total": 3309472.2222222225,
+    "confirmed": 0.0,
+    "list": 0.0,
+    "estimate": 3309472.2222222225
+   },
+   "compute": {
+    "total": 45420029.45833333,
+    "confirmed": 45389362.791666664,
+    "list": 0.0,
+    "estimate": 30666.666666666668
+   },
+   "controls": {
+    "total": 85460.56944444445,
+    "confirmed": 49636.958333333336,
+    "list": 216.66666666666669,
+    "estimate": 35606.944444444445
+   },
+   "base": {
+    "total": 5453388.388888889,
+    "confirmed": 52224.5,
+    "list": 0.0,
+    "estimate": 5401163.888888889
+   }
+  },
+  "priced_on": "2026-11-08",
+  "margin": 0.28
+ }
+}

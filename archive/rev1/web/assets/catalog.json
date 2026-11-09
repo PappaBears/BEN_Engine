@@ -1,0 +1,418 @@
+{
+ "tiers": {
+  "ben5": {
+   "label": "BEN 5",
+   "enclosure": "Outdoor 24U NEMA 4X / IP66 cabinet on skid",
+   "kind": "cabinet",
+   "modules": 1,
+   "positioning": "core",
+   "ext_l_m": 1.2,
+   "ext_w_m": 1.0,
+   "ext_h_m": 1.8,
+   "int_l_m": 1.0,
+   "int_w_m": 0.8,
+   "int_h_m": 1.4,
+   "max_racks": 1,
+   "rack_u": 24,
+   "it_kw_min": 2,
+   "it_kw_max": 5,
+   "default_cooling": "cabinet_dx",
+   "voltage": "208/240 V 1ph",
+   "tare_kg": 320,
+   "rows": 1
+  },
+  "ben30": {
+   "label": "BEN 30",
+   "enclosure": "10 ft high-cube ISO-frame module, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
+   "positioning": "core",
+   "ext_l_m": 2.991,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 2.7,
+   "int_w_m": 2.2,
+   "int_h_m": 2.49,
+   "max_racks": 2,
+   "rack_u": 42,
+   "it_kw_min": 10,
+   "it_kw_max": 30,
+   "default_cooling": "inrow_dx_300",
+   "voltage": "208 V 3ph",
+   "tare_kg": 1300,
+   "rows": 1
+  },
+  "ben150": {
+   "label": "BEN 150",
+   "enclosure": "20 ft high-cube ISO-frame module, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
+   "positioning": "core",
+   "ext_l_m": 6.058,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 5.75,
+   "int_w_m": 2.2,
+   "int_h_m": 2.49,
+   "max_racks": 6,
+   "rack_u": 42,
+   "it_kw_min": 50,
+   "it_kw_max": 150,
+   "default_cooling": "rdhx_drycooler",
+   "voltage": "480 V 3ph",
+   "tare_kg": 2400,
+   "rows": 1
+  },
+  "ben500": {
+   "label": "BEN 500",
+   "enclosure": "40 ft high-cube ISO-frame module, sealed to IP66",
+   "kind": "module",
+   "modules": 1,
+   "positioning": "core",
+   "ext_l_m": 12.192,
+   "ext_w_m": 2.438,
+   "ext_h_m": 2.896,
+   "int_l_m": 11.85,
+   "int_w_m": 2.2,
+   "int_h_m": 2.49,
+   "max_racks": 12,
+   "rack_u": 48,
+   "it_kw_min": 150,
+   "it_kw_max": 500,
+   "default_cooling": "dlc_cdu",
+   "voltage": "480 V 3ph",
+   "tare_kg": 3900,
+   "rows": 1
+  },
+  "ben2000": {
+   "label": "BEN 2000",
+   "enclosure": "Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) + power module + plant yard, IP66 envelope",
+   "kind": "hall",
+   "modules": 3,
+   "positioning": "capability",
+   "ext_l_m": 36.6,
+   "ext_w_m": 11.0,
+   "ext_h_m": 4.2,
+   "int_l_m": 35.8,
+   "int_w_m": 10.4,
+   "int_h_m": 3.6,
+   "max_racks": 48,
+   "rack_u": 48,
+   "it_kw_min": 800,
+   "it_kw_max": 2000,
+   "rows": 4,
+   "default_cooling": "dlc_cdu",
+   "voltage": "12.47 kV MV service \u2192 480 V 3ph",
+   "tare_kg": 60000
+  }
+ },
+ "tier_aliases": {
+  "micro": "ben5",
+  "ben10": "ben30",
+  "ben20": "ben150",
+  "ben40": "ben500"
+ },
+ "hardening": {
+  "H1": {
+   "label": "H1 Standard",
+   "rating": "NEMA 4X / IP66",
+   "coating": "ISO 12944 C3",
+   "wind_ms_min": 47,
+   "mass_kg_m2": 0.0,
+   "features": [
+    "hose-tested gasketed penetrations (UL 50E type 4X)",
+    "compression-gasket doors, three-point latches",
+    "positive-pressure interior",
+    "door contacts"
+   ]
+  },
+  "H2": {
+   "label": "H2 Severe environment",
+   "rating": "NEMA 4X / IP66 + flood plinth 600 mm",
+   "coating": "ISO 12944 C5-M",
+   "wind_ms_min": 67,
+   "mass_kg_m2": 6.0,
+   "features": [
+    "sand/dust ePM1 filtration with weather hoods",
+    "hurricane-rated door hardware",
+    "roof snow guards",
+    "stainless fasteners, sacrificial anodes",
+    "intrusion detection and lighting"
+   ]
+  },
+  "H3": {
+   "label": "H3 Hardened / government",
+   "rating": "NEMA 4X / IP66 + ballistic (UL 752) + forced-entry (ASTM F3038) + HEMP shielding option (MIL-STD-188-125-1)",
+   "coating": "ISO 12944 C5-M",
+   "wind_ms_min": 67,
+   "mass_kg_m2": 48.0,
+   "features": [
+    "ballistic wall panels UL 752 level selectable",
+    "IK10 impact doors, forced-entry rated",
+    "80 dB shielded enclosure with filtered penetrations (option)",
+    "TEMPEST-ready separation",
+    "secure vestibule / mantrap",
+    "two-factor access, tamper detection, audit trail in BEN Care",
+    "CMMC / NIST 800-171 controls pack"
+   ]
+  }
+ },
+ "cooling": {
+  "cabinet_dx": {
+   "label": "Cabinet DX air conditioner (R-513A, 5.5 kW)",
+   "unit_kw": 5.5,
+   "cop": 2.6,
+   "medium": "air",
+   "max_rack_kw": 5,
+   "width_mm": 400,
+   "mass_kg": 60
+  },
+  "inrow_dx": {
+   "label": "In-row DX cooling unit (600 mm, 30 kW)",
+   "unit_kw": 30.0,
+   "cop": 3.2,
+   "medium": "air",
+   "max_rack_kw": 30,
+   "width_mm": 600,
+   "mass_kg": 250
+  },
+  "inrow_dx_300": {
+   "label": "In-row DX cooling unit (300 mm, 20 kW)",
+   "unit_kw": 20.0,
+   "cop": 3.1,
+   "medium": "air",
+   "max_rack_kw": 20,
+   "width_mm": 300,
+   "mass_kg": 180
+  },
+  "rdhx_drycooler": {
+   "label": "Rear-door heat exchanger + dry cooler",
+   "unit_kw": 35.0,
+   "cop": 8.0,
+   "medium": "water",
+   "max_rack_kw": 40,
+   "width_mm": 0,
+   "mass_kg": 150
+  },
+  "dlc_cdu": {
+   "label": "Direct liquid cooling + CDU + dry cooler",
+   "unit_kw": 300.0,
+   "cop": 12.0,
+   "medium": "liquid",
+   "max_rack_kw": 80,
+   "width_mm": 600,
+   "mass_kg": 400
+  },
+  "dlc_hd": {
+   "label": "High-density direct liquid cooling (W45 loop, 600 kW row CDU)",
+   "unit_kw": 600.0,
+   "cop": 20.0,
+   "medium": "liquid",
+   "max_rack_kw": 250,
+   "width_mm": 600,
+   "mass_kg": 500,
+   "water_class": "W45",
+   "air_residual": 0.1
+  }
+ },
+ "profiles": {
+  "ai_inference": {
+   "label": "AI inference edge",
+   "redundancy": "N+1",
+   "ashrae": "A2",
+   "rack_kw": 20
+  },
+  "ai_training": {
+   "label": "AI training pod",
+   "redundancy": "N+1",
+   "ashrae": "A1",
+   "rack_kw": 60
+  },
+  "private_cloud": {
+   "label": "Private cloud / ERP",
+   "redundancy": "N+1",
+   "ashrae": "A2",
+   "rack_kw": 10
+  },
+  "disaster_recovery": {
+   "label": "Disaster recovery",
+   "redundancy": "N",
+   "ashrae": "A3",
+   "rack_kw": 8
+  },
+  "industrial_ot": {
+   "label": "Industrial OT analytics",
+   "redundancy": "N+1",
+   "ashrae": "A3",
+   "rack_kw": 8
+  },
+  "healthcare": {
+   "label": "Healthcare (HIPAA)",
+   "redundancy": "2N",
+   "ashrae": "A1",
+   "rack_kw": 10
+  },
+  "public_sector": {
+   "label": "Public sector / tactical",
+   "redundancy": "2N",
+   "ashrae": "A3",
+   "rack_kw": 12
+  },
+  "off_grid": {
+   "label": "Remote / off-grid",
+   "redundancy": "N+1",
+   "ashrae": "A3",
+   "rack_kw": 6
+  }
+ },
+ "climates": {
+  "temperate": {
+   "label": "Temperate",
+   "t_design_c": 35,
+   "t_min_c": -15,
+   "solar_w_m2": 800,
+   "corrosion": "C3",
+   "wind_ms": 47
+  },
+  "hot_arid": {
+   "label": "Hot / arid",
+   "t_design_c": 46,
+   "t_min_c": -5,
+   "solar_w_m2": 1000,
+   "corrosion": "C2",
+   "wind_ms": 47
+  },
+  "hot_humid": {
+   "label": "Hot / humid",
+   "t_design_c": 38,
+   "t_min_c": 0,
+   "solar_w_m2": 900,
+   "corrosion": "C4",
+   "wind_ms": 58
+  },
+  "cold": {
+   "label": "Cold",
+   "t_design_c": 30,
+   "t_min_c": -40,
+   "solar_w_m2": 700,
+   "corrosion": "C3",
+   "wind_ms": 47
+  },
+  "coastal": {
+   "label": "Coastal",
+   "t_design_c": 34,
+   "t_min_c": -5,
+   "solar_w_m2": 850,
+   "corrosion": "C5",
+   "wind_ms": 67
+  },
+  "high_altitude": {
+   "label": "High altitude",
+   "t_design_c": 32,
+   "t_min_c": -30,
+   "solar_w_m2": 1100,
+   "corrosion": "C3",
+   "wind_ms": 51
+  }
+ },
+ "controls_tiers": {
+  "auto": {
+   "label": "Automatic (by tier and profile)"
+  },
+  "lite": {
+   "label": "BEN Controls Lite",
+   "controller": "Revolution Pi RevPi Connect 4 + RevPi DIO/AIO (DIN rail, UL/CE listed)",
+   "edge": "same RevPi runs ben_engine and the Thread border router",
+   "panel": "DIN-rail cabinet, listed components",
+   "for": [
+    "ben5",
+    "ben30"
+   ]
+  },
+  "pro": {
+   "label": "BEN Controls Pro",
+   "controller": "Phoenix Contact PLCnext AXC F 2152 + Axioline F I/O",
+   "edge": "OnLogic Karbon 400 industrial edge computer (TPM 2.0)",
+   "panel": "UL 508A listed BEN Controller panel",
+   "for": [
+    "ben30",
+    "ben150",
+    "ben500",
+    "ben2000"
+   ]
+  }
+ },
+ "controls_pro_profiles": [
+  "healthcare",
+  "public_sector",
+  "ai_training"
+ ],
+ "power_architectures": {
+  "ac480": {
+   "label": "480 V AC \u2192 UPS \u2192 208/415 V AC PDUs (today)",
+   "tiers": [
+    "ben5",
+    "ben30",
+    "ben150",
+    "ben500",
+    "ben2000"
+   ],
+   "busway_frames_a": []
+  },
+  "dc800": {
+   "label": "800 VDC bus: AC/DC front end \u2192 DC busway \u2192 DC-input racks, battery on bus (forward option)",
+   "tiers": [
+    "ben150",
+    "ben500",
+    "ben2000"
+   ],
+   "bus_v_nominal": 800,
+   "bus_v_min": 760,
+   "bus_v_max": 920,
+   "window_basis": "assumption pending OCP Diablo 400 \u00a79.3.1 / NVIDIA MGX power rack spec",
+   "pole_v_to_ground": 400,
+   "rectifier_eff": 0.985,
+   "rack_shelf_kw": 90,
+   "rack_shelf_eff": 0.985,
+   "rectifier_module_kw": 100,
+   "bus_headroom": 1.25,
+   "busway_frames_a": [
+    400,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3200
+   ],
+   "loss_saving_frac": 0.03,
+   "copper_current_density_a_mm2": 2.0,
+   "ac_feeder_v": 415,
+   "ac_feeder_pf": 0.95,
+   "copper_kg_per_mm2_m": 0.00896
+  }
+ },
+ "dlc_hd_tiers": [
+  "ben150",
+  "ben500",
+  "ben2000"
+ ],
+ "dc_conventions": {
+  "bipolar_400": {
+   "label": "\u00b1400 VDC bipolar, high-resistance midpoint ground (OCP Diablo 400 convention)",
+   "pole_v_to_ground": 400,
+   "grounding": "midpoint of the \u00b1400 V bus tied to ground through a high resistance (HRG): first fault flows a limited current, alarms, does not trip; insulation and clearances sized for 400 V to ground",
+   "imd_arrangement": "one insulation monitoring device at the midpoint per rectifier section (pole-to-ground resistance both poles)",
+   "spec": "OCP Diablo 400 v0.5.2 / v0.7.0 (\u00b1400 VDC, \u00b10.5 % regulation, 800 V rail-to-rail)"
+  },
+  "unipolar_800": {
+   "label": "800 VDC unipolar, return isolated from earth (NVIDIA / OCP LVDC SST v0.3 convention)",
+   "pole_v_to_ground": 800,
+   "grounding": "two-wire 800 VDC with the return isolated from protective earth (IT system): first fault undetected without insulation monitoring, so the IMD is mandatory; insulation and clearances sized for 800 V to ground",
+   "imd_arrangement": "two-pole insulation monitoring device (positive and return to earth) per rectifier section, with fault location on the tap-offs",
+   "spec": "OCP LVDC SST specification v0.3 (800 VDC unipolar, effective 2026-06-22); Diablo 400 800 VDC two-wire option"
+  }
+ }
+}

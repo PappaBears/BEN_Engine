@@ -1,0 +1,40 @@
+{
+  "brand": "Schreiber AI",
+  "product": "BEN Engine",
+  "product_expansion": "Business Edge Node",
+  "tagline": "AI infrastructure that arrives finished.",
+  "secondary_tagline": "Bringing AI back to every business.",
+  "colors": {
+    "graphite": "#0B1018",
+    "slate": "#152234",
+    "panel": "#1B2B42",
+    "text": "#EDF4FF",
+    "muted": "#9FB3CC",
+    "cyan": "#66E3FF",
+    "amber": "#FFC66D",
+    "red": "#FF707D",
+    "green": "#6EE7A8",
+    "light_bg": "#F4F7FB",
+    "light_text": "#0B1018"
+  },
+  "type": {
+    "display": "'Inter', 'Segoe UI', system-ui, sans-serif",
+    "mono": "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace",
+    "scale": {
+      "h1": "clamp(2.2rem, 5vw, 3.6rem)",
+      "h2": "1.75rem",
+      "h3": "1.25rem",
+      "body": "1rem",
+      "small": "0.875rem"
+    }
+  },
+  "logo": "web/kit/logo-sai.svg",
+  "wordmark": "web/kit/wordmark-ben-engine.svg",
+  "rules": [
+    "Logo is the SAI monogram in cyan on graphite, or graphite on light. Never on photos.",
+    "Product name is written BEN Engine. Tiers are BEN 5, BEN 30, BEN 150, BEN 500, BEN 2000 (the number is IT kW). Enclosure rating is NEMA 4X / IP66 with hardening H1/H2/H3; never the rain-only 3R rating.",
+    "Numbers come from the configuration model or measured evidence. No invented metrics.",
+    "Risks are shown before prices.",
+    "Samples and previews sent to prospects are watermarked Schreiber AI."
+  ]
+}
