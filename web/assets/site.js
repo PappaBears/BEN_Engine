@@ -123,7 +123,7 @@ function writeForm() {
   $('#tier').value = c.tier;
   const mini = t.kind === 'minirack';
   if ($('#lineupSel')) $('#lineupSel').value = state.lineup;
-  if ($('#formSel')) { $('#formLbl').hidden = !mini; if (mini) $('#formSel').value = c.form; }
+  if ($('#formSel')) { $('#formSelLbl').hidden = !mini; if (mini) $('#formSel').value = c.form; }
   const itMax = mini ? (t.forms[c.form]?.it_kw_max ?? t.it_kw_max) : t.it_kw_max;
   const it = $('#it_kw'); it.step = mini ? 0.1 : 1; it.min = t.it_kw_min; it.max = itMax; it.value = c.it_kw; $('#itOut').value = c.it_kw;
   $('#racks').max = t.max_racks; $('#racks').value = c.racks;
@@ -208,7 +208,7 @@ function recompute() {
     rows.push(['Noise at 1 m (estimate)', `${d.noise_dba_est} dBA (target ${d.noise_dba_target})${d.noise_ok ? '' : ` — meets the target up to ${d.noise_quiet_up_to_kw} kW`}`]);
   }
   if (d.liquid_first) {
-    rows.push(['Row (door end first)', `${d.row_items.join(' · ')} — ${fmt(d.row_length_mm)} of ${fmt(Math.round(d.geometry.int_l_m * 1000))} mm`]);
+    rows.push(['Row (door end first)', `${d.row_items.join(' · ')} — ${fmt(d.row_length_mm)} of ${fmt(Math.round(((d.geometry || CAT.tiers[state.cfg.tier]).int_l_m) * 1000))} mm`]);
     rows.push(['Power gear inside', `${d.ups_frames} UPS frame(s), ${d.battery_cabinets} lithium cabinet(s) ${fmt(d.battery_kwh_installed)} kWh (${d.battery_minutes_installed} min), ${d.swbd_sections ? d.swbd_sections + ' switchboard section(s)' : '600 A panelboard on the end wall'}`]);
     rows.push(['Residual air', `${d.fancoils_total} in-row fan coils on an ${d.trim_loop_c} °C trim loop (${fmt(d.trim_loop_kw)} kW trim chiller on the skid)`]);
   }

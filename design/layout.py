@@ -1135,9 +1135,9 @@ def _sensors(lay: Layout):
     leak rope on the floor, door contact on the cargo door. Logical node ids stay node{k} (one per two racks, as the
     twin and the API use them); the physical BEN Pods are two per rack (cold face P{2i+1}, hot face P{2i+2}) plus a
     room Pod and an outdoor Pod (docs/CONTROLS_HARDWARE_DECISION.md §3)."""
-    racks = lay.by_kind("rack")
+    racks = [lay.find("R1")] if lay.is_minirack else lay.by_kind("rack")   # BEN 1: the devices are kind "rack"; the enclosure is R1
     rf = lay.aisle_y0
-    heights = (300, 700, 1100) if lay.is_cabinet else (400, 1200, 1800)
+    heights = (300, 700, 1100) if lay.is_cabinet else ((100, 250, 400) if lay.is_minirack else (400, 1200, 1800))
     lay.notes["probe_heights"] = heights
 
     def cold_hot_y(r):
@@ -1173,6 +1173,9 @@ def _sensors(lay: Layout):
         lay.sensors.append(Sensor("P_utility", "kWh", "meter1", lay.L - 100, lay.W - 300, zmid, "pulse_kwh"))
     n_nodes = max(1, math.ceil(len(racks) / 2))
     lay.notes["n_nodes"] = n_nodes
+    if lay.is_minirack:
+        lay.notes["n_pods"] = len([i for i in lay.items if i.code == "CTL-POD"])   # P1 / P2 placed by _resolve_minirack
+        return
     # BEN Pods: cold-face and hot-face Pod on the top rail of every rack, one room Pod beside the controller, one outdoor Pod
     pods = []
     for i, r in enumerate(racks):

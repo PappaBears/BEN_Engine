@@ -386,8 +386,10 @@ def sheet_a002(lay: L.Layout, out):
             if b - a > 0:
                 v.dim_h(a, b, 0, -10, label=f"{b - a:.0f}", h=1.7)
         v.dim_h(0, Lm, 0, -20, label=f"{Lm:.0f} INTERIOR")
-        v.dim_h(row_end, Lm - L.END_ZONE, W, 10, label=f"{lay.notes['door_zone']:.0f} FREE")
-        v.dim_h(Lm - L.END_ZONE, Lm, W, 10, label=f"{L.END_ZONE} END ZONE")
+        ez = lay.notes.get("end_zone", L.END_ZONE)
+        off2 = 16 if (getattr(lay.cfg, "lineup", "rev1") == "rev2" and lay.notes["door_zone"] < 1200) else 10   # Rev 2: stagger short dims
+        v.dim_h(row_end, Lm - ez, W, 10, label=f"{lay.notes['door_zone']:.0f} FREE")
+        v.dim_h(Lm - ez, Lm, W, off2, label=f"{ez} END ZONE")
         # CTQ bubbles
         racks = lay.by_kind("rack")
         if racks:

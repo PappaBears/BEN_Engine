@@ -867,6 +867,8 @@ def ste_check(lines, name, banned):
 
 
 def main():
+    if "--lineup" in sys.argv and sys.argv[sys.argv.index("--lineup") + 1] == "rev2" or "--lineup=rev2" in sys.argv:
+        return main_rev2()
     used_by_tier = {}
     banned = ste_banned_words()
     violations, tot_steps, tot_sent = [], 0, 0
@@ -924,6 +926,325 @@ def main():
     with open(os.path.join(HERE, "ITEM_CODES_USED.md"), "w") as f:
         f.write("\n".join(lines))
     print("  wrote ITEM_CODES_USED.md", "MISSING:" if missing else "", missing or "")
+
+
+# ====================================================================== Rev 2 (design/assembly/rev2/, record design/rev2/REVISION.json)
+TOOLS.update({
+    "T-18": "Bench scale 200 kg, sound level meter (class 2, A-weighted), clamp meter",
+    "T-19": "Burn-in load script and laptop on the bench network",
+    "T-20": "Press-fit tool set for the trim-loop piping, hydrostatic test pump, strainer key",
+})
+REV2_OUT = os.path.join(HERE, "rev2")
+
+
+def _renumber(text):
+    """Renumber '## Task NN' headings and the numbered steps inside each task after Rev 2 edits."""
+    out, n_task, n_step = [], 0, 0
+    for ln in text.split("\n"):
+        if ln.startswith("## Task "):
+            n_task += 1; n_step = 0
+            ln = _re.sub(r"^## Task \d+", f"## Task {n_task:02d}", ln)
+        elif ln.startswith("**Check:**"):
+            n_step = 0
+        else:
+            m = _re.match(r"^(\d+)\. (.*)", ln)
+            if m:
+                n_step += 1
+                ln = f"{n_step}. {m.group(2)}"
+        out.append(ln)
+    return "\n".join(out)
+
+
+def _sections(text):
+    parts = _re.split(r"(?m)^(?=## Task \d+ — )", text)
+    head, tasks = parts[0], parts[1:]
+    tail = ""
+    if tasks:
+        last = tasks[-1]
+        k = last.find("\n## Handover")
+        if k >= 0:
+            tasks[-1], tail = last[:k + 1], last[k + 1:]
+    return head, tasks, tail
+
+
+def _appendix(text):
+    tools = sorted(set(_re.findall(r"\b(T-\d\d) ", text.split("## Tool list")[0])))
+    codes = sorted({c for c in _re.findall(r"\b(?:STR|ENV|PWR|CLG|CMP|CTL|FS|SITE|SVC)-[A-Z0-9-]+\b", text.split("## Tool list")[0]) if c in CATALOG})
+    lines = ["## Tool list used in this document", ""] + [f"- {t}: {TOOLS[t]}" for t in tools if t in TOOLS] + ["",
+             "## Item codes used in this document", "",
+             "Codes are purchasing catalog codes (`purchasing/parts_catalog.json`); Rev 2 lines carry `applies_to_lineups: [\"rev2\"]` where they must not change a Rev 1 BOM.", ""]
+    lines += [f"- {c} ({_desc(c)})" for c in codes] + [""]
+    return "\n".join(lines)
+
+
+def _task_doc(n_before, fn):
+    d = Doc()
+    d.n_task = n_before
+    fn(d)
+    return "\n".join(d.lines) + "\n"
+
+
+def _liner_steps(lay):
+    return [
+        ("W", "EN-001. The aisle wall opposite the row gets the non-conductive liner ENV-LINER-NC. Do not fit a steel liner on that wall."),
+        "Fit the steel liner ENV-LINER on the rack wall, the end walls and the roof only.",
+        "Fix the FRT plywood ENV-LINER-NC-SUB to the furring on the aisle wall with screws at 300 mm pitch.",
+        "Bond the FRP panels ENV-LINER-NC to the plywood with the FRP adhesive. Use the nylon rivets of the kit.",
+        "Use PVC or FRP trims on that wall. Do not use metal trims, metal screws in the face or metal corner angles.",
+        "Read the label on each FRP panel. Make sure it says ASTM E84 Class A. Keep one label for the QC file.",
+        "Measure from the liner face to the ground bar with the continuity tester at 10 points. The meter must show an open circuit.",
+        "Do not mount a box, a panel, a light switch or a receptacle on the aisle wall opposite the row.",
+    ]
+
+
+def _dense_cooling(lay):
+    d, cfg = lay.d, lay.cfg
+    cdus = [i for i in lay.items if i.tag.startswith("CDU")]
+    fcs = [i for i in lay.items if i.tag.startswith("FC") and i.kind == "cooling"]
+    racks = lay.by_kind("rack")
+    reg = {c.id: c for c in C.register(lay)}
+
+    def fn(doc):
+        doc.task("Liquid cooling: CDUs, W45 manifold, isolation valves, fan coils and trim loop", "2 workers, 1 licensed mechanical contractor, 1 QC inspector (witness)", h(32),
+                 ["T-01", "T-02", "T-03", "T-08", "T-11", "T-20", "T-15"],
+                 [("CLG-CDU-HD", len(cdus)), ("CLG-MANIFOLD-HD", 1), ("CLG-ISOVALVE-ROW", 1), ("CLG-FANCOIL-CW20", len(fcs)), ("CLG-LEAK-RACK", len(racks)), ("CLG-PIPING-HD", 1), ("CLG-WATER-TREAT-HD", 1)],
+                 [doc.steps([
+                     ("W", "HOLD POINT. Only the licensed mechanical contractor joins, flushes and fills the W45 loop and the trim loop. Workers do the mechanical work only."),
+                     ("C", "There is no refrigerant inside the module. The trim chiller on the skid is factory sealed. Do not open it."),
+                     ("N", "W45 water is 40 C to 50 C. It cannot cool the room air. The fan coils connect to the 18 C trim loop only."),
+                     "Move each CDU into position with the rack lifter. The back of the CDU goes against the rack wall.",
+                     "The CDU positions are:\n" + "\n".join(f"   - {c.tag} at x {c.x0:.0f}" for c in cdus),
+                     "Level each CDU. Fit four M12 bolts to the floor channel. Torque to 85 N·m.",
+                     f"Fit the drip tray and the W45 header CLG-MANIFOLD-HD low in the rear plenum, x {min(r.x0 for r in racks):.0f} to {max(r.x1 for r in racks):.0f}.",
+                     "Fit the row isolation valves ISO1 on the supply and the return at the row end. Connect the position switches.",
+                     "Connect the CDU secondary outlets to the header. Use the press-fit tool. Write each joint number on the joint log.",
+                     "Fit one rack drip tray with its leak sensor CLG-LEAK-RACK under each rack drop.",
+                     "Move each fan coil into its row slot. The positions are:\n" + "\n".join(f"   - {f.tag} at x {f.x0:.0f}" for f in fcs),
+                     f"Connect each fan coil to the trim-loop supply and return. The trim loop runs at {d['trim_loop_c']:.0f} C.",
+                     "Pipe each fan-coil condensate tray to the floor drain.",
+                     "Connect the CDU primary side to the wall sleeves for the skid. Cap the sleeves until the site hook-up.",
+                     "Pressure test each loop with water at 1.5 x working pressure for 2 hours. The gauge must not drop.",
+                     "Flush each loop through the strainer until the strainer stays clean for 30 minutes.",
+                     "Send a water sample to the lab. Fill the loop only after the lab report is on file.",
+                     "Connect each rack quick disconnect three times on a drip tray. Make sure no drop falls.",
+                     "Put a wet finger on one rack leak sensor. Measure the time until ISO1 is closed. Record it.",
+                     "Trip the duty pump of each CDU. Make sure the standby pump takes the flow.",
+                     "Fit the tag label on each unit.",
+                 ]),
+                  doc.checks([(cid, reg[cid].criterion + "." + (" " + reg[cid].point + " POINT." if reg[cid].point else ""), reg[cid].form)
+                              for cid in ("CTP-M1", "CTQ-M1", "CTQ-M8", "CTQ-M9", "CTQ-M6", "CTQ-M7", "CTQ-M3") if cid in reg])])
+    return fn
+
+
+def _dense_electrical(lay):
+    d, cfg = lay.d, lay.cfg
+    gear = [i for i in lay.items if i.tag.startswith(("UPS", "BAT", "SWBD"))]
+    racks = lay.by_kind("rack")
+    reg = {c.id: c for c in C.register(lay)}
+    main = "PWR-SWBD-SECTION" if lay.find("SWBD1") else "PWR-PANEL-600"
+
+    def fn(doc):
+        doc.task("Electrical installation: switchboard, UPS frames, battery groups, rack feeds", "2 workers, 1 licensed electrician, 1 QC inspector (witness)", h(24),
+                 ["T-01", "T-03", "T-04", "T-08", "T-10", "T-14", "T-15", "T-16"],
+                 [(main, 1), ("PWR-UPS-GVL500", d["ups_frames"]), ("PWR-BATT-LI", d["battery_cabinets"]), ("PWR-SVC-ENCL", 1), ("FS-EPO", 2), ("PWR-FEEDER", 1), ("PWR-GROUNDBAR", 1), ("CTL-LABELS", 1)],
+                 [doc.steps([
+                     ("W", "HOLD POINT. Only a licensed electrician lands power conductors, connects the service, and energises."),
+                     ("W", "A battery cabinet has stored energy. Keep each battery disconnect open until the electrician completes the tests."),
+                     ("W", "Lock out and tag out the service disconnect before you work in any enclosure."),
+                     "Move the power cabinets into position with the rack lifter. The back goes against the rack wall. The positions are:\n"
+                     + "\n".join(f"   - {g.tag} at x {g.x0:.0f}" for g in gear),
+                     "Level each cabinet. Fit four M12 bolts to the floor channel. Torque to 85 N·m.",
+                     "Keep each battery cabinet as its own group. Do not put a second cabinet in the same group.",
+                     "Mount the service section PWR-SVC-ENCL on the outside of the blind end wall at z 600 to 2000.",
+                     ("PWR-PANEL-600: mount the panelboard on the end wall, 10 mm from the aisle-wall liner, z 300 to 2100." if main == "PWR-PANEL-600"
+                      else "Fit the switchboard section PWR-SWBD-SECTION at the door end. Keep 1067 mm clear in front of it."),
+                     "Mount one EPO station FS-EPO in the door-end frame at the exit, z 1200. Mount the second EPO station on the service section.",
+                     "Do not mount any electrical box on the aisle wall opposite the row (EN-001).",
+                     "Pull the labelled feeders PWR-FEEDER in the power tray TR-P. Keep 300 mm from the data tray.",
+                     f"Fit two 480 V tap boxes over each rack, A and B. There are {2 * len(racks)} tap boxes.",
+                     "Fit the ground bar PWR-GROUNDBAR in the service section. Bond the frame, the trays, the racks, the CDUs and each cabinet.",
+                     "Do not bond the aisle-wall liner. It is non-conductive.",
+                     "Electrician: land all conductors. Torque each lug to the value on the device label. Mark each lug.",
+                     "Electrician: test the insulation of each feeder at 1000 V. Record the values.",
+                     "Electrician: close the battery disconnects. Start each UPS frame per the vendor start-up sheet.",
+                 ]),
+                  doc.checks([(cid, reg[cid].criterion + "." + (" " + reg[cid].point + " POINT." if reg[cid].point else ""), reg[cid].form)
+                              for cid in ("CTP-E1", "CTP-E2", "CTQ-E1", "CTQ-E2", "CTQ-E4", "CTQ-E9", "CTQ-E10") if cid in reg])])
+    return fn
+
+
+def rev2_document(lay) -> str:
+    if lay.is_minirack:
+        return generate_ben1(lay)
+    doc = generate(lay)
+    lines, _used = reconcile(doc.lines, lay)
+    text = "\n".join(lines)
+    text = text.replace(f"`design/drawings/{lay.tier}/`", f"`design/drawings/rev2/{lay.tier}/`")
+    text = text.replace("`design/REVISION.json`", f"`{REV['path']}`")
+    text = text.replace("Config.preset('" + lay.tier + "')", "Config.preset('" + lay.tier + "', lineup='rev2')")
+    # EN-001: no device on the aisle wall opposite the row
+    text = _re.sub(r"Mount the EPO station (\S+) on the aisle wall at x \d+, z 1200\.",
+                   r"Mount the EPO station \1 in the door-end frame at the exit, z 1200. Do not put it on the aisle wall (EN-001).", text)
+    text = _re.sub(r"Mount the releasing panel (\S+) on the aisle wall at x \d+, z 1500\.",
+                   r"Mount the releasing panel \1 outside, beside the cargo door, in its NEMA 4X box at z 1500 (EN-001).", text)
+    head, tasks, tail = _sections(text)
+    new_tasks = []
+    for t in tasks:
+        title = t.split("\n", 1)[0]
+        if lay.notes.get("nc_liner") and "Insulation, vapour barrier and liner" in title:
+            t = t.replace("Fit the liner panels ENV-LINER on the walls. Start at the blind end.",
+                          "Fit the liner panels ENV-LINER on the rack wall and the end walls. Start at the blind end.")
+            k = t.find("\n**Check:**")
+            extra = "\n".join(("\n" + {"W": W, "C": Ca, "N": note}[x[0]](x[1])) if isinstance(x, tuple) else f"99. {x}" for x in _liner_steps(lay))
+            chk = f"- [CTQ-E10] {C.register(lay)[[c.id for c in C.register(lay)].index('CTQ-E10')].criterion}. WITNESS POINT. Record on form Q-03.\n"
+            t = t[:k] + "\n" + extra + "\n" + t[k:]
+            t = t.replace("**Check:**\n\n", "**Check:**\n\n" + chk, 1)
+            t = t.replace("**Parts:** ", "**Parts:** ENV-LINER-NC (non-conductive FRP liner panel, ASTM E84 Class A, EN-001); ENV-LINER-NC-SUB (FRT plywood substrate); ", 1)
+        if lay.is_dense and "Cooling units, refrigerant and coolant piping" in title:
+            t = _task_doc(0, _dense_cooling(lay))
+        if lay.is_dense and "Electrical installation" in title:
+            t = _task_doc(0, _dense_electrical(lay))
+        new_tasks.append(t)
+    tail = tail.split("## Tool list used in this document")[0]
+    text = _renumber(head + "".join(new_tasks) + tail)
+    return text.rstrip("\n") + "\n\n" + _appendix(text)
+
+
+def generate_ben1(lay) -> str:
+    """BEN 1: in-house bench procedure (both forms in one document; form-specific steps are marked)."""
+    d = lay.d
+    lay2 = L.resolve_rev2("ben1", form="rack10" if lay.cfg.form == "cab12" else "cab12")
+    forms = {lay.cfg.form: lay, lay2.cfg.form: lay2}
+    r10, c12 = forms["rack10"], forms["cab12"]
+    reg = {c.id: c for c in C.register(c12)}
+    ups_code = {f: ("PWR-UPS-MINI-1000" if forms[f].d["ups_va"] <= 1000 else "PWR-UPS-MINI-2200") for f in forms}
+    doc = Doc()
+    A = doc.add
+    A("# BEN 1 — Assembly instructions, in-house bench build (ASD-STE100)")
+    A()
+    A(f"Schreiber AI · BEN Engine · {ISSUE} · matches drawing set {REV['set_label']} · Generated by `design/assembly/gen_assembly.py --lineup rev2` from "
+      f"`Config.preset('ben1', lineup='rev2', form=...)` and `{REV['path']}`.")
+    A()
+    A("Read `design/assembly/STE_STYLE.md` before you change this document. Read the drawings in `design/drawings/rev2/ben1/rack10/` or "
+      "`design/drawings/rev2/ben1/cab12/` before you start work. Keep the drawings at the bench.")
+    A()
+    A("## About this document")
+    A()
+    A("Schreiber AI builds BEN 1 in house, on a bench. This document tells you how to build one unit of either form. Steps marked (rack10) or (cab12) apply to that form only.")
+    A("A **HOLD POINT** stops the work. Only the named person can do the work after a hold point. A **WITNESS POINT** needs the QC inspector present.")
+    A("The CTQ references point to the tables on the drawings and to `design/ctq.py`. The Q-forms are in `design/assembly/QC_FORMS.md`.")
+    A()
+    A("### Configuration of the two forms")
+    A()
+    A("| Item | rack10 | cab12 |")
+    A("|---|---|---|")
+    A(f"| Enclosure | {r10.d['geometry']['reference']} | {c12.d['geometry']['reference']} |")
+    A(f"| IT load (preset) | {r10.cfg.it_kw:g} kW | {c12.cfg.it_kw:g} kW |")
+    A(f"| U stack | {' + '.join(r10.notes['stack'])} | {' + '.join(c12.notes['stack'])} |")
+    A(f"| UPS | {r10.d['ups_model']} (beside the rack) | {c12.d['ups_model']} (in the rack) |")
+    A(f"| Circuit at the customer | {r10.d['outlet_circuit']} | {c12.d['outlet_circuit']} |")
+    A(f"| Gross mass | {r10.d['gross_kg']} kg | {c12.d['gross_kg']} kg |")
+    A()
+    A("### Safety rules for all tasks")
+    A()
+    A(W("Do not open a UPS. Do not open a device power supply. Only the listed cords connect power."))
+    A(Ca("The cab12 cabinet has a mass of 75 kg empty. Two persons lift it. Use the bench lift table."))
+    A(Ca("Lithium batteries are inside the UPS. Do not drop the UPS. Keep the UPS documents with the unit."))
+    A()
+    doc.task("Unpack and receiving inspection", "1 technician, 1 QC inspector", h(1), ["T-01", "T-14", "T-15"], [],
+             [doc.steps([
+                 "Compare the delivery notes with the order and the A-001 device list.",
+                 "Open each carton. Examine each item for transport damage. Take a photo of each defect.",
+                 "Read the model label of the rack or the cabinet. Record the model and the serial number.",
+                 "Put a label with the BEN 1 serial number on the rack frame.",
+             ]), doc.checks([("CTQ-A1", reg["CTQ-A1"].criterion + ".", "Q-01")])])
+    doc.task("Rack the devices", "1 technician", h(2), ["T-01", "T-03", "T-15"],
+             [("STR-MINIRACK-10", None), ("STR-MINICAB-12", None), ("CMP-SW-MINI", 1), ("CTL-EDGE-MINI", 1)],
+             [doc.steps([
+                 ("C", "Fit the heavy items low. Do not put a device on top of another device without a shelf."),
+                 "Put the rack or the cabinet on the bench. Level it.",
+                 "Fit the shelves and the devices in the U positions of drawing A-001, from the bottom up.",
+                 "(rack10) Fit the 10-inch PDU in U1 and the switch in U2.",
+                 "(rack10) Fit the AI boxes on their shelves. Fit the edge computer at the top.",
+                 "(cab12) Fit the UPS in U1 and U2. Then fit the switch, the NAS and the 2U server.",
+                 "(cab12) Fit the edge computer and the patch panel at the top.",
+                 "(cab12) Fit blanking panels in each open U.",
+                 "Pull each shelf and each device by hand. Nothing must move.",
+             ]), doc.checks([("CTQ-A2", reg["CTQ-A2"].criterion + ".", "Q-05")])])
+    doc.task("Cable", "1 technician", h(1.5), ["T-14", "T-15"], [("CTL-CAT6A", 1), ("CTL-LABELS", 1)],
+             [doc.steps([
+                 "Connect each device to the switch with a labelled patch cable.",
+                 "Connect the edge computer and the uplink port of the switch. Label the uplink port CUSTOMER.",
+                 "Connect each device power cord to the PDU or to a UPS outlet. Do not use a power strip or an extension cord.",
+                 "Dress the cables on the rear rail with hook-and-loop straps. Keep the air path at the rear clear.",
+             ]), doc.checks([("", "Every cable labelled at both ends. No power strip, no extension cord.", "Q-07")])])
+    doc.task("UPS", "1 technician, 1 QC inspector (witness)", h(1), ["T-10", "T-15"],
+             [(ups_code["rack10"], 1), (ups_code["cab12"], 1)],
+             [doc.steps([
+                 ("W", "HOLD POINT. Use only listed cord-connected equipment. Do not change a plug or a cord."),
+                 f"(rack10) Put the UPS {ups_code['rack10']} beside the rack in tower position. Connect the PDU cord to a battery outlet.",
+                 f"(cab12) Connect the cords of the devices to the battery outlets of the UPS {ups_code['cab12']}.",
+                 "Connect the UPS network port to the switch. Connect the UPS USB cable to the edge computer.",
+                 "Measure the resistance from the plug ground pin to the rack frame and to each chassis.",
+                 "Connect the UPS plug to the bench test receptacle. Start the UPS. Run the UPS self-test.",
+             ]), doc.checks([(cid, reg[cid].criterion + "." + (" " + reg[cid].point + " POINT." if reg[cid].point else ""), reg[cid].form) for cid in ("CTP-E1", "CTQ-E1")])])
+    doc.task("BEN Pods and the BEN Care agent", "1 controls technician, 1 QC inspector (witness)", h(1.5), ["T-12", "T-17", "T-15"], [("CTL-POD", 2)],
+             [doc.steps([
+                 ("C", "Static electricity can damage a Pod. Touch the rack frame before you touch a Pod."),
+                 "Attach Pod P1 to the front rail at the height on drawing C-001. P1 measures the inlet air.",
+                 "Attach Pod P2 to the rear rail at the height on drawing C-001. P2 measures the exhaust air.",
+                 "Run the calibration of the two Pods in the ice-point and 40 C baths.",
+                 "Start the edge computer. Enrol the BEN Care agent with the unit serial number.",
+                 "Run `python -m ben_engine.commissioning --stage pre-ship`. Read the mesh report.",
+             ]), doc.checks([(cid, reg[cid].criterion + "." + (" " + reg[cid].point + " POINT." if reg[cid].point else ""), reg[cid].form) for cid in ("CTQ-K1", "CTQ-K3", "CTQ-K5")])])
+    doc.task("Burn-in 24 h", "1 technician, 1 QC inspector", h(25), ["T-18", "T-19", "T-15"], [],
+             [doc.steps([
+                 ("N", "HOLD POINT. The unit does not ship before the 24 h burn-in passes."),
+                 "Start the burn-in script. It loads each device to full power.",
+                 "Read the UPS load and the input current with the clamp meter. Record them.",
+                 "Run the burn-in for 24 hours. The script logs the Pod inlet and exhaust every minute.",
+                 "Measure the noise at 1 m in front of the unit with the sound level meter.",
+                 "Pull the UPS plug at full load. Measure the runtime until the shutdown signal. Put the plug back.",
+                 "Stop the script. Attach the burn-in report to form Q-10.",
+             ]), doc.checks([(cid, reg[cid].criterion + "." + (" " + reg[cid].point + " POINT." if reg[cid].point else ""), reg[cid].form) for cid in ("CTQ-E2", "CTQ-E3", "CTQ-T1")])])
+    doc.task("Pack", "1 technician", h(1), ["T-18", "T-14", "T-15"], [],
+             [doc.steps([
+                 "Weigh the unit. Record the mass.",
+                 "Make sure the data plate band, the nameplate and the QR label are on the unit.",
+                 "(cab12) Lock the door. Tape the keys inside the carton lid.",
+                 "Put the unit in the shipping carton with the foam blocks.",
+                 "Put the site sheet I-001, the burn-in report and the quick-start card in the carton.",
+                 "Close and label the carton with the serial number and the lithium battery mark.",
+             ]), doc.checks([("CTQ-A3", reg["CTQ-A3"].criterion + ".", "Q-10"), ("CTQ-I1", "Site sheet I-001 in the carton; the installer and the customer sign CTQ-I1 at the site.", "Q-12")])])
+    A("## Handover")
+    A()
+    A("The installer uses drawing I-001 at the customer site. The customer signs the site checklist (CTQ-I1) on form Q-12.")
+    A()
+    text = _renumber("\n".join(doc.lines))
+    return text.rstrip("\n") + "\n\n" + _appendix(text)
+
+
+def main_rev2():
+    assert REV.get("lineup") == "rev2", "run with --lineup rev2 so design/revision.py loads design/rev2/REVISION.json"
+    os.makedirs(REV2_OUT, exist_ok=True)
+    banned = ste_banned_words()
+    violations, tot_steps, tot_sent, n_docs = [], 0, 0, 0
+    for t in L.TIERS_BY_LINEUP["rev2"]:
+        lay = L.resolve_rev2(t, form="cab12") if t == "ben1" else L.resolve_rev2(t)
+        text = rev2_document(lay)
+        v, ns, nsent = ste_check(text.split("\n"), f"rev2/ASSEMBLY-{t}.md", banned)
+        violations += v; tot_steps += ns; tot_sent += nsent; n_docs += 1
+        p = os.path.join(REV2_OUT, f"ASSEMBLY-{t}.md")
+        with open(p, "w") as f:
+            f.write(text)
+        print("  wrote", os.path.relpath(p, os.path.dirname(os.path.dirname(HERE))), f"({text.count(chr(10) + '## Task ')} tasks, {ns} steps)")
+    if violations:
+        print(f"\nSTE CHECK FAILED — {len(violations)} violation(s):")
+        for v in violations:
+            print("  ", v)
+        raise SystemExit(f"gen_assembly.py --lineup rev2: {len(violations)} STE violations")
+    print(f"  STE check (Rev 2): 0 banned-word hits, 0 step sentences over {MAX_STEP_WORDS} words ({tot_steps} steps, {tot_sent} sentences, {n_docs} documents)")
+    return 0
 
 
 if __name__ == "__main__":

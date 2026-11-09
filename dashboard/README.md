@@ -54,7 +54,8 @@ Modbus adapters described in `firmware/ben-edge` feed `RT.twin`'s state in place
 
 ## Layout
 
-- **Top bar**: SAI monogram, `BEN Engine` wordmark, tier pill, site name.
+- **Top bar**: Schreiber AI v2 lockup, `BEN Engine` wordmark, tier pill, site name.
+- **Livery (Rev 2)**: `static/livery.js` paints every Rev 2 module, cabinet and hall Shop White with the Night Navy data plate band (`Schreiber AI · BEN Engine · <tier> · S/N … · Rated … kW IT · <voltage> · <IP> · Rev 2`, IBM Plex Mono canvas texture), lockup-deep and the tier product line on the long side; BEN 1 is Night Navy with stack-signal and an S2 band. Masters are copies of `brand/v2` in `static/brand/` (QR plates from `brand/v2/livery/<tier>-qr.svg`). White-label configs show the partner name; the band keeps "Schreiber AI". Configurations with `lineup: rev1` keep the Rev 1 decal. `window.__ben.scene.livery()` returns `{lineup, bandText, bodyColor, bandTexture, productLine}`. Heat cues (aisles, airflow, pipes, temperature sensors) use the thermal ramp `#5CD6FF → #FF8A3D`; alarms keep the status colours.
 - **Left rail**: Selector · Live · Alarms · Sweeps · I/O Test · Calibration · CFD · Commissioning · Export.
 - **Centre**: 3D viewport with camera presets, Walkthrough, Guided tour, Cutaway and Doors toggles.
 - **Right inspector**: the selected object's live values and *evidence* (sensor id, value, U95, node, last update).

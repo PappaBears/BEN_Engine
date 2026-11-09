@@ -237,7 +237,7 @@ function describe(hv) {
     case 'desk': name = 'Office desk (for scale)'; tag = 'room'; codes = CODES.desk; desc = d.room_cooling_note || ''; L('room', `${fmt.num((st.mini || {}).room_c)} °C`); break;
     case 'aisle_cold': name = 'Cold aisle'; tag = 'cooling'; codes = CODES.containment; desc = 'Supply-air aisle in front of the rack inlets.'; L('supply', `${fmt.num(st.supply_c)} °C`); L('ΔP', `${fmt.num(st.aisle_dp_pa)} Pa`); break;
     case 'aisle_hot': name = 'Hot aisle'; tag = 'cooling'; codes = CODES.containment; desc = 'Contained exhaust aisle behind the racks.'; L('return', `${fmt.num(st.return_c)} °C`); break;
-    default: name = d.tier_label; tag = `${PRODUCT_LINE[cfg.tier] || 'enclosure'} · BEN Engine, by Schreiber AI`; codes = hall ? CODES.hall : CODES.container;
+    default: name = d.tier_label; tag = PRODUCT_LINE[cfg.tier] || 'enclosure'; codes = hall ? CODES.hall : CODES.container;
       desc = hall ? `${d.enclosure}: ${d.modules} wide-body modules on a slab, ${d.hardening_label || 'H1'} (${d.hardening_rating || 'IP66'}); ${d.gross_kg.toLocaleString()} kg gross.` : `${d.enclosure}: ${cabinet ? 'NEMA 4X / IP66 cabinet' : 'ISO corner castings, 100 mm PIR insulation'}, ${d.hardening_label || 'H1'}, corrosion class ${d.climate.corrosion}; ${d.gross_kg.toLocaleString()} kg gross.`;
       L('room', `${fmt.num(st.room_c)} °C`); L('PUE', fmt.num(st.pue, 3)); L('alarms', st.alarms.length, st.alarms.length ? 'warn' : 'ok');
   }

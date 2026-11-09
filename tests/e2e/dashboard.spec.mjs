@@ -234,6 +234,11 @@ try {
     if (b.o.fans !== b.d.cooling_units_total || b.o.desk !== true) throw new Error('cab12 scene ' + JSON.stringify(b.o));
     await page.waitForTimeout(800);
     await shot(page, `${SCREENS}/selector-ben1-cab12.png`);
+    // Rev 2 livery: Night Navy cabinet, stack-signal lockup on the side panels, S2 band; office-corner view
+    const lv1 = await page.evaluate(() => window.__ben.scene.livery());
+    if (lv1.lineup !== 'rev2' || lv1.bodyColor !== '#06101F' || !lv1.bandTexture || !/BEN 1 · S\/N BEN1-.* · Rated 1\.5 kW IT · 120 V 1φ · IP20 · Rev 2$/.test(lv1.bandText)) throw new Error('BEN 1 livery ' + JSON.stringify(lv1));
+    await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true)); await page.waitForTimeout(1200);
+    await shot(page, `${SCREENS}/rev2-ben1-cab12-office.png`);
     return `rack10: ${a.o.aiBoxes} AI box(es), UPS beside, ${a.d.outlet_circuit_a} A outlet, ${a.d.noise_dba_est} dBA; cab12: ${b.o.fans} extraction fans, ${b.d.ups_va} VA UPS, ${b.d.noise_dba_est} dBA`;
   });
 
@@ -256,7 +261,42 @@ try {
     await page.evaluate(() => window.__ben.scene.clearHover());
     await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true)); await page.waitForTimeout(1200);
     await shot(page, `${SCREENS}/selector-ben700.png`);
+    const lv7 = await page.evaluate(() => window.__ben.scene.livery());
+    if (lv7.productLine !== 'Dense liquid · 40 ft' || lv7.bodyColor !== '#F4F7FB' || !lv7.bandTexture) throw new Error('BEN 700 livery ' + JSON.stringify(lv7));
+    await shot(page, `${SCREENS}/rev2-exterior-ben700.png`);
     return `${i.racks} GB300-class racks, ${i.o.cdus} CDUs, ${i.o.fancoils} fan coils, ${i.o.ups} UPS + ${i.o.batteries} Li + ${i.o.switchgear} switchboard; row ${i.d.row_length_mm} mm`;
+  });
+
+  // ---------------------------------------------------------------------------------------------- Rev 2 livery (BEN 300) and Rev 1 history
+  await step(`livery: Rev 2 ${L('ben300')} has the Shop White body, the data plate band texture and a tier tooltip; Rev 1 keeps its decal`, async () => {
+    await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben300')}")`);
+    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben300');
+    await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
+    await page.click('#btn-apply-config');
+    await page.waitForFunction(() => window.__ben.store.config.tier === 'ben300' && window.__ben.scene.rev2Objects().dense && window.__ben.scene.livery() && window.__ben.scene.livery().bandTexture, null, { timeout: 20000, polling: 200 });
+    const lv = await page.evaluate(() => window.__ben.scene.livery());
+    const want = 'Schreiber AI · BEN Engine · BEN 300 · S/N BEN300-2646-0001 · Rated 300 kW IT · 480 V 3φ · IP66 · Rev 2';
+    if (lv.lineup !== 'rev2' || lv.bandText !== want || lv.bodyColor !== '#F4F7FB' || !lv.bandTexture || lv.productLine !== 'Dense liquid · 20 ft') throw new Error('livery ' + JSON.stringify(lv));
+    await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true)); await page.waitForTimeout(1500);
+    await shot(page, `${SCREENS}/rev2-exterior-ben300.png`);
+    // the enclosure tooltip names the tier's product line (not "Business Edge Node")
+    await page.waitForFunction(() => window.__ben.tooltip && window.__ben.tooltip.bomLoaded, null, { timeout: 30000, polling: 200 });
+    if (!(await page.evaluate(() => window.__ben.scene.setHoverByKey('container')))) throw new Error('container not hoverable');
+    await page.waitForFunction(() => { const t = document.getElementById('tip'); return t && !t.hidden && /Dense liquid · 20 ft/.test(t.textContent); }, null, { timeout: 5000, polling: 200 });
+    const tip = (await page.textContent('#tip')).replace(/\s+/g, ' ');
+    if (/Business Edge Node/i.test(tip)) throw new Error('old product line in tooltip');
+    await shot(page, `${SCREENS}/rev2-hover-tooltip.png`);
+    await page.evaluate(() => window.__ben.scene.clearHover());
+    // Rev 1 configuration (lineup rev1) renders as it did: Rev 1 decal, no band
+    const r1 = await page.evaluate(async () => { const pr = await (await fetch('/api/presets?lineup=rev1')).json(); const r = await fetch('/api/config', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(pr.ben150.config) }); return r.status; });
+    if (r1 !== 200) throw new Error('rev1 config ' + r1);
+    await page.waitForFunction(() => window.__ben.store.config.lineup === 'rev1' && window.__ben.scene.livery() && window.__ben.scene.livery().lineup === 'rev1', null, { timeout: 20000, polling: 200 });
+    const lr1 = await page.evaluate(() => window.__ben.scene.livery());
+    if (lr1.bandTexture || lr1.bandText) throw new Error('Rev 1 config got the Rev 2 livery ' + JSON.stringify(lr1));
+    // restore the server's default (Rev 2) configuration for the steps that follow
+    await page.evaluate(async (c) => { await fetch('/api/config', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(c) }); }, cfg0.config);
+    await page.waitForFunction(([t, lu]) => window.__ben.store.config.tier === t && (window.__ben.store.config.lineup || 'rev1') === lu, [DEF.tier, cfg0.config.lineup || 'rev1'], { timeout: 20000, polling: 200 });
+    return `band "${lv.bandText}"; tooltip "${tip.slice(0, 50)}"; Rev 1 BEN 150 keeps its decal`;
   });
 
   // back to the default tier for the rest
@@ -419,6 +459,7 @@ try {
     const overflow = await narrow.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     const stacked = await narrow.evaluate(() => { const v = document.getElementById('viewport').getBoundingClientRect(), r = document.getElementById('rail').getBoundingClientRect(); return r.top >= v.bottom - 1; });
     await narrow.evaluate(() => window.__ben.scene.setPixelRatio(1)); await shot(narrow, `${SCREENS}/narrow-390.png`);
+    await shot(narrow, `${SCREENS}/rev2-narrow-390.png`);
     await narrow.close();
     if (overflow > 2) throw new Error(`horizontal overflow ${overflow}px`);
     if (!stacked) throw new Error('rail not stacked under viewport');

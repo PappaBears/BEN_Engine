@@ -270,7 +270,7 @@ def _livery(v, lay, x0, x1, z0, z1, rail=118.0, lockup_frac=0.165):
     v.rect(bx0, z0 + rail + 40, bx1, z0 + rail + 40 + bh, fc=V2["night"], ec=V2["border"], lw=0.5, z=3)
     d = lay.d
     rated = f"RATED {lay.cfg.it_kw:g} kW IT"
-    fields = ["SCHREIBER AI", "BEN ENGINE", d["tier_label"].upper(), "S/N ...", rated, d["voltage"].split(" →")[-1].replace("3ph", "3φ").upper().replace("KW", "kW"), "IP66", "REV 2"]
+    fields = ["SCHREIBER AI", "BEN ENGINE", d["tier_label"].upper(), "S/N ...", rated, d["voltage"].split(" →")[-1].replace("3ph", "3PH").replace("1ph", "1PH").upper(), "IP66", "REV 2"]
     k = (bx1 - bx0) / sum(len(f) + 4 for f in fields)
     xx = bx0 + 60
     for i, f in enumerate(fields):
@@ -562,9 +562,9 @@ def _ben1_front(sh, lay, ox, oy, s, labels=True):
 
 
 def ben1_a001(lay, out, n, total):
-    sh = sheet(lay, "A-001", BEN1_SHEETS[0][1], "1:5", n, total)
     d, cfg = lay.d, lay.cfg
-    s = 5 if cfg.form == "rack10" else 8
+    s = 2 if cfg.form == "rack10" else 5
+    sh = sheet(lay, "A-001", BEN1_SHEETS[0][1], f"1:{s}", n, total)
     sh.view_title(30, TOP - 8, f"FRONT ELEVATION — {d['form_label'].upper()}", f"1:{s}")
     oy = TOP - 30 - lay.ext_h / s
     v = _ben1_front(sh, lay, 40, oy, s)
@@ -583,7 +583,7 @@ def ben1_a001(lay, out, n, total):
     sh.text(sx, oy - 18, "Air: front intake -> rear exhaust" + (" (two extraction fans N+1 in the rear door)" if cfg.form == "cab12" else " (open rack, device fans)"), h=1.9, c=DK.MUTED)
     # plan with clearances
     ps = 20
-    py = 250.0
+    py = min(250.0, oy - 75)
     sh.view_title(30, py + 50, "PLAN — SERVICE AND AIR CLEARANCES", f"1:{ps}")
     vp = DK.View(sh, ps, 80, py - 60)
     fp_l = lay.notes["desk_footprint_mm"][0]
@@ -596,8 +596,9 @@ def ben1_a001(lay, out, n, total):
             vp.rect(u.x0, u.y0, u.x1, u.y1, fc=DK.FILL["power"], ec=DK.EDGE["power"], lw=0.6)
             vp.text(u.cx, u.cy, "UPS", h=1.6, ha="center", va="center", rot=90)
     vp.dim_h(0, lay.ext_l, lay.ext_w + 914, 4, f"{lay.ext_l:.0f}")
-    vp.dim_v(lay.ext_w, lay.ext_w + 914, -300, -4, "914 front (service)")
-    vp.dim_v(-300, 0, -300, -4, "300 rear (exhaust)")
+    vp.dim_v(lay.ext_w, lay.ext_w + 914, -300, -4, "914")
+    vp.dim_v(-300, 0, -300, -4, "300")
+    vp.text(lay.ext_l / 2, -150, "REAR: 300 mm clear (exhaust)", h=1.7, ha="center", va="center", c=DK.CTQ_C)
     vp.dim_h(-300, 0, -300, -4, "300")
     vp.text(lay.ext_l / 2, lay.ext_w + 914 - 120, "FRONT: keep 914 mm clear for service while energised", h=1.7, ha="center", c=DK.CTQ_C)
     # tables
@@ -637,12 +638,13 @@ def ben1_e001(lay, out, n, total):
     if pdu:
         DK.sym_box(sh, x - 30, yb - 24, 60, 22, "PDU1 10-inch 1U", ["4 x NEMA 5-15R, surge", "fed from one UPS outlet"], kind="power", title_h=2.0)
         sh.line(x, yb, x, yb - 2, lw=1.0)
+        sh.line(x, yb - 24, x, yb - 30, lw=1.0)
         yb -= 30
     sh.line(30, yb, 470, yb, lw=1.4)
     pitch = min(60.0, 430.0 / max(1, len(devices) + 2))
     loads = devices + [None, None]
     for i, it in enumerate(loads):
-        xl = 40 + i * pitch
+        xl = 30 + pitch / 2 + i * pitch
         sh.line(xl, yb, xl, yb - 10, lw=0.8)
         bw = pitch - 6
         if it is None:
@@ -674,9 +676,9 @@ def ben1_e001(lay, out, n, total):
 
 
 def ben1_c001(lay, out, n, total):
-    sh = sheet(lay, "C-001", BEN1_SHEETS[2][1], "1:5", n, total)
     d, cfg = lay.d, lay.cfg
-    s = 5 if cfg.form == "rack10" else 8
+    s = 2 if cfg.form == "rack10" else 5
+    sh = sheet(lay, "C-001", BEN1_SHEETS[2][1], f"1:{s}", n, total)
     sh.view_title(30, TOP - 8, "POD PLACEMENT — FRONT AND SIDE", f"1:{s}")
     oy = TOP - 30 - lay.ext_h / s
     v = _ben1_front(sh, lay, 40, oy, s, labels=False)
@@ -747,9 +749,21 @@ def ben1_i001(lay, out, n, total):
             ["Network", "1 x Ethernet to the customer router; outbound TLS (443) for BEN Care"],
             ["Not allowed", "No water pipes above, no sprinkler-only cupboard without the vent, no extension cords, no daisy-chained strips"]]
     sh.table(30, 300, ["REQUIREMENT", "VALUE"], rows, [90, 370], title="SITE REQUIREMENTS (from Config.preset('ben1', form='%s'))" % cfg.form, h=2.0, rowh=4.4)
-    sh.text(30, 120, "ROOM NOTE (from the configuration model)", h=2.6, bold=True)
-    for i, ln in enumerate(_wrap(d["room_cooling_note"], 170)):
-        sh.text(30, 115 - i * 3.2, ln, h=1.9)
+    sh.text(30, 236, "ROOM NOTE (from the configuration model)", h=2.6, bold=True)
+    for i, ln in enumerate(_wrap(d["room_cooling_note"], 200)):
+        sh.text(30, 231 - i * 3.2, ln, h=1.9)
+    # key numbers
+    tiles = [("HEAT TO ROOM", f"{d['heat_to_room_w']} W", f"{d['heat_to_room_btu_h']} BTU/h, 24 h/day"),
+             ("CLOSET VENT", f">= {d['closet_vent_cfm']} cfm", "or a 0.5 ton split unit"),
+             ("CIRCUIT", f"{d['outlet_circuit_a']} A, 120 V", f"dedicated; {d['outlet_amps']} A at full load"),
+             ("CLEARANCES", "914 / 300 mm", "front service / rear and inlet"),
+             ("NOISE AT 1 m", f"{d['noise_dba_est']} dBA", f"target {d['noise_dba_target']:.0f} dBA")]
+    for i, (a, b, c) in enumerate(tiles):
+        tx, ty = 270 + (i % 2) * 110, 470 - (i // 2) * 48
+        sh.rect(tx, ty, 100, 40, fc="#F4F7FB", ec=V2["deep"], lw=0.8)
+        sh.text(tx + 4, ty + 33, a, h=2.0, c=V2["slate"], mono=True)
+        sh.text(tx + 4, ty + 18, b, h=6.0, c=V2["ink"], bold=True)
+        sh.text(tx + 4, ty + 7, c, h=1.9, c=V2["slate"])
 
     def extra(sh, x, y):
         rows = [["1", "Customer confirms the dedicated circuit and receptacle type"], ["2", "Clearances measured: front 914, rear 300"], ["3", "Vent / split unit in place if closed closet"],

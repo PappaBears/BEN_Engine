@@ -30,6 +30,37 @@ BRAND = {"graphite": "#0B1018", "slate": "#152234", "panel": "#1B2B42", "text": 
          "cyan": "#66E3FF", "amber": "#FFC66D", "red": "#FF707D", "green": "#6EE7A8", "purple": "#C7A6FF"}
 KIND_COLOR = {"rack": BRAND["cyan"], "cooling": BRAND["green"], "power": BRAND["amber"], "controls": BRAND["purple"],
               "fire": BRAND["red"], "structure": BRAND["muted"], "tray": "#DCE6F2", "envelope": "#5C7391"}
+SHELL = {"shell": "#243752", "body": "#243752", "door": "#2E4461"}
+LINEUP = "rev1"
+FOOTER = ("Schreiber AI", "AI infrastructure that arrives finished.")
+
+
+def use_brand_v2():
+    """Rev 2 renders (design/renders/rev2/): brand v2 palette and the module livery (Shop White body + Night Navy band outdoors)."""
+    global LINEUP, FOOTER
+    LINEUP = "rev2"
+    BRAND.update({"graphite": "#06101F", "slate": "#0B1A31", "panel": "#0F2342", "text": "#EEF4FC", "muted": "#B2C1D8",
+                  "cyan": "#4C9DFF", "amber": "#4C9DFF", "red": "#FF6369", "green": "#7FE3D2", "purple": "#B9A7F0"})
+    KIND_COLOR.update({"rack": "#4C9DFF", "cooling": "#7FE3D2", "power": "#C9B37E", "controls": "#B9A7F0", "fire": "#FF6369",
+                       "structure": "#B2C1D8", "tray": "#DCE6F2", "envelope": "#8EA7C8"})
+    SHELL.update({"body": "#F4F7FB", "door": "#E8EEF6"})
+    FOOTER = ("BEN Engine, by Schreiber AI", "Schreiber AI is a Schreiber Holding LLC company.")
+
+
+def livery_v2(ax, lay):
+    """Night Navy data plate band along the bottom of the aisle-side wall and the tier on the Shop White body (BRAND_GUIDE §7)."""
+    W, Lm, H = lay.W, lay.L, lay.H
+    wall = (lay.ext_w - W) / 2
+    bh = max(lay.ext_h * 0.066, 120)
+    # the camera (azim -128) sees the rack-wall side (y = -wall): the livery goes on that face in the render
+    yf = -wall - 16
+    add_box(ax, 0, yf, 160, Lm, -wall, 160 + bh, "#06101F", alpha=1, edge="#24406B", lw=0.6, zs=30)
+    ax.text(Lm / 2, yf - 60, 160 + bh / 2, f"SCHREIBER AI  ·  BEN ENGINE  ·  {lay.d['tier_label'].upper()}  ·  RATED {lay.cfg.it_kw:g} kW IT  ·  REV 2",
+            color="#B2C1D8", fontsize=6 if lay.is_container else 4.5, ha="center", va="center", zdir="x", fontweight="bold", zorder=40)
+    ax.text(Lm * 0.8, yf - 60, H * 0.45, lay.d["tier_label"].upper(), color="#0B1A31", fontsize=13 if lay.is_container else 8, ha="center", va="center", zdir="x", fontweight="bold", zorder=40)
+    ax.text(Lm * 0.28, yf - 60, H * 0.75, "SCHREIBER AI  |  BEN ENGINE", color="#1E40AF", fontsize=10 if lay.is_container else 6, ha="center", va="center", zdir="x", fontweight="bold", zorder=40)
+
+
 STAGES_HALL = [
     (1, "Sections set and joined", "9 road sections on grade beams, bay joints sealed and bonded (CTP-J1), power module set"),
     (2, "Envelope check", "Factory-finished panels: seams sealed, IP66 hose test on every penetration (CTQ-A4), doors gasketed"),
@@ -105,7 +136,7 @@ def draw_shell(ax, lay: L.Layout, stage: int):
     endw = (lay.ext_l - Lm) / 2
     roof_t = (lay.ext_h - H - 198 - 100) if lay.is_container else (300 if lay.is_hall else 60)
     fl = (198 + 100) if lay.is_container else (300 if lay.is_hall else 60)   # floor structure below finished floor
-    shell = "#243752"
+    shell = SHELL["body"] if stage == 8 else SHELL["shell"]
     # floor slab (structure)
     add_box(ax, -endw, -wall, -fl, Lm + endw, W + wall, 0, shell, alpha=0.95, edge="#3A5070", lw=0.4, zs=-10)
     # rack wall (y=0 side) and blind end wall (x=L) - always drawn (back of the scene)
@@ -122,7 +153,7 @@ def draw_shell(ax, lay: L.Layout, stage: int):
         # roof and front wall translucent, door-end wall with doors
         add_box(ax, -endw, -wall, H, Lm + endw, W + wall, H + roof_t, shell, alpha=0.35 if stage == 1 else 0.9, edge="#3A5070", lw=0.4, zs=20)
         add_box(ax, -endw, W, 0, Lm + endw, W + wall, H, shell, alpha=0.25 if stage == 1 else 0.9, edge="#3A5070", lw=0.4, zs=19)
-        add_box(ax, -endw, -wall, 0, 0, W + wall, H, "#2E4461", alpha=0.6 if stage == 1 else 0.95, edge="#3A5070", lw=0.4, zs=19)
+        add_box(ax, -endw, -wall, 0, 0, W + wall, H, SHELL["door"] if stage == 8 else "#2E4461", alpha=0.6 if stage == 1 else 0.95, edge="#3A5070", lw=0.4, zs=19)
         if lay.is_hall:
             add_box(ax, -endw - 2, W / 2 - 1500, 0, -endw, W / 2 + 1500, 2400, "#1B2B42", alpha=1, edge=BRAND["muted"], lw=0.6, zs=20)
             for jx in lay.module_x:
@@ -255,7 +286,9 @@ def render_stage(lay: L.Layout, n: int, out_png: str):
                     draw_item(ax, it, lay, highlight=(n == k))
     if n >= 7:
         draw_sensors(ax, lay, highlight=(n == 7))
-    if n == 8:
+    if n == 8 and LINEUP == "rev2":
+        livery_v2(ax, lay)
+    elif n == 8:
         # brand panel on the aisle-side wall (exterior) and door-end detail
         wall = (lay.ext_w - W) / 2
         pw = min(Lm * 0.45, 3000)
@@ -318,8 +351,8 @@ def render_stage(lay: L.Layout, n: int, out_png: str):
         fig.text(0.80, 0.235 - i * 0.022, ln, color=BRAND["text"], fontsize=8)
     fig.text(0.80, 0.12, "Concept render — generated from configuration", color=BRAND["amber"], fontsize=8.5, fontweight="bold")
     fig.text(0.80, 0.095, f"design/renders/gen_renders.py · not to scale · see drawing set {REV['set_label']} A-001…C-001", color=BRAND["muted"], fontsize=7.5)
-    fig.text(0.80, 0.05, "Schreiber AI", color=BRAND["cyan"], fontsize=9, fontweight="bold")
-    fig.text(0.80, 0.03, "AI infrastructure that arrives finished.", color=BRAND["muted"], fontsize=7.5)
+    fig.text(0.80, 0.05, FOOTER[0], color=BRAND["cyan"], fontsize=9, fontweight="bold")
+    fig.text(0.80, 0.03, FOOTER[1], color=BRAND["muted"], fontsize=7.5)
     # legend
     lx = 0.03
     for i, (k, lab) in enumerate([("rack", "Racks"), ("cooling", "Cooling"), ("power", "Power"), ("controls", "Controls"), ("fire", "Fire"), ("tray", "Tray / channel")]):
@@ -351,7 +384,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--tier", choices=list(L.TIER_GEOMETRY) + list(L.TIER_ALIASES), action="append")
     ap.add_argument("--stage", type=int, action="append")
+    ap.add_argument("--lineup", default="rev1", choices=["rev1", "rev2"], help="rev2 writes design/renders/rev2/<tier>/ (record design/rev2/REVISION.json)")
     a = ap.parse_args(argv)
+    if a.lineup == "rev2":
+        return main_rev2(a)
     for t in [L.canonical_tier(x) for x in a.tier] if a.tier else list(L.TIERS_BY_LINEUP["rev1"]):
         lay = L.resolve(t)
         out = os.path.join(HERE, t)
@@ -363,6 +399,121 @@ def main(argv=None):
         if not a.stage:
             contact_sheet(out, lay)
             print("  wrote", os.path.join(out, "contact-sheet.png"))
+    return 0
+
+
+# ------------------------------------------------------------------ Rev 2 (design/renders/rev2/)
+STAGES_BEN1 = [
+    (1, "Unpack", "Receiving inspection: rack / cabinet, devices, UPS and Pods against the order"),
+    (2, "Rack the devices", "Shelves and devices in the A-001 U stack, bottom up"),
+    (3, "Cable", "Power and data cables dressed, labelled, PDU fitted"),
+    (4, "UPS", "UPS fitted and connected; ground continuity checked (CTQ-E1)"),
+    (5, "Pods", "BEN Pod P1 on the front rail (inlet), P2 on the rear rail (exhaust)"),
+    (6, "Burn-in 24 h", "Full load for 24 h; inlet / exhaust and noise logged (CTQ-T1 HOLD)"),
+    (7, "Pack", "Packed in the shipping carton with the site sheet I-001"),
+    (8, "On the desk", "Night Navy body, data plate band and QR; ready for the customer"),
+]
+
+
+def render_ben1(lay: L.Layout, n: int, out_png: str):
+    """BEN 1 mini rack bench stages: x across the face, y depth (front at y = ext_w), z up."""
+    fig = plt.figure(figsize=(16, 9), dpi=100)
+    fig.patch.set_facecolor(BRAND["graphite"])
+    ax = fig.add_axes([0.02, 0.0, 0.76, 1.0], projection="3d")
+    ax.set_facecolor(BRAND["graphite"]); ax.set_axis_off()
+    l, w, h = lay.ext_l, lay.ext_w, lay.ext_h
+    body = "#06101F" if n >= 8 else "#1B2B42"
+    desk_z = -30
+    add_box(ax, -400, -300, desk_z - 30, l + 500, w + 400, desk_z, "#3A4A60" if n == 8 else "#24324A", alpha=1, zs=-10)
+    if n == 7:
+        add_box(ax, -60, -60, 0, l + 60, w + 60, h + 80, "#C9B37E", alpha=0.9, edge="#8A7A52", lw=0.6, zs=5)
+    else:
+        a = 0.35 if 2 <= n <= 6 else 0.95
+        add_box(ax, 0, 0, 0, l, w, 30, body, alpha=1, zs=0)
+        add_box(ax, 0, 0, h - 30, l, w, h, body, alpha=a, edge="#24406B", lw=0.4, zs=1)
+        add_box(ax, 0, 0, 0, 20, w, h, body, alpha=a, zs=1)
+        add_box(ax, l - 20, 0, 0, l, w, h, body, alpha=a, zs=1)
+        if n == 8 and lay.cfg.form == "cab12":
+            add_box(ax, 0, 0, 0, l, w, h, body, alpha=1, edge="#24406B", lw=0.6, zs=6)                    # closed cabinet
+            add_box(ax, 20, w, 30, l - 20, w + 8, h - 30, "#0B1A31", alpha=1, edge="#24406B", lw=0.6, zs=7)  # door
+        x0, x1 = (l - lay.L) / 2, (l + lay.L) / 2
+        if n >= 2:
+            for it in ([] if (n == 8 and lay.cfg.form == "cab12") else [i for i in lay.items if i.mount == "rack" and i.code != "CTL-POD"]):
+                if (it.tag.startswith("UPS") or it.tag.startswith("BAT")) and n < 4:
+                    continue
+                if it.tag.startswith("PDU") and n < 3:
+                    continue
+                col = KIND_COLOR.get(it.kind, BRAND["muted"])
+                add_box(ax, x0 + 10, it.y0, it.z0 + 2, x1 - 10, it.y1, it.z1 - 2, col, alpha=0.95 if n in (2, 3, 4) else 0.7, edge=BRAND["text"] if n in (2, 3, 4) else None, lw=0.3, zs=3)
+            if n >= 4:
+                u = lay.find("UPS1")
+                if u and u.mount == "floor":
+                    add_box(ax, u.x0, u.y0, 0, u.x1, u.y1, u.z1, KIND_COLOR["power"], alpha=0.95, edge=BRAND["text"], lw=0.4, zs=3)
+            if n >= 3 and not (n == 8 and lay.cfg.form == "cab12"):
+                add_lines(ax, [[(x1 - 30, w * 0.3, 60), (x1 - 30, w * 0.3, h - 80)], [(x0 + 30, w * 0.25, 60), (x0 + 30, w * 0.25, h - 80)]], BRAND["muted"], lw=1.2)
+        if n >= 5 and not (n == 8 and lay.cfg.form == "cab12"):
+            for p in (lay.find("P1"), lay.find("P2")):
+                add_box(ax, p.x0, p.y0, p.z0, p.x1, p.y1, p.z1, KIND_COLOR["controls"], alpha=1, edge=BRAND["text"], lw=0.6, zs=8)
+        if n == 6:
+            ramp = ["#5CD6FF", "#7FE3D2", "#C9E89A", "#FFB86B", "#FF8A3D"]
+            for k, c in enumerate(ramp):
+                add_box(ax, x0 + 40, -40 - k * 40, h * 0.3, x1 - 40, -10 - k * 40, h * 0.7, c, alpha=0.5, zs=9)
+            add_box(ax, x0 + 40, w + 10, h * 0.3, x1 - 40, w + 40, h * 0.7, "#5CD6FF", alpha=0.5, zs=9)
+        if n == 8:
+            bh = max(h * 0.06, 18)
+            add_box(ax, 0, w + 8, 4, l, w + 14, 4 + bh, "#0F2342", alpha=1, edge="#24406B", lw=0.5, zs=12)
+            ax.text(l / 2, w + 60, h * 0.7, "BEN 1", color="#EEF4FC", fontsize=12, ha="center", va="center", zdir="x", fontweight="bold", zorder=40)
+            ax.text(l / 2, w + 60, h * 0.85, "SCHREIBER AI", color="#4C9DFF", fontsize=7, ha="center", va="center", zdir="x", fontweight="bold", zorder=40)
+            ax.text(l / 2, w + 60, 4 + bh / 2, "SCHREIBER AI · BEN ENGINE · BEN 1 · REV 2", color="#B2C1D8", fontsize=4.5, ha="center", va="center", zdir="x", zorder=40)
+    ax.set_xlim(-400, l + 500); ax.set_ylim(-300, w + 400); ax.set_zlim(-60, h + 300)
+    xr, yr, zr = ax.get_xlim(), ax.get_ylim(), ax.get_zlim()
+    ax.set_box_aspect((xr[1] - xr[0], yr[1] - yr[0], zr[1] - zr[0]))
+    ax.view_init(elev=22, azim=118)
+    stage_no, title, sub = STAGES_BEN1[n - 1]
+    d = lay.d
+    fig.text(0.80, 0.90, "BEN Engine", color=BRAND["cyan"], fontsize=13, fontweight="bold")
+    fig.text(0.80, 0.865, f"BEN 1 ({lay.cfg.form})  —  in-house bench build", color=BRAND["text"], fontsize=11)
+    fig.text(0.80, 0.80, f"STAGE {stage_no} / 8", color=BRAND["cyan"], fontsize=10, fontweight="bold")
+    fig.text(0.80, 0.765, title, color=BRAND["text"], fontsize=15, fontweight="bold")
+    import textwrap
+    for i, ln in enumerate(textwrap.wrap(sub, 48)):
+        fig.text(0.80, 0.735 - i * 0.025, ln, color=BRAND["muted"], fontsize=9)
+    cfg_lines = [d["form_label"][:52], f"{lay.cfg.it_kw:g} kW IT, {d['voltage']}", f"UPS {d['ups_model'].split(' (')[0]}, ~{d['ups_runtime_min_est']} min",
+                 f"Heat to room {d['heat_to_room_w']} W; noise {d['noise_dba_est']} dBA at 1 m"]
+    fig.text(0.80, 0.26, "Configuration", color=BRAND["muted"], fontsize=8)
+    for i, ln in enumerate(cfg_lines):
+        fig.text(0.80, 0.235 - i * 0.022, ln, color=BRAND["text"], fontsize=8)
+    if n == 6:
+        fig.text(0.03, 0.08, "Thermal ramp: inlet (cool) -> exhaust (warm), legend only", color=BRAND["muted"], fontsize=8)
+    fig.text(0.80, 0.12, "Concept render — generated from configuration", color=BRAND["cyan"], fontsize=8.5, fontweight="bold")
+    fig.text(0.80, 0.095, f"design/renders/gen_renders.py · not to scale · drawing set {REV['set_label']}", color=BRAND["muted"], fontsize=7.5)
+    fig.text(0.80, 0.05, FOOTER[0], color=BRAND["cyan"], fontsize=9, fontweight="bold")
+    fig.text(0.80, 0.03, FOOTER[1], color=BRAND["muted"], fontsize=7.5)
+    fig.savefig(out_png, dpi=100, facecolor=BRAND["graphite"], metadata={"Software": None})
+    plt.close(fig)
+
+
+def main_rev2(a):
+    use_brand_v2()
+    assert REV.get("lineup") == "rev2", "run with --lineup rev2 so design/revision.py loads design/rev2/REVISION.json"
+    out_root = os.path.join(HERE, "rev2")
+    jobs = []
+    for t in L.TIERS_BY_LINEUP["rev2"]:
+        if a.tier and t not in [L.canonical_tier(x) for x in a.tier]:
+            continue
+        if t == "ben1":
+            for form in ("rack10", "cab12"):
+                jobs.append((L.resolve_rev2(t, form=form), os.path.join(out_root, t, form)))
+        else:
+            jobs.append((L.resolve_rev2(t), os.path.join(out_root, t)))
+    for lay, out in jobs:
+        os.makedirs(out, exist_ok=True)
+        for n in a.stage or range(1, 9):
+            p = os.path.join(out, f"stage-{n}.png")
+            (render_ben1 if lay.is_minirack else render_stage)(lay, n, p)
+            print("  wrote", os.path.relpath(p, os.path.dirname(os.path.dirname(HERE))))
+        if not a.stage:
+            contact_sheet(out, lay)
     return 0
 
 
