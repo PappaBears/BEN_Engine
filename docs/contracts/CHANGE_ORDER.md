@@ -1,7 +1,9 @@
 # Change Order — BEN Engine SOW
 
+<img src="../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CHANGE_ORDER.md` · Template rev [TEMPLATE_REV]
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/CHANGE_ORDER.md` · Template rev [TEMPLATE_REV]
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. One form per change. Delete this box before signature.
 
 | Field | Value |
@@ -111,4 +113,4 @@ If none: "No change to the acceptance criteria in SOW Section 8."
 Signature authority: Change Orders up to [CO_PM_AUTHORITY_LIMIT] may be signed by the project managers named in the SOW; above that amount, by the signatories of the SOW.
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/CHANGE_ORDER.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/CHANGE_ORDER.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

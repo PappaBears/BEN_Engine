@@ -1,0 +1,59 @@
+/* Schreiber AI brand v2 for BEN Engine proposals (software/ben_engine/proposal.py → to_html()).
+   Load AFTER the generator's inline <style>; it overrides by the same selectors. Hooks and the
+   markup changes the lead applies are in brand/v2/PROPOSAL_HOOKS.md.
+   Look: touchpoint 4 of the brand package (proposal scope page): Shop White page, Ink text, Deep Cobalt
+   rule and mark, Archivo headings, Plex body, Plex Mono labels and figures, data plate band at the foot. */
+@import url("fonts/fonts.css"); /* path relative to brand/v2/; inline the fonts when the proposal travels alone */
+:root{
+  --bg:#E8EEF6; --slate:#F4F7FB; --panel:#E8EEF6; --text:#0B1A31; --muted:#4A5D7A;
+  --cyan:#1E40AF;           /* Rev 1 accent name → Deep Cobalt (accent on white) */
+  --amber:#0B1A31;          /* td.hl (the proposed option) is set bold Ink with a cobalt rule, not amber */
+  --red:#C8323A; --green:#1B7F50;
+  --line:#D7DFEA; --wm:#4A5D7A;
+  --night:#06101F; --s2:#0F2342; --border:#24406B; --fog:#B2C1D8; --steel:#8EA7C8; --signal:#4C9DFF;
+  --hold:#F2C94C; --pending-light:#FBE7A1; --amber-btn:#FFB020;
+}
+html,body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",Arial,sans-serif;font-size:14px;line-height:1.55}
+code{font-family:"IBM Plex Mono",Consolas,monospace;color:var(--cyan)}
+nav.toc a{color:var(--muted);font:500 11px/1.4 "IBM Plex Mono",Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}
+nav.toc a:hover{color:var(--cyan)}
+.page{background:var(--slate);border:1px solid var(--line);border-radius:4px;padding:32px 36px 72px;box-shadow:0 10px 30px rgba(6,16,31,.12)}
+.page.cover{background:var(--slate);min-height:620px}
+.hdr{align-items:center;border-bottom:3px solid var(--cyan);padding-bottom:18px}
+.hdr .sai-lockup{height:34px;width:auto;flex:none}
+.eyebrow{color:var(--muted);font:500 12px/16px "IBM Plex Mono",Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
+h1{font-family:"Archivo","Arial Black",Arial,sans-serif;font-weight:800;font-stretch:125%;font-size:30px;line-height:1.15;letter-spacing:-.005em;color:var(--text)}
+h1 em,h2 em{font-style:normal;color:var(--cyan)}
+.sub{color:var(--muted);font:400 13px/1.5 "IBM Plex Mono",Consolas,monospace}
+h2{font-family:"Archivo","Arial Black",Arial,sans-serif;font-weight:700;font-size:21px;color:var(--text)}
+h2 .n{background:var(--night);color:var(--signal);border:0;border-radius:4px;font:600 13px/1 "IBM Plex Mono",Consolas,monospace}
+p,li{max-width:76ch}
+thead th{background:transparent;color:var(--muted);font:600 10.5px/1.3 "IBM Plex Mono",Consolas,monospace;letter-spacing:.08em;border-bottom:2px solid var(--text)}
+tbody td,tbody th{border-bottom:1px solid var(--line)}
+tbody tr:nth-child(even) td{background:rgba(232,238,246,.6)}
+td.num,th.num{font-family:"IBM Plex Mono",Consolas,monospace}
+td.hl{color:var(--text);font-weight:700;box-shadow:inset 3px 0 0 var(--cyan)}
+table.kv th{color:var(--muted);font:500 11px/1.5 "IBM Plex Mono",Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}
+a{color:var(--cyan)}
+/* proof slot not yet filled: yellow chip (package proof-slot rule) */
+.pending{font:600 .85em "IBM Plex Mono",Consolas,monospace;color:var(--text);background:var(--pending-light);padding:1px 6px;border-radius:3px;white-space:nowrap}
+/* the one call to action in a proposal (acceptance / sign): amber, Night Navy text */
+.cta-primary{display:inline-block;background:var(--amber-btn);color:var(--night);font:600 15px/1 "IBM Plex Sans",Arial,sans-serif;padding:12px 18px;border-radius:6px;text-decoration:none}
+/* footer of every page becomes the data plate band */
+.page{position:relative}
+.pf{position:absolute;left:0;right:0;bottom:0;margin:0;padding:0 1.4em;height:2.6em;align-items:center;gap:1.6em;border:0;border-top:1px solid var(--border);background:var(--s2);color:var(--fog);font:600 10.5px/1 "IBM Plex Mono",Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;overflow:hidden;border-radius:0 0 4px 4px}
+.pf::before,.pf::after{content:"";flex:none;width:.7em;height:.7em;border-radius:50%;background:var(--night);box-shadow:inset 0 0 0 1.5px var(--steel)}
+.pf b{color:var(--signal);font-weight:600}
+.pf i{flex:none;width:1px;height:1em;background:var(--border)}
+.pf .grow{flex:1}
+.legal{font:400 11px/1.5 "IBM Plex Mono",Consolas,monospace;color:var(--muted)}
+@media print{
+  :root{--bg:#fff;--slate:#fff}
+  html,body{background:#fff;font-size:10.5px}
+  .page{box-shadow:none;border:0;padding:0 0 14mm}
+  .hdr .sai-lockup{height:28px}
+  .pf{display:flex!important;position:static;margin-top:8mm;background:#EEF4FC;color:#4A5D7A;border-top:1px solid #B2C1D8;border-bottom:1px solid #B2C1D8;font-size:8pt}
+  .pf b{color:#1E40AF}
+  .pf::before,.pf::after{background:#fff;box-shadow:inset 0 0 0 1.2px #4A5D7A}
+  .wm{color:#4A5D7A;font-family:"IBM Plex Mono",Consolas,monospace}
+}

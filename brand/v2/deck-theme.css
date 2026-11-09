@@ -1,0 +1,69 @@
+/* Schreiber AI brand v2 deck theme for decks built by build_presentation.py (BEN Engine Rev 2).
+   Injected after the generator's own <style> by scripts/brand_deck.py; it only overrides.
+   Hooks the script adds: .bv2-lockup (header), .bv2-title-lockup (slide 1), .bv2-dp (data plate band per slide). */
+:root{color-scheme:dark;--bg:#06101F;--panel:#0F2342;--text:#EEF4FC;--muted:#B2C1D8;--accent:#4C9DFF;
+  --s1:#0B1A31;--s3:#16305A;--border:#24406B;--steel:#8EA7C8;--hold:#F2C94C;--amber-btn:#FFB020}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+header,footer{background:var(--s1);border-color:var(--border)}
+header{border-bottom:1px solid var(--border);padding:.8rem 4vw}
+footer{border-top:1px solid var(--border)}
+header strong{display:flex;align-items:center;gap:14px;font:800 14px/1 "Archivo","Arial Black",Arial,sans-serif;font-stretch:125%;letter-spacing:.02em;text-transform:uppercase}
+header span,footer span,.hint{font:500 12px/1.4 "IBM Plex Mono",Consolas,monospace;letter-spacing:.06em;color:var(--steel)}
+.bv2-lockup{height:22px;width:auto;display:block}
+.bv2-lockup.print{display:none}
+.bv2-rule{width:1px;height:20px;background:var(--border);display:inline-block}
+.number{font:500 12px/16px "IBM Plex Mono",Consolas,monospace;letter-spacing:.08em;color:var(--accent)}
+h1{font-family:"Archivo","Arial Black",Arial,sans-serif;font-weight:800;font-stretch:125%;letter-spacing:-.01em;line-height:1.12}
+h1 em{font-style:normal;color:var(--accent)}
+.message{color:var(--muted)}
+li{color:var(--text)}
+li::marker{color:var(--accent)}
+img{border-color:var(--border);border-radius:10px;background:var(--s1)}
+figcaption{font-family:"IBM Plex Mono",Consolas,monospace;color:var(--steel)}
+.notes{background:var(--panel);border-left-color:var(--accent)}
+button{background:transparent;border:2px solid var(--accent);color:var(--text);border-radius:6px;font-weight:600}
+button:hover{background:var(--s3);border-color:var(--accent)}
+button:focus-visible,a:focus-visible{outline-color:var(--accent)}
+a{color:var(--accent)}
+.slide{position:relative;padding-bottom:calc(4vh + 3.4rem)}
+/* title slide */
+.slide.bv2-title{background:radial-gradient(900px 520px at 80% 30%,rgba(30,64,175,.25),transparent 70%)}
+.bv2-title-lockup{width:min(420px,70vw);height:auto;display:block;margin:0 0 1.6rem}
+.bv2-title h1{font-weight:900;font-size:clamp(2.2rem,4vw,3.6rem);max-width:20ch}
+.bv2-by{font:500 13px/1.4 "IBM Plex Mono",Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);margin:0 0 .4rem}
+/* data plate band, the signature device: bottom of every slide */
+.bv2-dp{position:absolute;left:6vw;right:6vw;bottom:1.4rem;container-type:inline-size}
+.bv2-dp .dp{display:flex;align-items:center;gap:1.6em;height:2.6em;padding:0 1.4em;background:#0F2342;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font:600 max(10px,1.05cqw)/1 "IBM Plex Mono",Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:#B2C1D8;white-space:nowrap;overflow:hidden}
+.bv2-dp .dp::before,.bv2-dp .dp::after{content:"";flex:none;width:.7em;height:.7em;border-radius:50%;background:#06101F;box-shadow:inset 0 0 0 1.5px #8EA7C8}
+.bv2-dp .dp span{flex:none}.bv2-dp .dp i{flex:none;width:1px;height:1em;background:var(--border)}
+.bv2-dp .dp b{color:#4C9DFF;font-weight:600}.bv2-dp .dp .grow{flex:1}
+.bv2-legal{font:400 11px/1.4 "IBM Plex Mono",Consolas,monospace;color:var(--steel)}
+@media(max-width:760px){.bv2-dp{position:static;margin-top:1.5rem}.slide{padding-bottom:2rem}.bv2-dp .dp span.opt,.bv2-dp .dp i.opt{display:none}}
+/* print on white: Deep Cobalt mark, Ink text, band stays Night Navy-on-Paper */
+@media print{
+  html,body{background:#fff;color:#0B1A31}
+  .bv2-lockup.screen{display:none}.bv2-lockup.print{display:block}
+  .slide.bv2-title{background:#fff}
+  .slide{padding-bottom:.9in!important}
+  h1{color:#0B1A31}h1 em{color:#1E40AF}.number{color:#1E40AF}.message,figcaption{color:#4A5D7A}li{color:#0B1A31}li::marker{color:#1E40AF}
+  img{background:#F4F7FB;border-color:#D7DFEA}
+  .bv2-title-lockup.screen{display:none}.bv2-title-lockup.print{display:block!important}
+  .bv2-dp{left:.7in;right:.7in;bottom:.3in}
+  .bv2-dp .dp{background:#EEF4FC;border-color:#B2C1D8;color:#4A5D7A;font-size:8pt}
+  .bv2-dp .dp b{color:#1E40AF}
+  .bv2-dp .dp::before,.bv2-dp .dp::after{background:#fff;box-shadow:inset 0 0 0 1.2px #4A5D7A}
+}
+.bv2-title-lockup.print{display:none}
+/* the generator styles every <img> as a framed figure; brand marks are not figures */
+img.bv2-lockup,img.bv2-title-lockup{border:0!important;background:none!important;border-radius:0!important;max-height:none!important;object-fit:contain}
+img.bv2-title-lockup{width:auto;height:clamp(72px,11vh,112px);align-self:flex-start;margin-bottom:1.2rem}
+h1[tabindex="-1"]:focus{outline:none}
+@media print{
+  img.bv2-title-lockup.print{height:.62in;margin-bottom:.12in}
+  .bv2-by{font-size:8pt;margin:0 0 .04in}
+  .bv2-title h1{font-size:28pt;margin:.06in 0 .12in}
+  .bv2-title .message{font-size:15pt;margin-bottom:.12in}
+  .bv2-title li{font-size:13pt;margin:.25em 0}
+  .bv2-title img:not(.bv2-title-lockup){max-height:2.3in}
+  .slide{justify-content:flex-start!important}
+}

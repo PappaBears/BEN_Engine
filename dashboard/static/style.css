@@ -251,3 +251,4 @@ h2, .inspector-title { font-family: var(--display); }
 @media (max-width: 900px) { .brand .lockup { height: 18px; } .dp-plate { display: none; } }
 @media (max-width: 420px) { .brand .lockup, .brand-rule { display: none; } .brand .mark-sm { display: block; } }
 .dp-plate .u { text-transform: none; }
+.tile .k span + span { text-transform: none; letter-spacing: 0; }

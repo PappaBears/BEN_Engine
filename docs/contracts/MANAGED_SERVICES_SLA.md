@@ -1,7 +1,9 @@
 # Managed Services Agreement and Service Level Agreement (SLA) — BEN Engine
 
+<img src="../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/MANAGED_SERVICES_SLA.md` · Template rev [TEMPLATE_REV]
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/MANAGED_SERVICES_SLA.md` · Template rev [TEMPLATE_REV]
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. This SLA is attached to a SOW as Annex E when the delivery model is "managed" or Managed Services are ordered later. Delete this box before signature.
 
 **SLA ID:** [SLA_ID]
@@ -255,4 +257,4 @@ Credits are capped at 100 % of the monthly fee in total, are Customer's sole rem
 | Date | [SIGNATURE_DATE_SCHREIBER] | [SIGNATURE_DATE_CUSTOMER] |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/MANAGED_SERVICES_SLA.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/MANAGED_SERVICES_SLA.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

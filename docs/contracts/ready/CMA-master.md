@@ -1,7 +1,9 @@
 # Contract Manufacturing Agreement — BEN Engine Build Shop
 
+<img src="../../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · Template rev 7f10d34
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · Template rev 4d362db
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Used with the third-party container modification shop, electrical integrator or UL 508A panel shop that builds Units for Schreiber AI (the operator's decision to manufacture with third parties first). Delete this box before signature.
 
 **Agreement ID:** [CM_AGREEMENT_ID]
@@ -348,4 +350,4 @@ Manufacturer carries and provides certificates for: commercial general liability
 | Date | [SIGNATURE_DATE_SCHREIBER] | [SIGNATURE_DATE_CM] |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

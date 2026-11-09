@@ -11,6 +11,11 @@ an 800 VDC bus whose voltage sags with load and, on utility loss, drifts with th
 fault that trips one rack section. ``cooling == "dlc_hd"`` adds a W45 liquid loop (supply/return, flow, ΔT),
 CDU pumps N+1 with a ``cdu_pump_fail`` fault and failover, and the measured leak-to-isolation time on ``leak``.
 
+Rev 2 BEN 1 (``kind == "minirack"``) has its own office-air model (``_step_minirack``): the "outdoor" temperature is the office
+air the unit stands in, the room warms with the unit's heat through ``office_room_ua_w_k``, the cabinet's extraction fans set the
+internal recirculation, and the noise at 1 m is tracked and alarmed. Faults that need hardware BEN 1 does not have (generator,
+liquid leak, DC, CDU pumps; door and fan faults on the open 10-inch rack) are not applicable.
+
 The twin is the single source of truth for simulation mode (no hardware), for commissioning
 rehearsal, for automated sweeps, and for prediction (analysis.py fits its parameters from
 measured data and then runs it forward).
@@ -24,7 +29,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
 
-from .config import Config, COOLING_LIBRARY, CLIMATE_DESIGN
+from .config import Config, COOLING_LIBRARY, CLIMATE_DESIGN, MINIRACK, TIER_GEOMETRY
 
 AIR_CP_J_KGK = 1006.0
 AIR_RHO = 1.18          # kg/m3 at ~25 C sea level
@@ -69,6 +74,12 @@ class TwinParams:
     leak_detect_s: float = 2.0
     leak_valve_travel_s: float = 6.0
     cooling_time_constant_s: float = 90.0
+    # BEN 1 (office air): how fast the room sheds the unit's heat (office with central HVAC ~800 W/K, i.e. +2 K at 1.6 kW; a closed closet ~40 W/K),
+    # the IT devices' own air temperature rise and the cabinet-fan noise at 1 m
+    office_room_ua_w_k: float = 800.0
+    office_room_tau_s: float = 900.0
+    minirack_it_dt_k: float = 12.0
+    minirack_fan_dba: float = 28.0
     sensor_noise_c: float = 0.08         # 1-sigma noise on temperature channels
     sensor_noise_pa: float = 0.3
     fan_law_exp: float = 2.7             # fan power ∝ speed^2.7 (real fans, not ideal 3)
@@ -93,7 +104,12 @@ class Twin:
         self.rng = random.Random(seed)
         self.t = 0.0
         clim = CLIMATE_DESIGN[cfg.climate]
-        self.outdoor_c = outdoor_c if outdoor_c is not None else (clim["t_design_c"] - 10.0)
+        self.mini = self.d["kind"] == "minirack"
+        if self.mini:
+            # BEN 1 stands indoors: "outdoor" is the office air around it
+            self.outdoor_c = outdoor_c if outdoor_c is not None else MINIRACK["office_design_c"]
+        else:
+            self.outdoor_c = outdoor_c if outdoor_c is not None else (clim["t_design_c"] - 10.0)
         self.it_fraction = 0.6
         n = cfg.racks
         self.rack_inlet_c = [self.p.supply_setpoint_c + 1.5] * n
@@ -130,6 +146,21 @@ class Twin:
         self.leak_t0: Optional[float] = None
         self.leak_isolated = False
         self.leak_to_isolation_s: Optional[float] = None
+        if self.mini:
+            g = self.d["geometry"]
+            self.has_door = bool(g.get("door"))
+            self.has_fans = bool(g.get("door"))          # cab12 has extraction fans N+1; the open 10-inch rack has none
+            self.room_c = self.outdoor_c + 1.0
+            self.rack_inlet_c = [self.outdoor_c + 1.0] * n
+            self.rack_outlet_c = [self.outdoor_c + 1.0 + self.p.minirack_it_dt_k * 0.6] * n
+            self.supply_c = self.outdoor_c
+            self.return_c = self.rack_outlet_c[0]
+            # installed UPS energy (internal + external packs) from the UPS model chosen in config.derived()
+            self.mini_batt_kwh = next(u["wh"] for u in MINIRACK["ups_models"] if u["va"] == self.d["ups_va"]) * (1 + self.d["ups_battery_packs"]) / 1000.0 / 0.9
+            self.noise_dba = self.d["noise_dba_est"]
+            for u in self.cooling_units:          # cab12 fans run active-active (N+1 shared); the open rack has none
+                u["on"] = self.has_fans
+                u["fan_pct"] = 50.0 if self.has_fans else 0.0
 
     # ------------------------------------------------------------------ controls
     def set_it_load(self, fraction: float):
@@ -138,15 +169,32 @@ class Twin:
     def set_outdoor(self, c: float):
         self.outdoor_c = c
 
+    MINIRACK_NA = ("generator_fail", "leak", "dc_ground_fault", "dc_arc", "cdu_pump_fail")
+    MINIRACK_NEEDS_CABINET = ("door_open", "cooling_unit_fail", "filter_clog")
+
     def applicable_faults(self) -> tuple:
-        """Faults this unit can take: the DC faults need dc800, the loop faults need dlc_hd."""
-        return tuple(f for f in self.FAULTS if (f not in self.DC_FAULTS or self.dc800) and (f not in self.LOOP_FAULTS or self.hd))
+        """Faults this unit can take: the DC faults need dc800, the loop faults need dlc_hd. BEN 1: no generator, no liquid loop
+        (liquid only inside the IT device), no DC bus; the open 10-inch rack has no door and no extraction fans."""
+        out = tuple(f for f in self.FAULTS if (f not in self.DC_FAULTS or self.dc800) and (f not in self.LOOP_FAULTS or self.hd))
+        if self.mini:
+            out = tuple(f for f in out if f not in self.MINIRACK_NA and (f not in self.MINIRACK_NEEDS_CABINET or self.has_fans))
+        return out
+
+    def not_applicable_reason(self, name: str) -> str:
+        """Plain-language reason a fault does not apply (used by sweeps and commissioning to skip with the reason stated)."""
+        if self.mini:
+            return {"generator_fail": "BEN 1 has no generator (plug-in UPS only)",
+                    "leak": "BEN 1 has no facility liquid loop; any liquid is a sealed loop inside the IT device",
+                    "door_open": "the 10-inch open rack has no door", "cooling_unit_fail": "the 10-inch open rack has no extraction fans; the IT devices' own fans move the air",
+                    "filter_clog": "the 10-inch open rack has no intake filter",
+                    }.get(name, "not applicable to BEN 1")
+        return f"needs {'dc800' if name in self.DC_FAULTS else 'dlc_hd'}"
 
     def inject(self, name: str, **params):
         if name not in self.FAULTS:
             raise ValueError(f"unknown fault {name}; valid: {self.FAULTS}")
         if name not in self.applicable_faults():
-            raise ValueError(f"fault {name} does not apply to this configuration (power {self.cfg.power_architecture}, cooling {self.cfg.cooling})")
+            raise ValueError(f"fault {name} does not apply to this configuration (power {self.cfg.power_architecture}, cooling {self.cfg.cooling}): {self.not_applicable_reason(name)}")
         self.faults[name] = params
         if name == "dc_arc":
             self.dc_arc_rack = int(params.get("rack", 0))
@@ -234,7 +282,93 @@ class Twin:
         self.t += dt
         self._seq += 1
 
+    def house_kw(self) -> float:
+        """House load (lighting, controls) used by the power chain and the commissioning reconciliation."""
+        return MINIRACK["aux_kw"] if self.mini else 0.5 + 0.02 * self.cfg.it_kw
+
+    def design_ambient_c(self) -> float:
+        """Design ambient for the temperature sweep: office maximum for BEN 1, climate design outdoor temperature otherwise."""
+        return MINIRACK["office_max_c"] if self.mini else CLIMATE_DESIGN[self.cfg.climate]["t_design_c"]
+
+    def _step_minirack(self, h: float):
+        """BEN 1 office-air model: IT fans push the IT heat through the cabinet; the cabinet extraction fans (cab12, N+1) carry it out
+        to the room; when extraction is short (failed fan, clogged filter) hot exhaust recirculates to the inlets. The room warms by
+        heat / office_room_ua. On utility loss the UPS carries IT, fans and Pods (all plug-in)."""
+        cfg, p, d = self.cfg, self.p, self.d
+        it_kw = cfg.it_kw * self.it_fraction
+        rho_cp = AIR_RHO * AIR_CP_J_KGK
+        # fans: start standby on failure, speed follows load
+        running = [u for u in self.cooling_units if u["on"] and u["ok"]]
+        if self.has_fans:                      # active-active: every healthy fan runs
+            for u in self.cooling_units:
+                if u["ok"] and not u["on"]:
+                    u["on"] = True
+                    u["fan_pct"] = 60.0
+                    running.append(u)
+        cl = COOLING_LIBRARY[cfg.cooling]
+        unit_flow = cl["unit_kw"] * 1000.0 / (rho_cp * cl.get("design_rise_k", 10.0))
+        if "filter_clog" in self.faults:
+            self.filter_dp_pa = min(250.0, self.filter_dp_pa + 0.02 * h)
+        clog = max(0.4, 1.0 - max(0.0, self.filter_dp_pa - 25.0) / 375.0)
+        it_flow = max(it_kw, 0.02) * 1000.0 / (rho_cp * p.minirack_it_dt_k)
+        # fan control: extraction = 115 % of the IT devices' own airflow, shared by the running fans
+        n_run = max(1, len(running))
+        target = max(30.0, min(100.0, 115.0 * it_flow / (unit_flow * n_run * clog)))
+        for u in self.cooling_units:
+            if u["on"] and u["ok"] and self.has_fans:
+                u["fan_pct"] += (target - u["fan_pct"]) * min(1.0, h / 20.0)
+            else:
+                u["fan_pct"] = 0.0
+        # power: plug-in UPS carries everything
+        ups_in = it_kw / MINIRACK["ups_eff"]
+        on_battery = not self.utility_ok
+        if on_battery:
+            self.ups_soc -= (ups_in * h / 3600.0) / max(self.mini_batt_kwh, 1e-3) * 100.0 * 0.9
+            self.ups_soc = max(0.0, self.ups_soc)
+            if self.ups_soc <= 0.0:
+                it_kw = 0.0
+        else:
+            self.ups_soc = min(100.0, self.ups_soc + h / 3600.0 / 2.0 * 100.0)    # lithium, ~2 h recharge
+        # extraction: running fans' share of the design flow (unit_kw at the design rise), reduced by a clogged filter
+        if self.has_fans:
+            extract = sum(unit_flow * u["fan_pct"] / 100.0 for u in self.cooling_units if u["on"] and u["ok"]) * clog
+            if "door_open" in self.faults:
+                extract += it_flow           # open door: room air reaches the inlets directly
+            recirc = 0.05 if extract >= it_flow else min(0.6, 0.05 + (1.0 - extract / it_flow))
+        else:
+            recirc = 0.06                    # open frame: a little exhaust wraps round to the front
+        dT = p.minirack_it_dt_k * (it_kw / max(cfg.it_kw, 1e-6)) / max(self.it_fraction, 1e-6) if it_kw > 0 else 0.0
+        heat_w = (ups_in + MINIRACK["aux_kw"]) * 1000.0 if (self.utility_ok or self.ups_soc > 0) else 0.0
+        room_target = self.outdoor_c + heat_w / p.office_room_ua_w_k
+        self.room_c += (room_target - self.room_c) * min(1.0, h / p.office_room_tau_s)
+        for i in range(cfg.racks):
+            inlet_target = self.room_c + recirc * dT / max(1.0 - recirc, 0.1)
+            self.rack_inlet_c[i] += (inlet_target - self.rack_inlet_c[i]) * min(1.0, h / 20.0)
+            self.rack_outlet_c[i] += ((self.rack_inlet_c[i] + dT) - self.rack_outlet_c[i]) * min(1.0, h / 20.0)
+        self.supply_c = self.room_c
+        self.return_c = sum(self.rack_outlet_c) / cfg.racks
+        for u in self.cooling_units:
+            u["kw"] = (cl["unit_kw"] * u["fan_pct"] / 100.0 * clog) if (u["on"] and u["ok"] and self.has_fans) else 0.0
+        fan_elec = sum(cl["unit_kw"] / cl["cop"] * (u["fan_pct"] / 100.0) ** p.fan_law_exp for u in self.cooling_units if u["on"] and u["ok"] and self.has_fans)
+        self.cooling_kw_elec = fan_elec
+        self.aisle_dp_pa = (2.0 * (max([u["fan_pct"] for u in self.cooling_units] + [0.0]) / 100.0) ** 2) if self.has_fans else 0.0
+        self.rh += (42.0 - self.rh) * min(1.0, h / 600.0)
+        # noise at 1 m: IT at this power, cabinet insertion loss (3 dB with the door open), + extraction fans
+        g = d["geometry"]
+        src = MINIRACK["noise_src_dba"]["rack" if self.has_fans else "desktop"] + 15.0 * math.log10(max(it_kw * 1000.0, 50.0) / 200.0)
+        il = g.get("insertion_loss_db", 0.0) if "door_open" not in self.faults else min(3.0, g.get("insertion_loss_db", 0.0))
+        fan_db = p.minirack_fan_dba + 20.0 * math.log10(max(max([u["fan_pct"] for u in self.cooling_units] + [1.0]), 1.0) / 100.0) if self.has_fans else -10.0
+        self.noise_dba = 10.0 * math.log10(10 ** ((src - il) / 10.0) + 10 ** (fan_db / 10.0)) if it_kw > 0 else 25.0
+        self.arc_dark = None
+        self.it_kw_now = it_kw
+        aux = fan_elec + MINIRACK["aux_kw"]
+        self.utility_kw = (ups_in + aux) if self.utility_ok else 0.0
+        self.pue = (ups_in + aux) / it_kw if it_kw > 0.01 else float("nan")
+        self._update_alarms()
+
     def _step_once(self, h: float):
+        if self.mini:
+            return self._step_minirack(h)
         cfg, p, d = self.cfg, self.p, self.d
         it_kw = cfg.it_kw * self.it_fraction
         rack_kw = it_kw / cfg.racks
@@ -279,8 +413,11 @@ class Twin:
         else:
             ups_in_kw = it_kw / p.ups_eff / p.pdu_eff
             if on_battery:
-                # battery_kwh at nominal; discharge
-                self.ups_soc -= (ups_in_kw * h / 3600.0) / max(d["battery_kwh"], 0.1) * 100.0 * 0.9
+                # battery_kwh at nominal; discharge (liquid-first: installed cabinets also carry the pumps and fan coils)
+                if d.get("liquid_first"):
+                    self.ups_soc -= ((ups_in_kw + getattr(self, "cooling_kw_elec", 0.0)) * h / 3600.0) / max(d["battery_kwh_installed"], 0.1) * 100.0 * 0.9
+                else:
+                    self.ups_soc -= (ups_in_kw * h / 3600.0) / max(d["battery_kwh"], 0.1) * 100.0 * 0.9
                 self.ups_soc = max(0.0, self.ups_soc)
                 if self.ups_soc <= 0.0:
                     it_kw = 0.0
@@ -289,7 +426,8 @@ class Twin:
                 self.ups_soc = min(100.0, self.ups_soc + h / 3600.0 / 4.0 * 100.0)  # 4 h recharge
         self.arc_dark = arc_dark
         # cooling loses power on battery unless generator (mechanical load is not on UPS, except the BEN 5 cabinet)
-        cooling_powered = self.utility_ok or self.generator_on or (d["kind"] == "cabinet")
+        # Rev 2 liquid-first tiers: CDU pumps and fan coils are on the UPS (a GB300-class cold plate has seconds of thermal mass)
+        cooling_powered = self.utility_ok or self.generator_on or (d["kind"] == "cabinet") or bool(d.get("liquid_first"))
 
         # ---- cooling capacity and electrical
         cool_kw_total = 0.0
@@ -447,6 +585,15 @@ class Twin:
             self._alarm("loop_flow_low", "critical", f"Liquid loop flow {self.loop_flow_lpm:.0f} L/min below 20 % of design", getattr(self, "loop_flow_low", False) and not self.leak_isolated)
             self._alarm("loop_supply_high", "warn", f"Loop supply {self.loop_supply_c:.1f} C above the W45 limit", self.loop_supply_c > 45.0)
             self._alarm("loop_isolated", "critical", f"Liquid loop isolated after leak ({self.leak_to_isolation_s} s to valve closed)", self.leak_isolated)
+        if self.mini:
+            tgt = self.d["noise_dba_target"]
+            self._alarm("noise_high", "warn", f"Estimated noise {self.noise_dba:.1f} dBA at 1 m (from IT power, fan speed and door state; the Pods carry no microphone) above the {tgt:.0f} dBA target + 3 dB", self.noise_dba > tgt + 3.0)
+            self._alarm("room_hot", "warn", f"Room air {self.room_c:.1f} C above the {MINIRACK['office_max_c']:.0f} C office limit: the room is not removing BEN 1's heat", self.room_c > MINIRACK["office_max_c"])
+            if self.has_door:
+                self._alarm("door_open", "warn", "Cabinet door open (sound damping lost)", "door_open" in self.faults)
+            if self.has_fans:
+                self._alarm("filter_dp", "warn", f"Cabinet intake filter ΔP {self.filter_dp_pa:.0f} Pa, replace filter", self.filter_dp_pa > 150.0)
+            return
         self._alarm("door_open", "warn", "Container door open", "door_open" in self.faults)
         self._alarm("leak", "critical", "Leak detected under floor", "leak" in self.faults)
         self._alarm("filter_dp", "warn", f"Filter ΔP {self.filter_dp_pa:.0f} Pa, replace filters", self.filter_dp_pa > 150.0)
@@ -460,6 +607,11 @@ class Twin:
         eff = 1.0 if self.dc800 else p.ups_eff
         ups_runtime = (self.ups_soc / 100.0 * self.d["battery_kwh"] * 0.9) / max(self.it_kw_now / eff, 0.1) * 60.0 if hasattr(self, "it_kw_now") else 0.0
         extra: Dict[str, Any] = {}
+        if self.mini:
+            ups_runtime = (self.ups_soc / 100.0 * self.mini_batt_kwh * 0.9) / max(getattr(self, "it_kw_now", 0.0) / MINIRACK["ups_eff"], 0.005) * 60.0
+            extra["mini"] = {"noise_dba": round(self.noise_dba + self._noise(0.2), 1), "noise_target_dba": self.d["noise_dba_target"],
+                             "room_c": round(self.room_c, 2), "office_c": round(self.outdoor_c, 2), "form": self.cfg.form,
+                             "heat_to_room_w": round(getattr(self, "utility_kw", 0.0) * 1000.0)}
         if self.dc800:
             v = self.v_bus
             gf = "dc_ground_fault" in self.faults

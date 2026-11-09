@@ -1,7 +1,9 @@
 # BEN Engine — Contracts and Paperwork Index
 
+<img src="../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE SET — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/README.md` · Template rev [TEMPLATE_REV]
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/README.md` · Template rev [TEMPLATE_REV]
 
 This folder holds the commercial paperwork for BEN Engine as a **two-sided system**: the customer side (Proposal → MSA → SOW → Change Orders → Acceptance → Warranty / Licence / SLA) and the supply side (Integrators, Contract Manufacturers, Suppliers). The two sides are written back-to-back so that delay, scope-change and quality risk land on the party that caused them. Every template is machine-fillable: bracketed `[FIELD_NAME]` tokens use one vocabulary listed in `docs/contracts/fields.json`, so the proposal generator can pre-fill a whole deal from the selector's `config.json` and the Proposal.
 
@@ -189,7 +191,7 @@ Validation rule for the generator: after substitution, `grep -c '\[[A-Z][A-Z0-9_
 15. Whether the Integrator's End Customer sublicence should be a Schreiber AI-form end-user licence rather than flow-down language.
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Index maintained at `docs/contracts/README.md` · TEMPLATE SET — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Index maintained at `docs/contracts/README.md` · TEMPLATE SET — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.
 
 
 ## Ready set (pre-filled)

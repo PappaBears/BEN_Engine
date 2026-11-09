@@ -1,7 +1,9 @@
 # Acceptance Certificates — FAT, SAT and Turnover
 
+<img src="../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/ACCEPTANCE_CERTIFICATES.md` · Template rev [TEMPLATE_REV]
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/ACCEPTANCE_CERTIFICATES.md` · Template rev [TEMPLATE_REV]
 > Bracketed `[FIELDS]` are filled by the proposal generator and by the Commissioning Script output. Each certificate is issued as a separate signed PDF and filed in the Turnover Package (items B1, B2, H3). Delete this box before signature.
 
 Three certificates are used for every Unit, in this order:
@@ -316,4 +318,4 @@ Both Parties confirm that `docs/TURNOVER.md` Section 5 is met: every Turnover Pa
 | Date | [TURNOVER_DATE] | [TURNOVER_DATE] |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/ACCEPTANCE_CERTIFICATES.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/ACCEPTANCE_CERTIFICATES.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

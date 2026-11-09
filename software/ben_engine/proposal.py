@@ -65,16 +65,21 @@ RISKS_PATH = REPO_ROOT / "web" / "assets" / "risks.json"
 
 # ----------------------------------------------------------------------------- commercial inputs
 MARGIN_HW = 0.28                       # gross margin on purchased hardware + build labour (unit_economics.py)
-CONTROLS_LICENCE_PER_UNIT_YR = {"ben5": 1200, "ben30": 4800, "ben150": 12000, "ben500": 30000, "ben2000": 90000}
+CONTROLS_LICENCE_PER_UNIT_YR = {"ben5": 1200, "ben30": 4800, "ben150": 12000, "ben500": 30000, "ben2000": 90000,
+                                # Rev 2 tiers: BEN Controls Mini (BEN Care agent + 2 Pods); dense tiers priced per the BEN 150 -> BEN 500 slope
+                                "ben1": 480, "ben300": 24000, "ben700": 54000}
 WHITE_LABEL_UPLIFT = 1.25              # white-label licence = controls licence x 1.25 (partner brand, source escrow)
 MANAGED_PER_KW_MONTH = 45.0            # USD/kW-month; below retail colocation because the customer owns the asset
 MANAGED_TERM_YEARS = 3                 # headline managed term; 1 and 5 year totals are also shown
 VALIDITY_DAYS = 60
 PAYMENT_MILESTONES = [("Engineering release (H4)", 0.30), ("Factory acceptance test (H13)", 0.40),
                       ("Site acceptance test (H19)", 0.25), ("Turnover (W20)", 0.05)]
+# BEN 1 (Rev 2) has no FAT/SAT on a pad: Schreiber AI assembles, burns in and ships it, then sets it up and hands it over
+PAYMENT_MILESTONES_MINI = [("Order confirmation (H4)", 0.50), ("Bench test passed and shipped (H13)", 0.40), ("Setup and handover (H19)", 0.10)]
 LD_RATE_PCT_PER_WEEK = 0.5             # delay liquidated damages, % of capital price per week of Schreiber AI-caused delay
 LD_CAP_PCT = 5.0                       # cap on delay LDs, % of capital price
-STORAGE_FEE_PER_DAY = {"ben5": 60, "ben30": 150, "ben150": 300, "ben500": 600, "ben2000": 2500}  # finished unit/modules that cannot ship (USD/day)
+STORAGE_FEE_PER_DAY = {"ben5": 60, "ben30": 150, "ben150": 300, "ben500": 600, "ben2000": 2500,  # finished unit/modules that cannot ship (USD/day)
+                       "ben1": 10, "ben300": 400, "ben700": 750}
 WARRANTY_WORKMANSHIP_MONTHS = 24
 WARRANTY_EQUIPMENT_MONTHS = 12         # pass-through of vendor warranties; longer vendor terms are passed through as-is
 
@@ -102,6 +107,11 @@ SCHEDULE_TIER = {
     "ben500": {"survey": 4, "release": 3, "short_lead": 3, "factory": 12, "cool_ctl": 4, "fat": 2, "ship": 2, "hookup": 1, "sat": 1, "permits": 10, "civil": 8, "ref_total": "32-36 weeks"},
     # BEN 2000: long-lead items (MV pad-mount transformers, 2 MW UPS strings, generators) typically 40 weeks from release;
     # site works (slab, MV service, yard) run 20 weeks in parallel; order-to-service about 52 weeks.
+    # Rev 2. BEN 1: assembled and shipped by Schreiber AI in 2-3 weeks (no contract manufacturer, no pad, no SAT: setup and handover).
+    "ben1": {"survey": 0, "release": 0, "short_lead": 1, "factory": 1, "cool_ctl": 0, "fat": 1, "ship": 1, "hookup": 0, "sat": 0, "permits": 0, "civil": 0, "ref_total": "2-3 weeks with customer-furnished or in-stock compute"},
+    # Liquid-first dense tiers: CDUs, Galaxy VL frames and the skid gear set the path (catalog lead times); FAT adds the loop pressure / flush test.
+    "ben300": {"survey": 3, "release": 3, "short_lead": 3, "factory": 10, "cool_ctl": 4, "fat": 2, "ship": 1, "hookup": 2, "sat": 1, "permits": 8, "civil": 6, "ref_total": "about 30-34 weeks, set by the CDU, UPS and compute lead times"},
+    "ben700": {"survey": 4, "release": 4, "short_lead": 3, "factory": 14, "cool_ctl": 5, "fat": 2, "ship": 2, "hookup": 2, "sat": 2, "permits": 10, "civil": 8, "ref_total": "about 36-40 weeks, set by the switchboard, UPS, CDU and compute lead times"},
     "ben2000": {"survey": 4, "release": 8, "short_lead": 12, "factory": 20, "cool_ctl": 4, "fat": 2, "ship": 3, "hookup": 4, "sat": 2, "permits": 12, "civil": 20, "long_lead_typical": 40, "ref_total": "52 weeks when the utility energises inside 40 weeks and transformers are ordered at engineering release; 60–72 weeks at today's catalog lead times (48–52 weeks for pad-mount transformers and 1,250 kW generators), which is what this schedule shows"},
 }
 
@@ -325,7 +335,36 @@ def _price_option(key: str, cfg: Config, catalog, margin: float, headline: bool)
 
 
 # ----------------------------------------------------------------------------- schedule
+def _schedule_minirack(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """BEN 1: Schreiber AI orders the parts, assembles, burns in and ships; then setup and handover at the customer. No contract
+    manufacturer, no pad, no SAT. Compute is customer-selectable; when Schreiber AI buys it, its lead time can set the path."""
+    leads = sorted([r for r in rows if r.get("lead_time_weeks")], key=lambda r: (-(r["lead_time_weeks"] or 0), -r["ext_price_usd"]))
+    long_lead = [{"code": r["code"], "name": r["name"], "lead_time_weeks": r["lead_time_weeks"], "qty": r["qty"], "unit": r["unit"],
+                  "ext_price_usd": r["ext_price_usd"], "vendor": r["vendor"]} for r in leads[:5]]
+    # BEN Pods, their enclosures, the Thread radio and labels are Schreiber AI stock items for BEN 1 (built ahead in Pod production batches)
+    stock = ("CTL-POD", "CTL-POD-ENCL", "CTL-RCP", "CTL-LABELS", "ENV-DATAPLATE-MINI")
+    infra = max([(r["lead_time_weeks"] or 0) for r in rows if r["subsystem"] != "compute" and r["code"] not in stock] + [1])
+    comp = max([(r["lead_time_weeks"] or 0) for r in rows if r["subsystem"] == "compute"] + [0])
+    w_parts = max(1, infra)
+    w_burn = w_parts + 1
+    w_ship = w_burn + 1 if w_burn < 2 else w_burn
+    w_ship = max(2, min(3, w_ship)) if infra <= 2 else w_ship
+    w_hand = w_ship + 1
+    ms = [
+        {"week": 0, "milestone": "Order confirmation: form (10-inch rack or 12U cabinet), compute (customer-furnished or bought by us), outlet and room checked against section 11", "owner": "Customer + Schreiber AI", "hold": "H4", "path": "critical"},
+        {"week": w_parts, "milestone": f"Parts on the bench (longest non-compute lead {infra} weeks; BEN Pods from Schreiber AI stock)", "owner": "Schreiber AI", "hold": "-", "path": "critical"},
+        {"week": w_burn, "milestone": "Assembled, imaged and 24 h burn-in test passed (commissioning script in factory mode)", "owner": "Schreiber AI; customer may witness remotely", "hold": "H13", "path": "critical"},
+        {"week": w_ship, "milestone": "Shipped (parcel for the 10-inch rack, LTL with liftgate for the 12U cabinet)", "owner": "Schreiber AI", "hold": "-", "path": "critical"},
+        {"week": w_hand, "milestone": "Setup and handover at the customer (or remote): placement, outlet check, network, BEN Care enrolment, room-heat check; in service", "owner": "Schreiber AI + customer", "hold": "H19, W20", "path": "critical"},
+    ]
+    if comp > infra:
+        ms.append({"week": comp + 2, "milestone": f"NOTE: compute bought by Schreiber AI has a {comp}-week lead time; with customer-furnished compute the dates above hold", "owner": "Customer", "hold": "-", "path": "risk"})
+    return ms, long_lead
+
+
 def _schedule(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    if TIER_GEOMETRY[cfg.tier]["kind"] == "minirack":
+        return _schedule_minirack(cfg, rows)
     s = SCHEDULE_TIER[cfg.tier]
     leads = sorted([r for r in rows if r.get("lead_time_weeks")], key=lambda r: (-(r["lead_time_weeks"] or 0), -r["ext_price_usd"]))
     max_lead = max((r["lead_time_weeks"] or 0) for r in rows) if rows else 0
@@ -378,6 +417,10 @@ def _schedule(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, A
 
 # ----------------------------------------------------------------------------- document readers
 def _drawing_index(tier: str) -> Tuple[List[List[str]], str]:
+    if TIER_GEOMETRY[tier]["kind"] == "minirack":
+        return ([["A-001", "Mini rack general arrangement, U stack and desk / closet footprint", "1:5"], ["E-001", "Power: outlet circuit, UPS, PDU one-line", "NTS"],
+                 ["C-001", "BEN Pods, network and BEN Care enrolment", "NTS"]],
+                "Rev 2.A set generated from the configuration at order confirmation (design/layout.py BEN 1 resolver, checks I-B1..I-B7)")
     md = _read(REPO_ROOT / "design" / "drawings" / tier / "INDEX.md")
     rows: List[List[str]] = []
     for headers, trs in _md_tables(md):
@@ -519,7 +562,9 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
     bt = totals(rows)
     milestones, long_lead = _schedule(cfg, rows)
     pay = []
-    for name, share in PAYMENT_MILESTONES:
+    mini = TIER_GEOMETRY[cfg.tier]["kind"] == "minirack"
+    pay_ms = PAYMENT_MILESTONES_MINI if mini else PAYMENT_MILESTONES
+    for name, share in pay_ms:
         wk = next((m["week"] for m in milestones if m["hold"].split(",")[-1].strip() in name or name.split("(")[-1].rstrip(")") in m["hold"]), None)
         pay.append({"milestone": name, "share": share, "amount_usd": round(headline.capital_price_usd * share, 2), "week": wk})
     pid = _proposal_id(cfg, today, customer)
@@ -566,8 +611,12 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
         f"We propose one {d['tier_label']}: a {d['enclosure']} fitted out as a complete data center with {cfg.racks} rack(s), "
         f"{d['cooling_label']} with {cfg.redundancy} redundancy, a {d['ups_modules']} x {d['ups_kva_each']} kVA UPS giving {cfg.ups_minutes} minutes of ride-through"
         + (", a standby generator" if cfg.generator else "") + ", clean-agent fire protection and the BEN Controls layer (sensors, firmware, digital twin, dashboard).")
-    s.p(f"The unit arrives finished and factory-tested. It needs a pad, a {d['service_breaker_a']} A {d['voltage']} feeder, fiber and a grounding electrode at the site; "
-        f"everything inside the enclosure is built, wired, tested and documented before it ships.")
+    if mini:
+        s.p(f"BEN 1 arrives assembled and burnt in by Schreiber AI. It needs a {d['outlet_circuit']}, a network port and a room that can take "
+            f"{d['heat_to_room_w']:,} W ({d['heat_to_room_btu_h']:,} BTU/h) of heat; estimated noise {d['noise_dba_est']} dBA at 1 m (target {d['noise_dba_target']:.0f}).")
+    else:
+        s.p(f"The unit arrives finished and factory-tested. It needs a pad, a {d['service_breaker_a']} A {d['voltage']} feeder, fiber and a grounding electrode at the site; "
+            f"everything inside the enclosure is built, wired, tested and documented before it ships.")
     s.p(f"Price for the {headline.label.lower()} option: {_usd(headline.capital_price_usd)} capital ({_usd(headline.price_per_kw_usd)} per kW IT)"
         + (f" plus {_usd(headline.recurring_usd_per_year)} per year ({headline.recurring_label.split(' (')[0]})" if headline.recurring_usd_per_year else "")
         + f". {headline.confirmed_pct:.0f} % of the underlying cost is at confirmed vendor prices, {headline.list_pct:.0f} % at manufacturer list price and {headline.estimate_pct:.0f} % is engineering estimate; "
@@ -675,8 +724,12 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
 
     # 7 schedule
     s = Section(7, "Schedule")
-    s.p(f"Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the {d['tier_label']} (reference order-to-service {SCHEDULE_TIER[cfg.tier]['ref_total']}) "
-        f"and the longest lead time in this bill of materials ({long_lead[0]['lead_time_weeks'] if long_lead else 0} weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.")
+    if mini:
+        s.p(f"BEN 1 is assembled and shipped by Schreiber AI in {SCHEDULE_TIER[cfg.tier]['ref_total']}: no contract manufacturer, no pad and no site acceptance test; "
+            "the last milestone is setup and handover. Weeks from order:")
+    else:
+        s.p(f"Milestones in weeks from order, derived from the stage durations in docs/PROCESS_FLOW.md for the {d['tier_label']} (reference order-to-service {SCHEDULE_TIER[cfg.tier]['ref_total']}) "
+            f"and the longest lead time in this bill of materials ({long_lead[0]['lead_time_weeks'] if long_lead else 0} weeks). Critical path: engineering release -> long-lead procurement -> fit-out -> FAT -> SAT. Site civil and permits run in parallel.")
     s.table(["Week", "Milestone", "Owner", "Hold / witness point", "Path"],
             [[m["week"], m["milestone"], m["owner"], m["hold"], m["path"]] for m in milestones])
     s.p("Long-lead items (ordered at engineering release):")
@@ -748,31 +801,48 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
     s = Section(11, "Site requirements summary")
     s.p("The full form (docs/SITE_REQUIREMENTS.md) is signed by the customer and by us at hold point H3 before anything is built for this site. Summary for this unit:")
     permits = json.loads(sreq.get("_permits", "[]"))
-    s.kv([
-        ("Pad plan size", sreq.get("pad_size", "unit footprint + 1.0 m apron all round + equipment yard")),
-        ("Pad type", sreq.get("pad_type", "reinforced slab or piers at corner castings to frost depth; PE-stamped drawing supplied")),
-        ("Anchor points", sreq.get("anchors", "twist-lock bases or weld plates at the corner castings (ISO 1161 pattern)")),
-        ("Gross mass to set", f"{d['gross_kg']:,} kg (crane sized for this mass at the required radius)"),
-        ("Utility service", f"{sreq.get('voltage', d['voltage'])}; customer disconnect rated {d['service_breaker_a']} A for this configuration (tier range: {sreq.get('disconnect', str(d['service_breaker_a']) + ' A')})"),
-        ("Feeder conductors (customer side)", sreq.get("feeder", "per NEC 310.16 for the breaker rating")),
-        ("Fault current", "utility available fault current and voltage required before shipping; unit SCCR 65 kA"),
-        ("Generator", sreq.get("generator", "n/a") if cfg.generator else "not in this configuration"),
-        ("Grounding electrode", sreq.get("ground_electrode", "ground ring or two rods, bonded to the building electrode system")),
-        ("Ground resistance", sreq.get("ground_resistance", "<= 25 ohm code minimum; <= 5 ohm recommended")),
-        ("Fiber conduit", sreq.get("fiber_conduit", "two 50 mm conduits with pull strings to the communications entry plate")),
-        ("Fiber service", sreq.get("fiber_service", "customer orders the circuit; order at H3 (60–120 day lead time)")),
-        ("Clearances", "2.5 m clear on the door side; >= 1.5 m at condensers / dry cooler with no recirculation; >= 3 m to other structures; fire lane on one long side"),
-        ("Climate inputs the customer confirms", "flood zone and base flood elevation, site wind speed and exposure, ground snow load, seismic category, altitude, corrosivity"),
-    ])
+    if mini:
+        permits = []
+        s.kv([
+            ("Placement", f"{d['form_label']}: {g['ext_l_m'] * 1000:.0f} W x {g['ext_w_m'] * 1000:.0f} D x {g['ext_h_m'] * 1000:.0f} H mm on a desk, shelf or floor; 300 mm clear at the front and back"),
+            ("Mass", f"{d['gross_kg']:,} kg loaded"),
+            ("Power", f"{d['outlet_circuit']}; draw {d['outlet_amps']} A at 120 V ({d['ups_plug']} on the UPS). {d['voltage_option']}"),
+            ("Room heat", d["room_cooling_note"]),
+            ("Noise", f"estimated {d['noise_dba_est']} dBA at 1 m (target {d['noise_dba_target']:.0f}); {d['noise_basis']}"),
+            ("Network", "one uplink port (1 GbE) to the customer's router or firewall; BEN Care reaches out over HTTPS only"),
+            ("Environment", f"office air {d['office_design_c']:.0f} °C design, {d['office_max_c']:.0f} °C maximum; IT held to ASHRAE {d['ashrae_class']}; {d['hardening_rating']}"),
+            ("Permits", "none for a plug-in unit; the building's own fire and electrical rules apply"),
+        ])
+    else:
+      s.kv([
+          ("Pad plan size", sreq.get("pad_size", "unit footprint + 1.0 m apron all round + equipment yard")),
+          ("Pad type", sreq.get("pad_type", "reinforced slab or piers at corner castings to frost depth; PE-stamped drawing supplied")),
+          ("Anchor points", sreq.get("anchors", "twist-lock bases or weld plates at the corner castings (ISO 1161 pattern)")),
+          ("Gross mass to set", f"{d['gross_kg']:,} kg (crane sized for this mass at the required radius)"),
+          ("Utility service", f"{sreq.get('voltage', d['voltage'])}; customer disconnect rated {d['service_breaker_a']} A for this configuration (tier range: {sreq.get('disconnect', str(d['service_breaker_a']) + ' A')})"),
+          ("Feeder conductors (customer side)", sreq.get("feeder", "per NEC 310.16 for the breaker rating")),
+          ("Fault current", "utility available fault current and voltage required before shipping; unit SCCR 65 kA"),
+          ("Generator", sreq.get("generator", "n/a") if cfg.generator else "not in this configuration"),
+          ("Grounding electrode", sreq.get("ground_electrode", "ground ring or two rods, bonded to the building electrode system")),
+          ("Ground resistance", sreq.get("ground_resistance", "<= 25 ohm code minimum; <= 5 ohm recommended")),
+          ("Fiber conduit", sreq.get("fiber_conduit", "two 50 mm conduits with pull strings to the communications entry plate")),
+          ("Fiber service", sreq.get("fiber_service", "customer orders the circuit; order at H3 (60–120 day lead time)")),
+          ("Clearances", "2.5 m clear on the door side; >= 1.5 m at condensers / dry cooler with no recirculation; >= 3 m to other structures; fire lane on one long side"),
+          ("Climate inputs the customer confirms", "flood zone and base flood elevation, site wind speed and exposure, ground snow load, seismic category, altitude, corrosivity"),
+      ])
     if permits:
         s.p("Permits and who pulls them:")
         s.table(["Permit", "Typical need", "Who pulls"], [[p[0], p[1], p[2]] for p in permits])
     sections.append(s)
 
     # 12 acceptance
-    s = Section(12, "Acceptance: FAT and SAT")
-    s.p("Acceptance is by the commissioning script (software/ben_engine/commissioning.py), run twice: in factory mode on load banks before shipping (FAT, hold point H13) and in site mode on the energised unit (SAT, hold point H19). "
-        "The same ten steps run both times and produce a signed report with the SHA-256 of the data file. The customer may witness both; FAT passing releases the 40 % milestone and SAT passing releases the 25 % milestone.")
+    s = Section(12, "Acceptance: FAT and SAT" if not mini else "Acceptance: burn-in test and handover")
+    if mini:
+        s.p("Acceptance is by the commissioning script (software/ben_engine/commissioning.py) in factory mode before shipping (24 h burn-in, hold point H13) and a short setup check at "
+            "handover (H19). Steps that need hardware BEN 1 does not have (generator, liquid loop, DC bus; door and fans on the 10-inch rack) are skipped with the reason stated in the report.")
+    else:
+        s.p("Acceptance is by the commissioning script (software/ben_engine/commissioning.py), run twice: in factory mode on load banks before shipping (FAT, hold point H13) and in site mode on the energised unit (SAT, hold point H19). "
+            "The same ten steps run both times and produce a signed report with the SHA-256 of the data file. The customer may witness both; FAT passing releases the 40 % milestone and SAT passing releases the 25 % milestone.")
     s.table(["Step", "Test", "Pass criterion"], [[a, b, c] for a, b, c in COMMISSIONING_STEPS])
     s.p(f"Pass criteria specific to this configuration: rack inlets within ASHRAE {d['ashrae_class']} at {cfg.it_kw:.0f} kW; {cfg.redundancy} failover with no inlet excursion; UPS ride-through >= {cfg.ups_minutes} minutes at IT load; "
         f"meter vs PDU reconciliation within 3 %; PUE at full load reported against the {d['pue_estimate']} estimate. Deviations are closed or accepted in writing before the milestone is invoiced.")
@@ -811,7 +881,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
         "the change order form (docs/contracts/CHANGE_ORDER.md), the acceptance certificates, and for the controls layer the software licence (docs/contracts/SOFTWARE_LICENCE.md) and, for the managed option, the service level agreement (docs/contracts/SLA.md). "
         "This section summarises them; the contracts prevail.")
     s.table(["Term", "Summary"], [
-        ["Payment", " / ".join(f"{int(sh * 100)} % at {name.split(' (')[0]}" for name, sh in PAYMENT_MILESTONES) + "; net 30 from invoice; recurring fees annually in advance"],
+        ["Payment", " / ".join(f"{int(sh * 100)} % at {name.split(' (')[0]}" for name, sh in pay_ms) + "; net 30 from invoice; recurring fees annually in advance"],
         ["Price validity", f"{VALIDITY_DAYS} days from the proposal date; capital price firm at engineering release (configuration frozen, hold point H4)"],
         ["Scope changes", "Every change after engineering release is a change order; each change order carries its price impact and its schedule impact and is signed before the work is done"],
         ["Customer-caused delay", "A delay caused by the customer or its contractors (site not ready, permits, utility, late information or approvals) extends the schedule day for day and suspends Schreiber AI's liquidated-damages exposure for that period"],

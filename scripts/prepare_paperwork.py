@@ -59,6 +59,15 @@ def fill(text: str, fields: dict) -> tuple[str, list[str]]:
     return TOKEN.sub(rep, text), sorted(open_fields)
 
 
+LEGAL = "Schreiber AI is a Schreiber Holding LLC company."
+LOCKUP = '<img src="../../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">'
+
+
+def for_ready(text: str) -> str:
+    """ready/ sits one folder deeper than the templates: fix the brand lockup path."""
+    return text.replace('src="../../brand/v2/', 'src="../../../brand/v2/')
+
+
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")[:48]
 
@@ -81,7 +90,7 @@ def main() -> int:
         })
         text, open_f = fill(nda_t, f)
         p = OUT / f"NDA-{slug(cp['name'])}.md"
-        p.write_text(text)
+        p.write_text(for_ready(text))
         rows.append((cp["name"], cp["role"], cp.get("rfq", ""), p.name, cp.get("agreements", []), open_f))
     masters = {"MSA-master.md": "MSA.md", "INTEGRATOR-master.md": "INTEGRATOR_AGREEMENT.md",
                "CMA-master.md": "CONTRACT_MANUFACTURING_AGREEMENT.md", "SUPPLIER-TERMS-master.md": "SUPPLIER_TERMS.md",
@@ -90,9 +99,10 @@ def main() -> int:
     master_open = {}
     for out_name, src in masters.items():
         text, open_f = fill((C / src).read_text(), SCHREIBER)
-        (OUT / out_name).write_text(text)
+        (OUT / out_name).write_text(for_ready(text))
         master_open[out_name] = open_f
-    lines = [f"# Paperwork ready set — generated {TODAY} (template rev {REV})", "",
+    lines = [f"# Paperwork ready set — generated {TODAY} (template rev {REV})", "", LOCKUP, "",
+             "BEN Engine, by Schreiber AI · Rev 2", "",
              "Schreiber AI's side and every policy number are filled; counterparty identity, addresses, dates and counsel choices stay as `[FIELD]` until known. "
              "Templates are not legal advice; counsel reviews before signature (`docs/contracts/README.md` §7). Regenerate with `python scripts/prepare_paperwork.py` after editing `purchasing/counterparties.json`.", "",
              "## Signing sequence", "",
@@ -108,6 +118,7 @@ def main() -> int:
     lines += ["", "## Masters (Schreiber AI side filled)", "", "| File | Source template | Fields still open |", "| --- | --- | --- |"]
     for k, v in masters.items():
         lines.append(f"| `{k}` | `{v}` | {len(master_open[k])} |")
+    lines += ["", "---", f"BEN Engine, by Schreiber AI · Rev 2 · {LEGAL}"]
     (OUT / "INDEX.md").write_text("\n".join(lines) + "\n")
     print(f"wrote {len(rows)} NDAs, {len(masters)} masters → {OUT}")
     return 0

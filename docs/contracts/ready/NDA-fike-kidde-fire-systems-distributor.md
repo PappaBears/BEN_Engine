@@ -1,7 +1,9 @@
 # Mutual Non-Disclosure Agreement — BEN Engine
 
+<img src="../../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/NDA_MUTUAL.md` · Template rev 7f10d34
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/NDA_MUTUAL.md` · Template rev 4d362db
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Used at Process Stage 1 (Inquiry) before the selector, site survey or any drawing, BOM price or firmware detail is shared, and with prospective integrators, contract manufacturers and suppliers. Delete this box before signature.
 
 **NDA ID:** NDA-2026-FIKE-KIDDE-FIRE-SYST
@@ -88,4 +90,4 @@ The Parties want to evaluate, and if they proceed, negotiate: RFQ: pre-engineere
 | Date | [SIGNATURE_DATE_SCHREIBER] | [SIGNATURE_DATE_COUNTERPARTY] |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/NDA_MUTUAL.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/NDA_MUTUAL.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

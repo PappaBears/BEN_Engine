@@ -31,6 +31,7 @@ from typing import List, Dict, Any, Optional
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(_HERE), "software"))
 from ben_engine.config import Config, TIER_GEOMETRY, COOLING_LIBRARY, CLIMATE_DESIGN, HARDENING, TIER_ALIASES, canonical_tier  # noqa: E402
+from ben_engine.config import TIERS_BY_LINEUP, DENSE_FOOTPRINTS, DENSE_RULES, MINIRACK  # noqa: E402  (Rev 2)
 
 # ------------------------------------------------------------------ component library (mm)
 # All footprints are catalogue-typical for the class of equipment; see DESIGN_BASIS.md §9.
@@ -181,8 +182,18 @@ class Layout:
 
     @property
     def is_container(self):
-        """ISO-frame module tiers (BEN 30/150/500): single row against the rack wall, cargo doors at x = 0."""
+        """ISO-frame module tiers (BEN 30/150/500, Rev 2 BEN 300/700): single row against the rack wall, cargo doors at x = 0."""
         return self.kind == "module"
+
+    @property
+    def is_dense(self):
+        """Rev 2 liquid-first module (BEN 300 / BEN 700)."""
+        return bool(self.d["geometry"].get("liquid_first"))
+
+    @property
+    def is_minirack(self):
+        """Rev 2 BEN 1 indoor mini rack."""
+        return self.kind == "minirack"
 
     @property
     def is_cabinet(self): return self.kind == "cabinet"
@@ -244,7 +255,8 @@ def _air_units(lay: Layout, kw_air: float, redundancy: str, unit_key: str):
 # ------------------------------------------------------------------ resolver
 def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None, cfg: Config | None = None) -> Layout:
     """Resolve the layout of a tier preset, or of an explicit ``cfg`` (forward-architecture studies: dc800 / dlc_hd)."""
-    cfg = cfg if cfg is not None else Config.preset(canonical_tier(tier), profile, climate, hardening)
+    cfg = cfg if cfg is not None else Config.preset(canonical_tier(tier), profile, climate, hardening,
+                                                    lineup="rev1" if canonical_tier(tier) in TIERS_BY_LINEUP["rev1"] else "rev2")
     errs = cfg.validate()
     if errs:
         raise ValueError("; ".join(errs))
@@ -259,6 +271,8 @@ def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate"
     lay.notes["dlc_hd"] = cfg.cooling == "dlc_hd"
     if lay.is_cabinet:
         _resolve_micro(lay)
+    elif lay.is_minirack:
+        _resolve_minirack(lay)
     elif lay.is_hall:
         _resolve_hall(lay)
     else:
@@ -268,7 +282,10 @@ def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate"
              resolution="" if lay.H <= h_eff + 10 else f"Drawings use {h_eff:.0f} mm; recommend int_h_m = {h_eff/1000:.2f}")
         lay.notes["int_h_config"] = lay.H
         lay.H = min(lay.H, h_eff + 10)
-        _resolve_container(lay)
+        if lay.is_dense:
+            _resolve_dense(lay)
+        else:
+            _resolve_container(lay)
     _sensors(lay)
     return lay
 
@@ -281,7 +298,7 @@ def resolve_config(cfg: Config) -> Layout:
 def forward_prototype_config() -> Config:
     """The forward prototype: BEN 150 at 150 kW in 2 racks (75 kW/rack), 800 VDC bus (±400 V, HR midpoint) and high-density DLC
     (docs/FORWARD_ARCHITECTURE_DECISION.md §4 workstream E; BOM in docs/BOM-ben150-forward.md)."""
-    cfg = Config.preset("ben150")
+    cfg = Config.preset("ben150", lineup="rev1")
     cfg.power_architecture = "dc800"
     cfg.dc_convention = "bipolar_400"
     cfg.cooling = "dlc_hd"
@@ -821,6 +838,196 @@ def _resolve_hall(lay: Layout):
     _chk(lay, "I-H20", "A-001", "Hall gross mass (config) vs slab + grade beams design 1,200 t", f"{d['gross_kg']} vs 1200000", d["gross_kg"], 1200000, "<=")
 
 
+# ------------------------------------------------------------------ Rev 2: liquid-first dense modules (BEN 300 / BEN 700)
+DENSE_TAGS = {"rack": "R", "cdu": "CDU", "fancoil": "FC", "ups": "UPS", "batt": "BAT", "swbd": "SWBD", "rect": "RECT", "batt800": "BAT"}
+DENSE_CODES = {"rack": "STR-RACK-MGX", "cdu": "CLG-CDU-HD", "fancoil": "CLG-FANCOIL-CW20", "ups": "PWR-UPS-GVL500", "batt": "PWR-BATT-LI",
+               "swbd": "PWR-SWBD-SECTION", "rect": "PWR-DC-RECT-CAB", "batt800": "PWR-BATT-800V"}
+DENSE_KIND = {"rack": "rack", "cdu": "cooling", "fancoil": "cooling", "ups": "power", "batt": "power", "swbd": "power", "rect": "power", "batt800": "power"}
+WALL_BACKED = ("cdu", "ups", "batt", "swbd", "rect", "batt800")    # back onto the rack wall (no plenum)
+
+
+def _resolve_dense(lay: Layout):
+    """BEN 300 / BEN 700: one row against the rack wall in the order config.dense_row_items() gives (switchboard, battery / UPS
+    interleaved, CDUs, racks with fan coils between them), with the footprints of config.DENSE_FOOTPRINTS. Racks and fan coils stand
+    on a 200 mm rear plenum (residual-air return and the low-level W45 manifolds); CDUs and the power gear back onto the wall, so the
+    480 V gear has the deeper working space in front. Blind end: BEN Controller panel and, up to 600 A, the panelboard on the end wall;
+    the FK-5-1-12 cylinder sits in a heated exterior enclosure. Checks I-D1..I-D18."""
+    cfg, d = lay.cfg, lay.d
+    L, W, H = lay.L, lay.W, lay.H
+    F, R = DENSE_FOOTPRINTS, DENSE_RULES
+    plenum = R["rear_plenum_mm"]
+    end_zone = R["end_zone_mm"]
+    items = d["row_items"]
+    x = 0.0
+    counters: Dict[str, int] = {}
+    for key in items:
+        f = F[key]
+        counters[key] = counters.get(key, 0) + 1
+        tag = f"{DENSE_TAGS[key]}{counters[key]}"
+        y0 = 0.0 if key in WALL_BACKED else plenum
+        label = f["label"]
+        if key == "rack":
+            label += f" + cold plates, UQD rear manifold, {cfg.it_kw / cfg.racks:.0f} kW"
+        elif key == "ups":
+            label = f"{f['label']}: {d['ups_kva_each']} kVA of {d['ups_frames']} frame(s), {cfg.redundancy}"
+        elif key == "batt":
+            label = f"{f['label']} ({d['battery_kwh_installed']} kWh in {d['battery_cabinets']} cabinets, {d['battery_minutes_installed']} min)"
+        elif key == "swbd":
+            label = f"{f['label']}, {d['service_breaker_a']} A main"
+        lay.items.append(Item(DENSE_CODES[key], tag, DENSE_KIND[key], label, x, y0, x + f["w"], y0 + f["d"], 0, f["h"], kg=f["kg"]))
+        x += f["w"]
+    lay.notes.update({"row_end_x": x, "door_zone": L - end_zone - x, "plenum": plenum, "row_front_y": plenum + F["rack"]["d"],
+                      "cooling_resolved": cfg.cooling, "rack_ups": False, "n_air": d["fancoils_total"], "air_key": "fancoil", "n_cdu": d["cooling_units_total"],
+                      "controls_tier": "pro", "end_zone": end_zone, "dense": True})
+    # rear plenum containment, manifolds and isolation valves
+    rx = [i for i in lay.items if i.kind == "rack" or i.tag.startswith("FC")]
+    x_r0, x_r1 = min(i.x0 for i in rx), max(i.x1 for i in rx)
+    lay.items.append(Item("STR-CONT-ROOF", "HAC", "cooling", "Rear-plenum containment: top panels + end doors (residual-air return to the fan coils)", x_r0, 0, x_r1, plenum, 0, H, mount="wall", kg=40, note="plenum"))
+    lay.items.append(Item("CLG-MANIFOLD-HD", "MAN", "cooling", "W45 supply / return row header DN80 low in the rear plenum, UQD drops per rack", x_r0, 20, x_r1, plenum - 20, 100, 400, mount="floor", kg=12 * (x_r1 - x_r0) / 1000))
+    lay.items.append(Item("CLG-ISOVALVE-ROW", "ISO1", "cooling", "Row isolation valves (supply + return, spring-return, position feedback), close on leak", x_r1 - 300, 20, x_r1, plenum - 20, 400, 600, mount="floor", kg=12))
+    # blind end
+    gw = LIB["controller"]
+    lay.items.append(Item(gw["code"], "CP1", "controls", gw["label"] + " (end wall, 1200 AFF)", L - gw["d"], 100, L, 100 + gw["w"], 1200, 1200 + gw["h"], mount="wall", kg=gw["kg"], front="-x"))
+    if d["panelboard_wall"]:
+        lay.items.append(Item("PWR-PANEL-600", "PNL-D", "power", f"480 V distribution panelboard {d['service_breaker_a']} A main breaker (end wall, aisle side)", L - 250, W - 80 - 900, L, W - 80, 300, 2100, mount="wall", kg=180, front="-x"))
+    lay.items.append(Item("FS-CLEAN-AGENT", "FS1", "fire", "FK-5-1-12 cylinder in a heated NEMA 4X exterior enclosure on the blind end, piped through the end wall", L + 160, -600, L + 160 + 500, -100, 0, 1600, mount="ext", kg=110, front="+x"))
+    lay.items.append(Item("FS-CLEAN-AGENT", "FRP", "fire", "Fire releasing panel (wall, aisle side, 1500 AFF)", 150, W - 100, 450, W, 1500, 1900, mount="wall", kg=8, front="-y"))
+    lay.items.append(Item("FS-EPO", "EPO", "power", "EPO push-button (by door, 1200 AFF)", 500, W - 60, 600, W, 1200, 1300, mount="wall", kg=1, front="-y"))
+    lay.items.append(Item("CTL-LEAK", "LEAK", "controls", "Leak rope: perimeter, under every CDU, along the rear-plenum header drip tray", 0, 0, L, W, 0, 20, mount="floor", kg=4))
+    lay.items.append(Item("PWR-SVC-ENCL", "SVC", "power", f"Service section NEMA 4X: main {d['service_breaker_a']} A + SPD" + (" + ATS" if cfg.generator else "") + " (exterior, end wall)",
+                          L + 160, W / 2 - 500, L + 160 + 400, W / 2 + 500, 600, 2000, mount="ext", kg=180, front="+x"))
+    lay.items.append(Item("CLG-DRYCOOLER-W45", "DC1", "cooling", f"Adjacent skid: W45 dry cooler bank {math.ceil(d['liquid_heat_kw'] * 1.15)} kW + trim chiller {d['trim_loop_kw']} kW (18 C loop for the fan coils)",
+                          L + 1500, -200, L + 1500 + (2400 if cfg.it_kw <= 300 else 4800), W + 200, 0, 2400, mount="ext", kg=1400 if cfg.it_kw <= 300 else 2800))
+    lay.items.append(Item("CLG-HRX", "HRX", "cooling", f"Heat-reuse plate heat exchanger (option), {d['heat_reuse_kw_available']} kW at the W45 return", L + 160, W / 2 + 700, L + 160 + 400, W / 2 + 1300, 300, 1500, mount="ext", kg=120, front="+x"))
+    ay = plenum + F["rack"]["d"]
+    lay.items.append(Item("STR-TRAY", "TR-D", "tray", "Cable tray 300 wide, data (overhead, over the aisle)", 0, ay + 100, L - end_zone, ay + 400, TRAY_Z, TRAY_Z + TRAY_H, mount="ceiling", kg=6 * L / 1000))
+    lay.items.append(Item("STR-TRAY", "TR-P", "tray", "Cable tray 300 wide, 480 V rack feeds (overhead, over the aisle, drops to rack tops)", 0, ay + 450, L - end_zone, ay + 750, TRAY_Z, TRAY_Z + TRAY_H, mount="ceiling", kg=6 * L / 1000))
+    lay.items.append(Item("STR-FLOORCHAN", "FC", "structure", "Floor channel C100x50x5, 2 runs under the row + rack load-spreading frames", 0, 0, x, ay, -50, 0, kg=8 * x / 1000 * 2))
+
+    # ---- checks
+    rl = sum(F[k]["w"] for k in items)
+    _chk(lay, "I-D1", "A-002", "Config row_length_mm (dense rule: row items + 350 end zone) vs interior length", f"{d['row_length_mm']} vs {L:.0f}", d["row_length_mm"], L, "<=")
+    _chk(lay, "I-D2", "A-002", f"Row length with real footprints ({cfg.racks} racks 600, {d['cooling_units_total']} CDU 600, {d['fancoils_total']} fan coil 300, {d['ups_frames']} UPS 850, "
+         f"{d['battery_cabinets']} battery 600, {d['swbd_sections']} switchboard 915) vs usable length (interior - 350 end zone)", f"{rl:.0f} vs {L - end_zone:.0f}", rl, L - end_zone, "<=")
+    aisle_rack = W - plenum - F["rack"]["d"]
+    _chk(lay, "I-D3", "A-002", f"Aisle in the rack zone (W - {plenum} plenum - {F['rack']['d']} rack) vs 900 egress", f"{W:.0f} - {plenum} - {F['rack']['d']} = {aisle_rack:.0f}", aisle_rack, EGRESS_MIN, ">=")
+    _chk(lay, "I-D4", "A-002", "NEC 110.26 working space in front of the racks (480Y/277 V power shelves), condition 1: non-conductive FRP liner panels opposite the rack zone",
+         f"{aisle_rack:.0f} vs 914", aisle_rack, NEC_WS_COND1, ">=")
+    gear = [k for k in set(items) if k in ("ups", "batt", "swbd", "rect", "batt800")]
+    gear_d = max(F[k]["d"] for k in gear) if gear else 0
+    aisle_gear = W - gear_d
+    _chk(lay, "I-D5", "E-001", "NEC 110.26 condition 2 in front of the 480 V gear (switchboard, UPS, battery DC breakers; bonded steel liner opposite = grounded): gear backs onto the wall",
+         f"{W:.0f} - {gear_d} = {aisle_gear:.0f} vs 1067", aisle_gear, NEC_WS_COND2, ">=")
+    aisle_cdu = W - F["cdu"]["d"]
+    _chk(lay, "I-D6", "A-002", "Aisle in front of the row CDUs (1200 deep, back to the wall) vs 914 (condition 1, 480 V pump drives behind closed covers)", f"{W:.0f} - {F['cdu']['d']} = {aisle_cdu:.0f}", aisle_cdu, NEC_WS_COND1, ">=")
+    if d["swbd_sections"]:
+        sw_w = d["swbd_sections"] * F["swbd"]["w"]
+        _chk(lay, "I-D7", "E-001", f"NEC 110.26(C)(2): a second entrance to the working space is needed for equipment >= 1,200 A AND over 1.8 m wide; switchboard {d['service_breaker_a']} A, {sw_w} mm wide",
+             f"{sw_w} vs 1800", sw_w, 1800, "<=", resolution="" if d["service_breaker_a"] < 1200 else "1,200 A main but 915 mm wide: one entrance (the aisle) is permitted; the cargo doors give a second")
+    _chk(lay, "I-D8", "A-003", f"Rack-top clearance ({F['rack']['h']} mm MGX rack) vs {R['rack_top_min_mm']} (top power entry; lights over the aisle; liquid enters low from the plenum)",
+         f"{H:.0f} - {F['rack']['h']} = {H - F['rack']['h']:.0f}", H - F["rack"]["h"], R["rack_top_min_mm"], ">=")
+    _chk(lay, "I-D9", "A-003", "Overhead tray top vs ceiling liner (>= 100 for installation); trays run over the aisle, not the racks",
+         f"{H:.0f} - {TRAY_Z + TRAY_H} = {H - TRAY_Z - TRAY_H:.0f}", H - TRAY_Z - TRAY_H, 100, ">=")
+    resid = COOLING_LIBRARY["dlc_hd"]["air_residual"]
+    _chk(lay, "I-D10", "M-001", f"Residual air ({resid:.0%} of IT x 1.05) vs fan coils x (N) at {F['fancoil']['kw']} kW (18 C trim loop)",
+         f"{d['fancoils_n']} x {F['fancoil']['kw']} vs {resid * cfg.it_kw * 1.05:.1f}", d["fancoils_n"] * F["fancoil"]["kw"], resid * cfg.it_kw * 1.05, ">=")
+    _chk(lay, "I-D11", "M-001", "Row CDU capacity (N units x 600 kW) vs liquid heat x 1.05", f"{d['cooling_units_n']} x 600 vs {d['liquid_heat_kw'] * 1.05:.0f}",
+         d["cooling_units_n"] * F["cdu"]["kw"], d["liquid_heat_kw"] * 1.05, ">=")
+    if cfg.power_architecture != "dc800":
+        _chk(lay, "I-D12", "E-001", "UPS frames (N x 500 kVA) vs IT / 0.95 x 1.15", f"{d['ups_frames_n']} x 500 vs {cfg.it_kw / 0.95 * 1.15:.0f}", d["ups_frames_n"] * F["ups"]["kva"], cfg.it_kw / 0.95 * 1.15, ">=")
+    mult = 2 if cfg.redundancy == "2N" else 1
+    _chk(lay, "I-D13", "E-001", f"Battery cabinet discharge power ({d['battery_cabinets'] // mult} x 200 kW per path) vs IT load", f"{d['battery_cabinets'] // mult * F['batt']['kw']} vs {cfg.it_kw:.0f}",
+         d["battery_cabinets"] // mult * F["batt"]["kw"], cfg.it_kw, ">=")
+    _chk(lay, "I-D14", "E-001", "NFPA 855 group energy: one lithium cabinet per group vs 50 kWh; groups adjacent in the row",
+         f"{F['batt']['kwh']} kWh vs 50", F["batt"]["kwh"], 50, "<=",
+         resolution="Adjacent groups need UL 9540A large-scale fire test data for reduced spacing (Galaxy Li-ion is listed as a UL 9540 ESS with Galaxy VL; the 9540A report is to be obtained); "
+                    "otherwise 914 mm between groups, which does not fit the row" if d["battery_cabinets"] > 1 else "")
+    _chk(lay, "I-D15", "S-001", "Gross mass vs ISO 668 max gross (30,480 kg)", f"{d['gross_kg']} vs 30480", d["gross_kg"], 30480, "<=")
+    rk_kg = F["rack"]["kg"]
+    point = rk_kg * 9.81 / 1000 / (0.6 * 1.6)
+    _chk(lay, "I-D16", "S-001", f"Rack floor load: {rk_kg} kg GB300-class rack on a 600 x 1,600 mm load-spreading frame (on its own 0.6 x 1.068 m footprint it is {rk_kg * 9.81 / 1000 / (0.6 * 1.068):.1f} kN/m2) vs 20 kN/m2",
+         f"{point:.1f} vs 20", point, 20, "<=", resolution="STR-LOADFRAME under every rack, bearing on the C100 floor channels; structural calc confirms")
+    _chk(lay, "I-D17", "A-002", "Door zone (free length between the row end and the blind-end zone) vs 0", f"{L:.0f} - {end_zone} - {x:.0f} = {L - end_zone - x:.0f}", L - end_zone - x, 0, ">=")
+    t_sup = CLIMATE_DESIGN[cfg.climate]["t_design_c"] + 8.0
+    lay.notes["heat_rejection"] = (f"W45 dry cooler: design ambient {CLIMATE_DESIGN[cfg.climate]['t_design_c']} C + 8 K approach = {t_sup:.0f} C supply"
+                                   + (" (within W45)" if t_sup <= 45 else " — above W45: adiabatic pre-cooling on the skid is required at this climate"))
+    lay.deviations.append(f"DEV-D1: GB300 NVL72 racks are drawn 600 x {F['rack']['d']} (NVIDIA MGX / Supermicro / Cisco datasheet). The Vertiv SmartIT enclosure is 1,200 deep "
+                          f"with its rear extension: W {W:.0f} - {plenum} plenum - 1,200 = {W - plenum - 1200:.0f} mm aisle, below the 900 mm egress, so it is not used in a 2.2 m module.")
+    if CLIMATE_DESIGN[cfg.climate]["t_design_c"] + 8.0 > 45:
+        lay.deviations.append(f"DEV-D2: {lay.notes['heat_rejection']}.")
+
+
+# ------------------------------------------------------------------ Rev 2: BEN 1 mini rack
+MINI_DEVICES = {
+    # key: (U, depth mm, label, code)
+    "pdu10": (1, 120, "10-inch 1U PDU, 4 x NEMA 5-15R, surge protected", "PWR-PDU-10IN"),
+    "switch": (1, 120, "8-port managed switch (UniFi Lite 8 PoE) on a 1U shelf", "CMP-SW-MINI"),
+    "spark": (2, 150, "Desktop AI box (NVIDIA DGX Spark class, 150 x 150 x 50 mm) on a 2U shelf", "CMP-AI-DGXSPARK"),
+    "minipc": (2, 180, "Mini PC on a 2U shelf", "CMP-MINIPC"),
+    "edge": (1, 120, "Fanless edge computer (OnLogic CL210 class) for the BEN Care agent, 1U shelf", "CTL-EDGE-MINI"),
+    "ups2u": (2, 470, "Lithium line-interactive UPS 2U", "PWR-UPS-MINI"),
+    "upsxbp": (2, 470, "UPS external battery pack 2U", "PWR-UPS-MINI-XBP"),
+    "nas1u": (1, 470, "1U 4-bay NAS (Synology RS422+)", "CMP-NAS-RS422"),
+    "gpu2u": (2, 472, "2U short-depth server, 1 x RTX PRO 6000 Blackwell (Dell XR7620 / Lenovo SE455 V3 class)", "CMP-AI-2U-RTXPRO"),
+    "srv1u": (1, 470, "1U short-depth server", "CMP-MINI-1U"),
+    "patch": (1, 60, "1U brush / patch panel", "CTL-PATCH"),
+}
+
+
+def _minirack_stack(cfg: Config, d: Dict[str, Any]) -> List[str]:
+    ai = cfg.profile in ("ai_training", "ai_inference")
+    if cfg.form == "rack10":
+        n_ai = max(1, int(cfg.it_kw * 1000 * 0.7 // 200)) if ai else 0
+        stack = ["pdu10", "switch"] + ["spark"] * n_ai + ([] if ai else ["minipc"]) + ["edge"]
+    else:
+        stack = ["ups2u"] + ["upsxbp"] * d["ups_battery_packs"] + ["switch", "nas1u"] + (["gpu2u"] if ai else ["srv1u"]) + ["edge", "patch"]
+    return stack
+
+
+def _resolve_minirack(lay: Layout):
+    """BEN 1: one mini rack (10-inch 8U or 19-inch 12U cabinet) with its U stack, the UPS (rack-mounted in cab12; standing beside the
+    10-inch rack in tower orientation, because a 19-inch 2U UPS does not fit 10-inch rails), two Pod W and the customer's room.
+    Coordinates: x across the rack face, y depth from the rear, z up, origin at the rear-left foot. Checks I-B1..I-B7."""
+    cfg, d = lay.cfg, lay.d
+    g = d["geometry"]
+    f = TIER_GEOMETRY["ben1"]["forms"][cfg.form]
+    L, W, H = lay.L, lay.W, lay.H
+    stack = _minirack_stack(cfg, d)
+    u = 0
+    x0, x1 = (lay.ext_l - L) / 2, (lay.ext_l + L) / 2
+    lay.items.append(Item("STR-MINIRACK-10" if cfg.form == "rack10" else "STR-MINICAB-12", "R1", "rack", g["form_label"] + f" ({g['reference']})", 0, 0, lay.ext_l, lay.ext_w, 0, lay.ext_h, kg=g["tare_kg"]))
+    for k in stack:
+        uu, depth, label, code = MINI_DEVICES[k]
+        tag = {"ups2u": "UPS1", "upsxbp": "BAT1", "pdu10": "PDU1"}.get(k, k.upper()[:6])
+        lay.items.append(Item(code, tag, "power" if k.startswith(("ups", "pdu")) else ("controls" if k in ("edge", "patch") else "rack"), label,
+                              x0, (lay.ext_w - depth) / 2, x1, (lay.ext_w + depth) / 2, 60 + u * 44.45, 60 + (u + uu) * 44.45, mount="rack", kg=5))
+        u += uu
+    if cfg.form == "rack10":
+        lay.items.append(Item("PWR-UPS-MINI", "UPS1", "power", f"{d['ups_model']} standing beside the rack in tower orientation", lay.ext_l + 50, 0, lay.ext_l + 50 + 89, 432, 0, 445, mount="floor", kg=16))
+    lay.items.append(Item("CTL-POD", "P1", "controls", "BEN Pod W (inlet: 2 x Pt1000 at the front rail)", x0, lay.ext_w - 40, x0 + 100, lay.ext_w, H * 0.5, H * 0.5 + 60, mount="rack", kg=0.3))
+    lay.items.append(Item("CTL-POD", "P2", "controls", "BEN Pod W (exhaust: 2 x Pt1000 at the rear rail; Thread router)", x0, 0, x0 + 100, 40, H * 0.7, H * 0.7 + 60, mount="rack", kg=0.3))
+    lay.notes.update({"u_used": u, "u_total": f["rack_u"], "stack": stack, "row_front_y": lay.ext_w, "plenum": 0, "n_pods": 2, "controls_tier": "mini",
+                      "desk_footprint_mm": [lay.ext_l + (150 if cfg.form == "rack10" else 0), lay.ext_w]})
+    _chk(lay, "I-B1", "A-002", f"Rack units used ({' + '.join(stack)}) vs {f['rack_u']}U", f"{u}U vs {f['rack_u']}U", u, f["rack_u"], "<=")
+    deepest = max(MINI_DEVICES[k][1] for k in stack)
+    _chk(lay, "I-B2", "A-002", f"Deepest device vs usable depth ({f['usable_depth_mm']} mm)", f"{deepest} vs {f['usable_depth_mm']}", deepest, f["usable_depth_mm"], "<=",
+         resolution="2U short-depth edge servers only (472 mm class); standard 2U GPU servers (700-800 mm) do not fit" if cfg.form == "cab12" else "")
+    _chk(lay, "I-B3", "E-001", f"IT load vs {cfg.form} rating", f"{cfg.it_kw} vs {f['it_kw_max']} kW", cfg.it_kw, f["it_kw_max"], "<=")
+    _chk(lay, "I-B4", "E-001", f"Outlet current at 120 V vs 80 % of the {d['outlet_circuit_a']} A circuit (NEC 210.19 / 210.20 continuous load)",
+         f"{d['outlet_amps']} A vs {0.8 * d['outlet_circuit_a']:.0f} A", d["outlet_amps"], 0.8 * d["outlet_circuit_a"], "<=")
+    _chk(lay, "I-B5", "E-001", f"UPS real power ({d['ups_w']} W) vs IT x 1.25 headroom", f"{d['ups_w']} vs {cfg.it_kw * 1250:.0f}", d["ups_w"], cfg.it_kw * 1250, ">=")
+    if cfg.form == "cab12":
+        _chk(lay, "I-B6", "M-001", "Cabinet extraction (one fan of the N+1 pair at 100 %, 1.6 kW at 10 K) vs IT x 1.05", f"1.6 vs {cfg.it_kw * 1.05:.2f} kW", 1.6, cfg.it_kw * 1.05, ">=")
+    _chk(lay, "I-B7", "A-001", f"Estimated noise at 1 m vs the {d['noise_dba_target']:.0f} dBA target", f"{d['noise_dba_est']} vs {d['noise_dba_target']}", d["noise_dba_est"], d["noise_dba_target"], "<=",
+         resolution="" if d["noise_ok"] else f"meets the target up to {d['noise_quiet_up_to_kw']} kW; above it, place BEN 1 in a closet with the vent rule of the room note")
+    lay.notes["room_cooling_note"] = d["room_cooling_note"]
+
+
+def resolve_lineup(lineup: str = "rev2", profile: str = "ai_inference", climate: str = "temperate") -> List[Layout]:
+    """Layouts of every preset in ``lineup`` (Rev 2 adds BEN 1, BEN 300 and BEN 700)."""
+    return [resolve(t, cfg=Config.preset(t, profile, climate, lineup=lineup)) for t in TIERS_BY_LINEUP[lineup]]
+
+
 def _interleave(racks, units):
     """Distribute cooling units evenly between racks: unit first, then racks, keep a unit at the far end if odd."""
     if not units:
@@ -934,7 +1141,7 @@ def deviations_md(lays: List[Layout]) -> str:
 
 
 if __name__ == "__main__":
-    lays = [resolve(t) for t in TIER_GEOMETRY]
+    lays = [resolve(t) for t in (TIERS_BY_LINEUP["rev2"] if "--rev2" in sys.argv else TIERS_BY_LINEUP["rev1"])]
     for lay in lays:
         print(f"== {lay.d['tier_label']}  cooling resolved: {lay.notes.get('cooling_resolved', lay.cfg.cooling)}  row end {lay.notes.get('row_end_x')}  door zone {lay.notes.get('door_zone')}")
         for it in lay.items:

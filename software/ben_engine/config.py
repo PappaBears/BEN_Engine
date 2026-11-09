@@ -95,7 +95,7 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
         "label": "BEN 1", "enclosure": "Indoor mini rack: 10-inch 8U desk / shelf rack or 19-inch 12U sound-damped office cabinet",
         "kind": "minirack", "modules": 1, "positioning": "core", "lineup": "rev2", "indoor": True,
         "ext_l_m": 0.688, "ext_w_m": 0.952, "ext_h_m": 0.744,
-        "int_l_m": 0.48, "int_w_m": 0.80, "int_h_m": 0.53,
+        "int_l_m": 0.48, "int_w_m": 0.55, "int_h_m": 0.53,
         "max_racks": 1, "rack_u": 12, "it_kw_min": 0.2, "it_kw_max": 1.5,
         "default_cooling": "office_air", "voltage": "120 V 1ph 15/20 A plug-in",
         "voltage_option": "230 V 1ph 10/16 A (IEC C14 / C20 inlet) option for export; same UPS family in the 230 V (I) variant",
@@ -103,14 +103,15 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
         "forms": {
             # DeskPi RackMate T1 class: 281 W x 200 D (shelf) x 451 H mm incl. handles (computingforgeeks / CNX listings; DeskPi wiki not read).
             # Depth carried as 260 mm = 200 mm shelf + 60 mm rear cable and PDU space. Open frame: no sound damping.
-            "rack10": {"label": "10-inch 8U desk / shelf mini rack (open or semi-enclosed)", "rack_in": 10,
+            "rack10": {"label": "10-inch 8U desk / shelf mini rack (open or semi-enclosed)", "rack_in": 10, "usable_depth_mm": 200,
                        "ext_l_m": 0.281, "ext_w_m": 0.260, "ext_h_m": 0.451, "int_l_m": 0.222, "int_w_m": 0.200, "int_h_m": 0.356,
                        "rack_u": 8, "it_kw_max": 0.6, "tare_kg": 4, "insertion_loss_db": 0.0, "noise_source": "desktop",
                        "door": False, "reference": "DeskPi RackMate T1 (10-inch 8U)"},
             # APC NetShelter CX Mini 12U (AR4000MV family): 744 H x 688 W x 952 D mm, 75 kg, 18.5 dB broadband noise reduction at 1 m
-            # (APC sales sheet as quoted by resellers, 2026-11-09). Internal: 12U x 44.45 = 533 mm, usable depth ~ 800 mm.
-            "cab12": {"label": "19-inch 12U sound-damped office cabinet", "rack_in": 19,
-                      "ext_l_m": 0.688, "ext_w_m": 0.952, "ext_h_m": 0.744, "int_l_m": 0.48, "int_w_m": 0.80, "int_h_m": 0.53,
+            # (APC sales sheet as quoted by resellers, 2026-11-09). Internal: 12U x 44.45 = 533 mm; installed equipment depth 600 mm,
+            # usable ~550 mm (reseller listing) -> short-depth servers only (<= 550 mm).
+            "cab12": {"label": "19-inch 12U sound-damped office cabinet", "rack_in": 19, "usable_depth_mm": 550,
+                      "ext_l_m": 0.688, "ext_w_m": 0.952, "ext_h_m": 0.744, "int_l_m": 0.48, "int_w_m": 0.55, "int_h_m": 0.53,
                       "rack_u": 12, "it_kw_max": 1.5, "tare_kg": 75, "insertion_loss_db": 18.5, "noise_source": "rack",
                       "door": True, "reference": "APC NetShelter CX Mini 12U (AR4000MVX431)"},
         },
@@ -756,7 +757,9 @@ class Config:
             "modules": 1, "kind": "minirack",
             "hardening": self.hardening, "hardening_label": hz["label"], "hardening_rating": hz["rating"], "hardening_coating": hz["coating"],
             "hardening_recommended": "IND", "envelope_area_m2": round(area, 2),
-            "ashrae_class": PROFILE_DEFAULTS[self.profile]["ashrae"],
+            # BEN 1 runs in office air: its IT is specified to ASHRAE A2 or wider (an A1 profile is held to A2 limits and says so)
+            "ashrae_class": "A2" if PROFILE_DEFAULTS[self.profile]["ashrae"] == "A1" else PROFILE_DEFAULTS[self.profile]["ashrae"],
+            "ashrae_profile_class": PROFILE_DEFAULTS[self.profile]["ashrae"],
             "controls_tier_resolved": ct, "controls_label": CONTROLS_TIERS[ct]["label"], "pods": 2,
             "noise_dba_est": round(noise, 1), "noise_dba_target": target, "noise_ok": noise <= target, "noise_quiet_up_to_kw": round(quiet_kw, 2),
             "noise_basis": f"IT sound pressure at 1 m {src:.1f} dBA ({f['noise_source']} gear, +15 dB per decade of power) less {f['insertion_loss_db']} dB cabinet insertion loss, + 28 dBA extraction fans",
@@ -856,10 +859,10 @@ class Config:
     @classmethod
     def _preset_minirack(cls, tier: str, profile: str, climate: str, lineup: str, form: str | None) -> "Config":
         """BEN 1: AI inference on two desktop AI boxes in the 10-inch rack; AI training, healthcare and public sector in the lockable
-        12U cabinet with a 2U single-GPU server; everyone else a 0.4 kW 10-inch rack. Hardening IND, no generator, 10 min UPS."""
+        12U cabinet with a 2U short-depth single-GPU server; everyone else a 0.4 kW 10-inch rack. Hardening IND, no generator, 10 min UPS."""
         form = form or ("cab12" if profile in ("ai_training", "healthcare", "public_sector") else "rack10")
         if form == "cab12":
-            it = 1.5 if profile == "ai_training" else 1.0
+            it = 1.1 if profile == "ai_training" else 1.0     # 1.1 kW: one RTX PRO 6000 server, inside the 45 dBA target (1.17 kW)
         else:
             it = 0.6 if profile == "ai_inference" else 0.4
         return cls(tier=tier, profile=profile, it_kw=it, racks=1, cooling="office_air", redundancy="N" if form == "rack10" else "N+1",

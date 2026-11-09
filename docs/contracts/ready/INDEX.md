@@ -1,4 +1,8 @@
-# Paperwork ready set — generated 2026-11-08 (template rev 7f10d34)
+# Paperwork ready set — generated 2026-11-09 (template rev 4d362db)
+
+<img src="../../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
+BEN Engine, by Schreiber AI · Rev 2
 
 Schreiber AI's side and every policy number are filled; counterparty identity, addresses, dates and counsel choices stay as `[FIELD]` until known. Templates are not legal advice; counsel reviews before signature (`docs/contracts/README.md` §7). Regenerate with `python scripts/prepare_paperwork.py` after editing `purchasing/counterparties.json`.
 
@@ -50,3 +54,6 @@ Schreiber AI's side and every policy number are filled; counterparty identity, a
 | `SLA-master.md` | `MANAGED_SERVICES_SLA.md` | 57 |
 | `SOFTWARE-LICENSE-master.md` | `SOFTWARE_LICENSE_BEN_CONTROLS.md` | 25 |
 | `WARRANTY-master.md` | `WARRANTY_TERMS.md` | 51 |
+
+---
+BEN Engine, by Schreiber AI · Rev 2 · Schreiber AI is a Schreiber Holding LLC company.

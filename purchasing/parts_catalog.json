@@ -35,7 +35,8 @@
   "availability_note": "Common stock item at most US depots; delivery quoted per ZIP.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben150"
+   "ben150",
+   "ben300"
   ],
   "qty_rule": "1"
  },
@@ -55,7 +56,8 @@
   "availability_note": "Backordered at ContainerOne on 2026-11-07; alternates Cascade ($4,950), Dry Box (~$4,800), eBay Oakland ($4,700).",
   "moq": 1,
   "applies_to_tiers": [
-   "ben500"
+   "ben500",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -160,7 +162,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks"
  },
@@ -182,7 +186,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2"
  },
@@ -204,7 +210,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -226,7 +234,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks"
  },
@@ -248,7 +258,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m/7)"
  },
@@ -270,7 +282,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -293,7 +307,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m)"
  },
@@ -315,7 +331,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil((2*(tier_len_m+2.44)*2.9+tier_len_m*2.44)/2.97*2*1.1)"
  },
@@ -357,7 +375,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil((2*(tier_len_m+2.2)*2.55+tier_len_m*2.2)/2.23*1.1)"
  },
@@ -379,7 +399,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*4)"
  },
@@ -403,7 +425,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*2)+2"
  },
@@ -427,7 +451,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(1, ceil(tier_len_m/1.5))"
  },
@@ -449,7 +475,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*2.2*10.76)"
  },
@@ -471,7 +499,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*1.2)"
  },
@@ -604,9 +634,11 @@
   "moq": 1,
   "applies_to_tiers": [
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
-  "qty_rule": "0 if battery_kwh <= 20 else max(1, ceil(battery_kwh/32.6))",
+  "qty_rule": "battery_cabinets if liquid_first else (0 if battery_kwh <= 20 else max(1, ceil(battery_kwh/32.6)))",
   "applies_to_power": [
    "ac480"
   ]
@@ -780,7 +812,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -933,7 +967,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ups_modules + 1 + transformers_total"
  },
@@ -957,7 +993,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ups_modules + 1 + transformers_total"
  },
@@ -981,7 +1019,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "service_breaker_a"
  },
@@ -1005,7 +1045,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -1028,7 +1070,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -1397,7 +1441,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(2, racks)"
  },
@@ -1420,7 +1466,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "min(2, ceil(racks/3)) if racks <= 12 else ceil(racks/4)"
  },
@@ -1463,7 +1511,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks*4"
  },
@@ -1487,11 +1537,15 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700",
+   "ben1"
   ],
   "applies_to_controls": [
    "lite",
-   "pro"
+   "pro",
+   "mini"
   ],
   "qty_rule": "pods"
  },
@@ -1537,11 +1591,15 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700",
+   "ben1"
   ],
   "applies_to_controls": [
    "lite",
-   "pro"
+   "pro",
+   "mini"
   ],
   "qty_rule": "pods"
  },
@@ -1565,7 +1623,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "lite",
@@ -1593,11 +1653,15 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700",
+   "ben1"
   ],
   "applies_to_controls": [
    "lite",
-   "pro"
+   "pro",
+   "mini"
   ],
   "qty_rule": "modules + 1 if modules > 1 else (2 if racks >= 3 else 1)"
  },
@@ -1621,7 +1685,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "lite",
@@ -1649,7 +1715,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "lite",
@@ -1677,7 +1745,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "lite",
@@ -1704,7 +1774,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1730,7 +1802,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1756,7 +1830,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1782,7 +1858,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1808,7 +1886,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1834,7 +1914,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1860,7 +1942,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1886,7 +1970,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1912,7 +1998,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1938,7 +2026,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -1964,7 +2054,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -2011,7 +2103,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -2037,7 +2131,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "applies_to_controls": [
    "pro"
@@ -2182,7 +2278,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2",
   "applies_to_controls": [
@@ -2210,7 +2308,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "10 if racks <= 6 else (20 if racks <= 12 else 40)",
   "applies_to_controls": [
@@ -2238,7 +2338,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(1, ceil(tier_len_m*2*rows/15.24))",
   "applies_to_controls": [
@@ -2266,7 +2368,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1",
   "applies_to_controls": [
@@ -2294,7 +2398,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks+2",
   "applies_to_controls": [
@@ -2346,7 +2452,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "100 if racks <= 2 else (200 if racks <= 12 else 600)",
   "applies_to_controls": [
@@ -2374,12 +2482,16 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700",
+   "ben1"
   ],
   "qty_rule": "racks*4+6",
   "applies_to_controls": [
    "lite",
-   "pro"
+   "pro",
+   "mini"
   ]
  },
  {
@@ -2402,7 +2514,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(racks/8)",
   "applies_to_controls": [
@@ -2430,12 +2544,16 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700",
+   "ben1"
   ],
   "qty_rule": "1",
   "applies_to_controls": [
    "lite",
-   "pro"
+   "pro",
+   "mini"
   ]
  },
  {
@@ -2456,7 +2574,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*2.2*2.55)"
  },
@@ -2500,7 +2620,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2+ceil(tier_len_m/6)"
  },
@@ -2521,7 +2643,9 @@
   "moq": 1,
   "applies_to_tiers": [
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2544,7 +2668,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(1, modules)"
  },
@@ -2588,7 +2714,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1+ceil(tier_len_m/7)"
  },
@@ -2612,7 +2740,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2635,7 +2765,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil((tier_len_m+1.2)*3.64*10.76)"
  },
@@ -2657,7 +2789,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2699,7 +2833,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2742,7 +2878,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "service_breaker_a"
  },
@@ -2766,7 +2904,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2790,7 +2930,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2813,7 +2955,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2836,7 +2980,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "generator"
  },
@@ -2859,7 +3005,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*4)+4"
  },
@@ -2881,7 +3029,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "3+cooling_units_total"
  },
@@ -2905,7 +3055,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(40+racks*8+service_breaker_a/10)"
  },
@@ -2929,7 +3081,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(cooling_units_total*8+it_kw/10)"
  },
@@ -2951,7 +3105,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -2975,7 +3131,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks+cooling_units_total+ups_modules"
  },
@@ -2999,7 +3157,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "16 + racks*4 + 40*(modules-1)"
  },
@@ -3022,7 +3182,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -3044,7 +3206,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*2/3)"
  },
@@ -3066,7 +3230,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m/3)*2"
  },
@@ -3089,7 +3255,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks*2"
  },
@@ -3111,7 +3279,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2"
  },
@@ -3133,7 +3303,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*2.2)"
  },
@@ -3155,7 +3327,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "cooling_units_total+2"
  },
@@ -3179,7 +3353,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -3201,7 +3377,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -3245,7 +3423,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks*4"
  },
@@ -3313,7 +3493,9 @@
   "applies_to_tiers": [
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -3362,7 +3544,9 @@
    "ben5",
    "ben30",
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1"
  },
@@ -3385,7 +3569,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(1, modules)"
  },
@@ -3409,7 +3595,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2 if tier_len_m < 2 else 3 + cooling_units_total + modules"
  },
@@ -3433,7 +3621,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1 if tier_len_m < 2 else modules + 1 + ceil(tier_len_m/7)"
  },
@@ -3457,7 +3647,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(4 + 0.5*(2 if tier_len_m < 2 else 3 + cooling_units_total + modules))"
  },
@@ -3480,7 +3672,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "modules"
  },
@@ -3709,7 +3903,9 @@
   "availability_note": "Configured-to-order; 16-24 wk.",
   "moq": 1,
   "applies_to_tiers": [
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ups_modules * ceil(ups_kva_each/500)",
   "applies_to_power": [
@@ -4122,7 +4318,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(2*(tier_len_m + footprint_m2/tier_len_m))",
   "applies_to_hardening": [
@@ -4150,7 +4348,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(envelope_area_m2)",
   "applies_to_hardening": [
@@ -4178,7 +4378,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(2, modules*2)",
   "applies_to_hardening": [
@@ -4206,7 +4408,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1 if tier_len_m < 2 else modules + 1 + ceil(tier_len_m/7)",
   "applies_to_hardening": [
@@ -4234,7 +4438,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m*2)",
   "applies_to_hardening": [
@@ -4262,7 +4468,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m)",
   "applies_to_hardening": [
@@ -4290,7 +4498,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(2, ceil(tier_len_m/3))",
   "applies_to_hardening": [
@@ -4318,7 +4528,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "modules",
   "applies_to_hardening": [
@@ -4346,7 +4558,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "max(2, modules*2)",
   "applies_to_hardening": [
@@ -4374,7 +4588,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(wall_area_m2)",
   "applies_to_hardening": [
@@ -4401,7 +4617,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1 if tier_len_m < 2 else modules + 1 + ceil(tier_len_m/7)",
   "applies_to_hardening": [
@@ -4428,7 +4646,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "modules",
   "applies_to_hardening": [
@@ -4455,7 +4675,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(envelope_area_m2)",
   "applies_to_hardening": [
@@ -4482,7 +4704,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2 if tier_len_m < 2 else 3 + cooling_units_total + modules",
   "applies_to_hardening": [
@@ -4509,7 +4733,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "modules",
   "applies_to_hardening": [
@@ -4535,7 +4761,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1",
   "applies_to_hardening": [
@@ -4562,7 +4790,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "modules",
   "applies_to_hardening": [
@@ -4589,7 +4819,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1",
   "applies_to_hardening": [
@@ -4616,7 +4848,9 @@
    "ben30",
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "1",
   "applies_to_hardening": [
@@ -4641,7 +4875,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "rectifier_modules",
   "applies_to_power": [
@@ -4666,7 +4902,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "rectifier_cabinets",
   "applies_to_power": [
@@ -4691,7 +4929,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m * rows)",
   "applies_to_power": [
@@ -4716,7 +4956,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks",
   "applies_to_power": [
@@ -4741,7 +4983,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2",
   "applies_to_power": [
@@ -4766,7 +5010,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "imd_count",
   "applies_to_power": [
@@ -4791,7 +5037,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks + rectifier_cabinets",
   "applies_to_power": [
@@ -4816,7 +5064,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(battery_on_bus_kwh)",
   "applies_to_power": [
@@ -4841,7 +5091,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks",
   "applies_to_power": [
@@ -4866,7 +5118,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "2",
   "applies_to_power": [
@@ -4891,7 +5145,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "cooling_units_total",
   "applies_to_cooling": [
@@ -4916,7 +5172,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks",
   "applies_to_cooling": [
@@ -4941,7 +5199,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(liquid_heat_kw * 1.15)",
   "applies_to_cooling": [
@@ -4966,7 +5226,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "racks",
   "applies_to_cooling": [
@@ -4991,7 +5253,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "rows",
   "applies_to_cooling": [
@@ -5016,7 +5280,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(heat_reuse_kw)",
   "applies_to_cooling": [
@@ -5040,7 +5306,9 @@
   "moq": 1,
   "applies_to_tiers": [
    "ben150",
-   "ben500"
+   "ben500",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(tier_len_m)",
   "applies_to_cooling": [
@@ -5065,7 +5333,9 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "ceil(it_kw)",
   "applies_to_cooling": [
@@ -5114,11 +5384,696 @@
   "applies_to_tiers": [
    "ben150",
    "ben500",
-   "ben2000"
+   "ben2000",
+   "ben300",
+   "ben700"
   ],
   "qty_rule": "rack_shelves_total",
   "applies_to_power": [
    "dc800"
+  ]
+ },
+ {
+  "code": "STR-MINIRACK-10",
+  "name": "10-inch 8U desk / shelf mini rack, aluminium + acrylic (DeskPi RackMate T1), 281 W x 200 D x 451 H mm",
+  "manufacturer": "DeskPi (GeeekPi)",
+  "mpn": "RackMate T1",
+  "vendor": "DeskPi store",
+  "vendor_url": "https://deskpi.com/products/deskpi-rackmate-t1-2",
+  "unit": "ea",
+  "unit_price_usd": 119.99,
+  "price_status": "confirmed",
+  "price_source_note": "DeskPi store $119.99 seen in a search-result snippet 2026-11-09 (listing showed sold out). Alternatives: Lab Rax, Digitus 10-inch DN-10-08U (not priced). Dimensions from computingforgeeks / CNX listings; DeskPi wiki not read.",
+  "price_checked": "2026-11-09",
+  "lead_time_weeks": 2,
+  "availability_note": "Stock varies; T1-Plus / black variant interchangeable.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_rack10"
+ },
+ {
+  "code": "STR-MINI-SHELF10",
+  "name": "10-inch 2U vented shelf (one desktop AI box or mini PC per shelf)",
+  "manufacturer": "DeskPi (GeeekPi)",
+  "mpn": "10in-2U-shelf",
+  "vendor": "DeskPi store",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 25.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $25 per 10-inch 2U shelf (accessory class price); not priced from a vendor page.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_rack10 * 3"
+ },
+ {
+  "code": "STR-MINICAB-12",
+  "name": "APC NetShelter CX Mini 12U sound-damped office cabinet with PDU (744 H x 688 W x 952 D mm, 75 kg, 18.5 dB broadband noise reduction)",
+  "manufacturer": "APC by Schneider Electric",
+  "mpn": "AR4000MVX431",
+  "vendor": "Server Rack Online",
+  "vendor_url": "https://server-rack-online.com/ar4000mvx431.html",
+  "unit": "ea",
+  "unit_price_usd": 2517.24,
+  "price_status": "confirmed",
+  "price_source_note": "Server Rack Online $2,517.24 (was $2,800) for AR4000MVX431 seen in a search-result snippet 2026-11-09. AR4000MV itself is discontinued ($1,821.84 clearance). Alternatives: Sysracks SP 12.900 soundproof 12U ($855-949 on a marketplace, not usable as a confirmed price), Tripp Lite / Eaton SmartRack 12U (not sound-damped). Heat rating per model to be checked against the 1.6 kW design value.",
+  "price_checked": "2026-11-09",
+  "lead_time_weeks": 3,
+  "availability_note": "CX Mini variants X429/X431/X432 differ in finish; installed equipment depth 600 mm (usable ~550).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_cab12"
+ },
+ {
+  "code": "PWR-UPS-MINI-1000",
+  "name": "Smart-UPS Li-ion short depth 1000 VA / 800 W 120 V, 2U rack/tower, line-interactive, SmartConnect (NEMA 5-15P)",
+  "manufacturer": "APC by Schneider Electric",
+  "mpn": "SMTL1000RM2UC",
+  "vendor": "Reseller listings",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1550.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,550: 120 V SMTL1000RM2UC reseller listings $1,483-1,670 (regular $2,885) seen in search snippets 2026-11-09; CDW lists the 230 V SMTL1000RMI2UC at $1,893.99. Full-load runtime ~7 min 47 s at 800 W (reseller). Stands beside the 10-inch rack in tower orientation.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "1 if ups_va == 1000 else 0",
+  "applies_to_power": [
+   "ac480"
+  ]
+ },
+ {
+  "code": "PWR-UPS-MINI-2200",
+  "name": "Smart-UPS Li-ion 2200 VA / 1920 W 120 V, 2U rackmount, line-interactive, SmartConnect (NEMA 5-20P; 6 x 5-15R + 2 x 5-20R)",
+  "manufacturer": "APC by Schneider Electric",
+  "mpn": "SMTL2200RM2UC",
+  "vendor": "CDW",
+  "vendor_url": "https://www.cdw.com/product/apc-smart-ups-line-interactive-2200va-lithium-ion-rackmount-2u-120v-2/6583248",
+  "unit": "ea",
+  "unit_price_usd": 3382.0,
+  "price_status": "confirmed",
+  "price_source_note": "CDW $3,382 (list $5,335) seen in a search-result snippet 2026-11-09; SHI $3,475, Avendor $3,685.99. Runtime at 1,920 W not read (192 Wh delivered assumed). Lithium-ion; NEMA 5-20P input.",
+  "price_checked": "2026-11-09",
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "1 if ups_va == 2200 else 0",
+  "applies_to_power": [
+   "ac480"
+  ]
+ },
+ {
+  "code": "PWR-UPS-MINI-XBP",
+  "name": "External battery pack 2U for the 2200 VA lithium Smart-UPS (runtime extension to the configured minutes)",
+  "manufacturer": "APC by Schneider Electric",
+  "mpn": "(model to confirm)",
+  "vendor": "Distributor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1900.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,900; the lithium pack model compatible with SMTL2200RM2UC was not confirmed (2026-11-09). Each pack is assumed to add the internal battery energy.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Confirm compatibility before order.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "ups_battery_packs",
+  "applies_to_power": [
+   "ac480"
+  ]
+ },
+ {
+  "code": "PWR-PDU-10IN",
+  "name": "10-inch 1U PDU, 4 x NEMA 5-15R, 15 A, surge protected",
+  "manufacturer": "Generic 10-inch",
+  "mpn": "10IN-1U-4OUT",
+  "vendor": "Marketplace listing",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 114.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $114: 10-inch 1U 4-outlet 15 A surge PDU listed at $113.99 on Newegg (marketplace) 2026-11-09; Intellinet 10-inch 4-outlet (IEC) $99.99 on a storefront platform.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_rack10",
+  "applies_to_power": [
+   "ac480"
+  ]
+ },
+ {
+  "code": "CMP-AI-DGXSPARK",
+  "name": "Desktop AI computer NVIDIA DGX Spark (GB10 Grace Blackwell, 128 GB unified memory, 240 W supply) — customer-selectable",
+  "manufacturer": "NVIDIA",
+  "mpn": "DGX Spark",
+  "vendor": "NVIDIA / partners",
+  "vendor_url": "https://www.nvidia.com/en-us/products/workstations/dgx-spark/",
+  "unit": "ea",
+  "unit_price_usd": 4699.0,
+  "price_status": "list",
+  "price_source_note": "MSRP $4,699 after NVIDIA's February 2026 increase from the $3,999 launch price (reported by reviews and price trackers 2026-11-09); OEM GB10 variants differ. Customer-selectable compute: the customer may supply their own.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Customer-selectable line.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_rack10 * profile_ai * max(1, floor(it_kw*1000*0.7/200))"
+ },
+ {
+  "code": "CMP-MINIPC",
+  "name": "Mini PC (Intel Core Ultra / AMD Ryzen class, 64 GB, 2 TB) on a 10-inch shelf — customer-selectable",
+  "manufacturer": "Various",
+  "mpn": "NUC-class",
+  "vendor": "Various",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 900.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $900 for a business mini PC; customer-selectable.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "Customer-selectable line.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_rack10 * (1 - profile_ai)"
+ },
+ {
+  "code": "CMP-NAS-DS224",
+  "name": "Synology DiskStation DS224+ 2-bay desktop NAS beside the 10-inch rack (diskless) — customer-selectable",
+  "manufacturer": "Synology",
+  "mpn": "DS224+",
+  "vendor": "Various",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 330.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $330 (diskless) not read from a vendor page; Synology makes no 10-inch rack NAS.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "Customer-selectable line.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_rack10"
+ },
+ {
+  "code": "CMP-AI-2U-RTXPRO",
+  "name": "2U short-depth (<= 550 mm) edge server with 1 x NVIDIA RTX PRO 6000 Blackwell Server Edition 96 GB (Dell XR7620 / Lenovo SE455 V3 class) — customer-selectable",
+  "manufacturer": "Dell / Lenovo / Supermicro",
+  "mpn": "2U-SD-1xRTXPRO6000",
+  "vendor": "Vendor quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 32000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $32,000 = card ~$14,690 (US seller listing 2026-11-09; EU 12,893-13,936 EUR ex VAT) + short-depth 2U edge server ~$15,000 + integration. No single-GPU 2U configured price found; GPU support in the chosen chassis to confirm with the vendor.",
+  "price_checked": null,
+  "lead_time_weeks": 6,
+  "availability_note": "Customer-selectable line.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_cab12 * profile_ai"
+ },
+ {
+  "code": "CMP-MINI-1U",
+  "name": "1U short-depth server (<= 550 mm) for non-AI profiles — customer-selectable",
+  "manufacturer": "Dell / Supermicro",
+  "mpn": "1U-SD",
+  "vendor": "Vendor quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 4500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $4,500 for a 1U short-depth server; customer-selectable.",
+  "price_checked": null,
+  "lead_time_weeks": 3,
+  "availability_note": "Customer-selectable line.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_cab12 * (1 - profile_ai)"
+ },
+ {
+  "code": "CMP-NAS-RS422",
+  "name": "Synology RackStation RS422+ 1U 4-bay NAS (diskless)",
+  "manufacturer": "Synology",
+  "mpn": "RS422+",
+  "vendor": "SHI",
+  "vendor_url": "https://www.shi.com/product/44741700/Synology-RackStation-RS422",
+  "unit": "ea",
+  "unit_price_usd": 799.99,
+  "price_status": "list",
+  "price_source_note": "MSRP $799.99 shown on the SHI listing 2026-11-09 (Staples $1,000.12, CDW Canada C$1,281.99).",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_cab12"
+ },
+ {
+  "code": "CMP-SW-MINI",
+  "name": "UniFi Switch Lite 8 PoE, 8 x GbE, 4 x PoE+ (52 W), managed",
+  "manufacturer": "Ubiquiti",
+  "mpn": "USW-Lite-8-PoE",
+  "vendor": "SHI",
+  "vendor_url": "https://www.shi.com/product/40833921/Ubiquiti-UniFi-Switch-Lite-USW-Lite-8-POE",
+  "unit": "ea",
+  "unit_price_usd": 136.0,
+  "price_status": "confirmed",
+  "price_source_note": "SHI $136.00 seen in a search-result snippet 2026-11-09 (Altex $137.99; UI UK store GBP 85, sold out).",
+  "price_checked": "2026-11-09",
+  "lead_time_weeks": 1,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "CTL-EDGE-MINI",
+  "name": "Fanless edge computer for the BEN Care agent (OnLogic BlastShield CL210, dual LAN) — omit when BEN Care runs on the customer's own box",
+  "manufacturer": "OnLogic",
+  "mpn": "CL210 (BlastShield)",
+  "vendor": "CDW",
+  "vendor_url": "https://www.cdw.com/product/onlogic-blastshield-cl210-gateway-fanless-industrial-with-dual-lan/9043873",
+  "unit": "ea",
+  "unit_price_usd": 924.99,
+  "price_status": "confirmed",
+  "price_source_note": "CDW $924.99 seen in a search-result snippet 2026-11-09. Alternative RevPi Connect S from 407 EUR ex VAT (KUNBUS shop). Customer-selectable.",
+  "price_checked": "2026-11-09",
+  "lead_time_weeks": 3,
+  "availability_note": "Customer-selectable line.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "1",
+  "applies_to_controls": [
+   "mini"
+  ]
+ },
+ {
+  "code": "CTL-DOOR-MINI",
+  "name": "Surface-mount magnetic door contact (cab12 door) to Pod W digital input",
+  "manufacturer": "(as CTL-DOOR)",
+  "mpn": "7939WG-WH",
+  "vendor": "AlarmGrid",
+  "vendor_url": "https://www.alarmgrid.com/products/honeywell-7939wg",
+  "unit": "ea",
+  "unit_price_usd": 10.99,
+  "price_status": "confirmed",
+  "price_source_note": "Same part and price evidence as CTL-DOOR: AlarmGrid $10.99 (list $12) seen 2026-11-07; JMAC $7.00 with $99 min order",
+  "price_checked": "2026-11-07",
+  "lead_time_weeks": 1,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_cab12",
+  "applies_to_controls": [
+   "mini"
+  ]
+ },
+ {
+  "code": "ENV-DATAPLATE-MINI",
+  "name": "Data plate band label, printed polycarbonate with QR (Schreiber AI · BEN Engine · BEN 1 · S/N · Rated kW · 120 V · Rev 2)",
+  "manufacturer": "Label printer",
+  "mpn": "DP-BAND-MINI",
+  "vendor": "Print vendor",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 35.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $35 for a short-run printed polycarbonate band label.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "SVC-MINI-ASSEMBLY",
+  "name": "Schreiber AI assembly, imaging, 24 h burn-in and test of BEN 1 (hours)",
+  "manufacturer": "Schreiber AI",
+  "mpn": "SVC-MINI",
+  "vendor": "Schreiber AI",
+  "vendor_url": "",
+  "unit": "h",
+  "unit_price_usd": 95.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate: internal labour rate $95/h (as SVC-COMMISSION); 6 h for the 10-inch rack, 10 h for the 12U cabinet.",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "6 if form_rack10 else 10"
+ },
+ {
+  "code": "SITE-MINI-PARCEL",
+  "name": "Parcel freight, insured, BEN 1 10-inch rack",
+  "manufacturer": "Carrier",
+  "mpn": "PARCEL",
+  "vendor": "Carrier",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 120.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $120 insured parcel (two boxes).",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_rack10"
+ },
+ {
+  "code": "SITE-MINI-LTL",
+  "name": "LTL freight on a pallet, liftgate delivery, BEN 1 12U cabinet (~180 kg)",
+  "manufacturer": "Carrier",
+  "mpn": "LTL",
+  "vendor": "Carrier",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 480.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $480 LTL with liftgate and inside delivery.",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "form_cab12"
+ },
+ {
+  "code": "SVC-MINI-SETUP",
+  "name": "Setup and handover at the customer (or remote): placement, outlet check, network, BEN Care enrolment, room-heat check (hours)",
+  "manufacturer": "Schreiber AI",
+  "mpn": "SVC-MINI-SETUP",
+  "vendor": "Schreiber AI",
+  "vendor_url": "",
+  "unit": "h",
+  "unit_price_usd": 95.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate 4 h at $95/h; replaces the site acceptance test of the module tiers.",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben1"
+  ],
+  "qty_rule": "4"
+ },
+ {
+  "code": "STR-RACK-MGX",
+  "name": "48U MGX liquid rack enclosure 600 x 1068 mm for GB300 NVL72-class systems (manifold-ready, 2236 mm H)",
+  "manufacturer": "Vertiv / OEM MGX",
+  "mpn": "MGX-48U-600x1068",
+  "vendor": "Vendor quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 9500.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $9,500; normally shipped with the rack-scale system from the OEM (then this line is removed). Vertiv SmartIT for GB300 NVL72 is 600 x 1200 D with its rear extension (2286 mm H, 189 kg empty) and is not used in the 2.2 m module (layout DEV-D1).",
+  "price_checked": null,
+  "lead_time_weeks": 12,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "racks"
+ },
+ {
+  "code": "STR-LOADFRAME",
+  "name": "Rack load-spreading base frame 600 x 1,600 mm, galvanised, bolted to the floor channels (1.5 t GB300-class rack)",
+  "manufacturer": "Fabricator",
+  "mpn": "LSF-600x1600",
+  "vendor": "Fabricator",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1400.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,400 per frame (steel + galvanising + fabrication); structural calc confirms.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "racks"
+ },
+ {
+  "code": "CMP-GB300-NVL72",
+  "name": "NVIDIA GB300 NVL72 rack-scale system (72 Blackwell Ultra GPUs, 36 Grace CPUs; 132-155 kW) less enclosure — customer-selectable",
+  "manufacturer": "NVIDIA via OEM (Supermicro / Dell / HPE / Lenovo)",
+  "mpn": "GB300 NVL72",
+  "vendor": "OEM quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 4300000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $4.3 M: Wolfe Research analyst estimate (Jan 2026); published estimates range $3.0-6.5 M per rack and $8-8.6 M installed with networking. No list price exists. Customer-selectable: most buyers source compute directly.",
+  "price_checked": null,
+  "lead_time_weeks": 26,
+  "availability_note": "Allocation-dependent.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "racks"
+ },
+ {
+  "code": "PWR-SWBD-SECTION",
+  "name": "480Y/277 V switchboard section 36 in W x 24 in D, UL 891 (main breaker to 1,200 A per section, maintenance bypass for the UPS frames, distribution)",
+  "manufacturer": "Schneider Electric (Square D)",
+  "mpn": "QED-2",
+  "vendor": "Distributor quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 48000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $48,000 per configured section; surplus 2000 A QED listings $4-47 k show breakers drive cost; no new-equipment price found 2026-11-09.",
+  "price_checked": null,
+  "lead_time_weeks": 22,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "swbd_sections"
+ },
+ {
+  "code": "PWR-PANEL-600",
+  "name": "480Y/277 V I-Line distribution panelboard, 600 A main breaker, NEMA 1, end-wall mounted",
+  "manufacturer": "Schneider Electric (Square D)",
+  "mpn": "I-Line 600A MB",
+  "vendor": "Distributor quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 9800.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $9,800 (interior + box + 600 A main); not priced from a vendor page.",
+  "price_checked": null,
+  "lead_time_weeks": 10,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "1 if swbd_sections == 0 else 0"
+ },
+ {
+  "code": "PWR-RACKFEED-HD",
+  "name": "Rack power feed, 480Y/277 V 3-phase 60 A whip with IEC 60309 connector, metered branch breaker (GB300 power shelves)",
+  "manufacturer": "Various",
+  "mpn": "RACKFEED-60A",
+  "vendor": "Various",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 1800.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,800 per feed (breaker, cable, connector, meter); 4 feeds per 150 kW rack. 277 V power-shelf input to confirm with the OEM.",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "racks * ceil(it_kw / racks / 40)",
+  "applies_to_power": [
+   "ac480"
+  ]
+ },
+ {
+  "code": "PWR-ATS-DENSE",
+  "name": "Automatic transfer switch 480 V 3P, 600-1,200 A, service-entrance rated",
+  "manufacturer": "ASCO / Eaton",
+  "mpn": "ATS-480-1200",
+  "vendor": "Distributor quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 28000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $28,000 (600-1,200 A class); generator option only.",
+  "price_checked": null,
+  "lead_time_weeks": 16,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "generator"
+ },
+ {
+  "code": "PWR-GEN-DENSE",
+  "name": "Diesel standby generator 400-900 kW class, 480 V, L2 enclosure, sub-base tank (per kW)",
+  "manufacturer": "Kohler / Cummins / CAT",
+  "mpn": "GEN-DENSE",
+  "vendor": "Dealer quote",
+  "vendor_url": "",
+  "unit": "kW",
+  "unit_price_usd": 420.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $420/kW installed on the skid pad (generator option only).",
+  "price_checked": null,
+  "lead_time_weeks": 40,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "generator_kw_each * generator"
+ },
+ {
+  "code": "CLG-FANCOIL-CW20",
+  "name": "In-row chilled-water fan coil 300 mm, 20 kW at 18 C water (residual air of the liquid racks, trim loop)",
+  "manufacturer": "Schneider Electric / Vertiv",
+  "mpn": "InRow RC 300 / CRV CW 300",
+  "vendor": "Vendor quote",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 11000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $11,000; 20 kW at 18 C water is a design value not read from a datasheet.",
+  "price_checked": null,
+  "lead_time_weeks": 14,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "fancoils_total",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ]
+ },
+ {
+  "code": "CLG-TRIM-CHILLER",
+  "name": "Air-cooled trim chiller on the skid for the 18 C residual-air loop (R-454B, GWP 466), per kW",
+  "manufacturer": "Various",
+  "mpn": "TRIM-CH",
+  "vendor": "Vendor quote",
+  "vendor_url": "",
+  "unit": "kW",
+  "unit_price_usd": 650.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $650/kW; the W45 loop cannot cool room air, so the fan coils need this colder loop.",
+  "price_checked": null,
+  "lead_time_weeks": 16,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "ceil(trim_loop_kw)",
+  "applies_to_cooling": [
+   "dlc_hd"
+  ],
+  "refrigerant": "R-454B (A2L)",
+  "gwp": 466
+ },
+ {
+  "code": "CLG-SKID-DENSE",
+  "name": "Heat-rejection skid: steel frame, pipe bridge to the module, isolation valves, expansion and fill (dry coolers and trim chiller on it)",
+  "manufacturer": "Fabricator",
+  "mpn": "SKID-DENSE",
+  "vendor": "Fabricator",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 28000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $28,000.",
+  "price_checked": null,
+  "lead_time_weeks": 10,
+  "availability_note": "",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben300",
+   "ben700"
+  ],
+  "qty_rule": "1",
+  "applies_to_cooling": [
+   "dlc_hd"
   ]
  }
 ]

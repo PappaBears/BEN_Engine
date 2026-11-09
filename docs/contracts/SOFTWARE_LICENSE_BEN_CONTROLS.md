@@ -1,7 +1,9 @@
 # Software Licence — BEN Controls
 
+<img src="../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SOFTWARE_LICENSE_BEN_CONTROLS.md` · Template rev [TEMPLATE_REV]
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/SOFTWARE_LICENSE_BEN_CONTROLS.md` · Template rev [TEMPLATE_REV]
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. This Licence is incorporated into the MSA (MSA Section 16.2) and the Integrator Agreement; the order form in Section 14 selects the licence type per Unit. Delete this box before signature.
 
 **Licence ID:** [LICENSE_ID]
@@ -179,4 +181,4 @@ A Type A or converted Type B licence transfers with the Unit to a buyer who agre
 | Date | [SIGNATURE_DATE_SCHREIBER] | [SIGNATURE_DATE_LICENSEE] |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/SOFTWARE_LICENSE_BEN_CONTROLS.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/SOFTWARE_LICENSE_BEN_CONTROLS.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

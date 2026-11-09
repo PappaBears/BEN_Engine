@@ -220,6 +220,15 @@ def _builtin_sweep(name: str, cfg: Config, progress: Callable[[float], None]) ->
     spec = BUILTIN_SWEEPS[name]
     tw = Twin(cfg, seed=7)
     tw.set_it_load(0.8)
+    fault = spec.get("fault")
+    if fault and fault not in tw.applicable_faults():
+        # Rev 2 BEN 1 open rack (no door, no fans): the scenario is skipped with the reason, and the result says so
+        reason = tw.not_applicable_reason(fault)
+        tw.step(1.0)
+        st = tw.state()
+        return {"rows": [{"t_s": 1, "it_kw": st["it_kw"], "inlet_max_c": max(st["rack_inlet_c"]), "alarms": ""}],
+                "criteria": [_crit("not applicable", reason, "n/a", True)], "passed": True, "events": [f"skipped: {reason}"],
+                "duration_s": 0.0, "sim_seconds": 1, "skipped": reason}
     total = spec["seconds"]
     rows: List[Dict[str, Any]] = []
     t0 = time.time()
@@ -315,11 +324,11 @@ def _cr_utility(tw, rows, a_max, ev):
 
 
 def _sc_outdoor(tw: Twin, s: int, ev: List[str]):
-    clim = CLIMATE_DESIGN[tw.cfg.climate]
-    start = clim["t_design_c"] - 12
-    tw.set_outdoor(start + (clim["t_design_c"] - start) * min(1.0, s / 900.0))
+    design = tw.design_ambient_c()          # climate design outdoor; BEN 1: the 30 C office maximum
+    start = design - 12
+    tw.set_outdoor(start + (design - start) * min(1.0, s / 900.0))
     if s == 900:
-        ev.append(f"t=900 s: outdoor reached design {clim['t_design_c']} C")
+        ev.append(f"t=900 s: {'office air' if tw.mini else 'outdoor'} reached design {design} C")
 
 
 def _cr_outdoor(tw, rows, a_max, ev):
@@ -354,13 +363,13 @@ def _cr_door(tw, rows, a_max, ev):
 BUILTIN_SWEEPS: Dict[str, Dict[str, Any]] = {
     "load_step": {"label": "IT load step 30 → 100 %", "seconds": 1200, "script": _sc_load_step, "criteria": _cr_load_step,
                   "description": "Steps IT load and checks rack inlets settle inside the ASHRAE class with margin."},
-    "cooling_unit_fail": {"label": "Cooling unit failure", "seconds": 1200, "script": _sc_cool_fail, "criteria": _cr_cool_fail,
+    "cooling_unit_fail": {"label": "Cooling unit failure", "seconds": 1200, "script": _sc_cool_fail, "criteria": _cr_cool_fail, "fault": "cooling_unit_fail",
                           "description": "Fails cooling unit 1; redundancy must start a standby unit and inlets stay below the class maximum."},
     "utility_loss": {"label": "Utility loss / UPS ride-through", "seconds": 600, "script": _sc_utility, "criteria": _cr_utility,
                      "description": "Drops utility for 6 min; UPS must hold the IT load and generator must start if fitted."},
     "outdoor_ramp": {"label": "Outdoor ramp to design day", "seconds": 1200, "script": _sc_outdoor, "criteria": _cr_outdoor,
                      "description": "Ramps outdoor temperature to the climate design value; cooling must keep inlets in class."},
-    "door_open": {"label": "Door open 10 min", "seconds": 900, "script": _sc_door, "criteria": _cr_door,
+    "door_open": {"label": "Door open 10 min", "seconds": 900, "script": _sc_door, "criteria": _cr_door, "fault": "door_open",
                   "description": "Opens the container door; alarm must raise and inlets must not rise more than 3 K."},
 }
 

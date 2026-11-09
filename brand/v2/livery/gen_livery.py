@@ -45,8 +45,20 @@ FALLBACK = {
     "ben1000": {"label": "BEN 1000", "it_kw_max": 1000, "voltage": "480 V 3ph", "ip": "IP66", "kind": "module", "ext_l_m": 12.192, "ext_w_m": 2.438, "ext_h_m": 2.896},
 }
 # Which tiers get which drawings (module length class from the decision table).
-PLAN = [("ben1", "mini_rack"), ("ben5", "cabinet"), ("ben30", "module"), ("ben150", "module"), ("ben300", "module"),
-        ("ben500", "module"), ("ben1000", "module")]
+def _plan() -> list:
+    """Every non-hall tier the configuration model carries, in IT-power order; decision-table fallbacks only for
+    new tiers the model does not carry yet (BEN 1000 is skipped once the model renames it, e.g. to BEN 700)."""
+    kinds = {"minirack": "mini_rack", "mini_rack": "mini_rack", "cabinet": "cabinet", "module": "module"}
+    plan = [(k, kinds[g.get("kind")]) for k, g in GEOM.items() if g.get("kind") in kinds]
+    aliases = getattr(_cfg, "TIER_ALIASES", {}) if GEOM else {}
+    for k, fb in FALLBACK.items():
+        if k not in GEOM and aliases.get(k) not in GEOM:
+            plan.append((k, fb["kind"] if fb["kind"] != "mini_rack" else "mini_rack"))
+    order = lambda kv: float((GEOM.get(kv[0]) or FALLBACK.get(kv[0], {})).get("it_kw_max") or 0)
+    return sorted(plan, key=order)
+
+
+PLAN = _plan()
 
 WEEK = _dt.date(2026, 11, 9).isocalendar()
 
@@ -61,7 +73,10 @@ def plate_url(serial: str) -> str:
 
 
 def volt(v: str) -> str:
-    return v.replace("3ph", "3φ").replace("1ph", "1φ")
+    """'120 V 1ph 15/20 A plug-in' -> '120 V 1φ'; '480 V 3ph' -> '480 V 3φ'."""
+    import re
+    m = re.match(r"^\s*([\d/.,]+\s*k?V(?:\s*\dph)?)", v)
+    return (m.group(1) if m else v).replace("3ph", "3φ").replace("1ph", "1φ")
 
 
 def tier_info(key: str) -> dict:

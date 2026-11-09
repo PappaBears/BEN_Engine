@@ -1,7 +1,9 @@
 # Purchase Order Terms and Conditions, with Supplier Quality Requirements — BEN Engine
 
+<img src="../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SUPPLIER_TERMS.md` · Template rev [TEMPLATE_REV]
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/SUPPLIER_TERMS.md` · Template rev [TEMPLATE_REV]
 > Bracketed `[FIELDS]` are filled by the proposal generator and the purchasing system from `docs/contracts/fields.json`. Part 1 is referenced on every Schreiber AI purchase order ("These Terms apply: docs/contracts/SUPPLIER_TERMS.md rev [TEMPLATE_REV]"). Part 2 is the Supplier Quality Requirements appendix. Contract Manufacturers buying Purchased Materials under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` use these Terms or terms at least as protective. Delete this box before issue.
 
 # Part 1 — Purchase Order Terms and Conditions
@@ -233,4 +235,4 @@ Buyer tracks on-time delivery, documentation completeness, receiving rejects, SC
 | Terms | `docs/contracts/SUPPLIER_TERMS.md` rev [TEMPLATE_REV] |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/SUPPLIER_TERMS.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/SUPPLIER_TERMS.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

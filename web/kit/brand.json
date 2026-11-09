@@ -101,7 +101,7 @@
     "Status colors (Run, Hold, Stop, Info) are for status chips and alarms only, never brand.",
     "Heat maps and hot/cold aisles use the thermal ramp (#5CD6FF cool to #FF8A3D warm) with a legend.",
     "Every piece carries the data plate band: Schreiber AI · BEN Engine · <tier> · S/N · Rated kW IT · voltage · IP · Rev 2.",
-    "Product name is written BEN Engine. Tiers are BEN 1, BEN 5, BEN 30, BEN 150, BEN 300, BEN 500, BEN 1000, BEN 2000 (the number is the nominal maximum IT kW). Outdoor enclosures are NEMA 4X / IP66 with hardening H1/H2/H3; never the rain-only 3R rating.",
+    "Product name is written BEN Engine. Tiers are BEN 1, BEN 5, BEN 30, BEN 150, BEN 300, BEN 500, BEN 700, BEN 2000 (the number is the nominal maximum IT kW). Outdoor enclosures are NEMA 4X / IP66 with hardening H1/H2/H3; never the rain-only 3R rating.",
     "Numbers come from the configuration model or measured evidence. No invented metrics. An empty proof slot is a yellow 'fact pending' chip.",
     "Risks are shown before prices.",
     "Samples and previews sent to prospects are watermarked Schreiber AI."

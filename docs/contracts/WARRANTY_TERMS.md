@@ -1,7 +1,9 @@
 # Warranty Terms — BEN Engine Unit and Modules
 
+<img src="../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/WARRANTY_TERMS.md` · Template rev [TEMPLATE_REV]
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/WARRANTY_TERMS.md` · Template rev [TEMPLATE_REV]
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. These Warranty Terms are incorporated into the MSA (Section 10) and issued as the warranty certificate in the Turnover Package (item E2). Delete this box before issue.
 
 **Warranty certificate ID:** [WARRANTY_CERT_ID]
@@ -163,4 +165,4 @@ The warranty does not cover, and Schreiber AI may void the affected part of the 
 | Issued by | [SCHREIBER_SIGNATORY_NAME], [SCHREIBER_SIGNATORY_TITLE], Schreiber AI |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/WARRANTY_TERMS.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/WARRANTY_TERMS.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

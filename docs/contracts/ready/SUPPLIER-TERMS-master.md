@@ -1,8 +1,10 @@
 # Purchase Order Terms and Conditions, with Supplier Quality Requirements — BEN Engine
 
+<img src="../../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/SUPPLIER_TERMS.md` · Template rev 7f10d34
-> Bracketed `[FIELDS]` are filled by the proposal generator and the purchasing system from `docs/contracts/fields.json`. Part 1 is referenced on every Schreiber AI purchase order ("These Terms apply: docs/contracts/SUPPLIER_TERMS.md rev 7f10d34"). Part 2 is the Supplier Quality Requirements appendix. Contract Manufacturers buying Purchased Materials under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` use these Terms or terms at least as protective. Delete this box before issue.
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/SUPPLIER_TERMS.md` · Template rev 4d362db
+> Bracketed `[FIELDS]` are filled by the proposal generator and the purchasing system from `docs/contracts/fields.json`. Part 1 is referenced on every Schreiber AI purchase order ("These Terms apply: docs/contracts/SUPPLIER_TERMS.md rev 4d362db"). Part 2 is the Supplier Quality Requirements appendix. Contract Manufacturers buying Purchased Materials under `docs/contracts/CONTRACT_MANUFACTURING_AGREEMENT.md` use these Terms or terms at least as protective. Delete this box before issue.
 
 # Part 1 — Purchase Order Terms and Conditions
 
@@ -230,7 +232,7 @@ Buyer tracks on-time delivery, documentation completeness, receiving rejects, SC
 | Payment terms | Net 30 |
 | Required documents (Q1 category rows and Q2) | [PO_REQUIRED_DOCS] |
 | Buyer contact | [BUYER_CONTACT_NAME], [BUYER_CONTACT_EMAIL] |
-| Terms | `docs/contracts/SUPPLIER_TERMS.md` rev 7f10d34 |
+| Terms | `docs/contracts/SUPPLIER_TERMS.md` rev 4d362db |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/SUPPLIER_TERMS.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/SUPPLIER_TERMS.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

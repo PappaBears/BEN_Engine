@@ -1,7 +1,9 @@
 # Master Services Agreement (MSA) — BEN Engine
 
+<img src="../../../brand/v2/lockup-deep.svg" alt="Schreiber AI" height="28">
+
 > **TEMPLATE — not legal advice — have counsel review before use.**
-> Schreiber AI · BEN Engine (Business Edge Node) · `docs/contracts/MSA.md` · Template rev 7f10d34
+> BEN Engine, by Schreiber AI · Rev 2 · `docs/contracts/MSA.md` · Template rev 4d362db
 > Bracketed `[FIELDS]` are filled by the proposal generator from `docs/contracts/fields.json`. Delete this box before signature.
 
 **Agreement ID:** [MSA_ID]
@@ -408,4 +410,4 @@ Capitalised terms have these meanings throughout this Agreement and every SOW.
 | Compliance matrix | `docs/COMPLIANCE.md` | [DOC_REV_COMPLIANCE] |
 
 ---
-Schreiber AI · BEN Engine (Business Edge Node) · Ben@SchreiberAI.com · Template maintained at `docs/contracts/MSA.md` · TEMPLATE — not legal advice — have counsel review before use.
+BEN Engine, by Schreiber AI · Rev 2 · Ben@SchreiberAI.com · Template maintained at `docs/contracts/MSA.md` · TEMPLATE — not legal advice — have counsel review before use. Schreiber AI is a Schreiber Holding LLC company.

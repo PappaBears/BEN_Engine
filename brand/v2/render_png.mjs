@@ -22,7 +22,7 @@ try {
       await page.setViewportSize({ width, height: h });
       await page.goto('file://' + path.dirname(abs) + '/'); await page.setContent(`<html><body style="margin:0;background:${flags.bg || '#ffffff'}"><img src="file://${abs}" style="display:block;width:${width}px;height:${h}px"></body></html>`);
       await page.waitForTimeout(300);
-      await page.screenshot({ path: out });
+      await page.screenshot({ path: out, omitBackground: flags.bg === 'transparent' });
     } else {
       await page.goto('file://' + abs, { waitUntil: 'networkidle' });
       await page.waitForTimeout(400);

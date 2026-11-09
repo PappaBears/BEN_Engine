@@ -251,7 +251,7 @@ def utility_loss_ride_through(twin: Twin, load: float = 1.0, max_s: float = 3600
     if t_gen is not None:
         res.summary = (f"Utility lost at {int(load*100)} % load; generator took load after {t_gen:.0f} s. Peak rack inlet {peak:.1f} C. ")
     else:
-        res.summary = (f"Utility lost at {int(load*100)} % load with cooling off. Rack inlets reached the ASHRAE {cls} limit ({a_max:.0f} C) after "
+        res.summary = (f"Utility lost at {int(load*100)} % load with {'the cabinet fans on the UPS' if twin.mini else ('the CDU pumps and fan coils on the UPS' if twin.d.get('liquid_first') else 'cooling off')}. Rack inlets reached the ASHRAE {cls} limit ({a_max:.0f} C) after "
                        f"{'%.1f min' % ride_min if ride_min is not None else 'more than the test window'}; UPS reached 0 % after "
                        f"{'%.1f min' % ups_min if ups_min is not None else 'more than the test window'} (configured {twin.cfg.ups_minutes} min). ")
     res.summary += "Thermal ride-through, not battery, is the binding limit." if (ride_min is not None and (ups_min is None or ride_min < ups_min)) else "Battery, not temperature, is the binding limit."
@@ -296,14 +296,16 @@ def door_open(twin: Twin, load: float = 0.8, open_s: float = 900.0, record_every
     return res
 
 
-def outdoor_temperature_sweep(twin: Twin, load: float = 1.0, t_start_c: float = 10.0, t_end_c: Optional[float] = None,
+def outdoor_temperature_sweep(twin: Twin, load: float = 1.0, t_start_c: Optional[float] = None, t_end_c: Optional[float] = None,
                               step_k: float = 5.0, hold_s: float = 900.0, record_every_s: float = 10.0,
                               clock: Optional[str] = None) -> SweepResult:
     """Ramp outdoor temperature from ``t_start_c`` to the climate design temperature in steps."""
     res = SweepResult("outdoor_temperature_sweep", _now(clock))
     cls = twin.d["ashrae_class"]
     a_max = ASHRAE_MAX[cls]
-    t_end = t_end_c if t_end_c is not None else CLIMATE_DESIGN[twin.cfg.climate]["t_design_c"]
+    t_end = t_end_c if t_end_c is not None else twin.design_ambient_c()
+    if t_start_c is None:
+        t_start_c = 18.0 if twin.mini else 10.0     # BEN 1: office air from 18 C to the 30 C office maximum
     rec = Recorder(twin, "outdoor_temperature_sweep", record_every_s=record_every_s)
     twin.set_it_load(load)
     points = []
@@ -480,10 +482,22 @@ SWEEPS: Dict[str, Callable[..., SweepResult]] = {
     "dc_ground_fault_response": dc_ground_fault_response,
 }
 # sweeps that need a configuration feature: name -> predicate on Config
+def _minirack_cabinet(cfg: Config) -> bool:
+    """True unless the unit is a BEN 1 open 10-inch rack (no door, no extraction fans, no intake filter)."""
+    return not (cfg.derived()["kind"] == "minirack" and cfg.form == "rack10")
+
+
 SWEEP_REQUIRES: Dict[str, Callable[[Config], bool]] = {
     "cdu_pump_failover": lambda cfg: cfg.cooling == "dlc_hd",
     "dc_ground_fault_response": lambda cfg: cfg.power_architecture == "dc800",
+    # Rev 2 BEN 1: the open 10-inch rack has no door, fans or filter to test
+    "door_open": _minirack_cabinet,
+    "cooling_unit_failover": _minirack_cabinet,
+    "filter_clog": _minirack_cabinet,
 }
+SWEEP_NA_REASON = {"door_open": "the BEN 1 10-inch open rack has no door", "cooling_unit_failover": "the BEN 1 10-inch open rack has no extraction fans",
+                   "filter_clog": "the BEN 1 10-inch open rack has no intake filter",
+                   "cdu_pump_failover": "needs the high-density liquid loop (dlc_hd)", "dc_ground_fault_response": "needs the 800 VDC option (dc800)"}
 
 
 def applicable(name: str, cfg: Config) -> bool:
@@ -537,8 +551,10 @@ def main(argv=None):
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--power-architecture", dest="power_architecture", default=None, help="ac480 or dc800 (forward option)")
     ap.add_argument("--cooling", default=None, help="override the preset cooling (e.g. dlc_hd)")
+    ap.add_argument("--lineup", default="rev2", choices=["rev1", "rev2"])
+    ap.add_argument("--form", default=None, choices=["rack10", "cab12"], help="BEN 1 form")
     a = ap.parse_args(argv)
-    cfg = Config.preset(a.tier, a.profile, a.climate)
+    cfg = Config.preset(a.tier, a.profile, a.climate, lineup=a.lineup, form=a.form)
     if a.power_architecture:
         cfg.power_architecture = a.power_architecture
     if a.cooling:

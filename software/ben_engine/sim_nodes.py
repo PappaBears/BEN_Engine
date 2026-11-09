@@ -258,13 +258,14 @@ class NodeFleet:
         fs = max(10.0, d["total_kw"] * 1.25)
         self.nodes: List[SimNode] = [SimNode("node1", "room", (), unit, seed, on_output, fs)]
         self.nodes[0].module = 1
-        self.nodes[0].pods = 3 if d["kind"] == "cabinet" else 2
+        # BEN 5 cabinet: 3 Pods on the room node; Rev 2 BEN 1 mini rack: 2 Pods (one exhaust Pod W here, one inlet Pod W on the rack node)
+        self.nodes[0].pods = 3 if d["kind"] == "cabinet" else (1 if d["kind"] == "minirack" else 2)
         racks = list(range(cfg.racks))
         for k in range(0, len(racks), 2):
             nid = f"node{2 + k // 2}"
             n = SimNode(nid, "rack", tuple(racks[k:k + 2]), unit, seed, on_output, fs)
             n.module = 1 + (k // 2) * self.modules // max(1, (cfg.racks + 1) // 2)
-            n.pods = 0 if d["kind"] == "cabinet" else 2 * len(n.rack_indices)
+            n.pods = 0 if d["kind"] == "cabinet" else (1 if d["kind"] == "minirack" else 2 * len(n.rack_indices))
             self.nodes.append(n)
         for m in range(2, self.modules + 1):
             n = SimNode(f"node{len(self.nodes) + 1}", "room", (), unit, seed, on_output, fs)
