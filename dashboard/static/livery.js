@@ -46,7 +46,9 @@ export const liveryReady = (async () => {
 })();
 
 const qrCache = {};
+const QR_TIERS = new Set(['ben1', 'ben5', 'ben30', 'ben150', 'ben300', 'ben500', 'ben700']);   // brand/v2/livery/<tier>-qr.svg exists
 function qrImage(tier) {
+  if (!QR_TIERS.has(tier)) return null;    // hall: plain Shop White plate, no code drawn
   if (!(tier in qrCache)) { qrCache[tier] = null; svgImage(`brand/qr/${tier}-qr.svg`, 256).then(im => { qrCache[tier] = im; redrawAll(); }); }
   return qrCache[tier];
 }
@@ -145,8 +147,9 @@ function drawSide(g, s, info, L, H, layout) {
     if (info.productLine) text(g, info.productLine.toUpperCase(), cx * s, (tb + 0.40 * M) * s, { weight: 500, px: 0.15 * M * s / monoCap, color: LV.slate, align: 'center', tracking: 0.08 });
     return;
   }
-  const Hc = Math.min(H, 2.9), inset = 0.06 * Hc;
-  const M = Math.min(0.165 * Hc, 0.8 * (L - 2 * post - 2 * inset) / MASTERS['lockup-deep']);
+  const hall = layout === 'hall';
+  const Hc = hall ? H : Math.min(H, 2.9), inset = 0.06 * Hc;
+  const M = Math.min((hall ? 0.2 : 0.165) * Hc, 0.8 * (L - 2 * post - 2 * inset) / MASTERS['lockup-deep']);
   const x0 = post + inset, y0 = railT + 0.10 * Hc;
   if (info.whiteLabel) {
     text(g, info.brand.toUpperCase(), x0 * s, (y0 + 0.69 * M) * s, { weight: 800, px: 0.62 * M * s / archivoCap, family: ARCHIVO, color: LV.ink, tracking: 0.02, stretch: 'expanded' });

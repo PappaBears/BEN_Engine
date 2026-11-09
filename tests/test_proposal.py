@@ -1,5 +1,6 @@
 """Proposal generator tests. Run from repo root: PYTHONPATH=software pytest tests/test_proposal.py -q"""
 import json
+import re
 import math
 from pathlib import Path
 
@@ -119,6 +120,8 @@ def test_white_label_uses_partner_brand():
     assert p.brand == "Northwind Partners"
     html = P.to_html(p)
     assert "Northwind Partners" in html and "Schreiber AI" in html  # partner brand on top, watermark stays
+    assert "Northwind Partners · BEN Engine · engineering by Schreiber AI" in html   # PROPOSAL_HOOKS.md step 3
+    assert "Engineering by" in html and "sai-lockup" in html                         # lockup moves to the credit line
 
 
 def test_profile_and_climate_sections_from_docs():
@@ -139,12 +142,22 @@ def test_markdown_and_html_render(built):
         md = P.to_markdown(p); html = P.to_html(p)
         assert md.count("\n## ") == 16
         assert "Schreiber AI" in html and "schreiber ai — proposal" in html.lower()
-        assert "#66E3FF" in html and "#0B1018" in html     # brand colours from brand.json
+        # brand v2 tokens (brand/v2/tokens.json): Night Navy, Signal Blue, Deep Cobalt; the Rev 1 palette is gone
+        assert "#06101F" in html and "#4C9DFF" in html and "#1E40AF" in html
+        assert "#66E3FF" not in html and "#0B1018" not in html and "#FFC66D" not in html
+        assert 'class="sai-lockup on-light"' in html and 'class="sai-lockup on-dark"' in html   # lockup-deep + lockup-signal masters
+        assert "Schreiber AI Monogram".lower() not in html.lower()                             # Rev 1 SAI monogram retired
+        assert "Schreiber AI is a Schreiber Holding LLC company." in html
+        assert "BEN Engine, by Schreiber AI" in html
+        assert "font-family:'Archivo'" in html and "IBM Plex Mono" in html and "Arial" in html   # inlined fonts + system fallbacks
+        assert html.count("<footer class='pf'>") == 16 and "Page 16 / 16" in html             # data plate band on every section
+        assert html.count("class='cta-primary'") <= 1                                           # one amber call to action at most
         assert "<svg" in html and "@media print" in html and "page-break-after" in html
         assert html.count("<section class='page") == 16
         assert "[" not in md.replace("[GOVERNING_STATE]", "") or True  # no stray placeholders other than the governing-law field
+        text = re.sub(r"url\(data:[^)]*\)", "", html)   # inlined font data is base64, not copy
         for token in ("TBD", "TODO", "lorem"):
-            assert token not in md and token not in html
+            assert token not in md and token not in text
 
 
 def test_json_round_trip(built):
@@ -210,3 +223,20 @@ def test_sample_proposals_exist_for_all_tiers():
         assert list(d.glob(f"sample-{tier}-*.md")), tier
         assert list(d.glob(f"sample-{tier}-*.html")), tier
     assert (d / "README.md").exists()
+
+
+def test_risks_filter_by_profile_and_tier():
+    """_risks() keeps a risk only when the profile AND the tier match (risks.json `tiers`)."""
+    risks = json.loads(P.RISKS_PATH.read_text(encoding="utf-8"))
+    for tier in ("ben1", "ben300", "ben150"):
+        got = P._risks("ai_inference", tier)
+        want = [r for r in risks if "ai_inference" in r.get("profiles", []) and (not r.get("tiers") or tier in r["tiers"])]
+        assert {r["id"] for r in got} == {r["id"] for r in want}
+        assert all(not r.get("tiers") or tier in r["tiers"] for r in got)
+    outdoor_only = [r for r in risks if r.get("tiers") and "ben1" not in r["tiers"] and "ai_inference" in r.get("profiles", [])]
+    assert outdoor_only, "risks.json should carry outdoor-only risks"
+    ids1 = {r["id"] for r in P._risks("ai_inference", "ben1")}
+    assert not ids1 & {r["id"] for r in outdoor_only}
+    p = P.build_proposal(Config.preset("ben1", "ai_inference", lineup="rev2"), option="hardware_controls", date=DATE)
+    md = P.to_markdown(p)
+    assert not any(f"| {r['id']} |" in md for r in outdoor_only)
