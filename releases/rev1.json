@@ -1,7 +1,7 @@
 {
  "release": "rev1",
  "commit": "d9dad54361779c72bc80def65cafda9f556b6e44",
- "tag": "ben-engine-rev1",
+ "tag": "ben-engine-rev1 (local)", "branch": "release/rev1",
  "inventory": {
   "Configuration model and software": {
    "paths": [

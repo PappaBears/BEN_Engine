@@ -6,7 +6,7 @@ Set by the operator on 2026-11-09: "We don't delete, we only save the updated re
 
 | Level | What it names | Format | Where it lives |
 | --- | --- | --- | --- |
-| **Product revision** | The whole BEN Engine offering: lineup, configuration rules, software, drawings, BOMs, documents, brand application | **Rev 1, Rev 2, …** | git tag `ben-engine-revN`, record `releases/REVN.md` + `releases/revN.json` |
+| **Product revision** | The whole BEN Engine offering: lineup, configuration rules, software, drawings, BOMs, documents, brand application | **Rev 1, Rev 2, …** | branch `release/revN` on GitHub (frozen, never force-pushed), record `releases/REVN.md` + `releases/revN.json`; a git tag `ben-engine-revN` is added where tags can be pushed |
 | **Document revision** | One controlled document set inside a product revision (drawing set, SQAM, assembly instructions, contracts) | **Rev N.letter**, e.g. Rev 2.A, Rev 2.B | `design/REVISION.json` (drawings), document headers |
 
 Rev 1 ended with drawing set Rev C (Rev B issued for construction for BEN 30/150/500/2000, Rev C issued for review for the BEN 5 refrigerant change). Rev 2 starts the drawing set at **Rev 2.A**.
@@ -23,6 +23,6 @@ Rev 1 ended with drawing set Rev C (Rev B issued for construction for BEN 30/150
 ## How to retrieve history
 
 ```bash
-git tag --list 'ben-engine-rev*'
-git show ben-engine-rev1:design/drawings/ben150/A-001.svg > A-001-rev1.svg
+git branch -r --list "origin/release/*"
+git show origin/release/rev1:design/drawings/ben150/A-001.svg > A-001-rev1.svg
 ```

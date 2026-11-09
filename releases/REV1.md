@@ -1,12 +1,12 @@
 # Release record — BEN Engine Rev 1 (final)
 
-Frozen 2026-11-09 at commit `d9dad54361779c72bc80def65cafda9f556b6e44`, git tag **`ben-engine-rev1`**. Nothing in Rev 1 is deleted by Rev 2: Rev 2 artifacts are written to versioned locations (see `docs/REVISION_POLICY.md`) and Rev 1 files stay where they are or are copied under `archive/rev1/` before any change.
+Frozen 2026-11-09 at commit `d9dad54361779c72bc80def65cafda9f556b6e44`, git branch **`release/rev1`** on GitHub (and local tag `ben-engine-rev1`; this environment cannot push tags). Nothing in Rev 1 is deleted by Rev 2: Rev 2 artifacts are written to versioned locations (see `docs/REVISION_POLICY.md`) and Rev 1 files stay where they are or are copied under `archive/rev1/` before any change.
 
 Retrieve any Rev 1 file exactly as released:
 
 ```bash
-git show ben-engine-rev1:<path>
-git checkout ben-engine-rev1 -- <path>   # restore into the working tree
+git show origin/release/rev1:<path>
+git checkout origin/release/rev1 -- <path>   # restore into the working tree
 ```
 
 | Area | Paths | Files | SHA-256 of the file list + contents |
