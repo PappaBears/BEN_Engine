@@ -607,7 +607,7 @@ def _ben1_front(sh, lay, ox, oy, s, labels=True):
         mh = lay.ext_l * 0.9 / _aspect("lockup-signal"); lw_ = lay.ext_l * 0.9
     sx, sy = v.p((lay.ext_l - lw_) / 2, lay.ext_h - 8 - mh)
     sh.add_master("lockup-signal", sx, sy, mh / v.k)
-    sh.leader(sx + lw_ / v.k, sy + mh / v.k / 2, sx + lw_ / v.k + 12, sy + mh / v.k / 2 + 8, f"Artwork: brand/v2/livery/ben1-{'bezel-10in' if lay.cfg.form == 'rack10' else 'door-12u'}.svg (production file)", h=1.6)
+    sh.text(v.ox, v.oy - 23, f"Artwork: brand/v2/livery/ben1-{'bezel-10in' if lay.cfg.form == 'rack10' else 'door-12u'}.svg (production file); lockup-signal master on the Night Navy bezel / door", h=1.7, c=V2["slate"])
     return v
 
 
@@ -633,7 +633,7 @@ def ben1_a001(lay, out, n, total):
     sh.text(sx, oy - 18, "Air: front intake -> rear exhaust" + (" (two extraction fans N+1 in the rear door)" if cfg.form == "cab12" else " (open rack, device fans)"), h=1.9, c=DK.MUTED)
     # plan with clearances
     ps = 20
-    py = min(250.0, oy - 75)
+    py = min(250.0, oy - 85)
     sh.view_title(30, py + 50, "PLAN — SERVICE AND AIR CLEARANCES", f"1:{ps}")
     vp = DK.View(sh, ps, 80, py - 60)
     fp_l = lay.notes["desk_footprint_mm"][0]
