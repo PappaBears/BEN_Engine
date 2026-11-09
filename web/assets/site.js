@@ -31,7 +31,13 @@ let CAT, RISKS, PRICING;
 let state = { profile: 'ai_inference', climate: 'temperate', cfg: null, lineup: 'rev2' };
 let PRICING_BY_LINEUP = {};
 // Rev 2 (docs/REV2_DECISION.md §2): tiers shown follow the lineup; BEN 1 has a form; hero art for tiers without their own image
+// Rev 2 heroes live in assets/rev2/hero-<tier>.svg (design agent); Rev 1 configurations and missing Rev 2 files fall back to
+// the Rev 1 art in assets/hero-<tier>.svg (HERO_FALLBACK maps the new tiers onto the nearest Rev 1 drawing).
 const HERO_FALLBACK = { ben300: 'ben150', ben700: 'ben500' };
+function heroSources(tier, lineup) {
+  const rev1 = `assets/hero-${HERO_FALLBACK[tier] || tier}.svg`;
+  return lineup === 'rev2' ? [`assets/rev2/hero-${tier}.svg`, ...(HERO_FALLBACK[tier] || tier !== 'ben1' ? [rev1] : [])] : [rev1];
+}
 const lineupTiers = () => tiersByLineup(CAT)[state.lineup];
 
 async function load(url, fallback) { try { const r = await fetch(url); if (!r.ok) throw 0; return await r.json(); } catch { return fallback; } }
@@ -73,7 +79,10 @@ function climateNote() { const c = CAT.climates[state.climate]; $('#climateNote'
 
 function buildRisks() {
   const list = $('#riskList'); list.innerHTML = '';
-  const rs = RISKS.filter(r => !r.profiles || r.profiles.length === 0 || r.profiles.includes(state.profile));
+  // filtered by mission profile AND tier (risks.json `tiers`; an empty or missing list means every tier)
+  const tier = state.cfg ? canonicalTier(state.cfg.tier, CAT) : null;
+  const rs = RISKS.filter(r => (!r.profiles || r.profiles.length === 0 || r.profiles.includes(state.profile))
+    && (!tier || !r.tiers || r.tiers.length === 0 || r.tiers.includes(tier)));
   for (const r of rs) {
     const sev = (r.severity || 'medium').toLowerCase();
     const el = document.createElement('article'); el.className = `risk ${sev}`;
@@ -86,7 +95,7 @@ function setPreset(tier, form = null) {
   tier = canonicalTier(tier, CAT);
   if (!lineupTiers().includes(tier)) tier = 'ben150';
   state.cfg = preset(tier, state.profile, state.climate, CAT, null, state.lineup, form);
-  writeForm(); recompute();
+  writeForm(); recompute(); buildRisks();
 }
 function buildTierSelect() {
   const ts = $('#tier'); ts.innerHTML = '';
@@ -146,8 +155,12 @@ function writeForm() {
   $('#hardeningSel').value = c.hardening;
   document.querySelectorAll('.sub').forEach(x => x.checked = c.subsystems.includes(x.value));
   $('#white_label').checked = c.white_label; $('#brand').value = c.brand;
-  const hero = $('#heroImg'); hero.src = `assets/hero-${HERO_FALLBACK[c.tier] || c.tier}.svg`;
-  const fig = hero.closest('figure'); if (fig) fig.hidden = mini;   // no hero art for the indoor mini rack yet
+  const hero = $('#heroImg'), fig = hero.closest('figure');
+  const srcs = heroSources(c.tier, state.lineup); let k = 0;
+  hero.onerror = () => { if (++k < srcs.length) hero.src = srcs[k]; else if (fig) fig.hidden = true; };   // no art at all: hide the figure
+  hero.onload = () => { if (fig) fig.hidden = false; };
+  if (fig) fig.hidden = false;
+  hero.src = srcs[0];
   const cap = hero.closest('figure') && hero.closest('figure').querySelector('figcaption');
   if (cap) cap.textContent = `${t.label} · ${t.enclosure} · up to ${fmt(t.it_kw_max)} kW IT · generated from the configuration model`;
   hero.alt = t.kind === 'hall' ? `Isometric illustration of the ${t.label} prefabricated data hall: three joined modules, a power module and a plant yard with dry coolers and generators` : `Isometric illustration of a ${t.label} ${t.kind === 'cabinet' ? 'outdoor cabinet' : 'container data center'} with the Schreiber AI mark on the side`;
@@ -232,7 +245,7 @@ function renderPrice(d) {
   p.innerHTML = `<h3>Indicative hardware + build price</h3><div class="big">${usd(total)}</div>
     <p class="muted small">Excludes site civil, utility service, permits and GPUs beyond the reference compute node unless Compute is selected. Managed service is priced separately.</p>
     <div class="bar"><span class="c" style="width:${pc(conf)}%"></span><span class="l" style="width:${pc(list)}%"></span><span class="e" style="width:${pc(est)}%"></span></div>
-    <div class="legend"><span><i style="background:var(--green)"></i>Vendor-confirmed ${pc(conf)} %</span><span><i style="background:var(--cyan)"></i>List price ${pc(list)} %</span><span><i style="background:var(--amber)"></i>Estimate ${pc(est)} %</span></div>
+    <div class="legend"><span><i style="background:var(--green)"></i>Vendor-confirmed ${pc(conf)} %</span><span><i style="background:var(--cyan)"></i>List price ${pc(list)} %</span><span><i style="background:var(--hold)"></i>Estimate ${pc(est)} %</span></div>
     <p class="small muted">Per kW IT: ${usd(total / state.cfg.it_kw)}. Priced ${t.priced_on}.</p>${(state.cfg.power_architecture === 'dc800' || state.cfg.cooling === 'dlc_hd') ? '<p class="small muted"><strong>Forward options are not in this table.</strong> The 800 VDC chain and the high-density liquid loop are costed only as estimates in <a href="../docs/BOM-ben150-forward.md">docs/BOM-ben150-forward.md</a> (forward prototype); the figure above still uses the standard AC / cooling pricing.</p>' : ''}`;
 }
 

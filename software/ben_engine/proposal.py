@@ -45,6 +45,7 @@ CLI::
 """
 from __future__ import annotations
 
+import base64
 import datetime as _dt
 import hashlib
 import html as _html
@@ -455,13 +456,16 @@ def _compliance_rows(profile: str, climate: str) -> Tuple[Optional[Dict[str, str
     return prof_row, clim_row
 
 
-def _risks(profile: str) -> List[Dict[str, Any]]:
+def _risks(profile: str, tier: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Risks for a mission profile AND a tier (risks.json ``tiers``; a risk without a tier list applies to every tier),
+    high severity first. ``tier=None`` filters by profile only."""
     try:
         risks = json.loads(RISKS_PATH.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return []
     sev = {"high": 0, "medium": 1, "low": 2}
-    out = [r for r in risks if profile in r.get("profiles", [])]
+    out = [r for r in risks if profile in r.get("profiles", [])
+           and (tier is None or not r.get("tiers") or tier in r["tiers"])]
     out.sort(key=lambda r: (sev.get(r.get("severity", "low"), 3), r["id"]))
     return out
 
@@ -579,7 +583,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
         notes.append("COMPLIANCE.md section 11 row not found; built-in summary used")
     if clim_row is None:
         notes.append("COMPLIANCE.md section 12 row not found; built-in summary used")
-    risks = _risks(cfg.profile)
+    risks = _risks(cfg.profile, cfg.tier)
     if not risks:
         notes.append("web/assets/risks.json not readable; risk section lists the register reference only")
     sreq = _site_requirements(cfg.tier)
@@ -794,7 +798,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
 
     # 10 risks
     s = Section(10, "Risks disclosed up front")
-    s.p(f"These are the risks that apply to the {prof['label'].lower()} profile, from the product risk register (docs/RISK_REGISTER.md, web/assets/risks.json). "
+    s.p(f"These are the risks that apply to the {prof['label'].lower()} profile on a {d['tier_label']}, from the product risk register (docs/RISK_REGISTER.md, web/assets/risks.json). "
         "Each line says what the design covers and what remains the customer's decision or duty. Please read them before accepting the price.")
     if risks:
         s.table(["ID", "Risk", "Severity", "What can happen", "Covered by the design", "Customer owns"],
@@ -964,13 +968,48 @@ def to_markdown(p: Proposal) -> str:
     return "\n".join(out)
 
 
-_LOGO_SVG = (
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="56" height="56" role="img" aria-label="Schreiber AI monogram">'
-    '<rect width="120" height="120" rx="24" fill="#0B1018"/>'
-    '<path d="M30 78c0 9 8 14 19 14 12 0 19-6 19-14 0-9-7-12-18-15-9-2-12-4-12-8 0-5 5-8 11-8 7 0 11 3 12 8" fill="none" stroke="#66E3FF" stroke-width="6" stroke-linecap="round"/>'
-    '<path d="M78 92V40h8v52zM60 28h26" fill="none" stroke="#EDF4FF" stroke-width="6" stroke-linecap="round"/>'
-    '<circle cx="98" cy="28" r="5" fill="#FFC66D"/></svg>'
-)
+# Schreiber AI brand v2 (brand/v2/PROPOSAL_HOOKS.md): masters inlined unchanged, never redrawn. lockup-deep on light grounds
+# (screen default and print), lockup-signal on a dark screen (prefers-color-scheme: dark). The Rev 1 SAI monogram is retired
+# from proposals; Rev 1 samples already issued keep it in their files (docs/proposals/*.html, frozen).
+BRAND_V2 = REPO_ROOT / "brand" / "v2"
+LEGAL_LINE = "Schreiber AI is a Schreiber Holding LLC company."
+_PROPOSAL_FONTS = [("Archivo", "archivo-latin-wdth-normal.woff2", "100 900", "62% 125%"),
+                   ("IBM Plex Sans", "ibm-plex-sans-latin-400-normal.woff2", "400", None),
+                   ("IBM Plex Sans", "ibm-plex-sans-latin-600-normal.woff2", "600", None),
+                   ("IBM Plex Mono", "ibm-plex-mono-latin-500-normal.woff2", "500", None),
+                   ("IBM Plex Mono", "ibm-plex-mono-latin-600-normal.woff2", "600", None)]
+
+
+def _lockup_svg(master: str, cls: str, prefix: str, height: int = 34) -> str:
+    """Inline a brand/v2 lockup master with its ids prefixed (two lockups share one page) and a class + height on the root."""
+    try:
+        svg = (BRAND_V2 / f"{master}.svg").read_text(encoding="utf-8").strip()
+    except OSError:
+        return f"<span class='{cls} sai-wordmark'>Schreiber AI</span>"
+    svg = re.sub(r"<\?xml[^>]*>", "", svg).strip()
+    for i in set(re.findall(r'id="([^"]+)"', svg)):
+        svg = svg.replace(f'id="{i}"', f'id="{prefix}{i}"').replace(f"#{i}\"", f"#{prefix}{i}\"").replace(f"#{i})", f"#{prefix}{i})")
+    return re.sub(r"<svg\b", f"<svg class=\"sai-lockup {cls}\" height=\"{height}\"", svg, count=1)
+
+
+def _font_css() -> str:
+    out = []
+    for fam, f, w, st in _PROPOSAL_FONTS:
+        try:
+            b64 = base64.b64encode((BRAND_V2 / "fonts" / f).read_bytes()).decode()
+        except OSError:
+            continue
+        out.append(f"@font-face{{font-family:'{fam}';font-style:normal;font-display:swap;font-weight:{w};" + (f"font-stretch:{st};" if st else "")
+                   + f"src:url(data:font/woff2;base64,{b64}) format('woff2')}}")
+    return "".join(out)
+
+
+def _proposal_css() -> str:
+    try:
+        css = (BRAND_V2 / "proposal.css").read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    return re.sub(r"@import[^;]+;", "", css)
 
 
 def _inline(s: str) -> str:
@@ -983,8 +1022,16 @@ def _inline(s: str) -> str:
 
 
 def to_html(p: Proposal) -> str:
+    """One self-contained HTML file in the Schreiber AI brand v2 (brand/v2/proposal.css + PROPOSAL_HOOKS.md): v2 lockup, Archivo /
+    IBM Plex (inlined, system fallbacks), a data plate band at the foot of every section, the legal line on the cover and the last
+    section, no amber except an optional single ``.cta-primary``."""
     b = _brand(); c = b.get("colors", {})
     watermark = f"Schreiber AI — proposal {p.proposal_id}"
+    rev = "Rev 1" if p.config.get("lineup", "rev2") == "rev1" else "Rev 2"
+    white = bool(p.config.get("white_label")) and p.brand != "Schreiber AI"
+    lockups = _lockup_svg("lockup-deep", "on-light", "ld-") + _lockup_svg("lockup-signal", "on-dark", "ls-")
+    legal = f"<p class='legal'>{_html.escape(LEGAL_LINE)}</p>"
+    n_total = len(p.sections)
     parts: List[str] = []
     for s in p.sections:
         body: List[str] = []
@@ -1001,61 +1048,89 @@ def to_html(p: Proposal) -> str:
                 trs = "".join("<tr>" + "".join(f"<td{' class=num' if num_cols and num_cols[i] else ''}{' class=hl' if 'PROPOSED' in r else ''}>{_inline(cell)}</td>" for i, cell in enumerate(r)) + "</tr>" for r in bl.rows)
                 body.append(f"<div class='tw'><table><thead><tr>{th}</tr></thead><tbody>{trs}</tbody></table></div>")
         cover = " cover" if s.number == 1 else ""
-        head = (f"<header class='hdr'>{_LOGO_SVG}<div><div class='eyebrow'>{_html.escape(p.brand)} · BEN Engine · Proposal {p.proposal_id}</div>"
-                f"<h1>{_html.escape(p.tier_label)} for {_html.escape(p.customer)}</h1>"
-                f"<div class='sub'>{_html.escape(p.profile_label)} · {_html.escape(p.site)} · {OPTION_LABELS[p.option]} · {p.date}</div></div></header>") if s.number == 1 else ""
-        parts.append(f"<section class='page{cover}' id='s{s.number}'>{head}<h2><span class='n'>{s.number}</span>{_html.escape(s.title)}</h2>{''.join(body)}"
-                     f"<footer class='pf'><span>{_html.escape(watermark)}</span><span>Section {s.number} of {len(p.sections)} · valid until {p.valid_until}</span></footer></section>")
+        head = ""
+        if s.number == 1:
+            if white:   # partner leads; Schreiber AI keeps the engineering credit with its lockup (PROPOSAL_HOOKS.md step 2-3)
+                mark = f"<div class='partner'>{_html.escape(p.brand)}</div>"
+                eyebrow = f"{_html.escape(p.brand)} · BEN Engine · engineering by Schreiber AI · Proposal {p.proposal_id}"
+                credit = f"<div class='byline'><span>Engineering by</span>{_lockup_svg('lockup-deep', 'on-light', 'bd-', 22)}{_lockup_svg('lockup-signal', 'on-dark', 'bs-', 22)}</div>"
+            else:
+                mark = lockups
+                eyebrow = f"BEN Engine, by Schreiber AI · Proposal {p.proposal_id} · {rev}"
+                credit = ""
+            head = (f"<header class='hdr'>{mark}<div><div class='eyebrow'>{eyebrow}</div>"
+                    f"<h1>{_html.escape(p.tier_label)} for {_html.escape(p.customer)}</h1>"
+                    f"<div class='sub'>{_html.escape(p.profile_label)} · {_html.escape(p.site)} · {OPTION_LABELS[p.option]} · {p.date} · valid until {p.valid_until}</div>"
+                    f"{credit}{legal}</div></header>")
+        tail = legal if s.number == n_total else ""
+        band = (f"<footer class='pf'><b>Proposal {p.proposal_id}</b><i></i><span>BEN Engine, by Schreiber AI</span><i></i>"
+                f"<span>{rev}</span><span class='grow'></span><span>Page {s.number} / {n_total}</span></footer>")
+        parts.append(f"<section class='page{cover}' id='s{s.number}'>{head}<h2><span class='n'>{s.number}</span>{_html.escape(s.title)}</h2>{''.join(body)}{tail}{band}</section>")
     toc = "".join(f"<a href='#s{s.number}'>{s.number}. {_html.escape(s.title)}</a>" for s in p.sections)
+    # base layout; colours are the v2 tokens from web/kit/brand.json (Night Navy #06101F, Signal Blue #4C9DFF), then
+    # brand/v2/proposal.css turns the page light (Shop White, Ink, Deep Cobalt) for screen and print
     css = f"""
-:root {{ --bg:{c.get('graphite', '#0B1018')}; --slate:{c.get('slate', '#152234')}; --panel:{c.get('panel', '#1B2B42')}; --text:{c.get('text', '#EDF4FF')}; --muted:{c.get('muted', '#9FB3CC')};
-  --cyan:{c.get('cyan', '#66E3FF')}; --amber:{c.get('amber', '#FFC66D')}; --red:{c.get('red', '#FF707D')}; --green:{c.get('green', '#6EE7A8')}; --line:rgba(159,179,204,.22); --wm:rgba(159,179,204,.55); }}
+:root {{ --bg:{c.get('graphite', '#06101F')}; --slate:{c.get('slate', '#0B1A31')}; --panel:{c.get('panel', '#0F2342')}; --text:{c.get('text', '#EEF4FC')}; --muted:{c.get('muted', '#B2C1D8')};
+  --cyan:{c.get('cyan', '#4C9DFF')}; --amber:{c.get('text', '#EEF4FC')}; --red:{c.get('red', '#FF6369')}; --green:{c.get('green', '#2BB673')}; --line:rgba(142,167,200,.22); --wm:rgba(142,167,200,.55); }}
 * {{ box-sizing:border-box; }}
-html,body {{ margin:0; background:var(--bg); color:var(--text); font-family:{b.get('type', {}).get('display', "'Inter', 'Segoe UI', system-ui, sans-serif")}; font-size:14px; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }}
-code {{ font-family:{b.get('type', {}).get('mono', "'JetBrains Mono', Consolas, monospace")}; font-size:.9em; color:var(--cyan); }}
+html,body {{ margin:0; background:var(--bg); color:var(--text); font-family:"IBM Plex Sans", Arial, sans-serif; font-size:14px; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }}
+code {{ font-family:"IBM Plex Mono", Consolas, monospace; font-size:.9em; color:var(--cyan); }}
 .wrap {{ max-width:1100px; margin:0 auto; padding:24px 16px 64px; }}
 nav.toc {{ display:flex; flex-wrap:wrap; gap:6px 14px; padding:12px 0 20px; font-size:12px; }}
 nav.toc a {{ color:var(--muted); text-decoration:none; }} nav.toc a:hover {{ color:var(--cyan); }}
 .page {{ background:var(--slate); border:1px solid var(--line); border-radius:14px; padding:28px 32px 20px; margin:0 0 22px; position:relative; page-break-after:always; break-after:page; }}
-.page.cover {{ background:linear-gradient(160deg, var(--panel), var(--slate) 60%, var(--bg)); min-height:560px; }}
-.hdr {{ display:flex; gap:18px; align-items:flex-start; padding-bottom:22px; margin-bottom:18px; border-bottom:1px solid var(--line); }}
-.hdr svg {{ flex:none; }}
+.hdr {{ display:flex; gap:22px; align-items:flex-start; padding-bottom:22px; margin-bottom:18px; border-bottom:1px solid var(--line); flex-wrap:wrap; }}
+.hdr > div {{ flex:1 1 320px; min-width:0; }}
+.sai-lockup {{ display:block; height:34px; width:auto; max-width:100%; flex:none; }}
+.sai-lockup.on-dark {{ display:none; }}
+.partner {{ font-family:"Archivo","Arial Black",Arial,sans-serif; font-weight:800; font-stretch:125%; font-size:24px; letter-spacing:.02em; text-transform:uppercase; }}
+.byline {{ display:flex; align-items:center; gap:10px; margin-top:10px; font:500 11px/1 "IBM Plex Mono",Consolas,monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }}
+.byline .sai-lockup {{ height:22px; }}
 .eyebrow {{ color:var(--cyan); font-size:12px; letter-spacing:.14em; text-transform:uppercase; }}
-h1 {{ margin:6px 0 4px; font-size:30px; line-height:1.15; font-weight:650; }}
+h1 {{ margin:6px 0 4px; font-size:30px; line-height:1.15; font-weight:800; }}
 .sub {{ color:var(--muted); font-size:14px; }}
-h2 {{ font-size:20px; margin:0 0 14px; font-weight:650; display:flex; align-items:center; gap:12px; }}
-h2 .n {{ display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:var(--panel); color:var(--cyan); font-size:14px; font-weight:700; border:1px solid var(--line); }}
+.hdr .legal {{ margin:10px 0 0; }}
+h2 {{ font-size:20px; margin:0 0 14px; font-weight:700; display:flex; align-items:center; gap:12px; }}
+h2 .n {{ display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:var(--panel); color:var(--cyan); font-size:14px; font-weight:700; border:1px solid var(--line); flex:none; }}
 p {{ margin:0 0 12px; }} ul {{ margin:0 0 12px; padding-left:20px; }} li {{ margin:2px 0; }}
 .tw {{ overflow-x:auto; margin:0 0 14px; }}
 table {{ width:100%; border-collapse:collapse; font-size:12.5px; }}
 thead th {{ text-align:left; color:var(--muted); font-weight:600; font-size:11.5px; letter-spacing:.04em; text-transform:uppercase; padding:8px 10px; border-bottom:1px solid var(--line); background:var(--panel); white-space:nowrap; }}
 tbody td, tbody th {{ padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:top; }}
-tbody tr:nth-child(even) td {{ background:rgba(27,43,66,.45); }}
 td.num, th.num {{ text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }}
 table.kv th {{ text-align:left; color:var(--muted); font-weight:600; width:26%; }}
 table.kv {{ margin-bottom:14px; }}
-td.hl {{ color:var(--amber); font-weight:700; }}
-.pf {{ display:flex; justify-content:space-between; gap:12px; margin-top:18px; padding-top:10px; border-top:1px dashed var(--line); color:var(--wm); font-size:11px; letter-spacing:.06em; text-transform:uppercase; }}
+.pf {{ display:flex; }}
+.pf span {{ flex:none; }}
 .wm {{ display:none; }}
-@media (max-width:640px) {{ .page {{ padding:18px 14px; }} h1 {{ font-size:22px; }} table.kv th {{ width:38%; }} }}
+@media (max-width:640px) {{ .page {{ padding:18px 14px 64px; }} h1 {{ font-size:22px; }} table.kv th {{ width:38%; }} .pf {{ gap:1em; letter-spacing:.08em; }} .pf span:nth-of-type(1), .pf i:nth-of-type(2) {{ display:none; }} }}
 @media print {{
-  :root {{ --bg:{c.get('light_bg', '#F4F7FB')}; --slate:#ffffff; --panel:#E9EFF6; --text:{c.get('light_text', '#0B1018')}; --muted:#4A5B72; --cyan:#0A6B86; --amber:#8A5A00; --line:#C9D4E2; --wm:#7A8AA0; }}
   @page {{ size:A4; margin:14mm 12mm 18mm; }}
-  html,body {{ background:#fff; font-size:11px; }}
   .wrap {{ max-width:none; padding:0; }}
   nav.toc {{ display:none; }}
-  .page {{ border:none; border-radius:0; padding:0 0 10mm; margin:0; background:#fff; min-height:0; }}
+  .page {{ border:none; border-radius:0; margin:0; background:#fff; min-height:0; }}
   .page.cover {{ background:#fff; }}
-  .hdr svg rect {{ fill:#0B1018; }}
   tbody tr:nth-child(even) td {{ background:#F4F7FB; }}
   .tw {{ overflow:visible; }} table {{ font-size:9.5px; }} tr {{ page-break-inside:avoid; }}
-  .pf {{ display:none; }}
   .wm {{ display:block; position:fixed; bottom:4mm; left:0; right:0; text-align:center; color:var(--wm); font-size:9px; letter-spacing:.14em; text-transform:uppercase; }}
   a {{ color:inherit; text-decoration:none; }}
 }}
 """
+    # dark screen (prefers-color-scheme: dark): Night Navy grounds, Paper text, Signal Blue accents, lockup-signal. Print stays light.
+    dark = """
+@media screen and (prefers-color-scheme: dark){
+  :root{--bg:#06101F;--slate:#0B1A31;--panel:#0F2342;--text:#EEF4FC;--muted:#B2C1D8;--cyan:#4C9DFF;--amber:#EEF4FC;--line:#24406B;--wm:#8EA7C8}
+  .page{box-shadow:none}
+  thead th{border-bottom-color:#B2C1D8}
+  tbody tr:nth-child(even) td{background:rgba(15,35,66,.6)}
+  .sai-lockup.on-light{display:none}.sai-lockup.on-dark{display:block}
+  .pending{background:#F2C94C;color:#06101F}
+}
+"""
+    style = _font_css() + css + _proposal_css() + dark
     return (f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'>"
-            f"<title>{_html.escape(p.tier_label)} proposal — {_html.escape(p.customer)}</title><style>{css}</style></head><body>"
+            f"<meta name='color-scheme' content='light dark'>"
+            f"<title>{_html.escape(p.tier_label)} proposal — {_html.escape(p.customer)}</title><style>{style}</style></head><body>"
             f"<div class='wrap'><nav class='toc'>{toc}</nav>{''.join(parts)}</div><div class='wm'>{_html.escape(watermark)}</div></body></html>")
 
 

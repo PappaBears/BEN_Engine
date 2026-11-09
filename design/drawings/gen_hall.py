@@ -174,6 +174,14 @@ def sheet_a000(lay, out, ctx: Ctx):
 
 
 # ====================================================================== A-001 general arrangement (hall)
+def brand_panel_hall(va, lay, el, eh):
+    """Rev 1 brand panel on the hall long wall (gen_drawings_rev2.py replaces it with the brand v2 livery)."""
+    pw = 6000
+    va.rect(el / 2 - pw / 2, eh * 0.4, el / 2 + pw / 2, eh * 0.7, fc="#0B1018", ec="#0B1018")
+    va.text(el / 2, eh * 0.55, f"SCHREIBER AI  |  {lay.d['tier_label'].upper()}", h=3.0, ha="center", va="center", c="#66E3FF", bold=True)
+    va.text(el / 2, eh * 0.3, "Brand panel 1.5 mm aluminium composite, bonded + riveted to panel ribs; no penetration", h=1.6, ha="center", va="top", c=MUTED)
+
+
 def sheet_a001(lay, out, ctx: Ctx, n):
     endw, wall = _ext(lay)
     el, ew, eh = lay.ext_l, lay.ext_w, lay.ext_h
@@ -226,10 +234,7 @@ def sheet_a001(lay, out, ctx: Ctx, n):
     for jx in lay.module_x:
         va.line(jx + endw, 0, jx + endw, eh, c=RED, lw=0.8, ls="--")
     va.corrugation(0, el, 0, eh, pitch=1000, vertical=True)   # sandwich panel joints
-    pw = 6000
-    va.rect(el / 2 - pw / 2, eh * 0.4, el / 2 + pw / 2, eh * 0.7, fc="#0B1018", ec="#0B1018")
-    va.text(el / 2, eh * 0.55, f"SCHREIBER AI  |  {lay.d['tier_label'].upper()}", h=3.0, ha="center", va="center", c="#66E3FF", bold=True)
-    va.text(el / 2, eh * 0.3, "Brand panel 1.5 mm aluminium composite, bonded + riveted to panel ribs; no penetration", h=1.6, ha="center", va="top", c=MUTED)
+    brand_panel_hall(va, lay, el, eh)
     va.dim_h(0, el, 0, -8, label=f"{el:.0f}")
     va.dim_v(0, eh, 0, -8, label=f"{eh:.0f}")
     y_elevB_top = oyA - 20

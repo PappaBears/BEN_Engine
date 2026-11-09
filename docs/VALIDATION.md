@@ -1,6 +1,6 @@
 # VALIDATION — what was run, what was observed, what was not
 
-Environment: Linux cloud container, Python 3.13.18, Node 22.23, Chromium via Playwright (software WebGL), no hardware, no EFR32 / Gecko SDK toolchain (download blocked by network policy), vendor websites reachable only through web search/fetch. Dates: 2026-11-07 to 2026-11-08.
+Environment: Linux cloud container, Python 3.13.18, Node 22.23, Chromium via Playwright (software WebGL), no hardware, no EFR32 / Gecko SDK toolchain (download blocked by network policy), vendor websites reachable only through web search/fetch. Dates: 2026-11-07 to 2026-11-09 (Rev 2 checks in §9).
 
 Labels: **verified** = run here and observed · **implemented, unverified** = code exists, needs device/credential/service · **simulated** = explicitly fake · **blocked** · **deferred**.
 
@@ -8,7 +8,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 | Check | Command | Observed |
 | --- | --- | --- |
-| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **198 passed** in 20.3 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2, forward architecture dc800 / dlc_hd incl. JS parity, BOM filters, twin faults, sweeps, commissioning steps 10–11, forward layout and drawings) |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **262 passed** in 41.1 s on 2026-11-09 (Rev 2; adds the Rev 1 frozen fixture and the Rev 2 lineup tests, §9). Generation 2 on 2026-11-08: 198 passed in 20.3 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2, forward architecture dc800 / dlc_hd incl. JS parity, BOM filters, twin faults, sweeps, commissioning steps 10–11, forward layout and drawings) |
 | Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
 | Build contract | `build_control.py run` (skill helper) | eight checks: python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500, sim-e2e-pytest, links, audit-mechanical. Commands carry their own `PYTHONPATH` so they run from a clean clone (audit F-01). Latest report stored at `docs/audit/evidence/build-report.json` |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |
@@ -46,7 +46,7 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 | Proposals | `python -m ben_engine.proposal …` | 5 samples in `docs/proposals/` (one per tier); BEN 150 healthcare managed: $1.89 M capital, $27 k/yr, 34 weeks to in-service |
 | Packages | `python -m ben_engine.package …` | customer package 22 files, partner package 21 files, 0 missing after the BEN-POD spec path fix (audit F-04c); zips built; MANIFEST lists per-document unfilled fields |
 | Contract pre-fill | `proposal.known_fields_report` | of the 911 vocabulary fields filled from a proposal (BEN 150 healthcare sample); remaining fields belong to later stages (commissioning report 128, turnover 63, CRM 62, change order 59, QC forms 24, counsel 8). MSA draft has 15 fields left (customer identity, arbitration venue); SOW draft 47 |
-| Decks | `build_presentation.py` | 14 (product) + 13 (investor) slides with notes; rendered with Playwright and inspected 2026-11-08 (`docs/media/screens/deck-*.png`) |
+| Decks | `build_presentation.py` then `scripts/brand_deck.py` | Rev 2 (2026-11-09): 16 (product) + 16 (investor) slides with notes, brand v2 theme; slide 1 and the Density slide of each deck rendered with Playwright at 1280 × 720 and inspected (§9). Rev 1: 14 + 13 slides, inspected 2026-11-08 (`docs/media/screens/deck-*.png`) |
 | Demo GIF | `make_demo_gif.py` | 24 real tour frames, 6 s, 4.5 MB |
 
 ## 4a. Generation 2 (power-based tiers, BEN 2000, hardening) — observed 2026-11-08
@@ -83,3 +83,33 @@ Not verified: pointer-lock mouse look (needs a real user gesture), a live BEN Co
 
 ## 8. Audit trail
 An independent internal audit (`docs/audit/AUDIT_REPORT_2026-11-08.md`, 22 findings, 4 major) was run against this ledger on 2026-11-08. Corrective actions and their closure status are recorded in `docs/audit/CAPA_LOG.md`; the mechanical checks are rerun by `python scripts/audit.py` (also in CI) and the evidence of the latest run is stored under `docs/audit/evidence/`.
+
+## 9. Rev 2 (2026-11-09) — what was run for the new lineup
+
+Rev 2 adds BEN 1 (rack10, cab12), BEN 300 and BEN 700 (planned as BEN 1000, renamed by fit, `docs/REV2_DECISION.md` §2a). Everything below is simulation or generated output; **no Rev 2 hardware exists**. Rows for the Rev 2.A drawing set are added by the design work.
+
+| Check | Command | Observed |
+| --- | --- | --- |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **262 collected, 262 passed** in 41.1 s |
+| Rev 1 frozen | `tests/test_rev1_frozen.py` against `tests/fixtures/rev1_presets.json` | **267 Rev 1 configurations** (config, derived values byte-identical and BOM totals identical) recompute exactly under the Rev 2 code; Rev 1 sample-proposal configs reproduce; the `rev1` lineup rejects Rev 2 tiers; `lineup` missing or `rev1` loads as Rev 1 (`docs/REVISION_POLICY.md` rule 3) |
+| Rev 2 lineup | `tests/test_rev2_lineup.py` (18 test functions, parametrised) | every Rev 2 preset valid for every profile and climate; `ben1000` → `ben700` alias and lineup loading; BEN 1 forms and sizing; dense tiers fit with real footprints and names follow power; dense validation rules; Rev 2 BOM totals and lines; `docs/DENSITY.md` current; sweeps, twin faults, CFD within 60 s, commissioning and proposals on the new tiers. 2N step-down observed by CLI: BEN 300 155 kW, BEN 700 400 kW |
+| Sweeps | `python -m ben_engine.sweeps --tier ben1` / `ben300` / `ben700` | BEN 1 3/3 PASS (load step, utility-loss ride-through 12.5 min vs 10 min configured, outdoor sweep); BEN 300 7/7 PASS; BEN 700 7/7 PASS (incl. CDU pump failover: standby within 6 s, loop ΔT peak 10.1 K vs 10 K design) |
+| Commissioning (simulation) | `python -m ben_engine.commissioning --sim --tier <t> --yes --fast` | **12/12 steps PASS** on BEN 1, BEN 300 and BEN 700. BEN 1: steps 10–11 skipped with the reason (office air, AC). BEN 300 / BEN 700: leak-to-isolation 8.0 s (limit 15 s), 5/5 alarm paths, UPS empty at 13.0 / 11.3 min; step 11 (DC bus) skipped on AC |
+| CFD | `python -m ben_engine.cfd --tier <t>` | BEN 1 grid 13 × 12, 0.64 s; BEN 300 grid 232 × 90, 10.4 s; BEN 700 grid 239 × 46, 4.6 s; all converged; recirculation index ≤ 0.035 (BEN 1, open containment) and ≤ 0.005 (dense, closed). Relative tool, as in §2 |
+| Selector (browser) | product-page / dashboard selector checks for the Rev 2 tiers (UI work) | **13/13** reported by the lineup work; screenshots `docs/media/screens/selector-ben1-rack10.png`, `selector-ben1-cab12.png`, `selector-ben700.png`. Not re-run in this documentation pass |
+| Decks | `build_presentation.py` + `scripts/brand_deck.py` | Both decks rebuilt; slide 1 and the Density slide of each rendered and looked at |
+
+**Honest limits of the Rev 2 numbers** (from the lineup engineer; each stays an estimate until a datasheet, a quote or the lighthouse replaces it):
+
+1. **Fan coil 20 kW per 300 mm on the 18 °C trim loop** is a design value, not a datasheet figure (checks I-D10 depend on it).
+2. **Galaxy VL UPS masses** (900 kg assumed) and **200 kW per Galaxy lithium battery cabinet** are inferred, not read from the manual.
+3. **UL 9540A large-scale fire test data** for the Galaxy lithium cabinets was not obtained; without it the cabinets cannot stand side by side (I-D14) and the battery moves to an external enclosure.
+4. **GB300 NVL72 acceptance of 480Y/277 V** at the rack power shelves is unverified.
+5. **APC NetShelter CX Mini 12U 1.6 kW** extraction rating (cab12, I-B6) is unverified.
+6. **SMTL2200 runtime** (cab12, 11.5 min estimated) is unverified; SMTL1000 runtime is from reseller listings.
+7. **BEN 1 noise** (45–47 dBA at 1 m) is a source-level estimate (+15 dB per decade of power, cabinet insertion loss), not a measurement; E21 replaces it.
+8. **Rack-top clearance 254 mm** against the 250 mm rule (I-D8) is marginal: a taller rack or a top-entry fitting breaks it.
+9. **GB300 rack price is an analyst estimate**, so the BEN 300 and BEN 700 all-modules BOMs are about 97–98 % estimate (`docs/rev2/UNIT_ECONOMICS.md`); the infrastructure-only figures (24.6 % / 26.4 % confirmed listings excluding compute, `docs/rev2/BOM.md`) are the ones to quote.
+10. **Liquid loop volume** is not computed by the configuration (`docs/SITE_REQUIREMENTS.md` §15).
+
+Sources: [`docs/DENSITY.md`](DENSITY.md), [`docs/rev2/BOM.md`](rev2/BOM.md), [`docs/rev2/UNIT_ECONOMICS.md`](rev2/UNIT_ECONOMICS.md), [`docs/proposals/rev2/README.md`](proposals/rev2/README.md).

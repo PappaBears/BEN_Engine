@@ -1,0 +1,70 @@
+{
+  "product_revision": 2,
+  "lineup": "rev2",
+  "drawing_rev": "2.A",
+  "issue_date": "2026-11-09",
+  "status": "ISSUED FOR REVIEW",
+  "checker": "",
+  "checked_date": "",
+  "notes": "Rev 2.A: first issue of the BEN Engine Rev 2 design set (docs/REV2_DECISION.md) for review — Rev 2 lineup BEN 1 (both forms), BEN 5, BEN 30, BEN 150, BEN 300, BEN 500, BEN 700 and BEN 2000; brand v2 title blocks with the data plate band; liquid-first dense tiers BEN 300 and BEN 700; non-conductive liner on the wall opposite live parts per EN-001. Not for construction until a named checker signs this record and the set is regenerated.",
+  "scope": {
+    "tiers": ["ben1", "ben5", "ben30", "ben150", "ben300", "ben500", "ben700", "ben2000"],
+    "ben1_forms": ["rack10", "cab12"],
+    "drawings": "design/drawings/rev2/<tier>/ (BEN 1: design/drawings/rev2/ben1/<form>/)",
+    "renders": "design/renders/rev2/<tier>/",
+    "assembly": "design/assembly/rev2/ASSEMBLY-<tier>.md",
+    "sqam": "docs/rev2/SQAM.md",
+    "design_basis": "design/rev2/DESIGN_BASIS.md",
+    "wiring": "design/specs/wiring/rev2/",
+    "heroes": "web/assets/rev2/hero-<tier>.svg"
+  },
+  "predecessor": {
+    "record": "design/REVISION.json",
+    "product_revision": 1,
+    "drawing_rev": "C",
+    "note": "Rev 1 design set (Rev B issued for construction for BEN 30/150/500/2000, Rev C issued for review for BEN 5). Frozen; see releases/REV1.md and the notices list in design/REVISION.json (EN-001 hold)."
+  },
+  "change_register": [
+    {
+      "id": "R2-01",
+      "date": "2026-11-09",
+      "title": "New tiers",
+      "sheets": ["ben1/rack10/*", "ben1/cab12/*", "ben300/*", "ben700/*"],
+      "summary": "BEN 1 indoor mini rack (10-inch 8U desk rack <= 0.6 kW and 19-inch 12U sound-damped cabinet <= 1.5 kW, 120 V plug-in) with a reduced sheet set A-001, E-001, C-001 and the installation sheet I-001; BEN 300 (20 ft, 300 kW, 2 GB300 NVL72-class racks) and BEN 700 (40 ft, 700 kW, 5 racks; renamed from BEN 1000 because 1,000 kW does not fit the 40 ft row with real footprints, interference checks I-D1..I-D19).",
+      "reason": "docs/REV2_DECISION.md §2",
+      "requested_by": "operator (Rev 2 decision)",
+      "approved_by": ""
+    },
+    {
+      "id": "R2-02",
+      "date": "2026-11-09",
+      "title": "Brand v2 title blocks",
+      "sheets": ["all Rev 2 sheets", "SQAM", "wiring one-lines", "renders", "heroes"],
+      "summary": "Title block per brand/v2/titleblock-spec.md: Deep Cobalt lockup master (lockup-deep.svg) on white paper, Archivo / IBM Plex fonts from brand/v2/fonts/ttf with DejaVu fallbacks, print colour set (Ink / Slate / Fog / Deep Cobalt / Hold), data plate band 'Schreiber AI · BEN Engine · <tier> · Drawing set Rev 2.A · <status> · <date>' under every title block, legal line under the frame. Thermal ramp replaces amber for heat cues.",
+      "reason": "docs/REV2_DECISION.md §1; web/kit/BRAND_GUIDE.md",
+      "requested_by": "operator (Rev 2 decision)",
+      "approved_by": ""
+    },
+    {
+      "id": "R2-03",
+      "date": "2026-11-09",
+      "title": "Liquid-first dense tiers",
+      "sheets": ["ben300/E-001", "ben300/M-001", "ben700/E-001", "ben700/M-001", "ben300/A-002", "ben700/A-002"],
+      "summary": "BEN 300 / BEN 700: direct liquid W45 loop with row CDUs N+1 (600 kW class), rear-plenum UQD manifolds, row isolation valves closing on leak (leak-to-isolation <= 15 s), residual air on in-row fan coils fed by an 18 C trim loop from the skid chiller (W45 water cannot cool room air: Rev 1 forward line CLG-AIR-RESID-HD at 12 kW on W45 is not used), Galaxy VL UPS frames with lithium battery cabinets as separate NFPA 855 groups, heat-reuse port. CTQ/CTP tables add CDU, manifold, W45 loop, leak-to-isolation and battery-group items.",
+      "reason": "docs/REV2_DECISION.md §2 (density); CAPA observation on the W45 fan coil (docs/audit/CAPA_LOG.md)",
+      "requested_by": "operator (Rev 2 decision)",
+      "approved_by": ""
+    },
+    {
+      "id": "R2-04",
+      "date": "2026-11-09",
+      "title": "Non-conductive liner on the wall opposite live parts (EN-001)",
+      "sheets": ["ben150/A-002", "ben150/A-003", "ben500/A-002", "ben500/A-003", "ben300/A-002", "ben300/A-003", "ben700/A-002", "ben700/A-003"],
+      "summary": "The aisle wall opposite the row is lined with ENV-LINER-NC (Class A, ASTM E84, non-conductive FRP panels on furring with nylon fasteners, no metal trim) instead of the galvanised steel liner ENV-LINER, so the NEC 110.26 condition 1 working space (914 mm at 151-600 V to ground) is justified for the 480 V tiers BEN 150 / 500 / 300 / 700; the fire releasing panel moves to the exterior beside the door and the EPO station into the door-end frame so no grounded device sits in the working space; 480 V gear keeps the condition 2 depth (1,067 mm) conservatively. BEN 30 (208Y/120 V) and BEN 5 / BEN 1 (120 V to ground) need 914 mm under every condition and keep their liners. BEN 2000 aisles are designed to condition 2 / 3.",
+      "reason": "docs/audit/EN-001_working_space_liner.md",
+      "requested_by": "design authority (finding of the lineup engineer)",
+      "approved_by": ""
+    }
+  ],
+  "superseded_sets": []
+}

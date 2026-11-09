@@ -132,6 +132,20 @@ def right_column(sh, lay, sheet_no, extra=None):
     deviation_note(sh, lay, RX, y)
 
 
+def brand_panel_side(vb, lay, el, eh, s):
+    """Rev 1 brand panel on the module aisle-side elevation (gen_drawings_rev2.py replaces it with the brand v2 livery)."""
+    pw = min(el * 0.45, 3000)
+    vb.rect(el / 2 - pw / 2, eh * 0.35, el / 2 + pw / 2, eh * 0.65, fc="#0B1018", ec="#0B1018")
+    vb.text(el / 2, eh * 0.5, f"SCHREIBER AI  |  {lay.d['tier_label'].upper()}", h=min(3.4, 7000 / s / 10), ha="center", va="center", c="#66E3FF", bold=True)
+    vb.text(el / 2, eh * 0.3, "Brand panel: 1.5 mm aluminium composite, bonded + riveted; no penetration", h=1.7, ha="center", va="top", c=MUTED)
+
+
+def brand_panel_cabinet(vb, lay, el, eh, s):
+    """Rev 1 brand panel on the cabinet elevation (replaced in Rev 2)."""
+    vb.rect(el * 0.1, eh * 0.75, el * 0.9, eh * 0.9, fc="#0B1018", ec="#0B1018")
+    vb.text(el / 2, eh * 0.825, f"SCHREIBER AI | {lay.d['tier_label'].upper()}", h=2.4, ha="center", va="center", c="#66E3FF", bold=True)
+
+
 # ====================================================================== A-001
 def sheet_a001(lay: L.Layout, out):
     s = pick_scale((lay.ext_l + 2600, 470), (lay.ext_w + 2 * lay.ext_h + 1300, 500))
@@ -241,18 +255,14 @@ def sheet_a001(lay: L.Layout, out):
         vb.corrugation(0, el, 0, eh, pitch=280, vertical=True)
         for X in (0, el - 178):
             vb.rect(X, 0, X + 178, 118, fc="#E8EDF3", lw=0.6); vb.rect(X, eh - 118, X + 178, eh, fc="#E8EDF3", lw=0.6)
-        pw = min(el * 0.45, 3000)
-        vb.rect(el / 2 - pw / 2, eh * 0.35, el / 2 + pw / 2, eh * 0.65, fc="#0B1018", ec="#0B1018")
-        vb.text(el / 2, eh * 0.5, f"SCHREIBER AI  |  {lay.d['tier_label'].upper()}", h=min(3.4, 7000 / s / 10), ha="center", va="center", c="#66E3FF", bold=True)
-        vb.text(el / 2, eh * 0.3, "Brand panel: 1.5 mm aluminium composite, bonded + riveted; no penetration", h=1.7, ha="center", va="top", c=MUTED)
+        brand_panel_side(vb, lay, el, eh, s)
     else:
         for it in lay.items:
             if it.mount == "ext" and it.kind == "cooling" and it.y0 > 0:
                 X0 = it.x0 + endw
                 vb.rect(X0, it.z0, X0 + it.w, it.z1, fc=FILL["cooling"], ec=EDGE["cooling"], lw=0.6)
                 vb.text(X0 + it.w / 2, (it.z0 + it.z1) / 2, it.tag, h=2.0, ha="center", va="center", bold=True)
-        vb.rect(el * 0.1, eh * 0.75, el * 0.9, eh * 0.9, fc="#0B1018", ec="#0B1018")
-        vb.text(el / 2, eh * 0.825, f"SCHREIBER AI | {lay.d['tier_label'].upper()}", h=2.4, ha="center", va="center", c="#66E3FF", bold=True)
+        brand_panel_cabinet(vb, lay, el, eh, s)
     vb.dim_h(0, el, 0, -8, label=f"{el:.0f}")
     sh.north_arrow(ox_end + ew / s / 2, oy - (eh - ew) / s - 30)
     sh.text(ox_end - 10, oy - (eh - ew) / s - 50, "Dimensions in mm. Ext dims per ISO 668 (containers).", h=2.0, c=MUTED)
@@ -352,7 +362,7 @@ def sheet_a002(lay: L.Layout, out):
         # NEC working space zone in front of row
         row_end = lay.notes["row_end_x"]
         v.rect(0, rf, row_end, rf + 914, fc="none", ec=CTQ_C, lw=0.5, ls=":", z=2)
-        v.text(row_end / 2, rf + 914 - 40, "NEC 110.26 WORKING SPACE 914 (condition 1)", h=1.8, ha="center", va="top", c=CTQ_C, bg=PAPER)
+        v.text(row_end / 2, rf + 914 - 40, lay.notes.get("ws_label", "NEC 110.26 WORKING SPACE 914 (condition 1)"), h=1.8, ha="center", va="top", c=CTQ_C, bg=PAPER)
         # egress path arrow along aisle to door
         ya = rf + (W - rf) / 2
         x0e, y0e = v.p(Lm - L.END_ZONE - 100, ya); x1e, y1e = v.p(-200, ya)

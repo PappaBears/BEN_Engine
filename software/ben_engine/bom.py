@@ -280,6 +280,10 @@ def generate_bom(cfg: Config, catalog: List[Dict[str, Any]] | None = None) -> Li
         power_filter = p.get("applies_to_power")
         if power_filter and cfg.power_architecture not in power_filter:
             continue
+        # Rev 2 only lines (e.g. ENV-LINER-NC, EN-001) never change a Rev 1 BOM (docs/REVISION_POLICY.md rule 3)
+        lineup_filter = p.get("applies_to_lineups")
+        if lineup_filter and getattr(cfg, "lineup", "rev1") not in lineup_filter:
+            continue
         prefix = p["code"].split("-", 1)[0]
         sub = subsystem_of(p["code"])
         if prefix not in ALWAYS_PREFIXES and sub not in subs:

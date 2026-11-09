@@ -1,4 +1,4 @@
-<p align="center"><img src="web/kit/wordmark-ben-engine.svg" alt="BEN Engine, Business Edge Node, by Schreiber AI" width="420"></p>
+<p align="center"><img src="web/kit/wordmark-ben-engine.svg" alt="BEN Engine, by Schreiber AI" width="420"></p>
 
 # BEN Engine — modular data centers you can run before they exist
 
@@ -14,11 +14,12 @@
 | BEN 150 | 20 ft module | 50–150 kW | Rear-door + dry cooler | carried |
 | **BEN 300** | 20 ft module, liquid-first | 150–300 kW | W45 direct liquid, row CDUs N+1 | **new** — dense |
 | BEN 500 | 40 ft module | 150–500 kW | DLC + CDU | carried (existing quotes) |
-| **BEN 1000** | 40 ft module, liquid-first, all-in-one | 500–1,000 kW | W45 direct liquid, CDUs N+1, heat-reuse port | **new** — flagship dense |
+| **BEN 700** | 40 ft module, liquid-first, all-in-one, 5 racks | 400–700 kW | W45 direct liquid, CDUs N+1, heat-reuse port | **new** — flagship dense (planned as BEN 1000; renamed by fit, `ben1000` loads as `ben700`) |
 | BEN 2000 | Prefabricated 2 MW hall | 800–2,000 kW | DLC | carried — capability example |
 
 - **Brand:** Schreiber AI brand package v2 applied (masters in `brand/v2/`): Night Navy ground, Signal Blue mark, Safety Amber on the primary button only, Archivo + IBM Plex, and the data plate band on every unit, drawing, proposal and slide.
-- **Density:** per-tier kW per rack and per m² in `docs/DENSITY.md`; design values until the BEN 300 lighthouse measures them. 800 VDC stays a study option behind a gated test cell.
+- **Density:** BEN 300 2 × 150 kW, 20.31 kW per m² of module footprint (310 kW verified maximum); BEN 700 5 × 140 kW, 23.55 kW per m² (705 kW verified maximum); per-tier table and interference checks in [docs/DENSITY.md](docs/DENSITY.md). Design values until the BEN 300 lighthouse measures them. 800 VDC stays a study option behind a gated test cell.
+- **Rev 2 numbers:** BOMs [docs/rev2/BOM.md](docs/rev2/BOM.md) · unit economics [docs/rev2/UNIT_ECONOMICS.md](docs/rev2/UNIT_ECONOMICS.md) · sample proposals [docs/proposals/rev2/README.md](docs/proposals/rev2/README.md) · open operator questions [docs/rev2/OPEN_QUESTIONS.md](docs/rev2/OPEN_QUESTIONS.md).
 - **Where Rev 1 lives:** frozen on branch `release/rev1` with its record and hashes in [releases/REV1.md](releases/REV1.md); every Rev 1 customer-facing document that Rev 2 rewrote is copied unchanged under [archive/rev1/](archive/rev1/README.md) (this README's Rev 1 edition: [archive/rev1/README.md](archive/rev1/README.md)). Rev 1 configurations load as `lineup: "rev1"` and reproduce their quoted numbers. Nothing is deleted ([docs/REVISION_POLICY.md](docs/REVISION_POLICY.md)).
 
 The rest of this page describes the engineering system that both revisions share.
@@ -128,7 +129,7 @@ Full architecture, trust boundaries and failure behaviour: `docs/ARCHITECTURE.md
 ## Tests and evidence
 
 ```bash
-PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e   # python suite
+PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e   # python suite: 262 tests (incl. the Rev 1 frozen fixture and the Rev 2 lineup)
 bash tests/e2e/run_e2e.sh                                          # Playwright, ~13 min under software WebGL
 cd firmware/ben-pod && make test                                   # 37 host unit tests
 ```

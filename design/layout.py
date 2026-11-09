@@ -553,8 +553,11 @@ def _resolve_container(lay: Layout):
         lay.notes["u_it_rack1"] = lay.d["geometry"]["rack_u"] - (n_rm * 10 + 6)
         lay.notes["n_rm_ups"] = n_rm
     # door-end wall: EPO + fire releasing panel + light switch on the aisle wall (shallow)
-    lay.items.append(Item("FS-CLEAN-AGENT", "FRP", "fire", "Fire releasing panel (wall, aisle side, 1500 AFF)", 150, W - 100, 450, W, 1500, 1900, mount="wall", kg=8, front="-y"))
-    lay.items.append(Item("FS-EPO", "EPO", "power", "EPO push-button (by door, 1200 AFF)", 500, W - 60, 600, W, 1200, 1300, mount="wall", kg=1, front="-y"))
+    if _rev2(lay):
+        _rev2_wall_devices(lay)
+    else:
+        lay.items.append(Item("FS-CLEAN-AGENT", "FRP", "fire", "Fire releasing panel (wall, aisle side, 1500 AFF)", 150, W - 100, 450, W, 1500, 1900, mount="wall", kg=8, front="-y"))
+        lay.items.append(Item("FS-EPO", "EPO", "power", "EPO push-button (by door, 1200 AFF)", 500, W - 60, 600, W, 1200, 1300, mount="wall", kg=1, front="-y"))
     lay.items.append(Item("CTL-LEAK", "LEAK", "controls", "Leak rope, floor perimeter + under cooling units", 0, 0, L, W, 0, 20, mount="floor", kg=3))
     # exterior: service section on the blind end wall, condensers / dry cooler
     lay.items.append(Item("PWR-SVC-ENCL", "SVC", "power", f"Service section NEMA 4X: main breaker {d['service_breaker_a']} A + SPD + ATS (exterior, end wall)",
@@ -591,11 +594,14 @@ def _resolve_container(lay: Layout):
         _chk(lay, "I-C22", "A-002", f"Aisle width with the catalog rack ({rc}: 600 x {cat_depth} deep{' + RDHx' if cooling == 'rdhx_drycooler' else ''}) vs 900 egress / 914 NEC",
              f"{W:.0f} - {plenum} - {cat_depth} = {a_cat:.0f}", a_cat, NEC_WS_COND1, ">=",
              resolution="" if a_cat >= NEC_WS_COND1 else f"Drawings use a {rk['d']}-deep rack. Change catalog {rc} to a 1070-deep model")
-    _chk(lay, "I-C5", "A-002", "Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite)",
-         f"{aisle:.0f} vs 914", aisle, NEC_WS_COND1, ">=")
-    _chk(lay, "I-C6", "A-002", "Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative",
-         f"{aisle:.0f} vs 1067", aisle, NEC_WS_COND2, ">=",
-         resolution="Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies")
+    if _rev2(lay):
+        _rev2_working_space_checks(lay, aisle, "I-C5", "I-C6", "I-C27")
+    else:
+        _chk(lay, "I-C5", "A-002", "Working space depth in front of row, NEC 110.26 condition 1 (insulated wall opposite)",
+             f"{aisle:.0f} vs 914", aisle, NEC_WS_COND1, ">=")
+        _chk(lay, "I-C6", "A-002", "Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative",
+             f"{aisle:.0f} vs 1067", aisle, NEC_WS_COND2, ">=",
+             resolution="Not required: liner wall opposite the row is insulated and non-grounded-surface; condition 1 applies")
     _chk(lay, "I-C7", "A-002", "Door zone (free length between door and first row item) vs 0",
          f"{L:.0f} - {END_ZONE} - {x:.0f} = {door_zone:.0f}", door_zone, 0, ">=")
     two_row = 2 * rk["d"] + 1000
@@ -889,10 +895,10 @@ def _resolve_dense(lay: Layout):
     gw = LIB["controller"]
     lay.items.append(Item(gw["code"], "CP1", "controls", gw["label"] + " (end wall, 1200 AFF)", L - gw["d"], 100, L, 100 + gw["w"], 1200, 1200 + gw["h"], mount="wall", kg=gw["kg"], front="-x"))
     if d["panelboard_wall"]:
-        lay.items.append(Item("PWR-PANEL-600", "PNL-D", "power", f"480 V distribution panelboard {d['service_breaker_a']} A main breaker (end wall, aisle side)", L - 250, W - 80 - 900, L, W - 80, 300, 2100, mount="wall", kg=180, front="-x"))
+        # EN-001 / I-D19: the panelboard sits 10 mm off the aisle-wall liner so its 900 mm wide working space clears the last fan coil
+        lay.items.append(Item("PWR-PANEL-600", "PNL-D", "power", f"480 V distribution panelboard {d['service_breaker_a']} A main breaker (end wall, aisle side)", L - 250, W - 10 - 900, L, W - 10, 300, 2100, mount="wall", kg=180, front="-x"))
     lay.items.append(Item("FS-CLEAN-AGENT", "FS1", "fire", "FK-5-1-12 cylinder in a heated NEMA 4X exterior enclosure on the blind end, piped through the end wall", L + 160, -600, L + 160 + 500, -100, 0, 1600, mount="ext", kg=110, front="+x"))
-    lay.items.append(Item("FS-CLEAN-AGENT", "FRP", "fire", "Fire releasing panel (wall, aisle side, 1500 AFF)", 150, W - 100, 450, W, 1500, 1900, mount="wall", kg=8, front="-y"))
-    lay.items.append(Item("FS-EPO", "EPO", "power", "EPO push-button (by door, 1200 AFF)", 500, W - 60, 600, W, 1200, 1300, mount="wall", kg=1, front="-y"))
+    _rev2_wall_devices(lay)
     lay.items.append(Item("CTL-LEAK", "LEAK", "controls", "Leak rope: perimeter, under every CDU, along the rear-plenum header drip tray", 0, 0, L, W, 0, 20, mount="floor", kg=4))
     lay.items.append(Item("PWR-SVC-ENCL", "SVC", "power", f"Service section NEMA 4X: main {d['service_breaker_a']} A + SPD" + (" + ATS" if cfg.generator else "") + " (exterior, end wall)",
                           L + 160, W / 2 - 500, L + 160 + 400, W / 2 + 500, 600, 2000, mount="ext", kg=180, front="+x"))
@@ -911,14 +917,18 @@ def _resolve_dense(lay: Layout):
          f"{d['battery_cabinets']} battery 600, {d['swbd_sections']} switchboard 915) vs usable length (interior - 350 end zone)", f"{rl:.0f} vs {L - end_zone:.0f}", rl, L - end_zone, "<=")
     aisle_rack = W - plenum - F["rack"]["d"]
     _chk(lay, "I-D3", "A-002", f"Aisle in the rack zone (W - {plenum} plenum - {F['rack']['d']} rack) vs 900 egress", f"{W:.0f} - {plenum} - {F['rack']['d']} = {aisle_rack:.0f}", aisle_rack, EGRESS_MIN, ">=")
-    _chk(lay, "I-D4", "A-002", "NEC 110.26 working space in front of the racks (480Y/277 V power shelves), condition 1: non-conductive FRP liner panels opposite the rack zone",
+    _chk(lay, "I-D4", "A-002", "NEC 110.26 working space in front of the racks (480Y/277 V power shelves), condition 1: non-conductive Class A FRP liner ENV-LINER-NC opposite (EN-001), no grounded device on that wall",
          f"{aisle_rack:.0f} vs 914", aisle_rack, NEC_WS_COND1, ">=")
     gear = [k for k in set(items) if k in ("ups", "batt", "swbd", "rect", "batt800")]
     gear_d = max(F[k]["d"] for k in gear) if gear else 0
     aisle_gear = W - gear_d
-    _chk(lay, "I-D5", "E-001", "NEC 110.26 condition 2 in front of the 480 V gear (switchboard, UPS, battery DC breakers; bonded steel liner opposite = grounded): gear backs onto the wall",
+    _chk(lay, "I-D5", "E-001", "NEC 110.26 condition 2 in front of the 480 V gear (switchboard, UPS, battery DC breakers), applied conservatively although the liner opposite is non-conductive (bonded door-end frame within reach): gear backs onto the wall",
          f"{W:.0f} - {gear_d} = {aisle_gear:.0f} vs 1067", aisle_gear, NEC_WS_COND2, ">=")
     aisle_cdu = W - F["cdu"]["d"]
+    opp = [i for i in lay.items if i.mount in ("wall", "floor") and i.kind in ("power", "fire", "controls") and i.y1 >= W - 1 and i.y0 > W - 400
+           and i.x1 > 0 and i.x0 < x and i.tag != "LEAK"]
+    _chk(lay, "I-D20", "A-002", "Grounded or live devices on the aisle wall opposite the row inside its working space (EN-001)",
+         f"{len(opp)} ({', '.join(i.tag for i in opp) or 'none'})", len(opp), 0, "<=", resolution="" if not opp else "Relocate off the aisle wall")
     _chk(lay, "I-D6", "A-002", "Aisle in front of the row CDUs (1200 deep, back to the wall) vs 914 (condition 1, 480 V pump drives behind closed covers)", f"{W:.0f} - {F['cdu']['d']} = {aisle_cdu:.0f}", aisle_cdu, NEC_WS_COND1, ">=")
     if d["swbd_sections"]:
         sw_w = d["swbd_sections"] * F["swbd"]["w"]
@@ -947,6 +957,14 @@ def _resolve_dense(lay: Layout):
     point = rk_kg * 9.81 / 1000 / (0.6 * 1.6)
     _chk(lay, "I-D16", "S-001", f"Rack floor load: {rk_kg} kg GB300-class rack on a 600 x 1,600 mm load-spreading frame (on its own 0.6 x 1.068 m footprint it is {rk_kg * 9.81 / 1000 / (0.6 * 1.068):.1f} kN/m2) vs 20 kN/m2",
          f"{point:.1f} vs 20", point, 20, "<=", resolution="STR-LOADFRAME under every rack, bearing on the C100 floor channels; structural calc confirms")
+    pnl = lay.find("PNL-D")
+    if pnl:
+        ws_x0 = pnl.x0 - NEC_WS_COND1
+        intr = [i for i in lay.items if i.mount == "floor" and i.kind in ("rack", "cooling", "power") and i.x1 > ws_x0 and i.y1 > pnl.y0]
+        over = max([i.y1 - pnl.y0 for i in intr] + [0.0])
+        _chk(lay, "I-D19", "E-001", f"End-wall panelboard PNL-D working space ({pnl.y1 - pnl.y0:.0f} wide x 914 deep, NEC 110.26(A)(1)/(A)(2)) clear of the row end items",
+             f"intrusion {over:.0f} mm ({', '.join(i.tag for i in intr) or 'none'}); panel y {pnl.y0:.0f}-{pnl.y1:.0f}", over, 0, "<=",
+             resolution="" if over <= 0 else "Move PNL-D toward the aisle wall or shorten the row")
     _chk(lay, "I-D17", "A-002", "Door zone (free length between the row end and the blind-end zone) vs 0", f"{L:.0f} - {end_zone} - {x:.0f} = {L - end_zone - x:.0f}", L - end_zone - x, 0, ">=")
     t_sup = CLIMATE_DESIGN[cfg.climate]["t_design_c"] + 8.0
     lay.notes["heat_rejection"] = (f"W45 dry cooler: design ambient {CLIMATE_DESIGN[cfg.climate]['t_design_c']} C + 8 K approach = {t_sup:.0f} C supply"
@@ -1021,6 +1039,69 @@ def _resolve_minirack(lay: Layout):
     _chk(lay, "I-B7", "A-001", f"Estimated noise at 1 m vs the {d['noise_dba_target']:.0f} dBA target", f"{d['noise_dba_est']} vs {d['noise_dba_target']}", d["noise_dba_est"], d["noise_dba_target"], "<=",
          resolution="" if d["noise_ok"] else f"meets the target up to {d['noise_quiet_up_to_kw']} kW; above it, place BEN 1 in a closet with the vent rule of the room note")
     lay.notes["room_cooling_note"] = d["room_cooling_note"]
+
+
+# ------------------------------------------------------------------ Rev 2: EN-001 working space and liner (docs/audit/EN-001_working_space_liner.md)
+NC_LINER_BUILDUP = 15       # FRP 2.3 mm on 12.7 mm FRT plywood; the ribbed steel liner it replaces has a 19 mm (3/4 in) rib depth
+
+
+def _rev2(lay: "Layout") -> bool:
+    return getattr(lay.cfg, "lineup", "rev1") == "rev2"
+
+
+def volts_to_ground(lay: "Layout") -> float:
+    """Nominal voltage to ground of the equipment in the working space (NEC 110.26 Table 110.26(A)(1) column)."""
+    v = lay.d["voltage"]
+    if "480" in v:
+        return 277.0
+    return 120.0     # 208Y/120 V 3ph, 120/240 V 1ph, 120 V plug-in
+
+
+def needs_nc_liner(lay: "Layout") -> bool:
+    """Rev 2 module tiers whose drawn aisle relies on NEC 110.26 condition 1 (151-600 V to ground, aisle < 1,067)."""
+    return lay.is_container and volts_to_ground(lay) > 150
+
+
+def _rev2_wall_devices(lay: "Layout"):
+    """Rev 2 (EN-001): nothing grounded or live on the aisle wall opposite the row. The fire releasing panel goes to the
+    exterior beside the cargo door (NEMA 4X); the EPO station sits recessed in the door-end frame (x < 0), outside the
+    working space; the aisle wall carries the non-conductive Class A liner where condition 1 is relied on."""
+    L, W = lay.L, lay.W
+    endw = (lay.ext_l - L) / 2
+    lay.items.append(Item("FS-CLEAN-AGENT", "FRP", "fire", "Fire releasing panel in NEMA 4X enclosure, exterior beside the cargo door (EN-001: off the aisle wall), 1500 AFF",
+                          -endw - 160, W - 300, -endw - 10, W, 1500, 1900, mount="ext", kg=10, front="-x"))
+    lay.items.append(Item("FS-EPO", "EPO", "power", "EPO push-button, recessed in the door-end frame at the exit (EN-001: outside the working space), 1200 AFF",
+                          -60, W - 100, 0, W, 1200, 1300, mount="wall", kg=1, front="+x"))
+    if needs_nc_liner(lay):
+        lay.items.append(Item("ENV-LINER-NC", "LNR", "envelope", "Non-conductive Class A FRP liner on FRT plywood, aisle wall opposite the row (EN-001), no metal trim, nylon fasteners",
+                              0, W - 3, L, W, 0, lay.H, mount="wall", kg=4 * L / 1000))
+    lay.notes["nc_liner"] = needs_nc_liner(lay)
+
+
+def _rev2_working_space_checks(lay: "Layout", aisle: float, id1: str, id2: str, id3: str):
+    vg = volts_to_ground(lay)
+    if vg <= 150:
+        _chk(lay, id1, "A-002", f"Working space depth in front of the row, NEC 110.26 Table 110.26(A)(1) at {vg:.0f} V to ground (0-150 V: 914 mm under conditions 1, 2 and 3; liner type does not matter)",
+             f"{aisle:.0f} vs 914", aisle, NEC_WS_COND1, ">=")
+        _chk(lay, id2, "A-002", f"Working space depth NEC 110.26 condition 2 (grounded parts opposite) at {vg:.0f} V to ground: Table 110.26(A)(1) 0-150 V column = 914 mm",
+             f"{aisle:.0f} vs 914", aisle, NEC_WS_COND1, ">=", resolution=f"Condition 2 needs the same 914 mm at {vg:.0f} V to ground; EN-001 does not change this tier")
+    else:
+        _chk(lay, id1, "A-002", f"Working space depth in front of the row, NEC 110.26 condition 1 at {vg:.0f} V to ground: non-conductive Class A liner ENV-LINER-NC opposite (EN-001); liner build-up {NC_LINER_BUILDUP} mm <= 19 mm steel rib it replaces",
+             f"{aisle:.0f} vs 914", aisle, NEC_WS_COND1, ">=", resolution="ENV-LINER-NC on the aisle wall; AHJ accepts the FRP liner over insulation as not grounded")
+        _chk(lay, id2, "A-002", "Working space depth NEC 110.26 condition 2 (grounded parts opposite) - informative, the depth a steel liner would need",
+             f"{aisle:.0f} vs 1067", aisle, NEC_WS_COND2, ">=",
+             resolution="Not required with ENV-LINER-NC; a galvanised steel liner here would make the module non-compliant (EN-001)")
+    opp = [i for i in lay.items if i.mount in ("wall", "floor") and i.kind in ("power", "fire", "controls") and i.y1 >= lay.W - 1
+           and i.y0 > lay.W - 400 and i.x1 > 0 and i.x0 < lay.notes.get("row_end_x", 0) and i.tag not in ("LEAK",)]
+    _chk(lay, id3, "A-002", "Grounded or live devices on the aisle wall opposite the row inside its working space (EN-001)",
+         f"{len(opp)} ({', '.join(i.tag for i in opp) or 'none'})", len(opp), 0, "<=",
+         resolution="" if not opp else "Relocate off the aisle wall")
+
+
+def resolve_rev2(tier: str, form: str | None = None, profile: str = "ai_inference", climate: str = "temperate") -> Layout:
+    """Layout of a Rev 2 preset (lineup "rev2"; BEN 1 takes ``form`` rack10 / cab12). Carried tiers get the Rev 2 rules (EN-001)."""
+    kw = {"form": form} if form else {}
+    return resolve(tier, cfg=Config.preset(canonical_tier(tier), profile, climate, lineup="rev2", **kw))
 
 
 def resolve_lineup(lineup: str = "rev2", profile: str = "ai_inference", climate: str = "temperate") -> List[Layout]:
@@ -1141,7 +1222,7 @@ def deviations_md(lays: List[Layout]) -> str:
 
 
 if __name__ == "__main__":
-    lays = [resolve(t) for t in (TIERS_BY_LINEUP["rev2"] if "--rev2" in sys.argv else TIERS_BY_LINEUP["rev1"])]
+    lays = [resolve_rev2(t) for t in TIERS_BY_LINEUP["rev2"]] if "--rev2" in sys.argv else [resolve(t) for t in TIERS_BY_LINEUP["rev1"]]
     for lay in lays:
         print(f"== {lay.d['tier_label']}  cooling resolved: {lay.notes.get('cooling_resolved', lay.cfg.cooling)}  row end {lay.notes.get('row_end_x')}  door zone {lay.notes.get('door_zone')}")
         for it in lay.items:

@@ -1,4 +1,5 @@
 // BEN Engine dashboard — app controller: store, WebSocket, panels, inspector, status strip.
+import { liveryInfo } from './livery.js';
 import { api, h, fmt, sensorValue, reducedMotion } from './util.js';
 import { createScene } from './scene.js';
 import { initTooltip } from './tooltip.js';
@@ -276,7 +277,8 @@ setInterval(tickStatus, 500);
 store.on('config', (payload) => {
   document.getElementById('pill-tier').textContent = payload.derived.tier_label;
   document.getElementById('pill-site').textContent = payload.config.site_name;
-  document.getElementById('brand-sub').textContent = payload.config.white_label ? `Business Edge Node · ${payload.config.brand}` : 'by Schreiber AI · Rev 2';
+  // white-label: the partner leads, Schreiber AI stays as the engineering credit (licence rule); never "Business Edge Node"
+  document.getElementById('brand-sub').textContent = payload.config.white_label ? `${payload.config.brand} · engineering by Schreiber AI` : 'by Schreiber AI · Rev 2';
   // data plate band in the status strip (brand v2 signature device)
   const dpTier = document.getElementById('dp-tier'), dpRated = document.getElementById('dp-rated');
   if (dpTier) dpTier.textContent = payload.derived.tier_label;
@@ -284,9 +286,9 @@ store.on('config', (payload) => {
   if (dpRated) {
     // units keep their case inside the all-caps band (kW, φ)
     const u = (t) => h('span', { class: 'u' }, t);
-    const v = String(payload.derived.voltage || g.voltage || '').match(/^(.*?)(\d)ph$/);
-    dpRated.replaceChildren(`Rated ${(g.it_kw_max ?? payload.config.it_kw).toLocaleString('en-US')} `, u('kW'), ' IT · ',
-      ...(v ? [v[1] + v[2], u('φ')] : [String(payload.derived.voltage || g.voltage || '')]));
+    // same fields as the hardware band (livery.js): BEN 1 rack10 is rated 0.6 kW, voltage shortened to '120 V 1φ'
+    const lv = liveryInfo(payload.config, payload.derived), volt = lv.fields[5], v = volt.match(/^(.*)φ$/);
+    dpRated.replaceChildren(`Rated ${lv.rated} `, u('kW'), ' IT · ', ...(v ? [v[1], u('φ')] : [volt]));
   }
   scene.rebuild(payload);
   for (const p of PANELS) if (mounted.has(p.id) && p.onConfig) p.onConfig(payload);

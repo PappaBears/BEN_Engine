@@ -42,18 +42,37 @@ Names keep the Rev 1 rule: the number is the nominal maximum IT kW.
 | **BEN 150** | 20 ft module | 50–150 kW | Rear-door + dry cooler | Mid-market air/rear-door | carried |
 | **BEN 300** (new, dense) | 20 ft module, liquid-first | 150–300 kW | Direct liquid W45, row CDU N+1, ≤ 10 % air residual | One or two current liquid racks (GB300 NVL72-class, 132–155 kW) | new |
 | **BEN 500** | 40 ft module | 150–500 kW | DLC + CDU | Rev 1 configuration kept for existing quotes | carried |
-| **BEN 1000** (new, flagship dense) | 40 ft module, liquid-first, all-in-one | 500–1,000 kW | Direct liquid W45, CDU N+1, heat-reuse port | Up to six or seven current liquid racks with power, UPS/battery, CDUs and controls in one sealed box; heat rejection on an adjacent skid | new |
+| **BEN 700** (new, flagship dense) — *corrected 2026-11-09, see §2a; recorded at decision as BEN 1000, 500–1,000 kW, six or seven racks* | 40 ft module, liquid-first, all-in-one | 400–700 kW (5 racks; 705 kW is the verified maximum) | Direct liquid W45, CDU N+1, heat-reuse port | Up to five current liquid racks (GB300 NVL72-class, 140 kW each in the preset) with power, UPS/battery, CDUs and controls in one sealed box; heat rejection on an adjacent skid | new |
 | **BEN 2000** | Prefabricated hall | 800–2,000 kW | DLC | Capability example | carried |
 
 **All-in-one rule (from the operator, Rev 1):** power, cooling distribution, compute and controls inside one enclosure; heat rejection outside (roof or skid). The dense tiers must pass the existing interference checks (single row, 900 mm egress, NEC 110.26 working space at 480 V) with real footprints, or they are reported as study, not sold. If a target density does not fit, the tier is renamed to the power that does fit.
 
-**Forward options** (`dc800`, `dlc_hd`) remain options; on BEN 300 and BEN 1000 `dlc_hd` is the default cooling, `dc800` stays a study option until the program's test-cell gate.
+**Forward options** (`dc800`, `dlc_hd`) remain options; on BEN 300 and BEN 700 (BEN 1000 at decision, §2a) `dlc_hd` is the default cooling, `dc800` stays a study option until the program's test-cell gate.
+
+**Table note (2026-11-09).** The BEN 700 row above was corrected after the layout check in §2a; the decision as first recorded named the 40 ft dense tier BEN 1000 (500–1,000 kW, up to six or seven racks). The original wording is kept in git history (commit `3ea7d7d`) and in this note; nothing else in the table changed.
+
+## 2a. Amendment (2026-11-09) — Verified by layout: BEN 1000 does not fit; the 40 ft dense tier is BEN 700 (705 kW, 5 racks)
+
+The §2 rule ("if a target density does not fit, the tier is renamed to the power that does fit") was applied by the lineup work with real footprints (`design/layout.py` checks I-D1 to I-D17, `docs/DENSITY.md`):
+
+| Finding | Value | Source |
+| --- | --- | --- |
+| Best fit in the 40 ft module | **5 racks × 141 kW = 705 kW** (single row, N+1 CDUs and UPS modules, 5 min battery, GB300 NVL72-class racks capped at 155 kW) | `docs/DENSITY.md`, "Verified maxima" |
+| Why not 1,000 kW / 7 racks | The row would need 15,830 mm against 11,850 mm interior; six racks fit only 600 kW and seven 570 kW, because power gear (switchboard, two UPS frames, four battery cabinets: 5.0 m of the 11.5 m usable row) and three CDUs (1.8 m) grow faster than the racks add | `docs/DENSITY.md` |
+| New name and preset | **BEN 700**, key `ben700`, preset 5 × 140 kW = 700 kW, 23.55 kW per m² of module footprint, 1,200 A service, 19.3 t gross | `python -m ben_engine.config --tier ben700 --json` |
+| Old key | `ben1000` loads as `ben700` through the alias map (`config.py` `TIER_ALIASES`) | `config.py` |
+| BEN 300 | Name stands: 2 × 155 kW = 310 kW fits (row 5,350 of 5,400 mm usable); preset 2 × 150 kW = 300 kW, 20.31 kW per m² | `docs/DENSITY.md` |
+| 2N profiles (healthcare, public sector) | Drop to **155 kW** on BEN 300 (one rack) and **400 kW** on BEN 700: the preset steps the IT load down until the 2N row fits the single row (`Config._preset_dense`) | `python -m ben_engine.config --tier <t> --profile healthcare` |
+
+Every Rev 2 document, deck and the website use BEN 700 from this date. Open decisions that follow from it are in `docs/rev2/OPEN_QUESTIONS.md`.
 
 ## 3. Budget: USD 5 M revamp
 
 The revamp budget is USD 5 M. The engineering, branding and documentation revision is done in this repository now (Rev 2). The USD 5 M funds what a repository cannot: the BEN 1 and BEN 300 lighthouse units, the liquid and 800 VDC test cell, listings (UL 508A, FCC for the Pod, field evaluation), BEN Pod production, brand production (data plates, livery, print), and the team to run it. Allocation in `docs/programs/REV2_REVAMP_PROGRAM.md`, which supersedes `RD_PROGRAM_2027.md` (kept for history).
 
 ## 4. Questions the operator still owns
+
+Consolidated with the brand and program questions, each with a recommended default, in `docs/rev2/OPEN_QUESTIONS.md` (2026-11-09).
 
 1. Does the BEN Care dashboard sign-in become **"Atlas, by Schreiber AI"** (the brand package names Atlas as the system clients log into), or stay "BEN Care"?
 2. Brand package "facts only you have": phone number, starting prices for the BEN tiers, first pilot results for proof slots.

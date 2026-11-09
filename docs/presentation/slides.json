@@ -3,36 +3,33 @@
   "subtitle": "Schreiber AI · BEN Engine Rev 2 · what was built, how it is verified, how to run it",
   "slides": [
     {
-      "title": "BEN Engine, Business Edge Node",
-      "message": "All-in-one modular data centers named by IT power, from a mini rack on a shelf to a 1 MW liquid-first 40 ft module, with Schreiber AI's controls, twin and commissioning layer. The same system scales to a 2 MW center.",
+      "title": "BEN Engine, by Schreiber AI",
+      "message": "All-in-one modular data centers named by IT power, from a 0.6 kW mini rack on a shelf to a 700 kW liquid-first 40 ft module; the same system scales to 2 MW.",
       "bullets": [
-        "Rev 2 lineup: BEN 1 mini rack 0.6–1.5 kW · BEN 5 2–5 kW · BEN 30 (10 ft) · BEN 150 (20 ft) · BEN 300 liquid 20 ft · BEN 500 · BEN 1000 liquid 40 ft; BEN 2000 2 MW hall",
-        "Outdoor units NEMA 4X / IP66, hose-tested, hardening H1 / H2 / H3; BEN 1 is indoor, 120 V plug-in, office air",
-        "Modules: Power, Cooling, Compute, Controls; buy one or all",
-        "Mission profiles set class, redundancy, climate, compliance and the risk list"
+        "Rev 2: BEN 1 mini rack · 5 · 30 · 150 · 300 (liquid 20 ft) · 500 · 700 (liquid 40 ft); BEN 2000 2 MW hall",
+        "Outdoor units NEMA 4X / IP66, H1 / H2 / H3; BEN 1 indoor, 120 V plug-in",
+        "Modules: Power, Cooling, Compute, Controls; mission profiles set the risk list"
       ],
-      "image": "../media/screens/desktop-exterior-iso.png",
-      "image_alt": "BEN 500 isometric",
-      "notes": "Audience: engineers, integrators, facilities leads. Names changed on 2026-11-08: the number is now the IT kW, not the container length (docs/TIER_AND_ENCLOSURE_DECISION.md); old keys still load. Set expectations: every number on these slides comes from code in the repository and the evidence file is docs/VALIDATION.md. Rev 2 (2026-11-09) adds BEN 1, BEN 300 and BEN 1000; Rev 1 configurations load as rev1 and reproduce (docs/rev2/RELEASE_NOTES.md)."
+      "notes": "Audience: engineers, integrators, facilities leads. Names changed on 2026-11-08: the number is now the IT kW, not the container length (docs/TIER_AND_ENCLOSURE_DECISION.md); old keys still load. Set expectations: every number on these slides comes from code in the repository and the evidence file is docs/VALIDATION.md. Rev 2 (2026-11-09) adds BEN 1, BEN 300 and BEN 700; Rev 1 configurations load as rev1 and reproduce (docs/rev2/RELEASE_NOTES.md)."
     },
     {
       "title": "Density",
       "message": "As dense as a sealed, relocatable box allows, with every figure generated from the configuration and checked against real footprints, not taken from a brochure.",
       "bullets": [
-        "BEN 300: {{BEN300_KW_PER_RACK}} kW per rack, {{BEN300_KW_PER_M2}} kW per m² of module footprint, {{BEN300_RACKS}} racks in one 20 ft frame",
-        "BEN 1000: {{BEN1000_KW_PER_RACK}} kW per rack, {{BEN1000_KW_PER_M2}} kW per m²; power, UPS, CDUs and controls in one 40 ft box",
+        "BEN 300: 150 kW per rack, 20.3 kW per m² of module footprint, 2 racks in one 20 ft frame (310 kW verified maximum)",
+        "BEN 700: 140 kW per rack, 23.6 kW per m², 5 racks; power, UPS, CDUs and controls in one 40 ft box (705 kW verified maximum)",
         "Sourced peers: Delta 20 ft AI container up to 60 kW per rack (AC), ZTE prefab 40 kW per rack, HPE AI Mod POD up to 1.5 MW (AC)",
-        "Liquid-first at W45: dry coolers only, no chiller; loops sized for about 177 LPM per GB300-class rack at 45 °C (vendor table)",
-        "Design values until the BEN 300 lighthouse measures them; 800 VDC stays a gated study, not a claim"
+        "Liquid-first at W45: dry coolers carry the liquid heat; a small trim chiller serves the ≤ 10 % residual air; about 177 LPM per GB300-class rack at 45 °C (vendor table)",
+        "Planned as BEN 1000: power gear takes 5.0 m of the 11.5 m row, so 5 racks fit and the tier carries the power that fits. Design values until measured; 800 VDC a gated study"
       ],
-      "notes": "Fill the placeholders from docs/DENSITY.md before presenting; never present a slide with braces on it. Peer figures come from docs/research/STATE_OF_THE_ART_2026.md section 3 and are vendor statements, so say 'as published'. The honest positioning: every DC-ready offer is MW-class and every sub-MW container is AC; none publishes leak-to-isolation or redundancy-proof numbers. For engineers: kW per m² is IT kW over the module's outside footprint; the interference checks (single row, 900 mm egress, NEC 110.26 at 480 V) must pass first. Our density is a design value until the lighthouse."
+      "notes": "Figures from docs/DENSITY.md (generated from the configuration, 2026-11-09): BEN 300 2 x 150 kW on 14.77 m2; BEN 700 5 x 140 kW on 29.72 m2. The 40 ft tier was planned as BEN 1000 and renamed by fit (docs/REV2_DECISION.md section 2a): say so, it is the proof that the checks are real. 2N profiles drop to 155 kW (BEN 300) and 400 kW (BEN 700). Peer figures come from docs/research/STATE_OF_THE_ART_2026.md section 3 and are vendor statements, so say 'as published'. The honest positioning: every DC-ready offer is MW-class and every sub-MW container is AC; none publishes leak-to-isolation or redundancy-proof numbers. For engineers: kW per m² is IT kW over the module's outside footprint; the interference checks (single row, 900 mm egress, NEC 110.26 at 480 V) must pass first. Our density is a design value until the lighthouse."
     },
     {
       "title": "Mini racks: AI for tiny businesses",
       "message": "A tiny business can run private AI on a shelf: one or two AI boxes, a NAS and a firewall, plugged into the wall, set up and watched by Schreiber AI.",
       "bullets": [
-        "rack10: 10-inch 8U desk or shelf rack up to 0.6 kW; cab12: 19-inch 12U sound-damped office cabinet up to 1.5 kW",
-        "120 V plug-in on a dedicated 15 A or 20 A circuit; no pad, no permit, no crane; about 2–3 weeks from order to handover",
+        "rack10: 10-inch 8U shelf rack up to 0.6 kW; cab12: 19-inch 12U sound-damped cabinet (CX Mini class, ~550 mm deep: short-depth servers only) up to 1.5 kW",
+        "120 V plug-in on a dedicated 15 A / 20 A circuit; heat to room 649–1,599 W; est. 45–47 dBA at 1 m; no pad, permit or crane; 2–3 weeks to handover",
         "Built and burned in by Schreiber AI, the one in-house build; noise, heat to room and UPS runtime measured before it ships",
         "Risks in plain words before the price: heat in the closet, circuit overload, noise, theft, untested backups, UPS battery age",
         "Market size: our sources hold no statistic for on-premises tiny-business AI; the 10-unit lighthouse is the first evidence"
@@ -162,10 +159,10 @@
       "title": "Validation summary",
       "message": "Verified in simulation and on host; unverified on hardware; least accurate items named.",
       "bullets": [
-        "Python suite and firmware host tests pass; Playwright e2e exercises the dashboard",
+        "Python suite 262/262 pass (incl. Rev 1 frozen fixture of 267 configurations); firmware host tests 37/37; Playwright e2e exercises the dashboard",
         "Unverified: EFR32 Pod build, edge computer image, PLC project, any physical behaviour",
         "Least accurate: ride-through minutes, envelope UA, CFD absolutes, estimate-status prices",
-        "Rev 2 tiers (BEN 1, BEN 300, BEN 1000) are design values; their numbers are measured by the lighthouse units in the revamp program"
+        "Rev 2 tiers (BEN 1, BEN 300, BEN 700) are design values; BEN 300/700 BOMs are ~97 % estimate (GB300 rack price); unverified inputs listed in VALIDATION §9"
       ],
       "notes": "Read docs/VALIDATION.md before presenting; update numbers to the latest run."
     },

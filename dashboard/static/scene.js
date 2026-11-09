@@ -4,8 +4,15 @@ import * as THREE from './vendor/three/three.module.js';
 import { OrbitControls } from './vendor/three/OrbitControls.js';
 import { PointerLockControls } from './vendor/three/PointerLockControls.js';
 import { tempColor, lerpColor, reducedMotion } from './util.js';
+import { liveryInfo, sideTexture, miniPanelTexture, bezelTexture, bandPlateTexture, resetLivery, BODY, LV } from './livery.js';
 
-const C = { graphite: 0x0b1018, slate: 0x152234, panel: 0x1b2b42, text: 0xedf4ff, muted: 0x9fb3cc, cyan: 0x66e3ff, amber: 0xffc66d, red: 0xff707d, green: 0x6ee7a8 };
+// Schreiber AI brand v2 (brand/v2/tokens.json). One job per colour: cyan = Signal Blue (selection, hover, edges); hold / red / green /
+// info = status (alarms, LEDs) only; heat (aisles, airflow, pipes, temperature sensors) uses the thermal ramp, never amber.
+// `amber` is kept as a Rev 1 key name and now means Hold (caution), as in util.js BRAND.
+const C = { graphite: 0x06101f, slate: 0x0b1a31, panel: 0x0f2342, text: 0xeef4fc, muted: 0x8ea7c8, cyan: 0x4c9dff, amber: 0xf2c94c, hold: 0xf2c94c, red: 0xff6369, green: 0x2bb673, info: 0x5cd6ff };
+const T = { cool: 0x5cd6ff, warm: 0xff8a3d };   // thermal ramp ends (tokens --thermal-cool / --thermal-warm)
+// Rev 1 shell paint, kept so a saved Rev 1 configuration renders as it did (docs/REVISION_POLICY.md).
+const REV1 = { body: 0x2a3c5c, wl: 0x6b7a90, hall: 0x34496b, cab: 0x9aa5b8, pm: 0x2f4262 };
 const U_M = 0.04445;
 
 // ----------------------------------------------------------------------------- materials
@@ -26,8 +33,8 @@ const MAT = {
   casting: new THREE.MeshStandardMaterial({ color: 0x2a3340, roughness: 0.7, metalness: 0.6 }),
   ground: new THREE.MeshStandardMaterial({ color: 0x0e1520, roughness: 1 }),
   pad: new THREE.MeshStandardMaterial({ color: 0x3a4250, roughness: 0.95 }),
-  pipeCold: new THREE.MeshStandardMaterial({ color: 0x3fc0e0, roughness: 0.4, metalness: 0.6 }),
-  pipeHot: new THREE.MeshStandardMaterial({ color: 0xe0a44a, roughness: 0.4, metalness: 0.6 }),
+  pipeCold: new THREE.MeshStandardMaterial({ color: 0x5cd6ff, roughness: 0.4, metalness: 0.6 }),
+  pipeHot: new THREE.MeshStandardMaterial({ color: 0xff8a3d, roughness: 0.4, metalness: 0.6 }),
   fan: new THREE.MeshStandardMaterial({ color: 0x222a36, roughness: 0.5, metalness: 0.6 }),
   led: (color) => new THREE.MeshBasicMaterial({ color }),
 };
@@ -60,7 +67,8 @@ function corrugatedWall(len, height, color, period = 0.25, depth = 0.028) {
   return m;
 }
 
-/** Canvas texture of the brand mark + tier for the container side. */
+/** Rev 1 decal: the SAI monogram + tier for the container side. Used only for configurations with lineup rev1 (history);
+ *  Rev 2 configurations get the livery from livery.js. Colours here are the Rev 1 ones on purpose. */
 function brandTexture(brand, tier, whiteLabel) {
   const cv = document.createElement('canvas'); cv.width = 2048; cv.height = 640;
   const g = cv.getContext('2d');
@@ -102,7 +110,7 @@ function serverFrontTexture(units) {
     g.fillStyle = rnd() < 0.08 ? '#0a0f16' : '#2a3443'; g.fillRect(6, y + 1, 116, hgt - 2);
     g.fillStyle = '#151c26'; g.fillRect(10, y + 3, 70, hgt - 6);
     const leds = 2 + Math.floor(rnd() * 3);
-    for (let k = 0; k < leds; k++) { g.fillStyle = k === 0 ? '#6EE7A8' : (rnd() < 0.7 ? '#66E3FF' : '#FFC66D'); g.fillRect(88 + k * 9, y + hgt / 2 - 2, 4, 4); }
+    for (let k = 0; k < leds; k++) { g.fillStyle = k === 0 ? '#2BB673' : (rnd() < 0.7 ? '#4C9DFF' : '#F2C94C'); g.fillRect(88 + k * 9, y + hgt / 2 - 2, 4, 4); }
     u += size;
   }
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.minFilter = THREE.LinearMipmapLinearFilter;
@@ -150,7 +158,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x0b1018, 0.012);
+  scene.fog = new THREE.FogExp2(0x06101f, 0.012);
   const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 400);
   camera.position.set(8, 5, 10);
   const orbit = new OrbitControls(camera, canvas);
@@ -180,6 +188,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   let pickables = [];
   const racks = [], coolingUnits = [], dryCoolers = [], sensorMeshes = new Map(), flows = [];
   let particles = null, doorLeaves = [], roof = null, wallPos = null, wallNeg = null, decals = [];
+  let livery = null;   // Rev 2 livery facts of the current build (lineup, bandText, bodyColor), exposed for tests
   const mode = { walk: false, tour: false, cutaway: false, doors: false, camera: 'exterior_iso' };
   const reduce = reducedMotion();
   let highlightSel = null;
@@ -295,6 +304,9 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     for (const g of Object.values(groups)) clearGroup(g);
     for (const k of Object.keys(objects)) delete objects[k];
     racks.length = 0; coolingUnits.length = 0; dryCoolers.length = 0; sensorMeshes.clear(); flows.length = 0; doorLeaves = []; decals = []; particles = null; pickables = [];
+    resetLivery();
+    G.rev2 = (cfg.lineup || 'rev1') !== 'rev1';
+    livery = G.rev2 ? { ...liveryInfo(cfg, d), bandTexture: false } : { lineup: cfg.lineup || 'rev1', bandText: '', bodyColor: null, bandTexture: false };
     clearGroup(interiorLights);
 
     if (G.mini) {   // BEN 1: office corner, desk or 12U cabinet, mini-rack contents, Pods; no container, no plant
@@ -327,7 +339,9 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   function buildShell(cfg, d) {
     const { extL, extW, extH, micro, hall } = G;
     const g = groups.shell;
-    const color = micro ? 0x9aa5b8 : (cfg.white_label ? 0x6b7a90 : (hall ? 0x34496b : 0x2a3c5c));
+    // Rev 2: Shop White body (decision default, REV2_DECISION §4.3) with the Night Navy band; Rev 1: the Rev 1 paint
+    const color = G.rev2 ? BODY.shop : (micro ? REV1.cab : (cfg.white_label ? REV1.wl : (hall ? REV1.hall : REV1.body)));
+    if (G.rev2) livery.bodyColor = LV.shop;
     // pad (hall: slab-on-grade for the hall, the power module and the plant yard)
     const pad = hall ? box(extL + 18, 0.12, extW + 20, MAT.pad, -5, 0.06 - 0.12, 4) : box(extL + 1.2, 0.12, extW + 1.2, MAT.pad, 0, 0.06 - 0.12, 0);
     pad.receiveShadow = true; g.add(pad);
@@ -377,10 +391,21 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       for (const x of [-1, 1]) for (const y of [0, 1]) for (const z of [-1, 1]) g.add(box(0.18, 0.12, 0.16, MAT.casting, x * (extL / 2 - 0.09), y ? extH - 0.06 : 0.06, z * (extW / 2 - 0.08)));
       for (const z of [-1, 1]) { g.add(box(extL, 0.16, 0.08, MAT.casting, 0, 0.08, z * (extW / 2 + 0.03))); g.add(box(extL, 0.08, 0.08, MAT.casting, 0, extH - 0.04, z * (extW / 2 + 0.03))); }
     }
-    // brand decals on both long sides
-    const tex = brandTexture(cfg.white_label ? cfg.brand : 'Schreiber AI', d.tier_label, cfg.white_label);
+    // brand on both long sides. Rev 2: livery canvas over the whole side (lockup, tier, product line, data plate band);
+    // H3 armour panels sit 0.12 m proud of the wall, so the livery moves onto them. Rev 1: the Rev 1 monogram decal.
+    const off = (G.hardening === 'H3' && !micro) ? 0.185 : 0.035;
+    if (G.rev2) {
+      const tex = sideTexture(livery, extL, extH, hall ? 'hall' : (micro ? 'cabinet' : 'module'));
+      for (const side of [1, -1]) {
+        const dm = new THREE.Mesh(new THREE.PlaneGeometry(extL, extH), new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, metalness: 0.1, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+        dm.position.set(0, extH / 2, side * (extW / 2 + off)); dm.rotation.y = side > 0 ? 0 : Math.PI; dm.userData = { type: 'container', id: 'container', livery: 'side' };
+        g.add(dm); decals.push(dm);
+      }
+      livery.bandTexture = true;
+    }
+    const tex = G.rev2 ? null : brandTexture(cfg.white_label ? cfg.brand : 'Schreiber AI', d.tier_label, cfg.white_label);
     const decW = Math.min(extL * 0.62, 7.5), decH = decW * 640 / 2048;
-    if (decH < extH * 0.9) {
+    if (!G.rev2 && decH < extH * 0.9) {
       for (const side of [1, -1]) {
         const dm = new THREE.Mesh(new THREE.PlaneGeometry(decW, decH), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false }));
         dm.position.set(micro ? 0 : -extL * 0.08, extH * 0.5 + (micro ? 0.2 : 0.1), side * (extW / 2 + 0.035)); dm.rotation.y = side > 0 ? 0 : Math.PI;
@@ -414,9 +439,9 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       const pe = box(0.12, extH * 0.92, extW + 0.2, armour, extL / 2 + 0.12, extH * 0.5, 0); pe.userData = { type: 'armour', id: 'armour' }; g.add(pe); pickables.push(pe);
       // secure vestibule / mantrap at the door end
       const vW = Math.min(3.0, extW * 0.7), vH = Math.min(extH, 3.0), vL = 2.4;
-      const vest = box(vL, vH, vW, MAT.shell(0x2a3c5c), -extL / 2 - vL / 2 - 0.1, vH / 2, 0); vest.userData = { type: 'vestibule', id: 'vestibule' }; edges(vest, 0, 0.35); g.add(vest); pickables.push(vest); objects.vestibule = vest;
+      const vest = box(vL, vH, vW, MAT.shell(G.rev2 ? BODY.shop : REV1.body), -extL / 2 - vL / 2 - 0.1, vH / 2, 0); vest.userData = { type: 'vestibule', id: 'vestibule' }; edges(vest, 0, 0.35); g.add(vest); pickables.push(vest); objects.vestibule = vest;
       vest.add(box(0.08, vH * 0.7, 1.0, MAT.casting, -vL / 2 - 0.02, -vH * 0.1, 0));
-      vest.add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.1, 0.1), MAT.led(C.amber)).translateX(-vL / 2 - 0.06).translateY(vH * 0.25).translateZ(0.7));
+      vest.add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.1, 0.1), MAT.led(C.hold)).translateX(-vL / 2 - 0.06).translateY(vH * 0.25).translateZ(0.7));
       G.vestibuleL = vL;
     }
   }
@@ -435,10 +460,10 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const aisleH = G.intH - 0.05;
     for (let r = 0; r < G.rows; r++) {
       const zc = G.rowZ[r] - (G.rackD / 2 + G.aisleW / 2), zh = G.rowZ[r] + G.rackD / 2 + G.aisleW / 2;
-      const cold = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 1.2, aisleH, G.aisleW - 0.02), new THREE.MeshBasicMaterial({ color: C.cyan, transparent: true, opacity: 0.07, depthWrite: false }));
-      cold.position.set(0, G.floorTop + aisleH / 2, zc); cold.userData = { type: 'aisle_cold', id: 'aisle_cold', index: r }; groups.cooling.add(cold); edges(cold, C.cyan, 0.2);
-      const hot = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 1.2, aisleH, G.aisleW - 0.02), new THREE.MeshBasicMaterial({ color: C.amber, transparent: true, opacity: 0.07, depthWrite: false }));
-      hot.position.set(0, G.floorTop + aisleH / 2, zh); hot.userData = { type: 'aisle_hot', id: 'aisle_hot', index: r }; edges(hot, C.amber, 0.2); groups.cooling.add(hot);
+      const cold = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 1.2, aisleH, G.aisleW - 0.02), new THREE.MeshBasicMaterial({ color: T.cool, transparent: true, opacity: 0.07, depthWrite: false }));
+      cold.position.set(0, G.floorTop + aisleH / 2, zc); cold.userData = { type: 'aisle_cold', id: 'aisle_cold', index: r }; groups.cooling.add(cold); edges(cold, T.cool, 0.2);
+      const hot = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 1.2, aisleH, G.aisleW - 0.02), new THREE.MeshBasicMaterial({ color: T.warm, transparent: true, opacity: 0.07, depthWrite: false }));
+      hot.position.set(0, G.floorTop + aisleH / 2, zh); hot.userData = { type: 'aisle_hot', id: 'aisle_hot', index: r }; edges(hot, T.warm, 0.2); groups.cooling.add(hot);
       if (r === 0) { objects.aisle_cold = cold; objects.aisle_hot = hot; }
       for (const x of [-1, 1]) {
         const door = new THREE.Mesh(new THREE.PlaneGeometry(G.aisleW - 0.04, aisleH), MAT.glass); door.rotation.y = Math.PI / 2; door.position.set(x * (G.intL / 2 - 0.65), G.floorTop + aisleH / 2, zh); groups.cooling.add(door);
@@ -458,7 +483,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     for (let i = 0; i < n; i++) {
       const unit = new THREE.Group(); unit.position.set(-G.intL / 2 + 1.0 + step * (i + 0.5), G.floorTop, zCdu);
       const body = box(cduW, cduH, cduD, MAT.cooling, 0, cduH / 2, 0); body.userData = { type: 'cdu', id: 'cdu', index: i, unit: i }; unit.add(body); pickables.push(body); edges(body, 0, 0.3);
-      const disp = new THREE.Mesh(new THREE.PlaneGeometry(cduW - 0.2, 0.25), MAT.led(0x66e3ff)); disp.position.set(0, cduH * 0.6, cduD / 2 + 0.003); unit.add(disp);
+      const disp = new THREE.Mesh(new THREE.PlaneGeometry(cduW - 0.2, 0.25), MAT.led(0x4c9dff)); disp.position.set(0, cduH * 0.6, cduD / 2 + 0.003); unit.add(disp);
       const strip = new THREE.Mesh(new THREE.BoxGeometry(cduW - 0.2, 0.04, 0.02), MAT.led(C.green)); strip.position.set(0, cduH - 0.1, cduD / 2 + 0.012); unit.add(strip);
       unit.userData = { strip, body }; g.add(unit); coolingUnits.push(unit); objects[`cooling${i + 1}`] = body; if (i === 0) objects.cdu = body;
     }
@@ -507,13 +532,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   function buildHallPower(cfg, d) {
     const g = groups.power;
     const pmL = 3.66, pmW = 12.2, pmH = G.extH, pmX = -G.extL / 2 - 2.6 - pmL / 2 - (G.vestibuleL || 0);
-    const shellMat = MAT.shell(cfg.white_label ? 0x6b7a90 : 0x2f4262);
+    const pmColor = G.rev2 ? BODY.shop : REV1.pm;
+    const shellMat = MAT.shell(G.rev2 ? BODY.shop : (cfg.white_label ? REV1.wl : REV1.pm));
     const pm = new THREE.Group(); pm.position.set(pmX, 0, 0);
     const pmFloor = box(pmL, G.floorTop, pmW, shellMat, 0, G.floorTop / 2, 0); pm.add(pmFloor);
     const pmRoof = box(pmL, 0.2, pmW, shellMat, 0, pmH - 0.1, 0); pmRoof.userData = { type: 'powermodule', id: 'powermodule' }; pm.add(pmRoof); pickables.push(pmRoof); objects.powermodule = pmRoof;
-    const pmWallPos = corrugatedWall(pmL, pmH, 0x2f4262); pmWallPos.position.set(0, pmH / 2, pmW / 2); pm.add(pmWallPos);
-    const pmWallNeg = corrugatedWall(pmL, pmH, 0x2f4262); pmWallNeg.rotation.y = Math.PI; pmWallNeg.position.set(0, pmH / 2, -pmW / 2); pm.add(pmWallNeg);
-    const pmEnd = corrugatedWall(pmW, pmH, 0x2f4262); pmEnd.rotation.y = -Math.PI / 2; pmEnd.position.set(-pmL / 2, pmH / 2, 0); pm.add(pmEnd);
+    const pmWallPos = corrugatedWall(pmL, pmH, pmColor); pmWallPos.position.set(0, pmH / 2, pmW / 2); pm.add(pmWallPos);
+    const pmWallNeg = corrugatedWall(pmL, pmH, pmColor); pmWallNeg.rotation.y = Math.PI; pmWallNeg.position.set(0, pmH / 2, -pmW / 2); pm.add(pmWallNeg);
+    const pmEnd = corrugatedWall(pmW, pmH, pmColor); pmEnd.rotation.y = -Math.PI / 2; pmEnd.position.set(-pmL / 2, pmH / 2, 0); pm.add(pmEnd);
     for (const w of [pmWallPos, pmWallNeg, pmEnd]) { w.userData = { type: 'powermodule', id: 'powermodule' }; pickables.push(w); }
     G.pmRoof = pmRoof; G.pmWalls = [pmWallPos, pmWallNeg, pmEnd];
     // interior: switchgear lineup, UPS strings, battery room behind a partition
@@ -526,7 +552,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     for (let m = 0; m < nStr; m++) for (let f = 0; f < framesPer; f++) {
       const z = pmW / 2 - 6.2 - (m * framesPer + f) * 0.9;
       const ups = box(1.0, cabH, 0.8, MAT.power, pmL / 2 - 0.7, G.floorTop + cabH / 2, z); ups.userData = { type: 'ups', id: 'ups', index: m }; edges(ups, 0, 0.35); pm.add(ups); pickables.push(ups);
-      ups.add(new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.16), MAT.led(0x66e3ff)).translateY(0.6).translateX(-0.502).rotateY(-Math.PI / 2));
+      ups.add(new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.16), MAT.led(0x4c9dff)).translateY(0.6).translateX(-0.502).rotateY(-Math.PI / 2));
       if (m === 0 && f === 0) objects.ups = ups;
     }
     const partZ = pmW / 2 - 6.2 - nStr * framesPer * 0.9 - 0.5;
@@ -603,12 +629,12 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       const pl = new THREE.PointLight(0xdfe9ff, G.micro ? 2 : 10, G.micro ? 2.5 : 7, 1.6); pl.position.set(-G.intL / 2 + (i + 0.5) * G.intL / nL, G.ceiling - 0.1, 0); interiorLights.add(pl);
       const fixture = box(0.6, 0.03, 0.12, MAT.led(0xeef6ff), pl.position.x, G.ceiling - 0.02, G.zOff - G.rackD / 2 - G.coldW / 2); g.add(fixture);
     }
-    // aisle volumes (cold cyan / hot amber) with containment doors at the hot aisle ends
+    // aisle volumes (thermal ramp: cold #5CD6FF / hot #FF8A3D) with containment doors at the hot aisle ends
     const aisleH = G.intH - 0.05;
-    const cold = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, G.coldW - 0.02), new THREE.MeshBasicMaterial({ color: C.cyan, transparent: true, opacity: 0.08, depthWrite: false }));
-    cold.position.set(0, G.floorTop + aisleH / 2, G.zOff - (G.rackD / 2 + G.coldW / 2)); cold.userData = { type: 'aisle_cold', id: 'aisle_cold' }; groups.cooling.add(cold); edges(cold, C.cyan, 0.25);
-    const hot = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, G.hotW - 0.02), new THREE.MeshBasicMaterial({ color: C.amber, transparent: true, opacity: 0.08, depthWrite: false }));
-    hot.position.set(0, G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + G.hotW / 2); hot.userData = { type: 'aisle_hot', id: 'aisle_hot' }; edges(hot, C.amber, 0.25); groups.cooling.add(hot);
+    const cold = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, G.coldW - 0.02), new THREE.MeshBasicMaterial({ color: T.cool, transparent: true, opacity: 0.08, depthWrite: false }));
+    cold.position.set(0, G.floorTop + aisleH / 2, G.zOff - (G.rackD / 2 + G.coldW / 2)); cold.userData = { type: 'aisle_cold', id: 'aisle_cold' }; groups.cooling.add(cold); edges(cold, T.cool, 0.25);
+    const hot = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, G.hotW - 0.02), new THREE.MeshBasicMaterial({ color: T.warm, transparent: true, opacity: 0.08, depthWrite: false }));
+    hot.position.set(0, G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + G.hotW / 2); hot.userData = { type: 'aisle_hot', id: 'aisle_hot' }; edges(hot, T.warm, 0.25); groups.cooling.add(hot);
     objects.aisle_cold = cold; objects.aisle_hot = hot;
     if (!G.micro) {
       for (const x of [-1, 1]) {
@@ -625,7 +651,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     for (let i = 0; i < cfg.racks; i++) {
       const rack = new THREE.Group(); rack.position.set(G.rackX[i], G.floorTop, G.rackZ ? G.rackZ[i] : G.zOff);
       const body = box(G.rackW, G.rackH, G.rackD, MAT.rack, 0, G.rackH / 2, 0); body.userData = { type: 'rack', index: i, id: `rack${i + 1}` }; rack.add(body); pickables.push(body);
-      edges(body, 0x66e3ff, 0.12);
+      edges(body, 0x4c9dff, 0.12);
       const frontMat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.4, roughness: 0.7, metalness: 0.2 });
       const front = new THREE.Mesh(new THREE.PlaneGeometry(G.rackW - 0.06, G.rackH - 0.1), frontMat); front.position.set(0, G.rackH / 2, -G.rackD / 2 - 0.002); front.rotation.y = Math.PI; front.userData = body.userData; rack.add(front); pickables.push(front);
       const rear = new THREE.Mesh(new THREE.PlaneGeometry(G.rackW - 0.06, G.rackH - 0.1), G.water ? MAT.pipeCold : MAT.rackRear); rear.position.set(0, G.rackH / 2, G.rackD / 2 + 0.002); rear.userData = body.userData; rack.add(rear);
@@ -674,7 +700,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
         const w = G.unitW || 0.6;
         const x = G.unitX[k] !== undefined ? G.unitX[k] : (k === 0 ? G.intL / 2 - 0.4 : -G.intL / 2 + G.bayL + 0.4);
         const cdu = box(w, G.rackH, G.rackD, MAT.cooling, x, G.floorTop + G.rackH / 2, G.zOff); cdu.userData = { type: 'cdu', id: G.hd ? `cdu${k + 1}` : 'cdu', index: k }; edges(cdu, 0, 0.3); g.add(cdu); pickables.push(cdu);
-        const disp = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.1, 0.25), MAT.led(0x66e3ff)); disp.position.set(0, G.rackH * 0.3, -G.rackD / 2 - 0.003); disp.rotation.y = Math.PI; cdu.add(disp);
+        const disp = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.1, 0.25), MAT.led(0x4c9dff)); disp.position.set(0, G.rackH * 0.3, -G.rackD / 2 - 0.003); disp.rotation.y = Math.PI; cdu.add(disp);
         if (G.hd) { // row CDU: pump pair indicator strip + W45 supply/return stubs on the top
           const strip = new THREE.Mesh(new THREE.BoxGeometry(w - 0.1, 0.04, 0.02), MAT.led(C.green)); strip.position.set(0, G.rackH / 2 - 0.1, -G.rackD / 2 - 0.012); cdu.add(strip); cdu.userData.strip = strip;
           cdu.add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 10), MAT.pipeCold).translateY(G.rackH / 2 + 0.15).translateX(-0.12));
@@ -684,10 +710,11 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
         if (k === 0) objects.cdu = cdu;
       }
       // manifolds along the hot aisle ceiling with drops to each rack (dlc_hd: a pickable manifold + UQD drop pair on every rack)
-      const y = G.ceiling - 0.45, z0 = G.zOff + G.rackD / 2 + 0.12;
+      // dense tiers: both headers stay inside the 200 mm rear plenum (they used to poke through the rack-side wall)
+      const y = G.ceiling - 0.45, z0 = G.zOff + G.rackD / 2 + (G.dense ? 0.06 : 0.12), zs = G.dense ? 0.5 : 1;
       for (const [mat, dz] of [[MAT.pipeCold, 0], [MAT.pipeHot, 0.16]]) {
-        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.055 : 0.04, G.hd ? 0.055 : 0.04, G.intL - 0.2, 12), mat); pipe.rotation.z = Math.PI / 2; pipe.position.set(0, y - dz, z0 + dz); g.add(pipe);
-        for (const x of G.rackX) { const len = y - dz - (G.floorTop + G.rackH * 0.85); const drop = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.025 : 0.018, G.hd ? 0.025 : 0.018, len, 8), mat); drop.position.set(x + (dz ? 0.08 : -0.08), y - dz - len / 2, z0 + dz); g.add(drop); }
+        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.055 : 0.04, G.hd ? 0.055 : 0.04, G.intL - 0.2, 12), mat); pipe.rotation.z = Math.PI / 2; pipe.position.set(0, y - dz, z0 + dz * zs); g.add(pipe);
+        for (const x of G.rackX) { const len = y - dz - (G.floorTop + G.rackH * 0.85); const drop = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.025 : 0.018, G.hd ? 0.025 : 0.018, len, 8), mat); drop.position.set(x + (dz ? 0.08 : -0.08), y - dz - len / 2, z0 + dz * zs); g.add(drop); }
       }
       if (G.hd) {
         G.rackX.forEach((x, i) => {
@@ -757,7 +784,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       const idx = type === 'battery' ? nB++ : type === 'ups' ? nU++ : nS++;
       const cab = box(it.w - 0.02, hgt, dd, type === 'battery' ? MAT.battery : MAT.power, it.x, G.floorTop + hgt / 2, zw - dd / 2);
       cab.userData = { type, id: type === 'switchgear' ? 'switchgear' : (type === 'rectifier' ? 'rectifier' : type), index: idx }; edges(cab, 0, 0.35); g.add(cab); pickables.push(cab);
-      cab.add(new THREE.Mesh(new THREE.PlaneGeometry(Math.min(0.5, it.w * 0.6), 0.14), MAT.led(type === 'battery' ? C.green : 0x66e3ff)).translateY(hgt / 2 - 0.25).translateZ(-dd / 2 - 0.003).rotateY(Math.PI));
+      cab.add(new THREE.Mesh(new THREE.PlaneGeometry(Math.min(0.5, it.w * 0.6), 0.14), MAT.led(type === 'battery' ? C.green : 0x4c9dff)).translateY(hgt / 2 - 0.25).translateZ(-dd / 2 - 0.003).rotateY(Math.PI));
       if (type === 'switchgear') for (let k = 0; k < 4; k++) cab.add(box(it.w * 0.7, 0.3, 0.02, MAT.powerDark, 0, -0.7 + k * 0.42, -dd / 2 - 0.01));
       if (!objects[type]) objects[type] = cab;
     }
@@ -800,7 +827,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       let z = -rowW / 2 + cabW / 2;
       for (let m = 0; m < d.ups_modules; m++) {
         const ups = box(cabD, cabH, cabW, MAT.power, x0 + 0.05 + cabD / 2, G.floorTop + cabH / 2, z); ups.userData = { type: 'ups', id: 'ups' }; edges(ups, 0, 0.35); g.add(ups); pickables.push(ups);
-        ups.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.65, 0.16), MAT.led(0x66e3ff)).translateY(0.55).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
+        ups.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.65, 0.16), MAT.led(0x4c9dff)).translateY(0.55).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
         for (let k = 0; k < 3; k++) ups.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.25, cabW * 0.8), MAT.powerDark).translateY(-0.55 + k * 0.3).translateX(cabD / 2 + 0.004));
         if (m === 0) objects.ups = ups;
         z += cabW + 0.05;
@@ -810,7 +837,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
         const rect = box(cabD, cabH, cabW, MAT.power, x0 + 0.05 + cabD / 2, G.floorTop + cabH / 2, z); rect.userData = { type: 'rectifier', id: 'rectifier', index: r }; edges(rect, 0, 0.35); g.add(rect); pickables.push(rect);
         for (let k = 0; k < 4; k++) rect.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.3, cabW * 0.8), MAT.powerDark).translateY(-0.6 + k * 0.38).translateX(cabD / 2 + 0.004));
         for (let k = 0; k < 4; k++) rect.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.03, 0.03), MAT.led(C.green)).translateY(-0.72 + k * 0.38).translateX(cabD / 2 + 0.008).translateZ(cabW * 0.3));
-        rect.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.5, 0.12), MAT.led(0x66e3ff)).translateY(cabH / 2 - 0.2).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
+        rect.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.5, 0.12), MAT.led(0x4c9dff)).translateY(cabH / 2 - 0.2).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
         if (r === 0) { objects.rectifier = rect; objects.ups = objects.ups || rect; }
         z += cabW + 0.05;
       }
@@ -828,8 +855,8 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       if (G.dc800) {
         // 800 VDC busway (±400 V) over the rack row with a DC tap-off box per rack, replacing the AC feeders in the power tray
         const bwY = G.ceiling - 0.42, bwZ = G.zOff - G.rackD / 2 - 0.1, bwLen = G.intL - G.bayL - 0.3;
-        const bw = box(bwLen, 0.16, 0.14, MAT.powerDark, x0 + G.bayL + bwLen / 2, bwY, bwZ); bw.userData = { type: 'dc_busway', id: 'dc_busway' }; edges(bw, C.amber, 0.5); g.add(bw); pickables.push(bw); objects.dc_busway = bw;
-        bw.add(new THREE.Mesh(new THREE.BoxGeometry(bwLen - 0.05, 0.02, 0.02), MAT.led(C.amber)).translateY(-0.09));
+        const bw = box(bwLen, 0.16, 0.14, MAT.powerDark, x0 + G.bayL + bwLen / 2, bwY, bwZ); bw.userData = { type: 'dc_busway', id: 'dc_busway' }; edges(bw, C.info, 0.5); g.add(bw); pickables.push(bw); objects.dc_busway = bw;
+        bw.add(new THREE.Mesh(new THREE.BoxGeometry(bwLen - 0.05, 0.02, 0.02), MAT.led(C.info)).translateY(-0.09));
         for (let i = 0; i < G.rackX.length; i++) {
           const tap = box(0.25, 0.22, 0.2, MAT.powerDark, G.rackX[i], bwY - 0.19, bwZ); tap.userData = { type: 'dc_busway', id: 'dc_busway', index: i }; edges(tap, 0, 0.35); g.add(tap); pickables.push(tap);
           tap.add(new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.01), MAT.led(C.green)).translateZ(-0.105).translateY(0.05));
@@ -890,14 +917,33 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const W = G.extL, D = G.extW, H = G.extH, baseY = rack10 ? deskTop : 0.0;
     const rx = rack10 ? -0.25 : -0.35, rz = rack10 ? -0.65 : -0.45;
     const rack = new THREE.Group(); rack.position.set(rx, baseY, rz);
-    const bodyMat = rack10 ? new THREE.MeshStandardMaterial({ color: 0xc8ccd2, roughness: 0.35, metalness: 0.8 }) : MAT.rack;
-    const body = box(W, H, D, bodyMat, 0, H / 2, 0); body.userData = { type: 'rack', index: 0, id: 'rack1' }; rack.add(body); pickables.push(body); edges(body, 0x66e3ff, rack10 ? 0.3 : 0.15);
-    if (rack10) { body.material = bodyMat.clone(); body.material.transparent = true; body.material.opacity = 0.18; }   // open frame: see the shelves
+    // Rev 2 livery: Night Navy powder-coat body (indoor default), lockup and S2 data plate band (brand/v2/livery/previews/ben1-*.png)
+    const bodyMat = new THREE.MeshStandardMaterial({ color: BODY.night, roughness: 0.55, metalness: 0.35 });
+    livery.bodyColor = LV.night;
+    const body = box(W, H, D, bodyMat, 0, H / 2, 0); body.userData = { type: 'rack', index: 0, id: 'rack1' }; rack.add(body); pickables.push(body); edges(body, 0x4c9dff, rack10 ? 0.3 : 0.15);
+    if (rack10) { body.material = bodyMat.clone(); body.material.transparent = true; body.material.opacity = 0.22; }   // open front: see the shelves
     const tex = serverFrontTexture(G.rackU);
     const frontMat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.4, roughness: 0.7, metalness: 0.2, transparent: rack10, opacity: rack10 ? 0.0 : 1 });
     const front = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.06, H - 0.1), frontMat); front.position.set(0, H / 2, D / 2 + 0.003); front.userData = body.userData; rack.add(front);
     if (!rack10) { const door = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.04, H - 0.06), MAT.glass); door.position.set(0, H / 2, D / 2 + 0.008); rack.add(door); }
     const led = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.01), MAT.led(C.green)); led.position.set(W / 2 - 0.08, H - 0.04, D / 2 + 0.01); rack.add(led);
+    // side panels carry the stacked lockup, BEN 1, the product line and the band; rack10 adds a lockup bezel across the top
+    // of the open front, cab12 the band across the foot of the glass door
+    const sideTex = miniPanelTexture(livery, D, H);
+    for (const sd of [1, -1]) {
+      const pm = new THREE.Mesh(new THREE.PlaneGeometry(D - 0.004, H - 0.004), new THREE.MeshStandardMaterial({ map: sideTex, roughness: 0.55, metalness: 0.2 }));
+      pm.position.set(sd * (W / 2 + 0.002), H / 2, 0); pm.rotation.y = sd * Math.PI / 2; pm.userData = body.userData; rack.add(pm);
+    }
+    if (rack10) {
+      const bzH = 2 * 0.04445;
+      const bz = new THREE.Mesh(new THREE.BoxGeometry(W, bzH, 0.012), [MAT.rack, MAT.rack, MAT.rack, MAT.rack, new THREE.MeshStandardMaterial({ map: bezelTexture(livery, W, bzH), roughness: 0.5 }), MAT.rack]);
+      bz.position.set(0, H - bzH / 2 - 0.004, D / 2 + 0.006); bz.userData = body.userData; rack.add(bz);
+    } else {
+      const bh = 0.07;
+      const bp = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.06, bh), new THREE.MeshStandardMaterial({ map: bandPlateTexture(livery, W - 0.06, bh), roughness: 0.5 }));
+      bp.position.set(0, 0.05 + bh / 2, D / 2 + 0.012); bp.userData = body.userData; rack.add(bp);
+    }
+    livery.bandTexture = true;
     rack.userData = { front, frontMat, led, body };
     gc.add(rack); racks.push(rack); objects.rack1 = body;
     G.rackX = [rx]; G.rackZ = [rz]; G.rowZ = [rz];
@@ -934,7 +980,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     }
     // two Pod W: inlet (front rail) and exhaust (rear rail)
     for (const [k, z, label] of [[1, D / 2 - 0.02, 'inlet'], [2, -D / 2 + 0.02, 'exhaust']]) {
-      const pod = box(0.06, 0.09, 0.03, MAT.gateway, rx - W / 2 + 0.05, baseY + H * (k === 1 ? 0.5 : 0.7), rz + z); pod.userData = { type: 'pod', id: `pod${k}`, label }; edges(pod, 0x66e3ff, 0.5); gt.add(pod); pickables.push(pod); objects[`pod${k}`] = pod;
+      const pod = box(0.06, 0.09, 0.03, MAT.gateway, rx - W / 2 + 0.05, baseY + H * (k === 1 ? 0.5 : 0.7), rz + z); pod.userData = { type: 'pod', id: `pod${k}`, label }; edges(pod, 0x4c9dff, 0.5); gt.add(pod); pickables.push(pod); objects[`pod${k}`] = pod;
     }
     objects.controller = objects.edge; objects.gateway = objects.edge;
     // sensors: inlet probes on the front, outlet on the rear, room channels near the inlet Pod
@@ -960,10 +1006,10 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const g = groups.controls;
     // gateway / network cabinet on the cold-aisle wall at the door end
     const gw = box(0.45, 0.55, 0.18, MAT.gateway, -G.intL / 2 + (G.micro ? 0.2 : 0.5), G.floorTop + (G.micro ? 1.2 : 1.7), -(G.intW / 2 - 0.09));
-    gw.userData = { type: 'controller', id: 'controller' }; edges(gw, 0x66e3ff, 0.35); g.add(gw); pickables.push(gw); objects.controller = gw; objects.gateway = gw;
+    gw.userData = { type: 'controller', id: 'controller' }; edges(gw, 0x4c9dff, 0.35); g.add(gw); pickables.push(gw); objects.controller = gw; objects.gateway = gw;
     for (let k = 0; k < 4; k++) gw.add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.01), MAT.led(k % 2 ? C.cyan : C.green)).translateX(-0.15 + k * 0.08).translateY(0.2).translateZ(0.115));
     // leak-detection rope along the floor under the rack row (BEN Pod leak input)
-    const ropeMat = new THREE.MeshStandardMaterial({ color: 0xffc66d, roughness: 0.8 });
+    const ropeMat = new THREE.MeshStandardMaterial({ color: 0xf2c94c, roughness: 0.8 });
     for (let r = 0; r < (G.rowZ || [G.zOff]).length; r++) {
       const rope = new THREE.Mesh(new THREE.BoxGeometry(G.intL - (G.hall ? 1.4 : 0.3), 0.015, 0.04), ropeMat);
       rope.position.set(0, G.floorTop + 0.01, (G.rowZ ? G.rowZ[r] : G.zOff) + G.rackD / 2 + 0.06); rope.userData = { type: 'leak_rope', id: 'leak_rope', index: r }; g.add(rope); pickables.push(rope); if (r === 0) objects.leak_rope = rope;
@@ -1059,7 +1105,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       u.userData.strip.material = MAT.led(!cu.ok ? C.red : (cu.on ? C.green : C.muted));
       u.userData.fanPct = cu.ok && cu.on ? cu.fan_pct : 0;
     });
-    if (G.hd && st.loop) for (let k = 0; objects[`cdu${k + 1}`]; k++) { const c = objects[`cdu${k + 1}`]; const pump = (st.loop.pumps || [])[k]; if (c.userData.strip) c.userData.strip.material = MAT.led(pump && !pump.ok ? C.red : (st.loop.flow_low ? C.amber : C.green)); }
+    if (G.hd && st.loop) for (let k = 0; objects[`cdu${k + 1}`]; k++) { const c = objects[`cdu${k + 1}`]; const pump = (st.loop.pumps || [])[k]; if (c.userData.strip) c.userData.strip.material = MAT.led(pump && !pump.ok ? C.red : (st.loop.flow_low ? C.hold : C.green)); }
     if (G.hall) dryCoolers.forEach((u) => { const cu = st.cooling_units[u.userData.unit]; if (!cu) return; u.userData.strip.material = MAT.led(!cu.ok ? C.red : (cu.on ? C.green : C.muted)); u.userData.fanPct = cu.ok && cu.on ? cu.fan_pct : 0; });
     for (const [id, m] of sensorMeshes) {
       const s = m.userData.spec; let v = null;
@@ -1070,14 +1116,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       let color;
       if (s.kind === 'temperature') color = tempColor(v);
       else if (s.kind === 'leak') color = st.leak ? C.red : C.green;
-      else if (s.kind === 'contact') color = st.door_open ? C.amber : C.green;
+      else if (s.kind === 'contact') color = st.door_open ? C.hold : C.green;
       else if (s.kind === 'power') color = p.utility_ok ? C.green : C.red;
-      else color = C.cyan;
+      else color = C.info;
       m.material.color.setHex(color); m.material.emissive.setHex(color);
     }
     // power flows
     const lost = !p.utility_ok, battery = p.ups_on_battery, low = p.ups_soc_pct < 30;
-    const flowColor = lost && low ? C.red : (battery ? C.amber : C.green);
+    const flowColor = lost && low ? C.red : (battery ? C.hold : C.green);
     for (const f of flows) {
       f.setColor(f.role === 'generator' ? (p.generator_on ? C.green : C.muted) : flowColor);
       const kw = f.role === 'rack' ? (p.pdu_kw[f.index] || 0) * payload.config.racks : (f.role === 'utility' || f.role === 'generator' ? p.utility_kw : p.ups_kw);
@@ -1121,8 +1167,8 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     }
     for (const [k, h] of highlights) if (!want.has(k)) { groups.hl.remove(h); highlights.delete(k); }
     for (const [k, w] of want) {
-      if (highlights.has(k)) { highlights.get(k).material.color.setHex(w.sev >= 2 ? C.red : C.amber); continue; }
-      const o = makeOutline(w.obj, w.sev >= 2 ? C.red : C.amber); if (o) { groups.hl.add(o); highlights.set(k, o); }
+      if (highlights.has(k)) { highlights.get(k).material.color.setHex(w.sev >= 2 ? C.red : C.hold); continue; }
+      const o = makeOutline(w.obj, w.sev >= 2 ? C.red : C.hold); if (o) { groups.hl.add(o); highlights.set(k, o); }
     }
   }
   function alarmTargetLocal(a) {
@@ -1459,6 +1505,8 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     setPixelRatio(r) { renderer.setPixelRatio(r); resize(); renderer.render(scene, camera); return renderer.getPixelRatio(); },
     rackCount: () => racks.length, coolingCount: () => coolingUnits.length, sensorCount: () => sensorMeshes.size, dryCoolerCount: () => dryCoolers.length,
     rowCount: () => (G.rowZ || []).length,
+    // Rev 2 livery of the current build: { lineup, bandText, bodyColor, bandTexture, productLine, whiteLabel, brand }
+    livery: () => livery && { lineup: livery.lineup, bandText: livery.bandText, bodyColor: livery.bodyColor, bandTexture: !!livery.bandTexture, productLine: livery.productLine || '', whiteLabel: !!livery.whiteLabel, brand: livery.brand || '' },
     // Rev 2: counts of the dense-row parts and the BEN 1 contents, for tests and the tour
     rev2Objects: () => { const n = (t) => pickables.filter(o => o.userData && o.userData.type === t).length; return { mini: !!G.mini, form: G.form, dense: !!G.dense, fancoils: n('fancoil'), cdus: n('cdu'), ups: n('ups'), batteries: n('battery'), switchgear: n('switchgear'), skid: !!objects.skid, aiBoxes: n('ai_box'), pods: n('pod'), desk: !!objects.desk, fans: n('cooling') }; }, hallObjects: () => ({ powermodule: !!objects.pm, transformers: pickables.filter(o => o.userData && o.userData.type === 'transformer').length, generators: pickables.filter(o => o.userData && o.userData.type === 'generator').length, fanwalls: pickables.filter(o => o.userData && o.userData.type === 'fanwall').length, plinth: !!objects.plinth, vestibule: !!objects.vestibule }),
     mode, camera, objects, G,

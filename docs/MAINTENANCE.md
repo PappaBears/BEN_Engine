@@ -213,9 +213,11 @@ BEN 1 is indoors and has no envelope, refrigerant, generator or fire system, so 
 
 Spare kit shipped with every BEN 1: two intake filters, one fan (cab12), a printed one-page "what the lights mean" card and the battery return label.
 
-## 11. Dense liquid-first tiers BEN 300 and BEN 1000 (added 2026-11-09, Rev 2)
+## 11. Dense liquid-first tiers BEN 300 and BEN 700 (added 2026-11-09, Rev 2)
 
-BEN 300 and BEN 1000 follow sections 1–9 (as BEN 150 and BEN 500) and the liquid-loop rows of section 4b, which **apply to every unit** because liquid is the default on these tiers (no longer "study"). The rows below are added or tightened for the higher loop flows (about 177 LPM per GB300-class rack at a 45 °C supply, `docs/research/STATE_OF_THE_ART_2026.md` §2.3) and the larger number of CDUs and pumps.
+*(amended 2026-11-09: the 40 ft dense tier was renamed BEN 1000 → BEN 700 after the layout check, `docs/REV2_DECISION.md` §2a)*
+
+BEN 300 and BEN 700 follow sections 1–9 (as BEN 150 and BEN 500) and the liquid-loop rows of section 4b, which **apply to every unit** because liquid is the default on these tiers (no longer "study"). The rows below are added or tightened for the higher loop flows (about 177 LPM per GB300-class rack at a 45 °C supply, `docs/research/STATE_OF_THE_ART_2026.md` §2.3) and the larger number of CDUs and pumps.
 
 | Interval | Subsystem | Task | Who | Record |
 | --- | --- | --- | --- | --- |
@@ -223,7 +225,7 @@ BEN 300 and BEN 1000 follow sections 1–9 (as BEN 150 and BEN 500) and the liqu
 | Monthly (L) | CDU pumps | **Pump rotation**: change the duty pump on each CDU so run hours stay within 10 %; **CDU failover proof** on one CDU by rotation (E18 reduced); listen and check for seal weep | L | M1 dense supplement |
 | Monthly (L) | Filters | Strainer and side-stream filter ΔP; change the side-stream filter element at 1.5 × clean ΔP or every 3 months, whichever is first | L | M1 dense supplement |
 | **Quarterly** | Coolant | **Coolant sampling**: pH, conductivity, inhibitor level, glycol % (PG25), biocide residual, bacteria count, iron and copper (corrosion indicators) per OCP water-based coolant v1.3 / PG25 limits; result trended against commissioning (R50) | L + water treatment S | Water log |
-| Quarterly | Leak isolation | E19 leak-to-isolation on one rack by rotation (every rack within a year on BEN 300; within 18 months on BEN 1000) | L | E19 record |
+| Quarterly | Leak isolation | E19 leak-to-isolation on one rack by rotation (every rack within a year on BEN 300; within 18 months on BEN 700) | L | E19 record |
 | Semi-annual | CDU | CDU strainer clean; pump coupling and bearing check; VFD fan and filter; dead-head protection test with one row closed | S | Report |
 | Annual | Loop and heat rejection | Plate HX ΔP and approach on every CDU and the heat-reuse HX; flush or chemical clean at ΔP > 1.3 × commissioning; dry-cooler or skid coil clean; BTU-meter calibration; UQD connector inspection and seal replacement per vendor cycles | S | Report |
 | Annual | Power (≥ 1,200 A frames) | Ground-fault protection performance test on the main (NEC 230.95(C)); arc-energy reduction switch function test; IR scan of the main and busway at ≥ 40 % load; labels checked against the arc-flash study | S (NETA) | Report |

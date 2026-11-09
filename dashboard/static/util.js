@@ -61,10 +61,11 @@ export const fmt = {
   ago(sec) { if (sec === null || sec === undefined) return '—'; if (sec < 60) return `${Math.round(sec)} s`; if (sec < 3600) return `${Math.floor(sec / 60)} min ${Math.round(sec % 60)} s`; return `${(sec / 3600).toFixed(1)} h`; },
 };
 
-/** Temperature colour ramp (°C) shared by sensors, particles and tiles. */
+/** Temperature colour ramp (°C) shared by sensors, particles and tiles: the brand v2 thermal ramp (tokens --thermal-0..4,
+ *  cool #5CD6FF → warm #FF8A3D). Not a brand or status colour, never amber; the scene legend labels it. */
 export function tempColor(c) {
-  const stops = [[16, 0x3a7bff], [20, 0x66e3ff], [24, 0x6ee7a8], [28, 0xffc66d], [33, 0xff8a5c], [40, 0xff707d]];
-  if (c === null || c === undefined || Number.isNaN(c)) return 0x9fb3cc;
+  const stops = [[18, 0x5cd6ff], [22, 0x7fe3d2], [27, 0xc9e89a], [32, 0xffb86b], [38, 0xff8a3d]];
+  if (c === null || c === undefined || Number.isNaN(c)) return 0x8ea7c8;
   if (c <= stops[0][0]) return stops[0][1];
   for (let i = 1; i < stops.length; i++) {
     if (c <= stops[i][0]) {

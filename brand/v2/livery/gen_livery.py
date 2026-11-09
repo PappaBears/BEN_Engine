@@ -44,6 +44,19 @@ FALLBACK = {
     "ben300": {"label": "BEN 300", "it_kw_max": 300, "voltage": "480 V 3ph", "ip": "IP66", "kind": "module", "ext_l_m": 6.058, "ext_w_m": 2.438, "ext_h_m": 2.896},
     "ben1000": {"label": "BEN 1000", "it_kw_max": 1000, "voltage": "480 V 3ph", "ip": "IP66", "kind": "module", "ext_l_m": 12.192, "ext_w_m": 2.438, "ext_h_m": 2.896},
 }
+# Tier product lines (the line under the tier designation; replaces the Rev 1 "Business Edge Node" strap).
+# Same strings as dashboard/static/tooltip.js PRODUCT_LINE and the web product page.
+PRODUCT_LINE = {
+    "ben1": "Mini rack", "ben5": "Outdoor cabinet", "ben30": "10 ft module", "ben150": "20 ft module",
+    "ben300": "Dense liquid · 20 ft", "ben500": "40 ft module", "ben700": "Dense liquid · 40 ft",
+    "ben1000": "Dense liquid · 40 ft", "ben2000": "Prefabricated hall",
+}
+
+
+def product_line(key: str) -> str:
+    return PRODUCT_LINE.get(key, "")
+
+
 # Which tiers get which drawings (module length class from the decision table).
 def _plan() -> list:
     """Every non-hall tier the configuration model carries, in IT-power order; decision-table fallbacks only for
@@ -182,7 +195,11 @@ def module_side(t: dict) -> str:
     a.append(product_block(post + inset, rail_t + 0.10 * H, M, "s_"))
     # tier designation, right, above the band
     cap = 0.62 * M
-    a.append(BL.svg(t["label"].upper(), BL.size_for_cap(cap), L - post - inset, by - 0.085 * H, C["ink"], tracking=0.01, anchor="end", label=t["label"]))
+    tier_base = by - 0.085 * H - 0.30 * M
+    a.append(BL.svg(t["label"].upper(), BL.size_for_cap(cap), L - post - inset, tier_base, C["ink"], tracking=0.01, anchor="end", label=t["label"]))
+    pl = product_line(t["key"])
+    if pl:   # tier product line, Plex Mono Medium caps +8 %, Slate, cap 0.16 x mark, right-aligned under the tier
+        a.append(MONO.svg(pl.upper(), MONO.size_for_cap(0.16 * M), L - post - inset, by - 0.045 * H, C["slate"], tracking=0.08, anchor="end", label=pl))
     a.append(f'<rect x="0" y="0" width="{L:.1f}" height="{H:.1f}" fill="none" stroke="{C["steel"]}" stroke-width="6"/>')
     return "".join(a), M, bh
 
@@ -217,6 +234,9 @@ def module_door(t: dict) -> str:
     base = sy + stack_h + 0.30 * M + 0.38 * M
     art.append(XB.svg("BEN ENGINE", size, W / 2, base, C["ink"], tracking=0.02, anchor="middle", label="BEN Engine"))
     art.append(BL.svg(t["label"].upper(), BL.size_for_cap(0.62 * M), W / 2, base + 0.30 * M + 0.62 * M + 0.15 * M, C["ink"], tracking=0.01, anchor="middle", label=t["label"]))
+    pl = product_line(t["key"])
+    if pl:
+        art.append(MONO.svg(pl.upper(), MONO.size_for_cap(0.16 * M), W / 2, base + 0.30 * M + 0.62 * M + 0.15 * M + 0.42 * M, C["slate"], tracking=0.08, anchor="middle", label=pl))
     a += art
     a.append(band(post, by, W - 2 * post, bh, fields, ground=C["night"], text=C["fog"], lead=C["signal"], rule=C["border"],
                   rivet_ring=C["steel"], rivet_fill=C["night"], qr_url=plate_url(t["serial"]), qr_code_w=100.0, rows=2))
@@ -264,6 +284,9 @@ def cabinet_view(t: dict, view: str) -> str:
     base = sy + stack_h + 0.68 * M
     a.append(XB.svg("BEN ENGINE", 0.5539 * M, W / 2, base, C["ink"], tracking=0.02, anchor="middle", label="BEN Engine"))
     a.append(BL.svg(t["label"].upper(), BL.size_for_cap(0.55 * M), W / 2, base + 0.30 * M + 0.55 * M, C["ink"], tracking=0.01, anchor="middle", label=t["label"]))
+    pl = product_line(t["key"])
+    if pl:
+        a.append(MONO.svg(pl.upper(), MONO.size_for_cap(0.15 * M), W / 2, base + 0.30 * M + 0.55 * M + 0.40 * M, C["slate"], tracking=0.08, anchor="middle", label=pl))
     bh = 140.0
     by = H - skid - 40 - bh
     fields = plate_fields(t["label"], t["serial"], kw(t["it_kw_max"]), t["voltage"], t["ip"])
@@ -303,7 +326,7 @@ def ben1_bezel(t: dict) -> str:
         yy += 5.2
         row += 1
     a.append(BL.svg(t["label"].upper(), BL.size_for_cap(22), W - ear - 12, H - 66, C["paper"], tracking=0.01, anchor="end", label=t["label"]))
-    a.append(MONO.svg("MINI RACK · 10-INCH 8U", 4.2, ear + 12, H - 66, C["steel"], tracking=0.08))
+    a.append(MONO.svg(f"{product_line('ben1').upper()} · 10-INCH 8U", 4.2, ear + 12, H - 66, C["steel"], tracking=0.08))
     bh = 40.0
     fields = plate_fields(t["label"], t["serial"], "0.6", t["voltage"], t["ip"])
     a.append(band(ear, H - 8 - bh, iw, bh, fields, ground=C["s2"], text=C["fog"], lead=C["signal"], rule=C["border"],
@@ -330,7 +353,7 @@ def ben1_door(t: dict) -> str:
     base = sy + stack_h + 0.68 * M
     a.append(XB.svg("BEN ENGINE", 0.5539 * M, dx + DW / 2, base, C["fog"], tracking=0.02, anchor="middle", label="BEN Engine"))
     a.append(BL.svg(t["label"].upper(), BL.size_for_cap(0.62 * M), dx + DW / 2, base + 0.30 * M + 0.62 * M, C["paper"], tracking=0.01, anchor="middle", label=t["label"]))
-    a.append(MONO.svg("MINI RACK · 19-INCH 12U · SOUND-DAMPED", 8.0, dx + DW / 2, base + 0.30 * M + 0.62 * M + 34, C["steel"], tracking=0.08, anchor="middle"))
+    a.append(MONO.svg(f"{product_line('ben1').upper()} · 19-INCH 12U · SOUND-DAMPED", 8.0, dx + DW / 2, base + 0.30 * M + 0.62 * M + 34, C["steel"], tracking=0.08, anchor="middle"))
     bh = 52.0
     by = dy + DH - 48 - bh
     fields = plate_fields(t["label"], t["serial"], kw(t["it_kw_max"]), t["voltage"], t["ip"])
@@ -404,7 +427,7 @@ def main(png: bool) -> None:
             art, M, bh = module_side(t)
             length_class = {2991: "10 ft", 6058: "20 ft", 12192: "40 ft"}.get(round(t["L"]), f"{t['L']:.0f} mm")
             notes = common + [f"{t['label']} · {length_class} high-cube module · side · body Shop White, data plate band Night Navy (decision default, REV2_DECISION §4.3)",
-                              f"Lockup: lockup-deep, mark height {M:.0f} mm · product line BEN ENGINE Archivo ExtraBold wdth 125 +2 %, cap {0.38 * M:.0f} mm (0.38 × mark) · tier Archivo Black wdth 125",
+                              f"Lockup: lockup-deep, mark height {M:.0f} mm · tier product line “{product_line(key)}” Plex Mono Medium caps, Slate · product line BEN ENGINE Archivo ExtraBold wdth 125 +2 %, cap {0.38 * M:.0f} mm (0.38 × mark) · tier Archivo Black wdth 125",
                               f"Band: {bh:.0f} mm, Plex Mono SemiBold caps +16 %, lead Signal Blue, fields Fog #B2C1D8, rivets Steel ring · QR EC M, square modules, 4-module quiet zone, code 100 mm (≥ 2.5 in) on Shop White plate → {plate_url(t['serial'])}",
                               pms, "Vinyl: expand strokes before cutting; cut around castings and posts. Serial shown is a sample; regenerate per unit."]
             written.append(write(f"{key}-side.svg", frame(t["L"], t["H"], art, notes, f"{t['label']} side livery", "Schreiber AI · BEN Engine Rev 2 livery"), manifest, {**meta, "view": "side"}))

@@ -238,18 +238,20 @@ flowchart LR
 | 9 | Handover | Field tech + CUST | Set-up unit | One-page owner card, maintenance schedule (`MAINTENANCE.md` §10), backup target agreed, recovery key handed over, BEN Care enrolled; 30 minutes of owner training | Customer signs the acceptance certificate | Acceptance certificate | 1 hour |
 | 10 | Operations | R (BEN Care) + owner | — | Weekly report; monthly owner checks; quarterly UPS self-test, restore test and updates | — | BEN Care records | Life of unit |
 
-## 7. BEN 300 and BEN 1000 path — dense liquid-first modules (added 2026-11-09, Rev 2)
+## 7. BEN 300 and BEN 700 path — dense liquid-first modules (added 2026-11-09, Rev 2)
 
-BEN 300 follows the main flow (§1–§4) **as BEN 150** and BEN 1000 **as BEN 500**, at a qualified contract manufacturer, with these differences:
+*(amended 2026-11-09: the 40 ft dense tier was renamed BEN 1000 → BEN 700 after the layout check, `docs/REV2_DECISION.md` §2a)*
+
+BEN 300 follows the main flow (§1–§4) **as BEN 150** and BEN 700 **as BEN 500**, at a qualified contract manufacturer, with these differences:
 
 | # | Stage | What is different | Hold / witness | Typical duration |
 | --- | --- | --- | --- | --- |
-| 3 | Site survey | Heat-rejection skid yard and its noise; utility capacity for a 600–800 A (BEN 300) or about 1,600–2,000 A (BEN 1000) service, often a customer transformer; heat-reuse offtaker if any | **H3** | 2–4 weeks |
-| 4 | Engineering release | Rev 2.A drawings with the liquid loop (manifolds, UQD v2 connectors, row isolation valves), N+1 CDUs, arc-flash study at the higher frames, NFPA 855 package and, on BEN 1000, the external battery enclosure where spacing requires it; PE floor check for the selected racks (R51) | **H4** | 3–4 weeks |
-| 5 | Procurement | Longest items: 1,600–2,000 A switchboard 20–40 weeks, row CDUs 12–24 weeks, large UPS frames 16–30 weeks, dry coolers / skid 16–24 weeks (R52); ordered at engineering release | — | Sets the schedule |
+| 3 | Site survey | Heat-rejection skid yard and its noise; utility capacity for a 600 A (BEN 300) or 1,200 A (BEN 700) service, often a customer transformer; heat-reuse offtaker if any | **H3** | 2–4 weeks |
+| 4 | Engineering release | Rev 2.A drawings with the liquid loop (manifolds, UQD v2 connectors, row isolation valves), N+1 CDUs, arc-flash study at the higher frames, NFPA 855 package and, on BEN 700, the external battery enclosure where UL 9540A data does not allow the cabinets side by side; PE floor check for the selected racks (R51) | **H4** | 3–4 weeks |
+| 5 | Procurement | Longest items: 1,200 A switchboard (BEN 700) 20–40 weeks, row CDUs 12–24 weeks, large UPS frames 16–30 weeks, dry coolers / skid 16–24 weeks (R52); ordered at engineering release | — | Sets the schedule |
 | 9–11 | Fit-out | Liquid loop installed and **pressure-tested at 1.5 × design** before any IT power is connected; flushed and filled with coolant to OCP v1.3 / PG25; coolant sample at fill | **H11** pressure test and coolant sample | +1–2 weeks vs BEN 150 / 500 |
 | 13 | FAT | Liquid load banks on every rack position; **E18 (per CDU and one CDU off), E19 on every rack, E20 at 40 / 70 / 100 %, E25 single-rack isolation**; E17 only with `dc800` | **H13** | 1–2 weeks |
 | 14 | Transport prep | Racks shipped separately and set in at site where the gross mass would exceed the frame rating (R51); loop drained to transport level or kept filled per the CDU vendor | — | — |
 | 19 | SAT | E18–E20 repeated with the site heat rejection; the BEN 300 lighthouse adds a 30-day burn-in at ≥ 80 % load (`docs/programs/REV2_REVAMP_PROGRAM.md`) | **H19** | 1–2 weeks (+30 days burn-in on the lighthouse) |
 
-Typical order to in service at a qualified CM: **BEN 300 ≈ 28–32 weeks**, **BEN 1000 ≈ 36–44 weeks**, both set by the switchboard and CDU lead times, not by the shop.
+Typical order to in service at a qualified CM: **BEN 300 ≈ 28–32 weeks**, **BEN 700 ≈ 36–44 weeks**, both set by the switchboard and CDU lead times, not by the shop.

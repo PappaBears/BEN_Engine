@@ -45,6 +45,20 @@ TORQUE = {"M8": 25, "M10": 50, "M12": 85, "M16": 210, "M20": 410}
 
 
 def register(lay) -> List[CTQ]:
+    if getattr(lay, "is_minirack", False):
+        return _register_minirack(lay)
+    items = _register(lay)
+    if lay.notes.get("dense"):
+        # no refrigerant inside a liquid-first module (the trim chiller on the skid is factory sealed): CTP-M1 is the liquid piping
+        items = [CTQ("CTP-M1", "CTP", "M-001", "W45 and trim-loop piping: press-fit / welded joints, flushing and fill by a licensed mechanical contractor",
+                     "Joint log (press-fit gauge or weld VT); flush log; fill record", "Every joint logged; flush until the strainer stays clean for 30 min and turbidity < 5 NTU; fill fluid per CTQ-M9",
+                     "Q-06", "HOLD") if i.id == "CTP-M1" else i for i in items]
+    if lay.notes.get("dense") or lay.notes.get("nc_liner"):
+        items += _register_rev2(lay)
+    return items
+
+
+def _register(lay) -> List[CTQ]:
     d = lay.d
     is_c = lay.is_container          # ISO-frame module tiers (BEN 30/150/500)
     is_h = lay.is_hall               # BEN 2000 hall
@@ -186,6 +200,67 @@ def register(lay) -> List[CTQ]:
               "Hold time >= 10 min at design concentration" + (" in every zone" if is_h else "") + "; certificate on file", "Q-09", "HOLD"))
     else:
         A(CTQ("CTP-F1", "CTP", "C-001", "Aerosol suppression unit fitted, actuator independent of the controls bus", "Visual; document", "Unit listed; monitor contact only to the controller; warning label fitted", "Q-09"))
+    return items
+
+
+# ------------------------------------------------------------------ Rev 2 additions (design/rev2/REVISION.json R2-03, R2-04)
+def _register_rev2(lay) -> List[CTQ]:
+    """Dense liquid-first tiers (BEN 300 / BEN 700): CDU, manifold, W45 loop, trim loop, leak-to-isolation and battery groups.
+    Rev 2 module tiers on condition 1: the non-conductive liner (EN-001)."""
+    d = lay.d
+    items: List[CTQ] = []
+    A = items.append
+    if lay.notes.get("nc_liner"):
+        A(CTQ("CTQ-E10", "CTQ", "A-002", "Aisle-wall liner is ENV-LINER-NC (non-conductive, ASTM E84 Class A) with nylon fasteners and no metal trim; no device on that wall in the working space (EN-001)",
+              "Document check (E84 Class A report for the delivered lot); visual; steel tape; continuity tester on the liner face at 10 points",
+              "Class A report on file; no conductive path from the liner face to ground (open circuit); clear depth >= 914 mm in front of the row, >= 1,067 mm in front of 480 V gear", "Q-03", "WITNESS"))
+    if not lay.notes.get("dense"):
+        return items
+    A(CTQ("CTQ-M7", "CTQ", "M-001", f"Row CDUs ({d['cooling_units_total']} x 600 kW, N+1): pump failover and approach", "Commissioning: trip the duty pump on each CDU; CDU log",
+          "Standby pump takes over in <= 5 s, loop flow dip < 20 %; approach (secondary supply - facility supply) <= 4 K at design load", "Q-10", "WITNESS"))
+    A(CTQ("CTQ-M8", "CTQ", "M-001", "Rear-plenum W45 manifold and UQD drops: pressure test and dry-break check", "Hydrostatic test, calibrated gauge class 1.0; connect / disconnect every UQD 3 times on a drip tray",
+          "1.5 x working pressure for 2 h, no drop; no drip at any UQD after 3 cycles; drip tray under every drop with a leak sensor", "Q-06", "WITNESS"))
+    A(CTQ("CTQ-M9", "CTQ", "M-001", "W45 loop water quality and filtration", "Lab water analysis after flush; filter delta-p log",
+          "Conductivity, pH and inhibitor per the CDU / cold-plate vendor limits (OCP / ASHRAE TC 9.9 liquid-cooling guidance); 50 um or finer strainer on the secondary; report before the racks are connected", "Q-06", "HOLD"))
+    A(CTQ("CTQ-M10", "CTQ", "M-001", f"Trim loop {d['trim_loop_c']:.0f} C to the residual-air fan coils ({d['trim_loop_kw']} kW, skid chiller)", "Calibrated probe at the fan-coil supply; dew-point from the room Pod RH",
+          f"Supply {d['trim_loop_c']:.0f} +/-1 C at design load; supply >= room dew point + 2 K (no condensation); fan coils never on the W45 loop", "Q-10"))
+    if "CTQ-M6" not in {i.id for i in _register_ids(lay)}:
+        A(CTQ("CTQ-M6", "CTQ", "M-001", "Leak-to-isolation time (E19)", "Wet-finger test on a rack drip-tray sensor; valve position switch timed",
+              "Row isolation valves closed <= 15 s after the leak; loop flow to the row 0 within 30 s; alarm raised", "Q-10", "WITNESS"))
+    A(CTQ("CTQ-E9", "CTQ", "E-001", f"Lithium battery groups ({d['battery_cabinets']} cabinets of 32.6 kWh): NFPA 855 group limit and UL 9540A evidence", "Document check; steel tape between groups",
+          "One cabinet per group (<= 50 kWh); UL 9540 listing and the UL 9540A large-scale test report on file for the reduced spacing, otherwise 914 mm between groups; BMS trip tested", "Q-07", "HOLD"))
+    A(CTQ("CTP-S5", "CTP", "S-001", "Rack load-spreading frames STR-LOADFRAME under every rack bolted to the floor channels", "Calibrated torque wrench; laser level",
+          f"M12 {TORQUE['M12']} N·m, 4 per frame; frame level within 2 mm; rack {1500} kg on the frame only", "Q-04", "WITNESS"))
+    return items
+
+
+def _register_ids(lay) -> List[CTQ]:
+    return _register(lay)
+
+
+def _register_minirack(lay) -> List[CTQ]:
+    """BEN 1 in-house bench build (design/assembly/rev2/ASSEMBLY-ben1.md): sheets A-001, E-001, C-001, I-001."""
+    d = lay.d
+    f = lay.cfg.form
+    items: List[CTQ] = []
+    A = items.append
+    A(CTQ("CTQ-A1", "CTQ", "A-001", "Rack / cabinet model and outside dimensions", "Model label; steel tape",
+          f"{d['geometry']['reference']}; {lay.ext_l:.0f} x {lay.ext_w:.0f} x {lay.ext_h:.0f} mm +/-5", "Q-01"))
+    A(CTQ("CTQ-A2", "CTQ", "A-001", f"U stack per A-001 ({lay.notes['u_used']}U of {lay.notes['u_total']}U), shelves and devices fixed", "Visual against the A-001 elevation; tug test on every shelf",
+          "Every device in its U; cage nuts / shelf screws tight; nothing loose on a shelf; blanking panels in open U" + (" (cab12)" if f == "cab12" else ""), "Q-05"))
+    A(CTQ("CTQ-A3", "CTQ", "A-001", "Unit mass and labels", "Bench scale; visual", f"Mass {d['gross_kg']} kg +10 % max; data plate band, nameplate and QR fitted; serial recorded", "Q-10"))
+    A(CTQ("CTP-E1", "CTP", "E-001", "UPS and PDU are listed, cord-connected; no field wiring", "Listing marks (UL 1778 UPS, UL 62368-1 / UL 60950 IT gear)", "Every power item carries a listing mark; no splices, no extension cords, no daisy-chained power strips", "Q-07", "HOLD"))
+    A(CTQ("CTQ-E1", "CTQ", "E-001", "Ground continuity, plug to every metal part", "Bond tester / ohmmeter", "<= 0.1 ohm from the UPS plug ground pin to the rack frame and every chassis", "Q-07"))
+    A(CTQ("CTQ-E2", "CTQ", "E-001", f"Load on the UPS and on the {d['outlet_circuit_a']} A outlet circuit", "UPS load display; clamp meter at full burn-in load",
+          f"UPS load <= 80 % of {d['ups_w']} W; input current <= {0.8 * d['outlet_circuit_a']:.0f} A (NEC 210.19/210.20 continuous)", "Q-07", "WITNESS"))
+    A(CTQ("CTQ-E3", "CTQ", "E-001", "UPS self-test and runtime", "UPS self-test; pull the plug at full load", f"Self-test pass; runtime >= {d['ups_runtime_min_est'] * 0.8:.0f} min at burn-in load; graceful shutdown signal reaches the hosts", "Q-10", "WITNESS"))
+    A(CTQ("CTQ-K1", "CTQ", "C-001", "Pod positions: P1 inlet (front rail), P2 exhaust (rear rail)", "Visual against C-001", "Pods at the drawn U positions +/-1U; probes 20-50 mm from the rail", "Q-08"))
+    A(CTQ("CTQ-K3", "CTQ", "C-001", "Pod probes calibrated", "Ice-point and 40 C bath, 3 points", "Within +/-0.25 C after correction; cal_id in the Pod", "Q-08", "WITNESS"))
+    A(CTQ("CTQ-K5", "CTQ", "C-001", "Pod attestation and BEN Care agent enrolment", "Commissioning script `--stage pre-ship`", "Both Pods attested; edge agent online in BEN Care; unprovisioned Pod rejected", "Q-08", "WITNESS"))
+    A(CTQ("CTQ-T1", "CTQ", "I-001", "24 h burn-in at full load", "Burn-in script; Pod inlet / exhaust log",
+          f"24 h without fault; exhaust - inlet <= {10:.0f} K; noise at 1 m <= {d['noise_dba_target']:.0f} dBA (sound meter, A-weighted)", "Q-10", "HOLD"))
+    A(CTQ("CTQ-I1", "CTQ", "I-001", "Customer site checklist signed (circuit, clearances, heat to room, vent)", "Site checklist I-001 with the customer",
+          f"Dedicated {d['outlet_circuit_a']} A 120 V circuit; 300 mm clear at inlet and exhaust; {d['heat_to_room_w']} W heat accepted by the room or a {d['closet_vent_cfm']} cfm closet vent", "Q-12"))
     return items
 
 

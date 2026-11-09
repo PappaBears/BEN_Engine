@@ -1,16 +1,16 @@
 # BEN Engine — Product and engineering briefing: speaker notes
 
-## 1. BEN Engine, Business Edge Node
+## 1. BEN Engine, by Schreiber AI
 
-All-in-one modular data centers named by IT power, from a mini rack on a shelf to a 1 MW liquid-first 40 ft module, with Schreiber AI's controls, twin and commissioning layer. The same system scales to a 2 MW center.
+All-in-one modular data centers named by IT power, from a 0.6 kW mini rack on a shelf to a 700 kW liquid-first 40 ft module; the same system scales to 2 MW.
 
-Audience: engineers, integrators, facilities leads. Names changed on 2026-11-08: the number is now the IT kW, not the container length (docs/TIER_AND_ENCLOSURE_DECISION.md); old keys still load. Set expectations: every number on these slides comes from code in the repository and the evidence file is docs/VALIDATION.md. Rev 2 (2026-11-09) adds BEN 1, BEN 300 and BEN 1000; Rev 1 configurations load as rev1 and reproduce (docs/rev2/RELEASE_NOTES.md).
+Audience: engineers, integrators, facilities leads. Names changed on 2026-11-08: the number is now the IT kW, not the container length (docs/TIER_AND_ENCLOSURE_DECISION.md); old keys still load. Set expectations: every number on these slides comes from code in the repository and the evidence file is docs/VALIDATION.md. Rev 2 (2026-11-09) adds BEN 1, BEN 300 and BEN 700; Rev 1 configurations load as rev1 and reproduce (docs/rev2/RELEASE_NOTES.md).
 
 ## 2. Density
 
 As dense as a sealed, relocatable box allows, with every figure generated from the configuration and checked against real footprints, not taken from a brochure.
 
-Fill the placeholders from docs/DENSITY.md before presenting; never present a slide with braces on it. Peer figures come from docs/research/STATE_OF_THE_ART_2026.md section 3 and are vendor statements, so say 'as published'. The honest positioning: every DC-ready offer is MW-class and every sub-MW container is AC; none publishes leak-to-isolation or redundancy-proof numbers. For engineers: kW per m² is IT kW over the module's outside footprint; the interference checks (single row, 900 mm egress, NEC 110.26 at 480 V) must pass first. Our density is a design value until the lighthouse.
+Figures from docs/DENSITY.md (generated from the configuration, 2026-11-09): BEN 300 2 x 150 kW on 14.77 m2; BEN 700 5 x 140 kW on 29.72 m2. The 40 ft tier was planned as BEN 1000 and renamed by fit (docs/REV2_DECISION.md section 2a): say so, it is the proof that the checks are real. 2N profiles drop to 155 kW (BEN 300) and 400 kW (BEN 700). Peer figures come from docs/research/STATE_OF_THE_ART_2026.md section 3 and are vendor statements, so say 'as published'. The honest positioning: every DC-ready offer is MW-class and every sub-MW container is AC; none publishes leak-to-isolation or redundancy-proof numbers. For engineers: kW per m² is IT kW over the module's outside footprint; the interference checks (single row, 900 mm egress, NEC 110.26 at 480 V) must pass first. Our density is a design value until the lighthouse.
 
 ## 3. Mini racks: AI for tiny businesses
 

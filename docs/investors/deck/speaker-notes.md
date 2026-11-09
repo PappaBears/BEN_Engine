@@ -1,8 +1,8 @@
 # BEN Engine — Investor briefing: speaker notes
 
-## 1. BEN Engine: AI infrastructure that arrives finished
+## 1. AI infrastructure that arrives finished
 
-Schreiber AI turns a mission profile into an all-in-one data center, power, cooling, compute and controls in one sealed box, built, tested and documented, and keeps watching it. The same system scales to a 2 MW center.
+A mission profile in, a finished all-in-one data center out: built, tested, documented and watched by Schreiber AI. Scales to 2 MW.
 
 Open with the outcome, not the technology. The claim to make: a customer picks a mission profile and gets a finished, commissioned unit with a risk list they saw before the price. The claim to avoid: anything about hardware we have not built yet. Transition: why does this not exist already for small and mid-size businesses?
 
@@ -12,17 +12,17 @@ SMBs face a cloud bill that grows with success, colocation priced for hyperscale
 
 All three numbers are cited in docs/investors/MARKET_SOURCES.md with ranges. Say the ranges out loud; investors respect ranges more than point estimates. Transition: the product family. The BEN 2000 figure comes from docs/BOM-ben2000.md and scripts/unit_economics.py (infrastructure-only sell price $16.4 M for 1,600 kW IT); say 'about $10,200 per kW infrastructure-only vs $10,000–13,000 per kW traditional' and that most of that BOM is quote-only estimates.
 
-## 3. The Rev 2 lineup: BEN 1 to BEN 1000
+## 3. The Rev 2 lineup: BEN 1 to BEN 700
 
-One engineering model from a 0.6 kW mini rack on a shelf to a 1 MW liquid-first 40 ft module. BEN 2000 shows the same system at 2 MW.
+One engineering model from a 0.6 kW mini rack on a shelf to a 700 kW liquid-first 40 ft module. BEN 2000 shows the same system at 2 MW.
 
-Lead with the two ends the operator asked for: the very low side for tiny businesses (BEN 1) and the dense end (BEN 300, BEN 1000). Everything in the middle is Rev 1 carried unchanged, and Rev 1 quotes reproduce exactly. If the lineup work renamed a dense tier because its target did not fit the interference checks, use the new name here (docs/DENSITY.md). Transition: how dense is dense.
+Lead with the two ends the operator asked for: the very low side for tiny businesses (BEN 1) and the dense end (BEN 300, BEN 700). Everything in the middle is Rev 1 carried unchanged, and Rev 1 quotes reproduce exactly. The 40 ft tier was planned as BEN 1000 and is BEN 700 because only five racks fit with real footprints (docs/REV2_DECISION.md section 2a); old ben1000 configurations load as ben700. Transition: how dense is dense.
 
 ## 4. Density
 
 As dense as a sealed, relocatable box allows, with every figure generated from the configuration and checked against real footprints, not taken from a brochure.
 
-Fill the placeholders from docs/DENSITY.md before presenting; never present a slide with braces on it. Peer figures come from docs/research/STATE_OF_THE_ART_2026.md section 3 and are vendor statements, so say 'as published'. The honest positioning: every DC-ready offer is MW-class and every sub-MW container is AC; none publishes leak-to-isolation or redundancy-proof numbers. Our density is a design value until the lighthouse.
+Figures from docs/DENSITY.md (generated from the configuration, 2026-11-09): BEN 300 2 x 150 kW on 14.77 m2; BEN 700 5 x 140 kW on 29.72 m2. The 40 ft tier was planned as BEN 1000 and renamed by fit (docs/REV2_DECISION.md section 2a): say so, it is the proof that the checks are real. 2N profiles drop to 155 kW (BEN 300) and 400 kW (BEN 700). Peer figures come from docs/research/STATE_OF_THE_ART_2026.md section 3 and are vendor statements, so say 'as published'. The honest positioning: every DC-ready offer is MW-class and every sub-MW container is AC; none publishes leak-to-isolation or redundancy-proof numbers. Our density is a design value until the lighthouse.
 
 ## 5. Mini racks: AI for tiny businesses
 
@@ -82,7 +82,7 @@ Quote the operator: the base is good, we just need a once-over, and the budget f
 
 USD 5,000,000 over 18 months; each line is a ceiling released by a gate and tied to a measured deliverable.
 
-The table with basis, releasing gate and deliverable per line is section 2 of docs/programs/REV2_REVAMP_PROGRAM.md; walk it line by line if asked. Unit costs marked as placeholders there are filled from the Rev 2 BOMs. The DC cell line returns to contingency if its gate (NRTL field-evaluation path, front-end partner, liquid-cell numbers met) is not passed.
+The table with basis, releasing gate and deliverable per line is section 2 of docs/programs/REV2_REVAMP_PROGRAM.md; walk it line by line if asked. Unit costs there come from the Rev 2 BOMs (docs/rev2/BOM.md); at reference compute ten BEN 1 units exceed line 1, so the line assumes pilots bring their own compute (docs/rev2/OPEN_QUESTIONS.md). The DC cell line returns to contingency if its gate (NRTL field-evaluation path, front-end partner, liquid-cell numbers met) is not passed.
 
 ## 15. What is verified, what is not
 

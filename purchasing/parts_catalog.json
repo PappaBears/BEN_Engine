@@ -6075,5 +6075,57 @@
   "applies_to_cooling": [
    "dlc_hd"
   ]
+ },
+ {
+  "code": "ENV-LINER-NC",
+  "name": "Non-conductive liner panel, aisle wall opposite live parts (EN-001): FRP 0.09 in x 4 ft x 8 ft, ASTM E84 Class A (Crane Composites Fire-X Glasbord class; Kemlite Class A FRP alternate), nylon rivets and FRP adhesive, PVC/FRP trims only (no metal trim)",
+  "manufacturer": "Crane Composites (Glasbord) / Kemlite",
+  "mpn": "Fire-X Glasbord FXE 4x8 (or Kemlite Class A FRP)",
+  "vendor": "FRP distributor (RFQ)",
+  "vendor_url": "",
+  "unit": "sheet",
+  "unit_price_usd": 135.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $135/sheet: no published Fire-X Glasbord price found 2026-11-09 (distributor quote only); Class C Crane Sequentia 4x8 seen at $69.99 (ringsend.com) and $99.99 (hillsflatlumber.com); Class A Fire-X carries a premium. Class A (flame spread <= 25, smoke developed <= 450, ASTM E84) is REQUIRED - standard Glasbord / Sequentia Class C panels are not acceptable.",
+  "price_checked": null,
+  "lead_time_weeks": 2,
+  "availability_note": "Distributor stock item in the US; Class A product must be ordered by name (Fire-X) - confirm the E84 Class A report with the delivery.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben300",
+   "ben700"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "ceil(tier_len_m*2.55/2.97*1.1)"
+ },
+ {
+  "code": "ENV-LINER-NC-SUB",
+  "name": "Substrate for ENV-LINER-NC: fire-retardant-treated plywood 1/2 in x 4 ft x 8 ft, ASTM E84 Class A (FRT, interior type), fixed to the wall furring; FRP is adhered over it",
+  "manufacturer": "Lonza / Viance FRT (class)",
+  "mpn": "FRT plywood 1/2 in Class A interior",
+  "vendor": "Lumber yard (RFQ)",
+  "vendor_url": "",
+  "unit": "sheet",
+  "unit_price_usd": 75.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $75/sheet for 1/2 in interior FRT plywood (regional lumber pricing 2026, not quoted); FRP manufacturers require a solid substrate.",
+  "price_checked": null,
+  "lead_time_weeks": 1,
+  "availability_note": "Stock at commercial lumber yards.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben300",
+   "ben700"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "ceil(tier_len_m*2.55/2.97*1.1)"
  }
 ]
