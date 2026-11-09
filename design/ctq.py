@@ -156,6 +156,12 @@ def register(lay) -> List[CTQ]:
     A(CTQ("CTQ-M3", "CTQ", "M-001", "Leak rope under every cooling unit and along manifolds", "Wet-finger test at each 1 m", "Controller reports leak = 1 within 10 s at every point (LD2100 on Pro, Pod E leak input on Lite)", "Q-08"))
     if lay.notes.get("cooling_resolved") in ("rdhx_drycooler", "dlc_cdu"):
         A(CTQ("CTQ-M4", "CTQ", "M-001", "Coolant mix and flow", "Refractometer; CDU flow meter", "30 % propylene glycol +/-2 %; flow per rack within +/-10 % of design", "Q-06"))
+    if lay.notes.get("cooling_resolved") == "dlc_hd":
+        A(CTQ("CTQ-M4", "CTQ", "M-001", "W45 loop fluid and flow", "Refractometer / water analysis; CDU flow meter", f"Treated water or 25 % PG where t_min < 0 C; loop flow {d['loop_flow_lpm']} L/min +/-10 % at ΔT {d['loop_dt_design_k']:.0f} K", "Q-06"))
+        A(CTQ("CTQ-M6", "CTQ", "M-001", "Leak-to-isolation time (E19)", "Wet-finger test on a rack drip-tray sensor; valve position switch timed", "Row isolation valves closed <= 15 s after the leak; loop flow to the row 0 within 30 s; alarm raised", "Q-10", "WITNESS"))
+    if lay.notes.get("dc800"):
+        A(CTQ("CTQ-E7", "CTQ", "E-001", "800 VDC bus insulation monitoring (E17)", "Test resistor each pole to ground; IMD test button", "Healthy >= 500 kOhm; alarm < 100 kOhm within 10 s on each pole; IT load held; location identifies the faulted tap-off", "Q-07", "WITNESS"))
+        A(CTQ("CTQ-E8", "CTQ", "E-001", "DC bus polarity, voltage and window", "True-RMS/DC meter at every tap-off", f"Polarity per label; {d['dc_bus_v_nominal']} V nominal, {d['dc_bus_v_pole']} V to ground ({d['dc_convention'].replace('_', ' ')}); window {d['dc_window_v'][0]}-{d['dc_window_v'][1]} V (working assumption)", "Q-07"))
     A(CTQ("CTQ-M5", "CTQ", "M-001", "Supply air / coolant temperature at design load", "Commissioning sweep (software)", f"Rack inlet 18-27 C (ASHRAE {d['ashrae_class']}); all units share load within 15 %", "Q-10"))
 
     # ---- C-001 controls

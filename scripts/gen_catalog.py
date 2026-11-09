@@ -2,7 +2,7 @@
 import json, sys, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
-from ben_engine.config import TIER_GEOMETRY, COOLING_LIBRARY, PROFILE_DEFAULTS, CLIMATE_DESIGN, CONTROLS_TIERS, CONTROLS_PRO_PROFILES, HARDENING, TIER_ALIASES, POWER_ARCHITECTURES, DLC_HD_TIERS
+from ben_engine.config import TIER_GEOMETRY, COOLING_LIBRARY, PROFILE_DEFAULTS, CLIMATE_DESIGN, CONTROLS_TIERS, CONTROLS_PRO_PROFILES, HARDENING, TIER_ALIASES, POWER_ARCHITECTURES, DLC_HD_TIERS, DC_CONVENTIONS
 schema = {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "https://schreiberai.com/schemas/ben-config.schema.json",
@@ -22,7 +22,8 @@ schema = {
   "ups_minutes": {"type": "integer", "minimum": 5, "maximum": 60}, "generator": {"type": "boolean"},
   "site_name": {"type": "string", "maxLength": 80},
   "controls_tier": {"enum": list(CONTROLS_TIERS), "description": "BEN Controls tier: auto (by size and profile), lite (Revolution Pi + Pods) or pro (PLCnext + UL 508A panel + edge computer + Pods)"},
-  "power_architecture": {"enum": list(POWER_ARCHITECTURES), "default": "ac480", "description": "Power distribution: ac480 (480 V AC -> UPS -> AC PDUs, today) or dc800 (800 VDC bus, AC/DC front end, battery on bus; BEN 150 and up; docs/FORWARD_ARCHITECTURE_DECISION.md)"}},
+  "power_architecture": {"enum": list(POWER_ARCHITECTURES), "default": "ac480", "description": "Power distribution: ac480 (480 V AC -> UPS -> AC PDUs, today) or dc800 (800 VDC bus, AC/DC front end, battery on bus; BEN 150 and up; docs/FORWARD_ARCHITECTURE_DECISION.md)"},
+  "dc_convention": {"enum": list(DC_CONVENTIONS), "default": "bipolar_400", "description": "dc800 only: bipolar_400 (±400 VDC, high-resistance midpoint, OCP Diablo 400) or unipolar_800 (800 VDC, isolated return, OCP LVDC SST v0.3)"}},
  "x-tier-limits": {t: {"it_kw_min": g["it_kw_min"], "it_kw_max": g["it_kw_max"], "max_racks": g["max_racks"], "kind": g["kind"], "modules": g["modules"], "rows": g.get("rows", 1)} for t, g in TIER_GEOMETRY.items()},
  "x-tier-aliases": dict(TIER_ALIASES),
  "x-cooling-limits": {c: {"max_rack_kw": v["max_rack_kw"], "medium": v["medium"]} for c, v in COOLING_LIBRARY.items()},
@@ -34,6 +35,6 @@ tiers = {t: {**g, "rows": g.get("rows", 1)} for t, g in TIER_GEOMETRY.items()}  
 json.dump({"tiers": tiers, "tier_aliases": dict(TIER_ALIASES), "hardening": HARDENING, "cooling": COOLING_LIBRARY, "profiles": PROFILE_DEFAULTS,
            "climates": CLIMATE_DESIGN, "controls_tiers": CONTROLS_TIERS, "controls_pro_profiles": list(CONTROLS_PRO_PROFILES),
            "power_architectures": {k: {**v, "tiers": list(v["tiers"]), "busway_frames_a": list(v.get("busway_frames_a", []))} for k, v in POWER_ARCHITECTURES.items()},
-           "dlc_hd_tiers": list(DLC_HD_TIERS)},
+           "dlc_hd_tiers": list(DLC_HD_TIERS), "dc_conventions": DC_CONVENTIONS},
           open(os.path.join(ROOT, "web/assets/catalog.json"), "w"), indent=1)
 print("schema + catalog regenerated")

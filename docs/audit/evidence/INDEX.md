@@ -6,4 +6,4 @@
 - `firmware` → exit 0
 - `build-report.json` copied from the latest build_control run
 
-Generated 2026-11-08 by scripts/store_evidence.py
+Generated 2026-11-09 by scripts/store_evidence.py

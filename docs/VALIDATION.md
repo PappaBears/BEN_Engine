@@ -8,7 +8,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 | Check | Command | Observed |
 | --- | --- | --- |
-| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **185 passed** in 16.6 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2) |
+| Python suite | `PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e` | **198 passed** in 20.3 s (twin, cfd, calibration, analysis, sweeps, sim_nodes, commissioning, interlocks, bom, selector parity incl. aliases/hardening, api, proposal, package, export, config generation 2, forward architecture dc800 / dlc_hd incl. JS parity, BOM filters, twin faults, sweeps, commissioning steps 10–11, forward layout and drawings) |
 | Firmware host tests (BEN Pod core) | `cd firmware/ben-pod && make test` | **37 tests, 0 failures** (g++ -std=c++17 -Wall -Wextra, zero warnings); `make sim` runs a 10 s online/offline/replay simulation and exits 0 |
 | Build contract | `build_control.py run` (skill helper) | eight checks: python-suite, selector-parity, firmware-host-tests, commissioning-sim-e2e, sweeps-ben500, sim-e2e-pytest, links, audit-mechanical. Commands carry their own `PYTHONPATH` so they run from a clean clone (audit F-01). Latest report stored at `docs/audit/evidence/build-report.json` |
 | Dashboard e2e | `bash tests/e2e/run_e2e.sh` | see §3 |
@@ -16,7 +16,7 @@ Labels: **verified** = run here and observed · **implemented, unverified** = co
 
 ## 2. Simulated end-to-end (config → twin → sweeps → commissioning → CSV)
 
-`PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben150 --yes --out /tmp/r.md`, both normal and `--fast`: **all 10 steps PASS**. Key observed values (BEN 150 preset, 96 kW, 5 racks, rear-door heat exchangers, N+1): 10 inlet probes within 0.5–0.7 K at idle; 38 I/O points, 0 failed; meter vs PDU reconciliation 0.5 %; each of 4 cooling units failed in turn, worst peak inlet 25.5 °C (limit 35 °C); load step hottest inlet 23.7–23.9 °C, rack ΔT 12.9–13.2 K, PUE 1.17; utility loss with cooling off reaches ASHRAE A2 limit after 3.9 min, UPS empty at 11.8 min (thermal is the binding limit); 5/5 alarm paths raised and cleared; CSV 1077–1431 rows with SHA-256 in the report.
+`PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben150 --yes --out /tmp/r.md`, both normal and `--fast`: **all 12 steps PASS** (steps 10 and 11, the forward-architecture steps, are skipped with the stated reason on this AC / rear-door unit; on the forward prototype configuration `dc800 + dlc_hd` they run and pass: leak-to-isolation 8.0 s, IMD alarm 5 s on both poles, bus 771–880 V on battery). Key observed values (BEN 150 preset, 96 kW, 5 racks, rear-door heat exchangers, N+1): 10 inlet probes within 0.5–0.7 K at idle; 38 I/O points, 0 failed; meter vs PDU reconciliation 0.5 %; each of 4 cooling units failed in turn, worst peak inlet 25.5 °C (limit 35 °C); load step hottest inlet 23.7–23.9 °C, rack ΔT 12.9–13.2 K, PUE 1.17; utility loss with cooling off reaches ASHRAE A2 limit after 3.9 min, UPS empty at 11.8 min (thermal is the binding limit); 5/5 alarm paths raised and cleared; CSV 1077–1431 rows with SHA-256 in the report.
 
 `python -m ben_engine.sweeps --tier ben150` and `--tier ben500`: all 6 sweeps PASS.
 

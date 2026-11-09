@@ -33,7 +33,15 @@ SHEETS = [("A-001", "General arrangement"), ("A-002", "Interior layout plan"), (
           ("C-001", "Controls layout")]
 
 
+FORWARD_SHEETS = [("E-001", "Power one-line — 800 VDC bus (forward study)"), ("M-001", "Cooling P&ID — high-density liquid W45 loop (forward study)")]
+# Set by main(--forward): the forward prototype set is a study, generated for review beside the Rev C tier sets (change register DC-002)
+STATUS_OVERRIDE = None
+FORWARD_DIR = "forward-ben150"
+
+
 def sheets_for(lay):
+    if lay.notes.get("forward"):
+        return FORWARD_SHEETS
     return GH.hall_sheets(lay) if lay.is_hall else SHEETS
 RX = 500.0          # right column x
 RW = 326.0          # right column width
@@ -55,7 +63,8 @@ def pick_scale(*constraints):
 
 def config_line(lay):
     cfg, d = lay.cfg, lay.d
-    return f"{cfg.tier} | {cfg.profile} | {cfg.it_kw:.0f} kW IT | {cfg.racks} racks | cooling {lay.notes.get('cooling_resolved', cfg.cooling)} | {cfg.redundancy} | {cfg.climate} | {cfg.hardening}"
+    pw = f" | {cfg.power_architecture} {cfg.dc_convention}" if cfg.power_architecture == "dc800" else ""
+    return f"{cfg.tier} | {cfg.profile} | {cfg.it_kw:.0f} kW IT | {cfg.racks} racks | cooling {lay.notes.get('cooling_resolved', cfg.cooling)}{pw} | {cfg.redundancy} | {cfg.climate} | {cfg.hardening}"
 
 
 def new_sheet(lay, no, title, scale_text, n):
@@ -278,7 +287,7 @@ def sheet_a001(lay: L.Layout, out):
         y = sh.notes(x, y, "GENERAL NOTES", notes, h=2.0, lead=3.1)
         return y
     right_column(sh, lay, "A-001", extra)
-    sh.title_block()
+    sh.title_block(status=STATUS_OVERRIDE)
     sh.save(os.path.join(out, "A-001"))
 
 
@@ -434,7 +443,7 @@ def sheet_a002(lay: L.Layout, out):
         y = sh.legend(x, y, [("rack", "IT rack"), ("cooling", "Cooling unit / RDHx / CDU"), ("power", "UPS, battery, panel"), ("controls", "Controls"), ("fire", "Fire suppression")], h=2.0)
         return y
     right_column(sh, lay, "A-002", extra)
-    sh.title_block()
+    sh.title_block(status=STATUS_OVERRIDE)
     sh.save(os.path.join(out, "A-002"))
 
 
@@ -583,7 +592,7 @@ def sheet_a003(lay: L.Layout, out):
                  "Fire: PIR class B-s2,d0 minimum (EN 13501-1) or FM 4880 approved; liner joints sealed to maintain the clean-agent hold time (CTP-F1)."]
         return sh.notes(x, y, "ENVELOPE NOTES", notes, h=2.0, lead=3.1)
     right_column(sh, lay, "A-003", extra)
-    sh.title_block()
+    sh.title_block(status=STATUS_OVERRIDE)
     sh.save(os.path.join(out, "A-003"))
 
 
@@ -875,12 +884,14 @@ def sheet_s001(lay: L.Layout, out):
                  ]
         return sh.notes(x, y, "STRUCTURAL NOTES", notes, h=2.0, lead=3.1)
     right_column(sh, lay, "S-001", extra)
-    sh.title_block()
+    sh.title_block(status=STATUS_OVERRIDE)
     sh.save(os.path.join(out, "S-001"))
 
 
 # ====================================================================== E-001
 def sheet_e001(lay: L.Layout, out):
+    if lay.cfg.power_architecture == "dc800":
+        return sheet_e001_dc(lay, out)
     sh = new_sheet(lay, "E-001", "Power one-line", "NTS", 5)
     d, cfg = lay.d, lay.cfg
     V = 480 if d["voltage"].startswith("480") else (208 if d["voltage"].startswith("208 V 3") else 240)
@@ -1015,12 +1026,290 @@ def sheet_e001(lay: L.Layout, out):
                  "Labelling: every breaker, cable end and receptacle carries the tag on this sheet (CTQ-B6)."]
         return sh.notes(x, y, "ELECTRICAL NOTES", notes, h=2.0, lead=3.1)
     right_column(sh, lay, "E-001", extra)
-    sh.title_block()
+    sh.title_block(status=STATUS_OVERRIDE)
     sh.save(os.path.join(out, "E-001"))
+
+
+# ====================================================================== E-001 (dc800 variant, forward architecture study)
+def sheet_e001_dc(lay: L.Layout, out):
+    """Utility -> service section -> ATS -> 480 V bus -> AC/DC front end (SiC rectifier / SST modules N+1) -> 800 VDC busway
+    (bipolar ±400 V with high-resistance midpoint, or unipolar 800 V with isolated return) -> DC tap-off breakers -> racks with
+    800 V -> 50 V shelves; battery string on the bus; insulation monitoring; mechanical panel stays AC. docs/FORWARD_ARCHITECTURE_DECISION.md."""
+    n_sheet = 1 if lay.notes.get("forward") else 5
+    sh = new_sheet(lay, "E-001", "Power one-line — 800 VDC bus", "NTS", n_sheet)
+    d, cfg = lay.d, lay.cfg
+    V = 480
+    conv = d["dc_convention"]
+    bip = conv == "bipolar_400"
+    def amps(kw, v=V, pf=0.95):
+        return kw * 1000 / (math.sqrt(3) * v * pf)
+    rect_in_a = std(amps(d["ac_dc_front_end_kw"]) * 1.25)
+    tap_a = std(d["dc_bus_kw"] / cfg.racks * 1000 / d["dc_bus_v_nominal"] * 1.25)
+    batt_a = std(d["battery_on_bus_kwh"] / (cfg.ups_minutes / 60) * 1000 / d["dc_bus_v_nominal"] * 1.25)
+    cool_key = lay.notes.get("air_key", "inrow300")
+    cool_unit_kw = L.LIB[cool_key]["kw"] / (L.COOLING_LIBRARY["dlc_hd"]["cop"] if cool_key == "inrow_cw300" else L.COOLING_LIBRARY["inrow_dx"]["cop"])
+    cool_a = std(amps(cool_unit_kw) * 1.25)
+    cus = [i for i in lay.items if i.tag.startswith("CU")]
+    pumps = [i for i in lay.items if i.tag.startswith("PU") or i.tag.startswith("CDU")]
+    dc = lay.find("DC1")
+    pnlm_load_kw = len(cus) * cool_unit_kw + len(pumps) * 8 + (12 if dc else 0) + 1.5
+    pnlm_a = std(amps(pnlm_load_kw) * 1.25)
+    gen_kva = math.ceil(d["total_kw"] * 1.25 / 0.8 / 10) * 10
+
+    sh.view_title(30, TOP - 8, f"POWER ONE-LINE DIAGRAM — 800 VDC BUS ({'±400 V BIPOLAR, HR MIDPOINT' if bip else '800 V UNIPOLAR, ISOLATED RETURN'})", "NTS")
+    sh.text(30, TOP - 13, "FORWARD ARCHITECTURE STUDY (docs/FORWARD_ARCHITECTURE_DECISION.md, docs/research/STATE_OF_THE_ART_2026.md) — NOT FOR CONSTRUCTION; vendor efficiencies are claims; the bus window is a working assumption", h=2.0, c=RED, bold=True)
+    x_main = 70.0
+    y = TOP - 30
+    sh.text(x_main, y, "UTILITY", h=3, bold=True, ha="center")
+    sh.text(x_main, y - 4, f"{d['voltage']}, 3 ph 4 W, {d['service_amps_calc']} A calc", h=2.0, ha="center", c=MUTED)
+    sh.line(x_main, y - 6, x_main, y - 14, lw=1.0)
+    sh.circle(x_main, y - 18, 4, lw=0.8); sh.text(x_main, y - 18, "kWh", h=1.6, ha="center", va="center")
+    sh.text(x_main + 6, y - 18, "Utility meter + P_utility pulse (meter1)", h=1.9, va="center", c=MUTED)
+    sh.line(x_main, y - 22, x_main, y - 30, lw=1.0)
+    sym_box(sh, x_main - 28, y - 70, 56, 40, "SVC — SERVICE SECTION", [f"Main CB {d['service_breaker_a']} A, {V} V", "NEMA 4X, exterior end wall", "Type 1 SPD 100 kA", "Ground bar / GES bond"], kind="power")
+    sh.text(x_main + 32, y - 44, "CTP-E1 HOLD: licensed electrician", h=1.8, c=CTP_C)
+    sh.line(x_main, y - 70, x_main, y - 84, lw=1.0)
+    sym_box(sh, x_main - 28, y - 112, 56, 28, "ATS" + ("" if cfg.generator else " (optional)"), [f"{d['service_breaker_a']} A, 4 pole, open transition", "Generator-ready; EPO interlock"], kind="power")
+    sym_box(sh, x_main + 50, y - 112, 56, 28, "GENERATOR" + ("" if cfg.generator else " (optional)"), [f"{gen_kva} kVA diesel, {V} V", "Site item, 2 h fuel min"], kind="power")
+    sh.line(x_main + 28, y - 98, x_main + 50, y - 98, lw=1.0, ls="-" if cfg.generator else "--")
+    sh.line(x_main, y - 112, x_main, y - 126, lw=1.0)
+    y_bus = y - 128
+    sh.line(x_main - 30, y_bus, x_main + 360, y_bus, lw=2.0)
+    sh.text(x_main + 362, y_bus, f"AC BUS {V} V", h=2.2, va="center", bold=True)
+    # ---- AC/DC front end
+    xu = x_main
+    sh.line(xu, y_bus, xu, y_bus - 10, lw=1.0)
+    sym_breaker(sh, xu, y_bus - 15, "CB-FE", f"{rect_in_a} A")
+    sh.line(xu, y_bus - 20, xu, y_bus - 30, lw=1.0)
+    sym_box(sh, xu - 36, y_bus - 76, 72, 46, f"AC/DC FRONT END ({cfg.redundancy})",
+            [f"{d['rectifier_modules']} x {d['rectifier_module_kw']} kW SiC rectifier / SST modules in {d['rectifier_cabinets']} cabinet(s)", f"{d['ac_dc_front_end_kw']} kW at {d['rectifier_eff']*100:.1f} % (VENDOR CLAIM)",
+             "480 V AC -> 800 VDC, pre-charge, hot-swap", "Modbus TCP to BEN Controller", "Delta / Vertiv / Eaton / ABB class, sampling 2026"], kind="power")
+    sh.text(xu + 38, y_bus - 40, "EPO: shunt-trip CB-FE + open the battery disconnect (CTQ-E3)", h=1.8, c=RED)
+    sh.line(xu, y_bus - 76, xu, y_bus - 90, lw=1.0)
+    # ---- DC bus
+    yb = y_bus - 92
+    sh.line(xu - 30, yb, xu + 190, yb, lw=2.2, c=CTQ_C)
+    sh.line(xu - 30, yb - 3, xu + 190, yb - 3, lw=2.2, c=RED)
+    pole_lbl = "+400 V / −400 V to ground (midpoint HRG)" if bip else "+800 V / isolated return (IT system)"
+    sh.text(xu + 192, yb + 4, f"DC BUSWAY {d['dc_busway_a']} A, 800 VDC nominal", h=2.2, va="center", bold=True)
+    sh.text(xu + 192, yb - 1, pole_lbl, h=1.9, va="center", bold=True)
+    sh.text(xu + 192, yb - 6, f"bus {d['dc_bus_current_a']} A incl. 25 % headroom", h=1.7, va="center", c=MUTED)
+    # midpoint / grounding reference + IMD
+    xg = xu - 22
+    if bip:
+        sh.line(xg, yb - 1.5, xg, yb - 14, lw=0.8); sh.rect(xg - 3, yb - 22, 6, 8, fc=PAPER, lw=0.6); sh.text(xg + 5, yb - 18, "HRG resistor, midpoint", h=1.6, va="center")
+        sh.line(xg, yb - 22, xg, yb - 28, lw=0.8); sh.line(xg - 4, yb - 28, xg + 4, yb - 28, lw=1.0); sh.line(xg - 2.5, yb - 30, xg + 2.5, yb - 30, lw=0.8); sh.line(xg - 1, yb - 32, xg + 1, yb - 32, lw=0.6)
+    else:
+        sh.text(xg - 6, yb - 12, "Return isolated from PE (two-wire IT system)", h=1.6, va="center")
+    sym_instr(sh, xu + 8, yb - 14, "IMD")
+    sh.text(xu + 14, yb - 14, f"{d['imd_count']} x insulation monitor (Bender iso685 class): {d['dc_imd_arrangement']}", h=1.6, va="center", c=MUTED)
+    sym_instr(sh, xu + 8, yb - 24, "AFD"); sh.text(xu + 14, yb - 24, "DC arc-fault detection per section and per tap-off (method caveat: UL 1699B is a PV standard)", h=1.6, va="center", c=MUTED)
+    sym_instr(sh, xu + 8, yb - 34, "V/I"); sh.text(xu + 14, yb - 34, "V_bus_pos, V_bus_neg, I_bus, IMD_kohm to the controller (PROTOCOL.md)", h=1.6, va="center", c=MUTED)
+    # battery on the bus
+    xb = xu + 150
+    sh.line(xb, yb - 3, xb, yb - 12, lw=1.0, c=RED)
+    sym_breaker(sh, xb, yb - 17, "SW-BAT", f"{batt_a} A DC")
+    sh.line(xb, yb - 22, xb, yb - 30, lw=1.0, c=RED)
+    sym_box(sh, xb - 26, yb - 62, 52, 32, "BATTERY ON BUS", [f"{d['battery_on_bus_kwh']} kWh LFP, {d['battery_string_v']}", f"{cfg.ups_minutes} min at IT load; no UPS, no DC/DC", "pre-charge, fuses, BMS Modbus", "UL 9540 / 9540A data on file"], kind="power")
+    # racks
+    racks = lay.by_kind("rack")
+    nshow = min(len(racks), 6)
+    yr = yb - 44
+    for i in range(nshow):
+        xr = xu - 24 + i * 24
+        sh.line(xr, yb - 3, xr, yr + 6, lw=0.8, c=RED)
+        sym_breaker(sh, xr, yr + 2, "", f"{tap_a} A DC")
+        sh.line(xr, yr - 2, xr, yr - 10, lw=0.8)
+        sym_box(sh, xr - 10, yr - 40, 20, 30, f"R{i+1}", ["DC tap-off", f"{d['rack_shelves_per_rack']} x {d['rack_shelf_kw']} kW", "800->50 V shelf", "or MGX rack"], kind="rack", title_h=2.2)
+    if len(racks) > nshow:
+        sh.text(xu - 24 + nshow * 24, yr - 24, f"... to R{len(racks)}", h=2.0, c=MUTED)
+    sh.text(xu - 30, yr - 46, f"Rack interface: {d['rack_interface']}; shelf efficiency {d['rack_shelf_eff']*100:.1f} % is a VENDOR CLAIM ({d['dc_bus_kw']} kW on the bus for {cfg.it_kw:.0f} kW IT)", h=1.8, c=MUTED)
+    sh.text(xu - 30, yr - 50, f"Bus window {d['dc_window_v'][0]}–{d['dc_window_v'][1]} V = WORKING ASSUMPTION ({d['dc_window_basis']}); Diablo 400 states ±400 V ±0.5 % regulation only.", h=1.8, c=RED)
+    # ---- mechanical panel (AC)
+    xm = x_main + 330
+    sh.line(xm, y_bus, xm, y_bus - 10, lw=1.0)
+    sym_breaker(sh, xm, y_bus - 15, "CB-M", f"{pnlm_a} A")
+    sh.line(xm, y_bus - 20, xm, y_bus - 30, lw=1.0)
+    sym_box(sh, xm - 32, y_bus - 60, 64, 30, "PNL-M — MECHANICAL (AC)", [f"{V} V, {pnlm_a} A main, {pnlm_load_kw:.1f} kW connected", "Not on the DC bus; EPO shunt-trips cooling", "Surge: Type 2 SPD"], kind="power")
+    sh.line(xm, y_bus - 60, xm, y_bus - 70, lw=1.0)
+    ym = y_bus - 70
+    sh.line(xm - 30, ym, xm + 70, ym, lw=1.4)
+    loads = [(c.tag, f"{cool_a} A") for c in cus] + [(p.tag, f"{std(amps(8) * 1.25)} A") for p in pumps]
+    if dc:
+        loads.append(("DC1", f"{std(amps(12) * 1.25)} A"))
+    loads += [("LTG", "20 A"), ("RCPT", "20 A"), ("CTL", "15 A")]
+    for i, (tag, a) in enumerate(loads[:5]):
+        xl = xm - 26 + i * 20
+        sh.line(xl, ym, xl, ym - 8, lw=0.8)
+        sym_breaker(sh, xl, ym - 12, "", a)
+        sh.line(xl, ym - 16, xl, ym - 22, lw=0.8)
+        sh.rect(xl - 8, ym - 34, 16, 12, fc=FILL["cooling" if tag[:2] in ("CU", "PU", "CD", "DC") else "controls"], ec=EDGE["cooling" if tag[:2] in ("CU", "PU", "CD", "DC") else "controls"], lw=0.6)
+        sh.text(xl, ym - 28, tag, h=1.8, ha="center", va="center", bold=True)
+    if len(loads) > 5:
+        sh.text(xm - 26, ym - 40, f"+{len(loads) - 5} more: " + ", ".join(t for t, _ in loads[5:]), h=1.8, c=MUTED)
+    # grounding electrode system + DC grounding note
+    yg = 80
+    sh.text(30, yg + 26, "GROUNDING ELECTRODE SYSTEM (NEC 250) AND DC GROUNDING / MIDPOINT", h=3, bold=True)
+    sh.line(40, yg + 14, 300, yg + 14, lw=2.0); sh.text(302, yg + 14, "TMGB 25x6 Cu bar in SVC", h=2.0, va="center")
+    for i, lab in enumerate(["Ground rod 1 (3 m Cu-clad)", "Ground rod 2 (>= 1.8 m apart)", "Pad rebar (Ufer) where available", "Container frame bond (2 places, exothermic)", "Rack / busway / shelf chassis, 6 AWG per rack", "DC midpoint HRG resistor" if bip else "IMD reference (no bonded pole)"]):
+        xg2 = 50 + i * 46
+        sh.line(xg2, yg + 14, xg2, yg + 4, lw=0.8)
+        if i < 3:
+            sh.line(xg2, yg + 4, xg2, yg - 4, lw=1.0); sh.line(xg2 - 4, yg - 4, xg2 + 4, yg - 4, lw=1.0); sh.line(xg2 - 2.5, yg - 6, xg2 + 2.5, yg - 6, lw=0.8); sh.line(xg2 - 1, yg - 8, xg2 + 1, yg - 8, lw=0.6)
+        else:
+            sh.rect(xg2 - 5, yg - 4, 10, 8, fc=FILL["structure"], lw=0.5)
+        for k, ln in enumerate(_wrap(lab, 22)):
+            sh.text(xg2, yg - 12 - k * 2.8, ln, h=1.8, ha="center")
+    sh.text(30, yg - 24, f"DC grounding: {d['dc_grounding']}.", h=1.9, c=MUTED)
+    sh.text(30, yg - 28, f"Convention: {d['dc_convention_spec']}. Both conventions must be servable; this sheet is drawn for {d['dc_convention']}.", h=1.9, c=MUTED)
+
+    def extra(sh, x, y):
+        rows = [["Service (AC)", f"{d['voltage']}, main {d['service_breaker_a']} A (calc {d['service_amps_calc']} A at 80 %)"],
+                ["Total connected", f"{d['total_kw']} kW / {d['total_kva']} kVA (IT {cfg.it_kw:.0f} kW + cooling {d['cooling_elec_kw']} kW + aux)"],
+                ["AC/DC front end", f"{d['rectifier_modules']} x {d['rectifier_module_kw']} kW ({cfg.redundancy}); {d['ac_dc_front_end_kw']} kW; CB-FE {rect_in_a} A; eff {d['rectifier_eff']*100:.1f} % vendor claim"],
+                ["DC bus", f"800 VDC, {d['dc_convention_label']}; {d['dc_bus_current_a']} A -> busway {d['dc_busway_a']} A; {d['dc_bus_v_pole']} V to ground"],
+                ["Bus window", f"{d['dc_window_v'][0]}-{d['dc_window_v'][1]} V: {d['dc_window_basis']}"],
+                ["Rack interface", f"{cfg.racks} racks x {d['rack_shelves_per_rack']} x {d['rack_shelf_kw']} kW 800->50 V shelves, tap-off {tap_a} A DC each; {d['per_rack_kw']} kW/rack"],
+                ["Battery on bus", f"{d['battery_on_bus_kwh']} kWh / {cfg.ups_minutes} min; disconnect {batt_a} A DC; no UPS modules"],
+                ["Protection / monitoring", f"{d['imd_count']} x IMD, DC AFD per section, DC MCCB 1000 V class at bus, battery and tap-offs"],
+                ["Mechanical panel (AC)", f"{pnlm_a} A main; {len(cus)} x in-row {cool_a} A" + (f"; {len(pumps)} x CDU" if pumps else "") + ("; dry cooler" if dc else "")],
+                ["Stated savings (assumption)", f"-{d['dc_loss_saving_kw']} kW distribution loss ({d['dc_loss_saving_frac']*100:.0f} %); copper {d['copper_kg_dc_bus']} vs {d['copper_kg_ac_feeders']} kg (-{d['copper_saving_pct']} %, area-ratio method)"],
+                ["PUE estimate", f"{d['pue_estimate']} (rectifier + shelf losses from vendor claims)"]]
+        y = sh.table(x, y, ["ITEM", "VALUE"], rows, [RW * 0.28, RW * 0.72], title="ELECTRICAL SCHEDULE (study, preliminary)", h=1.8)
+        y -= 6
+        notes = ["STUDY SHEET: not for construction. Listings for 800 VDC busway, DC breakers and the front end are to be confirmed in the program (COMPLIANCE.md forward section); a field evaluation path is assumed.",
+                 "DC arc-flash: no settled IEEE 1584 method for DC; the study uses the NFPA 70E Annex D.5 (Doan) method with the equipment-specific data from the vendor; labels are preliminary.",
+                 "The 760-920 V bus window is a working assumption pending OCP Diablo 400 section 9.3.1 / NVIDIA MGX power rack spec; efficiencies of the front end and the rack shelves are vendor claims to be measured on the test cell.",
+                 "Both DC conventions (±400 V HR midpoint; 800 V unipolar isolated return) must be servable: bus insulation 1000 VDC class, IMD selectable, tap-offs labelled per convention.",
+                 "First ground fault on the IT bus alarms and locates; it does not trip (E17). A second fault is pole-to-pole: the tap-off DC breaker clears it.",
+                 "Battery: UL 9540A test data on file; string disconnect with pre-charge; ventilation per IFC 1207; the battery is sized so the bus never leaves the window above the string cutoff.",
+                 "Only a licensed electrician lands conductors and energises (CTP-E1 HOLD); DC polarity verified at every tap-off before load (CTQ-E8)."]
+        return sh.notes(x, y, "ELECTRICAL NOTES (800 VDC)", notes, h=1.9, lead=3.0)
+    right_column(sh, lay, "E-001", extra)
+    sh.title_block(status=STATUS_OVERRIDE)
+    sh.save(os.path.join(out, "E-001"))
+
+
+# ====================================================================== M-001 (dlc_hd variant, forward architecture study)
+def sheet_m001_hd(lay: L.Layout, out):
+    """High-density DLC: row CDUs (N+1 pumps) on a W45 warm-water secondary loop (40/50 C design), DN80 manifolds with UQD drops
+    to the cold plates of every rack, in-row fan coils on the same loop for the residual air, leak detection per rack with row
+    isolation valves (leak-to-isolation time E19), W45 dry coolers on the primary and a heat-reuse plate heat exchanger (option)."""
+    n_sheet = 2 if lay.notes.get("forward") else 6
+    sh = new_sheet(lay, "M-001", "Cooling P&ID — high-density liquid (W45)", "NTS", n_sheet)
+    d, cfg = lay.d, lay.cfg
+    sh.view_title(30, TOP - 8, "COOLING P&ID — HIGH-DENSITY DIRECT LIQUID COOLING, W45 WARM-WATER LOOP, ROW CDU N+1", "NTS")
+    sh.text(30, TOP - 13, "FORWARD ARCHITECTURE STUDY (docs/FORWARD_ARCHITECTURE_DECISION.md) — NOT FOR CONSTRUCTION; CDU, UQD and dry-cooler selections are vendor classes, not quotes", h=2.0, c=RED, bold=True)
+    xleft = 40
+    yb = TOP - 90
+    # primary: W45 dry cooler bank + heat reuse HX
+    sym_hx(sh, xleft, yb, 50, 34, f"DC1 W45 DRY COOLER BANK ({math.ceil(d['liquid_heat_kw'] * 1.15)} kW)")
+    sh.text(xleft + 25, yb + 26, "EC fans, no chiller, no adiabatic", h=1.6, ha="center", c=MUTED)
+    sh.text(xleft + 25, yb + 22, f"{d['climate']['t_design_c']} C design; approach 8 K", h=1.6, ha="center", c=MUTED)
+    sym_hx(sh, xleft, yb - 46, 50, 30, f"HRX HEAT-REUSE PHE (option), {d['heat_reuse_kw_available']} kW")
+    sh.text(xleft + 25, yb - 24, "3-way diverting valve, BTU meter (E20)", h=1.6, ha="center", c=MUTED)
+    sh.text(xleft + 25, yb - 28, "customer loop 45/55 C by others", h=1.6, ha="center", c=MUTED)
+    xs0 = xleft + 50
+    xp = xleft + 120
+    sh.line(xs0, yb + 8, xp, yb + 8, lw=1.2, c=CTQ_C); sh.line(xp, yb + 26, xs0, yb + 26, lw=1.2, c=RED)
+    sh.line(xs0 + 20, yb + 26, xs0 + 20, yb - 38, lw=1.0, c=RED); sh.line(xs0 + 20, yb - 38, xs0, yb - 38, lw=1.0, c=RED)
+    sh.line(xs0, yb - 24, xs0 + 26, yb - 24, lw=1.0, c=CTQ_C); sh.line(xs0 + 26, yb - 24, xs0 + 26, yb + 8, lw=1.0, c=CTQ_C)
+    sym_valve(sh, xs0 + 20, yb - 6, vertical=True); sh.text(xs0 + 23, yb - 6, "3-way CV (reuse / reject)", h=1.4, va="center", c=MUTED)
+    sym_valve(sh, xs0 + 10, yb + 8); sym_valve(sh, xs0 + 10, yb + 26); sh.text(xs0 + 10, yb + 2, "ISO", h=1.4, ha="center", c=MUTED)
+    sym_pump(sh, xs0 + 40, yb + 8); sh.text(xs0 + 40, yb + 1.5, "P1/P2 N+1 (primary)", h=1.5, ha="center")
+    sh.rect(xs0 + 50, yb + 6, 6, 4, fc=PAPER, lw=0.5); sh.text(xs0 + 53, yb + 1.5, "STR", h=1.4, ha="center")
+    sym_instr(sh, xs0 + 62, yb + 14, "FM-101"); sym_instr(sh, xs0 + 62, yb + 32, "TI-102"); sym_instr(sh, xs0 + 50, yb + 32, "PI-103")
+    sh.line(xs0 + 46, yb - 2, xs0 + 46, yb + 40, c=MUTED, lw=0.4, ls="--"); sh.text(xs0 + 30, yb + 36, "WALL PENETRATION (end wall, sleeved + sealed)", h=1.5, c=MUTED)
+    sym_tank(sh, xs0 + 54, yb - 12, 10, 8, "EXP"); sh.line(xs0 + 59, yb - 4, xs0 + 59, yb + 8, lw=0.5)
+    sh.text(xs0 + 66, yb - 8, "Expansion, air separator, PRV, make-up with RPZ + meter; treated water (25 % PG where t_min < 0 C)", h=1.6, c=MUTED)
+    # row CDUs
+    units = [i for i in lay.items if i.tag.startswith("CDU")]
+    xc = xp
+    for k, u in enumerate(units):
+        yc = yb - k * 46
+        sym_hx(sh, xc, yc, 44, 34, f"{u.tag} ROW CDU 600 kW ({cfg.redundancy})")
+        sh.text(xc + 22, yc + 26, "plate HX, pumps N+1 (E18)", h=1.6, ha="center", c=MUTED)
+        sh.text(xc + 22, yc + 22, "VFD, filter 50 um, leak tray", h=1.6, ha="center", c=MUTED)
+        sh.text(xc + 22, yc + 18, "Modbus TCP -> controller", h=1.6, ha="center", c=MUTED)
+        if k > 0:
+            sh.line(xp, yb + 8, xp, yc + 8, lw=1.2, c=CTQ_C); sh.line(xp - 4, yb + 26, xp - 4, yc + 26, lw=1.2, c=RED); sh.line(xp - 4, yc + 26, xc, yc + 26, lw=1.2, c=RED)
+        sh.line(xc + 44, yc + 8, xc + 70, yc + 8, lw=1.2, c=CTQ_C); sh.line(xc + 70, yc + 26, xc + 44, yc + 26, lw=1.2, c=RED)
+        sym_valve(sh, xc + 52, yc + 8); sym_valve(sh, xc + 52, yc + 26)
+    # secondary manifolds, row isolation valves, racks, fan coils
+    xm0 = xc + 70
+    xm1 = min(xm0 + 300, 440)
+    ysup, yret = yb + 8, yb + 26
+    sym_valve(sh, xm0 + 8, ysup, size=3.5); sym_valve(sh, xm0 + 8, yret, size=3.5)
+    sh.text(xm0 + 8, ysup - 7, "ISO1 row isolation (motorised, spring-return, closes on leak <= 15 s, CTQ-M6)", h=1.6, ha="left", c=RED)
+    sh.line(xm0, ysup, xm1, ysup, lw=1.6, c=CTQ_C); sh.line(xm0, yret, xm1, yret, lw=1.6, c=RED)
+    sh.text(xm0 + 50, ysup + 1.2, f"SUPPLY MANIFOLD DN80, {d['loop_supply_design_c']:.0f} C, {d['loop_flow_lpm']} L/min design", h=1.9, va="bottom", c=CTQ_C, bg=PAPER)
+    sh.text(xm0 + 50, yret + 1.2, f"RETURN MANIFOLD DN80, {d['loop_return_design_c']:.0f} C (ΔT {d['loop_dt_design_k']:.0f} K)", h=1.9, va="bottom", c=RED, bg=PAPER)
+    sym_instr(sh, xm0 + 24, ysup - 10, "TI-201"); sym_instr(sh, xm0 + 24, yret + 10, "TI-202"); sym_instr(sh, xm0 + 38, yret + 10, "FM-203"); sym_instr(sh, xm0 + 52, yret + 10, "PI-204")
+    racks = lay.by_kind("rack")
+    cus = [i for i in lay.items if i.tag.startswith("CU")]
+    nshow = min(len(racks), 10)
+    pitch = (xm1 - xm0 - 60) / max(1, nshow + 1)
+    for i in range(nshow):
+        xr = xm0 + 60 + i * pitch
+        sh.line(xr, ysup, xr, ysup - 18, lw=0.8, c=CTQ_C); sh.line(xr + 6, yret, xr + 6, ysup - 18, lw=0.8, c=RED)
+        sym_valve(sh, xr, ysup - 6, size=1.8, vertical=True); sym_valve(sh, xr + 6, yret - 14, size=1.8, vertical=True)
+        sh.rect(xr - 6, ysup - 36, 18, 18, fc=FILL["rack"], ec=EDGE["rack"], lw=0.6)
+        sh.text(xr + 3, ysup - 23, f"R{i+1} manifold", h=1.5, ha="center", va="center")
+        sh.text(xr + 3, ysup - 27, "UQD04 x cold plates", h=1.3, ha="center", va="center", c=MUTED)
+        sh.text(xr + 3, ysup - 30.5, f"{d['per_rack_kw']} kW, drip tray", h=1.3, ha="center", va="center", c=MUTED)
+        sh.text(xr + 3, ysup - 34, "leak sensor", h=1.3, ha="center", va="center", c=RED)
+    xf = xm0 + 60 + nshow * pitch
+    sh.line(xf, ysup, xf, ysup - 18, lw=0.8, c=CTQ_C); sh.line(xf + 6, yret, xf + 6, ysup - 18, lw=0.8, c=RED)
+    sh.rect(xf - 6, ysup - 36, 18, 18, fc=FILL["cooling"], ec=EDGE["cooling"], lw=0.6)
+    sh.text(xf + 3, ysup - 23, f"CU1..{len(cus)}", h=1.5, ha="center", va="center"); sh.text(xf + 3, ysup - 27, "in-row fan coils", h=1.3, ha="center", va="center", c=MUTED)
+    sh.text(xf + 3, ysup - 30.5, f"residual air {d['air_residual']:.0%}", h=1.3, ha="center", va="center", c=MUTED); sh.text(xf + 3, ysup - 34, "12 kW each at W45", h=1.3, ha="center", va="center", c=MUTED)
+    sh.line(xm0 + 30, ysup - 40, xm1, ysup - 40, c=RED, lw=0.6, ls=":")
+    sh.text(xm0 + 30, ysup - 43, "Leak detection: rope along manifolds + spot sensor in every rack drip tray -> leak controller -> ISO1 close + alarm (CTQ-M3, CTQ-M6, E19)", h=1.8, va="top", c=RED)
+    ynote = yb - 60 - (len(units) - 1) * 46
+    for k, ln in enumerate([
+        f"Loop: {d['loop_water_class']} class warm water (ASHRAE W45: facility supply up to 45 C), design {d['loop_supply_design_c']:.0f}/{d['loop_return_design_c']:.0f} C, {d['loop_flow_lpm']} L/min for {d['liquid_heat_kw']} kW to liquid ({1 - d['air_residual']:.0%} of IT); no chiller.",
+        "Coolant per OCP water-based cold-plate coolant spec v1.3 (or PG25 where freeze protection is needed); flush and fill through the CDU filter; pressure test 1.5 x working pressure 2 h (CTQ-M1 WITNESS); air vents at every high point.",
+        "Heat reuse (E20): the return side of HRX offers the full liquid heat at ~50 C to a customer loop; the 3-way valve diverts to the dry coolers when no heat sink is present; BTU meter is the accounting reference.",
+        "Residual air: in-row fan coils on the same W45 loop (sensible only, derated to 12 kW at a 40 C supply), N+1; rack inlet class per the configuration; no refrigerant inside the module.",
+        "Redundancy proof: CDU pump failover (E18) and leak-to-isolation (E19) are commissioning steps 6 and 10 (software/ben_engine/commissioning.py) and monthly BEN Care proofs."]):
+        sh.text(xleft, ynote - k * 3.6, ln, h=1.9, c=MUTED)
+    lx, ly = 30, 70
+    sh.text(lx, ly + 20, "SYMBOLS", h=2.6, bold=True)
+    sym_valve(sh, lx + 4, ly + 14); sh.text(lx + 10, ly + 14, "Isolation valve (motorised at ISO1)", h=1.8, va="center")
+    sym_pump(sh, lx + 4, ly + 6, r=2.5); sh.text(lx + 10, ly + 6, "Pump", h=1.8, va="center")
+    sym_instr(sh, lx + 74, ly + 14, "TI-xx", r=2.8); sh.text(lx + 80, ly + 14, "Instrument (TI temp, PI pressure, FM flow)", h=1.8, va="center")
+    sh.line(lx + 72, ly + 6, lx + 78, ly + 6, lw=1.4, c=CTQ_C); sh.text(lx + 80, ly + 6, "Supply line", h=1.8, va="center")
+    sh.line(lx + 162, ly + 14, lx + 168, ly + 14, lw=1.4, c=RED); sh.text(lx + 170, ly + 14, "Return line", h=1.8, va="center")
+    sh.line(lx + 162, ly + 6, lx + 168, ly + 6, lw=0.6, c=RED, ls=":"); sh.text(lx + 170, ly + 6, "Leak rope", h=1.8, va="center")
+
+    def extra(sh, x, y):
+        rows = [["IT load / per rack", f"{cfg.it_kw:.0f} kW / {d['per_rack_kw']} kW (dlc_hd limit 250 kW/rack)"],
+                ["Cooling architecture", d["cooling_label"]],
+                ["Row CDUs (N / total)", f"{d['cooling_units_n']} / {d['cooling_units_total']} x {d['cooling_unit_kw_derated']} kW, pumps N+1 each"],
+                ["Loop", f"{d['loop_water_class']}; {d['loop_supply_design_c']:.0f}/{d['loop_return_design_c']:.0f} C; {d['loop_flow_lpm']} L/min; {d['liquid_heat_kw']} kW to liquid"],
+                ["Heat reuse available", f"{d['heat_reuse_kw_available']} kW at ~{d['loop_return_design_c']:.0f} C (option HRX)"],
+                ["Dry coolers", f"{math.ceil(d['liquid_heat_kw'] * 1.15)} kW rejection at {d['climate']['t_design_c']} C, W45 class, no water"],
+                ["Residual air", f"{d['air_residual']:.0%} of IT = {d['air_residual'] * cfg.it_kw:.1f} kW; {lay.notes.get('n_air', 0)} x in-row fan coils 12 kW; {d['airflow_cfm']} cfm"],
+                ["Isolation / leak", f"{d['rows']} row valve pair(s); leak sensor per rack; leak-to-isolation <= 15 s (E19)"],
+                ["Cooling electrical", f"{d['cooling_elec_kw']} kW (COP {L.COOLING_LIBRARY['dlc_hd']['cop']}, stated)"],
+                ["ASHRAE class", f"{d['ashrae_class']} air; W45 liquid; inlet alarm > 27 C"]]
+        y = sh.table(x, y, ["ITEM", "VALUE"], rows, [RW * 0.32, RW * 0.68], title="COOLING SCHEDULE (study)", h=1.9)
+        y -= 6
+        notes = ["STUDY SHEET: not for construction. Row CDU, UQD, isolation valve and dry cooler are vendor classes (Vertiv XDU / CoolIT CHx / Motivair; Staubli / Parker UQD04; Belimo; Guntner / Alfa Laval) to be quoted in the program.",
+                 "Piping, welding, flushing and fill by a licensed mechanical contractor (CTP-M1 HOLD); no refrigerant work inside the module.",
+                 "Every drain and drip tray is water-tested before the floor is closed (CTQ-M2); leak rope and spot sensors tested wet (CTQ-M3).",
+                 "Controls: CDU pumps, ISO1 and the 3-way valve follow the BEN Controller; CDU defaults to local control on loss of comms; watchdog relay (CTP-K2); loop channels T_loop_sup, T_loop_ret, F_loop, cdu_pumpN, loop_iso (PROTOCOL.md).",
+                 "Fouling and water quality on a warm loop are a maintenance item (MAINTENANCE.md forward rows): quarterly water analysis, side-stream filter, annual HX ΔP check."]
+        return sh.notes(x, y, "COOLING NOTES (W45 LIQUID)", notes, h=2.0, lead=3.1)
+    right_column(sh, lay, "M-001", extra)
+    sh.title_block(status=STATUS_OVERRIDE)
+    sh.save(os.path.join(out, "M-001"))
 
 
 # ====================================================================== M-001
 def sheet_m001(lay: L.Layout, out):
+    if lay.cfg.cooling == "dlc_hd":
+        return sheet_m001_hd(lay, out)
     sh = new_sheet(lay, "M-001", "Cooling P&ID", "NTS", 6)
     d, cfg = lay.d, lay.cfg
     mode = lay.notes.get("cooling_resolved", cfg.cooling)
@@ -1167,7 +1456,7 @@ def sheet_m001(lay: L.Layout, out):
                  "Controls: unit supply temperature setpoint and fan speed follow the gateway; units default to local control on loss of comms; PLC / RevPi watchdog relay (CTP-K2); PROTOCOL.md safety rules."]
         return sh.notes(x, y, "COOLING NOTES", notes, h=2.0, lead=3.1)
     right_column(sh, lay, "M-001", extra)
-    sh.title_block()
+    sh.title_block(status=STATUS_OVERRIDE)
     sh.save(os.path.join(out, "M-001"))
 
 
@@ -1286,7 +1575,7 @@ def sheet_c001(lay: L.Layout, out):
                      title="SENSOR SCHEDULE (interior mm; matches twin.sensors() and PROTOCOL.md)")
         return y
     right_column(sh, lay, "C-001", extra)
-    sh.title_block()
+    sh.title_block(status=STATUS_OVERRIDE)
     sh.save(os.path.join(out, "C-001"))
 
 
@@ -1297,15 +1586,19 @@ GENERATORS = {"A-001": sheet_a001, "A-002": sheet_a002, "A-003": sheet_a003, "S-
 
 def write_index(lay, out):
     sheets = sheets_for(lay)
-    lines = [f"# {lay.d['tier_label']} — drawing set, Rev {REV['drawing_rev']} ({REV['status_title']})", "",
-             f"Generated {DATE} by `design/drawings/gen_drawings.py` from `Config.preset('{lay.tier}')`; revision from `design/REVISION.json`.",
+    fwd = lay.notes.get("forward")
+    lines = [f"# {lay.d['tier_label']}{' forward prototype (800 VDC + high-density liquid)' if fwd else ''} — drawing set, Rev {REV['drawing_rev']} ({REV['status_title']}{' — forward architecture study' if fwd else ''})", "",
+             (f"Generated {DATE} by `design/drawings/gen_drawings.py --forward` from `layout.forward_prototype_config()` (BEN 150, 150 kW in 2 racks, dc800 {lay.cfg.dc_convention}, dlc_hd); "
+              f"revision from `design/REVISION.json`, change register **DC-002**. Study sheets for review beside the Rev C tier sets; nothing here is issued for construction. "
+              f"Decision: `docs/FORWARD_ARCHITECTURE_DECISION.md`; BOM: `docs/BOM-ben150-forward.md`; research: `docs/research/STATE_OF_THE_ART_2026.md`.")
+             if fwd else f"Generated {DATE} by `design/drawings/gen_drawings.py` from `Config.preset('{lay.tier}')`; revision from `design/REVISION.json`.",
              f"Configuration: {config_line(lay)}", f"Enclosure: {lay.d['enclosure']} — {lay.d['hardening_rating']} ({lay.d['hardening_label']}).", "",
              "| Sheet | Title | Scale | Files |", "|---|---|---|---|"]
     scales = {"A-000": "see sheet", "A-001": "see sheet", "A-002": "see sheet", "A-003": "see sheet / 1:2", "S-001": "see sheet / 1:5", "E-001": "NTS", "M-001": "NTS", "C-001": "see sheet"}
     for i, (no, title) in enumerate(sheets, 1):
         lines.append(f"| {no} | {title} (sheet {i}/{len(sheets)}) | {scales.get(no, '1:50')} | [{no}.svg]({no}.svg), [{no}.png]({no}.png) |")
     checked = f"Checked: {REV['checker']}" if REV["checked"] else "Checked: blank (requires a checker before the set is re-issued for construction)"
-    lines += ["", f"Status: **{REV['status_long']}** — Rev {REV['drawing_rev']}, {REV['issue_date']}. Drawn: BEN Engine generator; {checked}.", "",
+    lines += ["", f"Status: **{STATUS_OVERRIDE or REV['status_long']}** — Rev {REV['drawing_rev']}, {REV['issue_date']}. Drawn: BEN Engine generator; {checked}.", "",
               "| Rev | Date | Description | Checked |", "|---|---|---|---|"]
     if REV.get("supersedes"):
         sp = REV["supersedes"]
@@ -1346,7 +1639,10 @@ def main(argv=None):
     ap.add_argument("--tier", choices=list(L.TIER_GEOMETRY) + list(L.TIER_ALIASES), action="append")
     ap.add_argument("--sheet", choices=ALL_SHEET_NOS, action="append")
     ap.add_argument("--dpi", type=int, default=110)
+    ap.add_argument("--forward", action="store_true", help=f"generate the forward prototype study set (E-001 dc800, M-001 dlc_hd) into {FORWARD_DIR}/ only")
     a = ap.parse_args(argv)
+    if a.forward:
+        return main_forward(a)
     tiers = [L.canonical_tier(t) for t in a.tier] if a.tier else list(L.TIER_GEOMETRY)
     lays = []
     for t in tiers:
@@ -1366,6 +1662,24 @@ def main(argv=None):
             f.write("Result key: OK = passes; OK* = passes after the documented resolution; FAIL = does not pass as given, resolution column says what changes.\n\n")
             f.write(L.checks_table(lays) + "\n\n## Deviations applied\n\n" + L.deviations_md(lays) + "\n")
         print("  wrote INTERFERENCE_CHECKS.md")
+    return 0
+
+
+def main_forward(a):
+    """Forward prototype study set: design/drawings/forward-ben150/ (E-001 800 VDC one-line, M-001 W45 P&ID, INDEX.md), title block
+    status 'ISSUED FOR REVIEW — forward architecture study'. Not part of the Rev C tier sets; change register DC-002."""
+    global STATUS_OVERRIDE
+    STATUS_OVERRIDE = "ISSUED FOR REVIEW — forward architecture study, not for construction"
+    cfg = L.forward_prototype_config()
+    lay = L.resolve_config(cfg)
+    lay.notes["forward"] = True
+    out = os.path.join(HERE, FORWARD_DIR)
+    os.makedirs(out, exist_ok=True)
+    for no, _title in FORWARD_SHEETS:
+        {"E-001": sheet_e001, "M-001": sheet_m001}[no](lay, out)
+        print(f"  wrote {out}/{no}.svg/.png")
+    write_index(lay, out)
+    STATUS_OVERRIDE = None
     return 0
 
 

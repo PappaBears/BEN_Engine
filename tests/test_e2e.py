@@ -29,7 +29,7 @@ def test_commissioning_sim_end_to_end(tmp_path, tier):
 def test_all_sweeps_pass_for_default_tier():
     cfg = Config.preset("ben150")
     results = S.run_all(cfg)
-    assert len(results) == len(S.SWEEPS)
+    assert len(results) == len([n for n in S.SWEEPS if S.applicable(n, cfg)])   # forward sweeps (dlc_hd / dc800) skipped on the AC preset
     for r in results:
         assert r.passed, (r.name, [c.name for c in r.criteria if not c.passed])
 

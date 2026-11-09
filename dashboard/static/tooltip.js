@@ -98,10 +98,10 @@ function describe(hv) {
       break;
     }
     case 'rectifier': name = 'AC/DC front end'; tag = 'power · 800 VDC'; codes = CODES.rectifier;
-      desc = `SiC rectifier / SST modules, ${d.rectifier_modules} × ${d.rectifier_module_kw} kW (${cfg.redundancy}) feeding the ±${d.dc_bus_v_pole} V DC bus at an assumed ${Math.round((d.rectifier_eff || 0.985) * 1000) / 10} % efficiency; no UPS double conversion, the battery sits on the bus. Forward architecture study.`;
+      desc = `SiC rectifier / SST modules, ${d.rectifier_modules} × ${d.rectifier_module_kw} kW (${cfg.redundancy}) feeding the 800 VDC bus (${d.dc_convention_label}) at a vendor-claimed ${Math.round((d.rectifier_eff || 0.985) * 1000) / 10} % efficiency; no UPS double conversion, the battery sits on the bus; racks take the bus through 800 V → 50 V shelves. Forward architecture study.`;
       L('bus', `${fmt.num(dc.v_bus, 0)} V`, dc.v_bus < d.dc_bus_v_min || dc.v_bus > d.dc_bus_v_max ? 'warn' : 'ok'); L('front end', `${fmt.num(p.ups_kw)} kW`); L('IMD', `${fmt.num(dc.imd_kohm, 0)} kΩ`, dc.imd_kohm < 100 ? 'bad' : ''); break;
     case 'dc_busway': name = 'DC busway'; tag = 'power · 800 VDC'; codes = CODES.dc_busway;
-      desc = `800 VDC busway rated ${d.dc_busway_a} A (bus ${d.dc_bus_current_a} A with 25 % headroom), ±400 V to ground with a high-resistance midpoint; DC tap-off breaker per rack, insulation monitoring and DC arc detection on every section.`;
+      desc = `800 VDC busway rated ${d.dc_busway_a} A (bus ${d.dc_bus_current_a} A with 25 % headroom), ${d.dc_bus_v_pole} V to ground: ${d.dc_grounding}. DC tap-off breaker per rack, ${d.dc_imd_arrangement}, DC arc detection on every section. Window ${d.dc_bus_v_min}–${d.dc_bus_v_max} V is a working assumption.`;
       L('V+ / V−', `${fmt.num(dc.v_bus_pos, 0)} / ${fmt.num(dc.v_bus_neg, 0)} V`, dc.ground_fault ? 'bad' : 'ok'); L('I bus', `${fmt.num(dc.i_bus, 0)} A`); L('IMD', `${fmt.num(dc.imd_kohm, 0)} kΩ`, dc.imd_kohm < 100 ? 'bad' : (dc.imd_kohm < 500 ? 'warn' : 'ok')); break;
     case 'manifold': name = `Rack manifold ${(hv.index || 0) + 1}`; tag = 'liquid cooling'; codes = CODES.manifold;
       desc = `Supply/return manifold with UQD quick-disconnect drops to the cold plates of rack ${(hv.index || 0) + 1}; leak sensor in the drip tray closes the row isolation valves (leak-to-isolation time is measured, E19).`;

@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "run_id": "76fee68cfcaf456da795618e88af108f",
-  "created_at": "2026-11-08T17:46:16.872734+00:00",
+  "run_id": "827f8ea803a0447a8da150b04e78ebaf",
+  "created_at": "2026-11-09T05:27:38.074252+00:00",
   "contract": "docs/build-contract.json",
   "sources": {
     "dashboard/static/app.js": "471a3fa443e57599572b4255d3f7c354b918002445141a06682da2c822fe36e5",
@@ -15,11 +15,11 @@
     "dashboard/static/panels/io.js": "e3e8dc1600cbd85a7315de81abd921d1b77af0bee9fb71b32c89b7cf5d67fe16",
     "dashboard/static/panels/live.js": "bcc1f7f46c5946118bf7047e271c83ede57ff319a44aa70f23e4db01a65a377b",
     "dashboard/static/panels/proposal.js": "e319a82ccc9060ac44e9fe3b48edde7d27f24685b15e143971cf897136ec2725",
-    "dashboard/static/panels/selector.js": "f3efcb4315991560b2e1693a2ebe2ecaba26081a46b0f6416c2859825926cab5",
+    "dashboard/static/panels/selector.js": "da544c24e7035bd4e6fb0ea5dd9cb647c6950dba9d1eb4cb031fbb091efd60f0",
     "dashboard/static/panels/sweeps.js": "5683c3cd713009506fb3af8e82a087a5d9bdb36222b7e088725db111b5ac167e",
-    "dashboard/static/scene.js": "5daa91f942e07db0e0570b7e2671961c1e2137e96740f5e31f42c81d1eebd721",
+    "dashboard/static/scene.js": "0c78b531be34284590e808933fd34921c433c3f3aecaa7b350f7a314b4430fc5",
     "dashboard/static/style.css": "737e2c4146267f8de238f45b96136a0d7ba3401a5cbfd14f49775f97e3a7b11e",
-    "dashboard/static/tooltip.js": "1ab29d76624506823f9eb4ebf85448fbe4a76eda33a16d5759659d8104acb588",
+    "dashboard/static/tooltip.js": "5640965678573da536fb85ee192a41dd2e487e70eb41880dc938a0f51c716c48",
     "dashboard/static/util.js": "2e7e5b59e7206e540f480f38c282312001e09103950eb5eeeb77eccd9730476d",
     "dashboard/static/vendor/three/LICENSE": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454",
     "dashboard/static/vendor/three/OrbitControls.js": "6f3052dd8860a60fe6999260d50558ff54609523724c6e374326228e5590cf55",
@@ -51,27 +51,27 @@
     "firmware/ben-pod/src/main.cpp": "23819aa6d60731425a97c831579aa2a29a212eb930d81a593738d07050f97882",
     "firmware/ben-pod/test/support/unity.h": "564c975b738eb8e7baddd4aa228443c426354b1f3963ec9cbe2a6d077b0da4c2",
     "firmware/ben-pod/test/test_core/test_main.cpp": "add8e870310f940e22d254fbc85568268382c0a3ebca6292f6e6393658697384",
-    "purchasing/parts_catalog.json": "a5d23b49d2da3e9df18d3ed5044a2f9e661a563646984c356a4c419256578a3e",
+    "purchasing/parts_catalog.json": "e642d7fc27f11d0fba0cde8162cdbb64b14d637606662a5929a60782e22f1c55",
     "pyproject.toml": "ece6d76a223d4241648239719c0b008132087f1bfd67f23f85b977d68540ffb6",
     "requirements.txt": "09165997ee1add9f8b63f6c059a58ca4da1918f06f3937c8bad3d04892dc5690",
     "software/ben_engine/__init__.py": "7209932bccc2dd19e83cc28c0d663622bf30113fe7751184e2e332fcfb7baf54",
     "software/ben_engine/analysis.py": "2ba061b0774792d4a68eb79afd16e3579addad13529acbe4b173ea6a681441b4",
-    "software/ben_engine/api.py": "3a8515d82533ff53127093cd0538cce7990969120af3121d0012242154f9299f",
-    "software/ben_engine/bom.py": "140ae9493e59a5f522e18f26b783417acfa89b1e88bd03d61618b5bcb5bcef10",
+    "software/ben_engine/api.py": "23307df36d31b4e6a1b2d88922c1adca83b0da44427919942485644f66260702",
+    "software/ben_engine/bom.py": "53d512c86b1f91606099ebff3287abae105532f8cc4fbf89b918e4a89344031f",
     "software/ben_engine/calibration.py": "9904e7dc245e0d689bce693b1e03df06f44af587b871c9f1e077f6ebf8bc5594",
     "software/ben_engine/cfd.py": "64b7ae7c34f9e076a1c85c5da34880d80d9f238f4dc6b653f02f3c960e722e24",
-    "software/ben_engine/commissioning.py": "9ebb8e0ec0081d4dbe05b22c19a8b0af2ccd4ddcc155325c286483fc41cfdf1b",
-    "software/ben_engine/config.py": "16b88913987942336342dec5426fb3781c11a377fdf9cba356f213597188de83",
+    "software/ben_engine/commissioning.py": "4ec4b9be188df34f3834339fd818f7431027b73935ce5082a20ce5fd92e99dc1",
+    "software/ben_engine/config.py": "73b5ac7c4aa15c80413a9bc75c737e71a961ea1592ad393f6c344dfbfdcdc919",
     "software/ben_engine/export.py": "073a8a34f0029440ab8397670e7acf951f7cc735c6a09d568ce213afa69bb372",
     "software/ben_engine/interlocks.py": "9003477defed4183a7247c155ff18fd25e44dd909494a9620be10f2e0939d733",
     "software/ben_engine/package.py": "bac2df57e57aa50719f8dce59822390263c8ec9af23d1e5731e21022f6ee0f20",
     "software/ben_engine/plc_bridge.py": "75bb03850a07baf927b5e70421dced77529406cba3e19c847fe5d7b6ad4a903f",
     "software/ben_engine/proposal.py": "46a6ea58575c7dc673fc6ca9f5f697cb1cb76decbbcd73dc0d5a9e6c63f2a163",
-    "software/ben_engine/sim_nodes.py": "1ac4319f59122a5198092c0d8fadac67c142e7f9b718321f0bd208a2e8bd7043",
-    "software/ben_engine/sweeps.py": "632a704399be00636bbfd029225e4963d833cdbe070d4a2afc0db8e217a97f30",
-    "software/ben_engine/twin.py": "92214cf5ab0c66cb292d264cadc73b8a1f4ecaff53925d8c8c0fd8003a227060",
+    "software/ben_engine/sim_nodes.py": "dc2384397c28c59fd23f958fe4e9b6d0df5c3da870f2cc67ca1a28c6c261bca7",
+    "software/ben_engine/sweeps.py": "f9e3e78d5cf10d495504e949d892807d21546d2e3e172acb1754570b88b1e27e",
+    "software/ben_engine/twin.py": "eaaa5e0e755c39cdec672606f05924a433a82549e86b9a5f20b498370d03fa7d",
     "tests/conftest.py": "92e26274c58a3ecd9e23fe3a79096e2f285f6297683eca14a6a53d642c106b29",
-    "tests/e2e/dashboard.spec.mjs": "6c247b4e311e01059e0be39ba8d6eebcbdabace77dfd6568838d95eb3b1ef1ea",
+    "tests/e2e/dashboard.spec.mjs": "7538cb1bd1cea94a7ca3bef54c958c66061c015006ccb3d31ee59edd66a808c9",
     "tests/e2e/run_e2e.sh": "24598552d581d13e774211dc068be0cd562a8bafc34bdb7d12f75aca0ac4d6d4",
     "tests/fixtures/CHANGE_ORDER_STUB.md": "edba927856fdc71a7e0b8be3610bc9af5af1ead7352aae82bbc72e1c36261eeb",
     "tests/fixtures/SOW_STUB.md": "25b3bb51eca8498658eba52a3e80df6b947da14e6e79ee11c859ed4678eb077f",
@@ -80,9 +80,10 @@
     "tests/test_bom.py": "2f3bf537f0732bbbded2a4f9ff706b125d20e3f6d88bd1a7d29f315f2ce920a0",
     "tests/test_calibration.py": "f437ab23463ab9441e56e06984ebc4325553a224dfde31d8e9a70ccf3e738ca8",
     "tests/test_cfd.py": "1a84eb58175405070487c369812aa9d7787ab16c6d14fd08d239e9c8ff397593",
-    "tests/test_commissioning.py": "5d2713f5b6de341d0d37f6c3d6483911f3490077bd54625cfc61fb6697820e18",
+    "tests/test_commissioning.py": "9c3aca3713d7155acac04ebe6ea5ee5d439c9ce52d7229242e5352b5fb90443d",
     "tests/test_config_gen2.py": "d3f021abdc617cf564260bb6c56870591c10e5314a4ba859635279f3cf31b275",
-    "tests/test_e2e.py": "83f6581dfdee7a8946c9e5156c8ee27798af944a1518b2644100d59cdc0f1fe8",
+    "tests/test_e2e.py": "bfd976687d9c87b40cf8b8512637bb650c4a61f79c11f6a48f91090529b73084",
+    "tests/test_forward.py": "d70bdcb4850d1b26f51ef738331090376985329616fe91ac05c551cc3c713d29",
     "tests/test_interlocks.py": "cce8d891d77cb0758adc6342abe801d33f2a48166303f39731d751eebd356cdf",
     "tests/test_package.py": "bf141cbf7a0f295ded6cd5a4eaca0d9738bf5edaa5ce002b2369a7e014d5761c",
     "tests/test_plc_bridge.py": "bf24512b6f142f19e6b0b0e0fdd176d57f0a19ed33ba9c27d1ff56ba9340b151",
@@ -91,17 +92,17 @@
     "tests/test_sim_nodes.py": "0e425877609133418cd016a06c709074e7884f4bd85d5ca11ccfe1ee9fc91664",
     "tests/test_sweeps.py": "d2d8def53110d60c02cb301831b8ec4d845c1235aebdf713d86e24e81cede957",
     "tests/test_twin.py": "a6f2c69bc77509cf59f3f275bb772cd4462bad99a80ec9fc59354e918e9e99e3",
-    "web/assets/catalog.json": "2f4d9155ebc06da8eb13078853e29dfcbb65ca9e18f5873ec89c23aebd324f5d",
+    "web/assets/catalog.json": "4324307048bdc58b745be96252bfb1c5838f6bc4aa4a5ffcd51af8b88e208a2e",
     "web/assets/hero-ben150.svg": "b32d885b89bed9534461415eddb8526d97566c8965e064f056eaad2c2aa2dbaf",
     "web/assets/hero-ben2000.svg": "458814919ba46440447dcd591aa792ba48315ef3ceed5bd358756e704eb71eea",
     "web/assets/hero-ben30.svg": "3a32a9caefb8c652ed1974dc755f08c04bda1b1b6fe9299ed19de24a75ef2a35",
     "web/assets/hero-ben5.svg": "b529da13d9bc1ec1a51ba9b118b55497cc4dbfc3549a777d1dbe8e8a7dfc4824",
     "web/assets/hero-ben500.svg": "92c8367bd74af7f9f344b31e9015b46d3534b433014fbad1773c2fc10ba9482b",
     "web/assets/pricing.json": "6274a91af3fa4a76ee4f087c7f680dc881de3eef4e90a9d7ece596a89d2d78fd",
-    "web/assets/risks.json": "d04b6379fc476f6ee630439c30313d4b5932d44656d41e3009886f4ca9a2049c",
-    "web/assets/selector.js": "b3c15894c456d80ffb06b4dba949a20c4730d2ccb70c460e3acefffad9287519",
-    "web/assets/site.css": "e70077270531dabd2daf2eeedb1c981f2d41dfc5811f0884a4dcc2153cec7296",
-    "web/assets/site.js": "0178ad23df84498f223910382f4c855e2ff25bb6bf724ec80de4ff4cd12b4721"
+    "web/assets/risks.json": "5c4934687dcd5acc6aececb5020c423148239db5ca1f7fb55dd91361e544e65c",
+    "web/assets/selector.js": "1524f5292f31c26630d141584bd7ba2515a7eb7cb969f8c694e9386bf0079e5e",
+    "web/assets/site.css": "0949d68a4d94627b3858db8ceadf4db63cbb70ac89fcf2300a48da73e5dfa4c1",
+    "web/assets/site.js": "074bfc0038bfe5a6e796a894899553f34901152c848a01096ec10614aeb91679"
   },
   "source_changed_during_run": false,
   "checks": [
@@ -120,12 +121,12 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T17:45:48.034711+00:00",
-      "finished_at": "2026-11-08T17:46:06.213468+00:00",
+      "started_at": "2026-11-09T05:27:07.614130+00:00",
+      "finished_at": "2026-11-09T05:27:27.260361+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/python-suite.log",
-      "log_sha256": "a5d34da43f5fdbafd400df117efc3b9f5e8498fc9c952009c479eb1c5ff4badd"
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/python-suite.log",
+      "log_sha256": "c32294b6eb14bfa013518c36a641aa154fda37cbca8ea6eb518f37585c037c0e"
     },
     {
       "id": "selector-parity",
@@ -141,11 +142,11 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T17:46:06.213630+00:00",
-      "finished_at": "2026-11-08T17:46:07.181315+00:00",
+      "started_at": "2026-11-09T05:27:27.260646+00:00",
+      "finished_at": "2026-11-09T05:27:28.278682+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/selector-parity.log",
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/selector-parity.log",
       "log_sha256": "543df23b421183f96154fc945c14277d243a6783f8bff82084c12a577e1942ef"
     },
     {
@@ -157,11 +158,11 @@
         "firmware/ben-pod",
         "test"
       ],
-      "started_at": "2026-11-08T17:46:07.181458+00:00",
-      "finished_at": "2026-11-08T17:46:07.750094+00:00",
+      "started_at": "2026-11-09T05:27:28.278873+00:00",
+      "finished_at": "2026-11-09T05:27:28.695389+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/firmware-host-tests.log",
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/firmware-host-tests.log",
       "log_sha256": "27a44d615c4e437a3b08ede18a79aacc61b623428759197203209eefab07eadb"
     },
     {
@@ -180,12 +181,12 @@
         "--out",
         ".schreiber-ai/commissioning-ben150.md"
       ],
-      "started_at": "2026-11-08T17:46:07.750310+00:00",
-      "finished_at": "2026-11-08T17:46:08.115489+00:00",
+      "started_at": "2026-11-09T05:27:28.695557+00:00",
+      "finished_at": "2026-11-09T05:27:29.061311+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/commissioning-sim-e2e.log",
-      "log_sha256": "fb9507d45273d0c655fa30836d49d92935605fa73b11f2546628f27a36ce4c7c"
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/commissioning-sim-e2e.log",
+      "log_sha256": "3e882cf9ce4090aa67269a276ea6b2f1c963fa37ddad29782e9653954eb710c7"
     },
     {
       "id": "sweeps-ben500",
@@ -199,11 +200,11 @@
         "--tier",
         "ben500"
       ],
-      "started_at": "2026-11-08T17:46:08.115626+00:00",
-      "finished_at": "2026-11-08T17:46:08.832380+00:00",
+      "started_at": "2026-11-09T05:27:29.061531+00:00",
+      "finished_at": "2026-11-09T05:27:29.729186+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/sweeps-ben500.log",
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/sweeps-ben500.log",
       "log_sha256": "d24e0aa7b1fb3d4be37a4a4d350adc5d86bde9ad70cd61cecb1bfb07bbeaaaaa"
     },
     {
@@ -213,12 +214,12 @@
         "python3",
         "scripts/audit.py"
       ],
-      "started_at": "2026-11-08T17:46:08.832819+00:00",
-      "finished_at": "2026-11-08T17:46:14.571869+00:00",
+      "started_at": "2026-11-09T05:27:29.729510+00:00",
+      "finished_at": "2026-11-09T05:27:35.872278+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/audit-mechanical.log",
-      "log_sha256": "106e4cce6a4555d15db9ea27265b2c1ddc24b6283c44721e10a53451098d11e3"
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/audit-mechanical.log",
+      "log_sha256": "c377c33dc4ce4f9cd08b65757d6cff74e3738844f29ab48e6c75cf6b17462cae"
     },
     {
       "id": "links",
@@ -227,12 +228,12 @@
         "python3",
         "scripts/check_links.py"
       ],
-      "started_at": "2026-11-08T17:46:14.572026+00:00",
-      "finished_at": "2026-11-08T17:46:14.739892+00:00",
+      "started_at": "2026-11-09T05:27:35.872465+00:00",
+      "finished_at": "2026-11-09T05:27:35.987089+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/links.log",
-      "log_sha256": "68b8c4590c5b15afae81e6631f69f73cb90c8774da230606961b86e1498b0841"
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/links.log",
+      "log_sha256": "5fd5c8ab03a98341bd1a6d40dddcbbf4d0f27fa50317ea2a2034a6ed1881d346"
     },
     {
       "id": "sim-e2e-pytest",
@@ -248,11 +249,11 @@
         "-p",
         "no:cacheprovider"
       ],
-      "started_at": "2026-11-08T17:46:14.740071+00:00",
-      "finished_at": "2026-11-08T17:46:16.861727+00:00",
+      "started_at": "2026-11-09T05:27:35.987255+00:00",
+      "finished_at": "2026-11-09T05:27:38.060684+00:00",
       "status": "pass",
       "exit_code": 0,
-      "log": ".schreiber-ai/runs/76fee68cfcaf456da795618e88af108f/sim-e2e-pytest.log",
+      "log": ".schreiber-ai/runs/827f8ea803a0447a8da150b04e78ebaf/sim-e2e-pytest.log",
       "log_sha256": "9204e7dab924eb2df47592acaa87de4df3764a5df8ccb7c17cbb9fec6219a379"
     }
   ]

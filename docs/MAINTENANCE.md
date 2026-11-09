@@ -94,6 +94,23 @@ Intervals are the default for `temperate`. Climate add-ons (section 5) shorten s
 | 5-year | Power | UPS string capacitor/fan replacement by string (2N allows it live); battery SOH review per room | S | Report |
 | 5-year | Plant | Generator major service (injectors, coolant system, exhaust bellows); fuel tank interior inspection (STI SP001) | S | Report |
 
+## 4b. Forward architecture items (units with the 800 VDC option or the high-density liquid loop; study)
+
+These rows apply only when `power_architecture: dc800` or `cooling: dlc_hd` is configured (`docs/FORWARD_ARCHITECTURE_DECISION.md`); intervals are the program's starting point and are revised from the test cell.
+
+| Interval | Subsystem | Task | Who | Record |
+| --- | --- | --- | --- | --- |
+| Weekly (R) | DC bus | `IMD_kohm` trend (warn < 500 kΩ), `V_bus_pos` / `V_bus_neg` symmetry (bipolar) or return-to-earth voltage (unipolar), bus voltage inside the window, rectifier module alarms and load share, battery string SoC / SoH and cell spread | R | Weekly report |
+| Weekly (R) | Liquid loop | Loop flow vs design, ΔT vs IT load (E20 reconciliation within 5 %), supply ≤ 45 °C, CDU pump hours balanced, make-up water volume, leak-sensor health, heat-reuse kWh | R | Weekly report |
+| Monthly (L) | DC bus | **IMD test button** and alarm path to the controller; rectifier module filters; thermography of the bus joints, tap-offs and battery terminations at ≥ 40 % load (DC joints loosen like AC ones); battery string disconnect exercise | L + S (IR) | M1 forward supplement |
+| Monthly (L) | Liquid loop | **CDU pump failover proof** (stop the duty pump, standby starts; E18 reduced); strainer / filter ΔP; drip trays dry; UQD connectors visual (weep); isolation-valve position feedback test without closing | L | M1 forward supplement |
+| Quarterly | Liquid loop | **Leak-to-isolation test E19** on one rack by rotation (every rack within a year); water analysis (pH, conductivity, inhibitor, biocide, bacteria count per OCP coolant spec v1.3 / PG25); side-stream filter change | L + water treatment S | E19 record; water log |
+| Quarterly | DC bus | DC arc-fault detector self-test; verify the convention label at every tap-off matches the configuration (`dc_convention`); torque spot-check 10 % of tap-off terminations | S (electrician) | Q forward supplement |
+| Semi-annual | DC bus | Ground-fault injection E17 on both poles with a test resistor (IMD alarm, location, no trip); battery string capacity check (discharge to 50 % on the bus) and BMS export | S + R | E17 record |
+| Annual | Liquid loop | Plate HX ΔP and approach check on the CDU and the heat-reuse HX; chemical clean or flush where ΔP > 1.3 × commissioning; dry-cooler coil clean; cold-plate inlet flow balance at the rack valves (±10 %); BTU meter calibration | S | Report |
+| Annual | DC bus | Full torque check of bus, tap-offs, rectifier and battery terminations; DC MCCB mechanical exercise and secondary injection on the main; IMD calibration check against a reference resistor; arc-flash labels against the study | S (NETA) | Torque log; report |
+| 3-year | DC bus / loop | Rectifier module capacitor / fan assessment per vendor; battery string SoH review (replace modules < 80 %); UQD connector seal replacement per vendor life; isolation-valve actuator spring test | S | Report |
+
 ## 5a. Hardening add-ons (H2 and H3 units)
 
 | Level | Interval | Task | Who | Record |

@@ -1,8 +1,8 @@
 # BEN Engine BOM — BEN 150 forward prototype (800 VDC + high-density liquid)
 
-**Configuration:** BEN 150 · ai_inference · H1 Standard · 150 kW IT in 2 rack(s) · High-density direct liquid cooling (W45 loop, 600 kW row CDU) (2 units, N+1) · W45 loop 193.8 L/min at ΔT 10 K, heat reuse 135.0 kW available · 480 V 3ph service · 400 A · **800 VDC bus** (±400 V, 760–920 V window): AC/DC front end 163.5 kW, 3 × 100 kW rectifier modules (N+1), bus 234 A → 400 A busway, 3 insulation monitors · battery on bus 27.8 kWh (800 V class, no UPS) · generator no · controls: BEN Controls Pro (6 BEN Pods) · subsystems: power, cooling, compute, controls
+**Configuration:** BEN 150 · ai_inference · H1 Standard · 150 kW IT in 2 rack(s) · High-density direct liquid cooling (W45 loop, 600 kW row CDU) (2 units, N+1) · W45 loop 193.8 L/min at ΔT 10 K, heat reuse 135.0 kW available · 480 V 3ph service · 400 A · **800 VDC bus**, ±400 VDC bipolar, high-resistance midpoint ground (OCP Diablo 400 convention) (760–920 V window: assumption pending OCP Diablo 400 §9.3.1 / NVIDIA MGX power rack spec): AC/DC front end 165.8 kW, 3 × 100 kW rectifier modules (N+1), bus 238 A → 400 A busway, 3 insulation monitors · 4 × 90 kW 800 V → 50 V rack shelves (efficiencies are vendor claims) · battery on bus 27.8 kWh (800 V class, no UPS) · generator no · controls: BEN Controls Pro (6 BEN Pods) · subsystems: power, cooling, compute, controls
 
-**Total: $2,962,399.32** across 114 lines — $2,222,125 confirmed listing (75.0%), $39 list price, $740,235 estimate. Confirmed-listing share excluding compute servers: 4.5%. Longest lead time in BOM: 30 weeks.
+**Total: $3,035,899.32** across 115 lines — $2,222,125 confirmed listing (73.2%), $39 list price, $813,735 estimate. Confirmed-listing share excluding compute servers: 4.1%. Longest lead time in BOM: 30 weeks.
 
 Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed listing is a price seen on the vendor's or distributor's own product page on the date shown (read from a search-result snippet, not a quote); re-verify before purchase order. Direct vendor pages were not reachable from the build environment. **list** = manufacturer published price (URL or MSRP note); **estimate** = engineering estimate with basis in the note.
 
@@ -10,10 +10,10 @@ Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed l
 |---|---:|
 | compute | 2,188,064.99 |
 | controls | 14,720.86 |
-| cooling | 439,150.00 |
+| cooling | 448,650.00 |
 | env | 9,724.85 |
 | fs | 27,604.34 |
-| power | 200,256.35 |
+| power | 264,256.35 |
 | site | 34,000.00 |
 | str | 17,232.93 |
 | svc | 31,645.00 |
@@ -133,4 +133,5 @@ Price status key: **confirmed listing** (JSON key `confirmed`) — A confirmed l
 | CLG-HRX | Heat-reuse plate heat exchanger on the W45 return (option): sized to the derived heat_reuse_kw_available, with 3-way diverting valve, BTU meter and isolation; per kW | Alfa Laval / SWEP / Danfoss Brazed / gasketed PHE, 50/45 C side | RFQ | 135 | kW | 38.00 | 5,130.00 | estimate | — | 10 | Estimate $38/kW for a PHE with valves and a BTU meter at 100-500 kW; the customer-side loop is excluded. Option: priced in the forward BOM, deleted if no heat sink exists. Standard product. |
 | CLG-PIPING-HD | W45 secondary loop piping inside the module: DN65-DN80 stainless or PP-R headers, isolation and balancing valves, strainers, air separator, expansion tank, make-up with RPZ, insulation (per m module length) | Local mechanical contractor Lot | Mechanical contractor | 7 | m | 1,600.00 | 11,200.00 | estimate | — | 8 | Estimate: catalog CLG-PIPING (glycol loop, RDHx / DLC) is $1,200/m; larger bore and stainless headers for W45 at +33 %. Site / shop labour. |
 | CLG-WATER-TREAT-HD | Loop fluid and treatment for the W45 loop: inhibited treated water (25 % propylene glycol where t_min < 0 C), biocide, side-stream filter, fill and flush; per kW IT | Chemical supplier / Dow (glycol) Lot | Mechanical contractor | 150 | kW | 6.00 | 900.00 | estimate | — | 4 | Estimate $6/kW IT from catalog CLG-GLYCOL (25 % PG at $35/gal, 0.8 gal/kW) plus treatment and filter. Stock. |
-| CLG-AIR-RESID-HD | In-row fan-coil unit on the W45 loop for the 10 % residual air load (chilled-water in-row, 300 mm, 20 kW class, EC fans, ePM1 filter), one per row + 1 | Vertiv / Schneider Electric (Uniflair / InRow CW class) In-row CW 300 mm 20 kW class | RFQ | 2 | ea | 9,500.00 | 19,000.00 | estimate | — | 16 | Estimate: chilled-water in-row units list $8-11k at 20 kW; the W45 supply limits sensible capacity, derated 40 % and still above the 10 % residual. Standard product. |
+| CLG-AIR-RESID-HD | In-row fan-coil unit on the W45 loop for the 10 % residual air load (chilled-water in-row, 300 mm, 20 kW class, 12 kW at W45 supply, EC fans, ePM1 filter), N+1 | Vertiv / Schneider Electric (Uniflair / InRow CW class) In-row CW 300 mm 20 kW class | RFQ | 3 | ea | 9,500.00 | 28,500.00 | estimate | — | 16 | Estimate: chilled-water in-row units list $8-11k at 20 kW; at a 40 C W45 supply the sensible capacity is derated to ~12 kW (vendor curves), sized N+1 for the residual 10 %. Standard product. |
+| PWR-DC-SHELF-50V | 800 V -> 50 V DC power shelf per rack, 90 kW class, N+1 modules, OCP ORv3 HPR busbar output (Delta 90 kW shelf / Flex 110 kW / LITEON class); racks do not take 800 VDC directly | Delta Electronics / Flex / LITEON / Vertiv (to be qualified) 800 VDC -> 50 VDC shelf 90 kW class | RFQ | 4 | ea | 16,000.00 | 64,000.00 | estimate | — | 24 | Sampling 2026: Delta 90 kW 800 V -> 50 V shelf shown at OCP 2026 (98.5 % peak efficiency is a VENDOR CLAIM, research §1.2); no list price. Estimate $16,000 (~$180/kW) from ORv3 48 V HPR shelf pricing ($90-120/kW at 33 kW) plus 800 V input stage; the alternative is an MGX 800 VDC power rack supplied with the IT. Sampling 2026; MGX-class racks carry their own shelves (then qty 0 for those racks). |

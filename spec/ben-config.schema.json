@@ -131,6 +131,14 @@
       ],
       "default": "ac480",
       "description": "Power distribution: ac480 (480 V AC -> UPS -> AC PDUs, today) or dc800 (800 VDC bus, AC/DC front end, battery on bus; BEN 150 and up; docs/FORWARD_ARCHITECTURE_DECISION.md)"
+    },
+    "dc_convention": {
+      "enum": [
+        "bipolar_400",
+        "unipolar_800"
+      ],
+      "default": "bipolar_400",
+      "description": "dc800 only: bipolar_400 (\u00b1400 VDC, high-resistance midpoint, OCP Diablo 400) or unipolar_800 (800 VDC, isolated return, OCP LVDC SST v0.3)"
     }
   },
   "x-tier-limits": {

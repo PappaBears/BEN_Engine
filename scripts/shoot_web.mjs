@@ -30,10 +30,25 @@ try {
   await page.dispatchEvent('#racks', 'change');
   const err = await page.textContent('#cfgErrors');
   const full = await page.screenshot({ path: 'docs/media/screens/web-full.png', fullPage: true });
+  // forward architecture: BEN 150 at 150 kW in 2 racks with the 800 VDC bus and high-density liquid selected
+  await page.click('.profile:nth-child(1)');
+  await page.selectOption('#tier', 'ben150');
+  await page.selectOption('#climateSel', 'temperate');
+  await page.fill('#racks', '2'); await page.dispatchEvent('#racks', 'change');
+  await page.fill('#it_kw', '150'); await page.dispatchEvent('#it_kw', 'input');
+  await page.selectOption('#powerArch', 'dc800');
+  await page.selectOption('#cooling', 'dlc_hd'); await page.dispatchEvent('#cooling', 'change');
+  await page.waitForTimeout(200);
+  const dcTxt = await page.textContent('#sizing');
+  const dcErr = (await page.textContent('#cfgErrors')).trim();
+  await page.locator('#configure').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'docs/media/screens/web-configure-dc800.png' });
+  const dcConvVisible = await page.evaluate(() => !document.querySelector('#dcConv').closest('label').hidden);
   const narrow = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: scale });
   await narrow.goto(`http://127.0.0.1:${port}/web/index.html`, { waitUntil: 'networkidle' });
   await narrow.waitForSelector('#sizing table');
   await narrow.screenshot({ path: 'docs/media/screens/web-narrow.png', fullPage: true });
   const overflow = await narrow.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
-  console.log(JSON.stringify({ sizingHasBen500: txt.includes('40 ft'), validationError: err.trim().slice(0, 120), narrowHorizontalOverflow: overflow, errors }, null, 1));
+  console.log(JSON.stringify({ sizingHasBen500: txt.includes('40 ft'), validationError: err.trim().slice(0, 120), narrowHorizontalOverflow: overflow,
+    dc800: { sizingHas800VDC: dcTxt.includes('800 VDC'), sizingHasBusway: /busway/.test(dcTxt), sizingHasLoop: /L\/min/.test(dcTxt), sizingHasVendorClaim: /vendor claim/.test(dcTxt), error: dcErr.slice(0, 120), dcConvVisible }, errors }, null, 1));
 } finally { await browser.close(); srv.kill(); }

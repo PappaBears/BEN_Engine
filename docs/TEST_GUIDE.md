@@ -26,6 +26,10 @@ Summary:
 | E14 | Envelope hose test (UL 50E type 4X) | FAT (H8), SAT after relocation, every 3 years | no | The envelope is watertight at every hardening level; the basis of the envelope warranty |
 | E15 | Module joint seal test (BEN 2000) | SAT (H17a), after relocation, by rotation annually | no | Three factory modules are one sealed envelope on site |
 | E16 | MV transformer / UPS string transfer test (BEN 2000) | FAT (power module, reduced), SAT | partly | 2N power path: either transformer and either UPS string carries the hall; generators start and carry it on utility loss |
+| E17 | DC bus ground-fault injection (test cell, dc800) | twin, test cell, FAT | yes (step 11) | Insulation monitoring reads, alarms and locates a first fault on each pole without tripping the IT load |
+| E18 | CDU pump failover (dlc_hd) | twin, FAT, SAT | yes (step 6) | Standby pump starts within the failover time; loop flow and ΔT stay inside the cold-plate margin |
+| E19 | Leak-to-isolation time (dlc_hd) | twin, FAT, SAT, quarterly | yes (step 10) | A leak at a rack manifold closes the row isolation valves within 15 s and the loop reports isolated |
+| E20 | W45 ΔT and heat-reuse accounting (dlc_hd) | twin, FAT (load banks), SAT | partly | Loop flow and ΔT reconcile with the IT load within 5 %; the heat available for reuse is a measured number, not a brochure one |
 
 Common "what to do if it fails": stop, record, do not adjust more than one thing, re-run on the twin with the suspected fault injected to see whether the twin reproduces the real data — if it does not, the model is wrong and `analysis.py` must be refit; if it does, fix the hardware cause and repeat.
 
@@ -265,6 +269,62 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 
 ---
 
+## E17 — DC bus ground-fault injection on the test cell (dc800, forward architecture)
+
+| | |
+| --- | --- |
+| **Purpose** | Prove that the insulation monitoring on the 800 VDC bus (bipolar ±400 V HR midpoint or unipolar 800 V isolated return) detects a first ground fault on either pole, raises the critical alarm, locates the faulted tap-off and does **not** trip the IT load; and that the alarm clears when the fault is removed. |
+| **Hypothesis** | With a listed test resistor (20 kΩ class) from one pole to the ground bar, `IMD_kohm` falls below 100 kΩ and `dc_ground_fault` is raised within 10 s; the faulted pole voltage to ground falls toward 0 V (`V_bus_pos` or `V_bus_neg`); `I_bus` and the rack loads are unchanged; the IMD location function names the tap-off; the second pole behaves the same. |
+| **Setup** | Test cell at ≥ 60 % load on load banks; bus healthy (`IMD_kohm` ≥ 500 kΩ recorded first); test resistor with a fused lead; qualified person; DC arc-flash PPE per the study; nobody else inside the module. Twin: `tw.inject("dc_ground_fault", pole="pos", kohm=20)`; sweep `dc_ground_fault_response`. |
+| **Instrumentation** | IMD over Modbus (`IMD_kohm`, location), `V_bus_pos`, `V_bus_neg`, `I_bus`, `power.pdu_kw[]`, `ben/<unit>/alarm` stream at 1 Hz; stopwatch on the alarm. |
+| **Procedure** | 1. Record 5 min baseline. 2. Connect the resistor positive pole to ground; log 60 s; read the location. 3. Remove; wait for the alarm to clear (log the clear time). 4. Repeat on the negative pole (or the return on unipolar_800). 5. On unipolar_800 repeat with the IMD coupling switched to the two-pole arrangement. |
+| **Data to record** | Healthy kΩ, kΩ at fault, time to alarm, pole voltages before/during, `I_bus`, rack kW, location result, clear time, convention and IMD arrangement used. |
+| **Analysis** | Compare with the twin sweep; any trip of a rack or the bus is a failure of the protection philosophy (first fault = alarm), to be reviewed with the PE before any retry. |
+| **Pass** | Alarm ≤ 10 s on both poles; `IMD_kohm` < 100 kΩ at fault and ≥ 500 kΩ after; location correct; IT load held within 5 %; alarm cleared. Commissioning step 11 records it. |
+| **If it fails** | No alarm: IMD coupling or Modbus mapping wrong (check the convention setting); trip on first fault: breaker ground-fault setting or a bonded pole — stop, review with the PE; wrong location: tap-off CT polarity. |
+
+## E18 — CDU pump failover (dlc_hd, forward architecture)
+
+| | |
+| --- | --- |
+| **Purpose** | Prove that losing any CDU pump at full load starts the standby within the failover time and that loop flow and ΔT stay inside the cold-plate margin (no chip throttling). |
+| **Hypothesis** | Stopping any one pump drops the flow to ≥ 60 % of design for ≤ 10 s; the standby starts within 5 s (twin) / 10 s (field); flow recovers to ≥ 80 % of design; loop ΔT peaks ≤ 1.5 × design (15 K); alarm `cdu_pumpN_fail` raised with the standby status. Twin: `tw.inject("cdu_pump_fail", pump=k)`; sweep `cdu_pump_failover`. |
+| **Setup** | 100 % load (E3 condition settled), both pumps healthy, CDU in automatic, flow meter and manifold temperatures logging at 1 Hz. |
+| **Instrumentation** | `F_loop`, `T_loop_sup`, `T_loop_ret`, `cdu_pump1..N`, CDU Modbus (pump speed, ΔP), rack inlet probes, GPU throttle flags from the IT (if available). |
+| **Procedure** | For each pump: 1. Baseline 10 min. 2. Stop the pump at its local disconnect; note the time. 3. Log 5 min. 4. Restore; wait for settle. Then one test with both pumps stopped for 20 s to record the loss-of-flow behaviour (cold-plate temperature rise rate) — only with load banks, never with customer IT. |
+| **Data to record** | Standby start delay, minimum flow (% design), peak ΔT, time to recover, alarm timestamps, any throttle flag. |
+| **Analysis** | Table per pump; compare with the twin; the both-pumps-off rate of rise gives the real thermal margin for the risk register (R37). |
+| **Pass** | Standby ≤ 10 s; flow ≥ 80 % after failover; ΔT ≤ 15 K; alarm within 30 s with the right `src`; no throttle flag. Commissioning step 6 records it. |
+| **If it fails** | Standby did not start: CDU controller in manual or the sequencing on the controller; flow too low: check valve, strainer ΔP, VFD limit; ΔT too high: loop under-flowed for the rack load, re-balance at the rack valves. |
+
+## E19 — Leak-to-isolation time (dlc_hd, forward architecture)
+
+| | |
+| --- | --- |
+| **Purpose** | Measure the time from a leak at a rack manifold to the row isolation valves closed, and prove the loop reports isolated. The number is written into the turnover package and repeated quarterly. |
+| **Hypothesis** | Wetting the drip-tray sensor of any rack closes the row isolation valves (spring-return) within 15 s (detection ≤ 2 s + valve travel ≤ 6 s in the twin → 8 s), `F_loop` to the row reads 0 within 30 s, `loop_iso` = 1 and `loop_isolated` is raised; after reset the valves reopen and flow returns. Twin: `tw.inject("leak")`, `state.loop.leak_to_isolation_s`. |
+| **Setup** | 60 % load on load banks (never customer IT for the first run); valve position switches wired; stopwatch; a wet sponge or the leak controller's test input; drip trays dry. |
+| **Instrumentation** | `leak`, `loop_iso`, `F_loop`, valve position switches, `ben/<unit>/alarm`, CDU pump status (the CDU must ride through a closed row without damage: dead-head protection). |
+| **Procedure** | For each rack: 1. Wet the drip-tray sensor; start the stopwatch. 2. Record valve-closed time and `F_loop` = 0 time. 3. Dry the sensor; reset; record reopen. Also one test at the manifold rope (not a tray). |
+| **Data to record** | Per rack: leak-to-valve-closed s, time to zero flow, alarm timestamps, CDU response, reopen time. |
+| **Analysis** | Worst rack is the number quoted; compare with the twin's 8 s; trend quarterly (valve wear). |
+| **Pass** | ≤ 15 s to valve closed on every rack; zero flow ≤ 30 s; alarm and `loop_iso` correct; reopen clean; CDU unharmed. Commissioning step 10 records it; quarterly result in `MAINTENANCE.md` §4b. |
+| **If it fails** | Slow: sensor placement or leak-controller delay; valve did not close: actuator supply or spring; no alarm: PLC mapping. Any failure stops liquid-cooled IT until repeated and passed. |
+
+## E20 — W45 ΔT and heat-reuse accounting (dlc_hd, forward architecture)
+
+| | |
+| --- | --- |
+| **Purpose** | Make the heat-reuse number honest: measure loop flow and ΔT against the IT load and show that the kW offered at the heat-reuse exchanger is a measured, reconciled figure. |
+| **Hypothesis** | At steady load, `F_loop` × 4.18 × (`T_loop_ret` − `T_loop_sup`) / 60 reconciles with the IT load × (1 − air residual 0.10) within 5 %; with the heat-reuse valve open, the customer-side BTU meter reads the same within 10 %; the supply stays ≤ 45 °C (W45) at the design outdoor temperature. |
+| **Setup** | Load banks at 40 / 70 / 100 %, each held 30 min; flow meter and manifold Pt1000s calibrated (E1 method); BTU meter on the HRX customer side (or a temporary one); outdoor temperature logged; dry coolers in automatic. |
+| **Instrumentation** | `F_loop`, `T_loop_sup`, `T_loop_ret`, `power.pdu_kw[]`, BTU meter, dry-cooler fan power, outdoor probe. |
+| **Procedure** | For each load: 1. Hold 30 min. 2. Record 10 min of 1 Hz data. 3. Open the heat-reuse valve (customer loop or a dump load); hold 20 min; record. 4. Close; confirm the dry coolers take the heat back. Repeat step 3 at 100 % only. |
+| **Data to record** | Loop kW (computed), IT kW, residual air kW (fan-coil side), BTU meter kW, supply/return °C, outdoor °C, dry-cooler kW, PUE. |
+| **Analysis** | Reconciliation table per load; the heat-reuse figure on the product page is the 100 % BTU-meter value minus losses, with its uncertainty from the meter classes. |
+| **Pass** | Loop energy balance within 5 % at every load; BTU meter within 10 %; supply ≤ 45 °C; the stated `heat_reuse_kw_available` is within 10 % of the measured value or the configuration model is corrected. |
+| **If it fails** | Flow meter or probe calibration (repeat E1 on the loop sensors); air-side share larger than 10 % (fan-coil load measured separately; correct `air_residual` in the library); supply above 45 °C: dry-cooler sizing or fouling (R39). |
+
 ## Appendix — running the scripted experiments
 
 ```
@@ -278,4 +338,4 @@ python -m ben_engine.commissioning --mode factory --config unit.json --experimen
 python -m ben_engine.commissioning --mode site --config unit.json --experiments E1,E2,E3r,E4,E5,E6,E9,E12,E13 --burnin-hours 48
 ```
 
-The report is signed JSON (hash of the data files plus the engineer's key) and a PDF. E8, E10, E14 and E15 are attached as separate reports with their own data files; E16 is scripted for the switching sequence log and the twin prediction only (the switching itself is done by the NETA test company). For BEN 2000 the twin and scripted experiments run per module (`--module 1..3`) plus one plant run. The twin run is kept beside the real run so every plot in the report shows "predicted" and "measured".
+The report is signed JSON (hash of the data files plus the engineer's key) and a PDF. E17–E20 run only on units configured with the forward options (dc800 / dlc_hd) and map to commissioning steps 11, 6, 10 and the loop reconciliation in step 5. E8, E10, E14 and E15 are attached as separate reports with their own data files; E16 is scripted for the switching sequence log and the twin prediction only (the switching itself is done by the NETA test company). For BEN 2000 the twin and scripted experiments run per module (`--module 1..3`) plus one plant run. The twin run is kept beside the real run so every plot in the report shows "predicted" and "measured".

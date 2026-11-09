@@ -24,6 +24,9 @@ def canonical_tier(t: str) -> str:
     return TIER_ALIASES.get(t, t)
 Cooling = Literal["cabinet_dx", "inrow_dx", "inrow_dx_300", "rdhx_drycooler", "dlc_cdu", "dlc_hd"]
 PowerArchitecture = Literal["ac480", "dc800"]
+# Two DC conventions coexist in 2026 (docs/research/STATE_OF_THE_ART_2026.md §1.3, §1.5): OCP Diablo 400 = ±400 VDC bipolar with a
+# high-resistance midpoint ground (±0.5 % regulation); NVIDIA / OCP LVDC SST v0.3 = 800 VDC unipolar with the return isolated from earth.
+DcConvention = Literal["bipolar_400", "unipolar_800"]
 Redundancy = Literal["N", "N+1", "2N"]
 Climate = Literal["temperate", "hot_arid", "hot_humid", "cold", "coastal", "high_altitude"]
 Profile = Literal[
@@ -116,14 +119,30 @@ POWER_ARCHITECTURES: Dict[str, Dict[str, Any]] = {
     "ac480": {"label": "480 V AC → UPS → 208/415 V AC PDUs (today)", "tiers": ("ben5", "ben30", "ben150", "ben500", "ben2000")},
     "dc800": {"label": "800 VDC bus: AC/DC front end → DC busway → DC-input racks, battery on bus (forward option)",
               "tiers": ("ben150", "ben500", "ben2000"),
-              "bus_v_nominal": 800, "bus_v_min": 760, "bus_v_max": 920, "pole_v_to_ground": 400,
-              "rectifier_eff": 0.985,            # assumption: SiC active front end / SST efficiency at design load
+              # WORKING ASSUMPTION, not a sourced figure: a 760–920 V operating window was found in no primary source (research §1.5);
+              # to be replaced by OCP Diablo 400 table 9.3.1 / the NVIDIA MGX power-rack spec once read in full.
+              "bus_v_nominal": 800, "bus_v_min": 760, "bus_v_max": 920, "window_basis": "assumption pending OCP Diablo 400 §9.3.1 / NVIDIA MGX power rack spec",
+              "pole_v_to_ground": 400,
+              "rectifier_eff": 0.985,            # VENDOR CLAIM (DG Matrix / Heron / Envision >98.5 % for SST; Delta shelves 98.5 % peak), used as the sizing assumption
+              # racks do not take 800 VDC directly today: each rack carries an 800 V -> 50 V DC shelf (Delta 90 kW class, 98.5 % peak VENDOR CLAIM)
+              # or is an MGX 800 VDC power rack; the shelf loss is in the chain (research §1.9)
+              "rack_shelf_kw": 90, "rack_shelf_eff": 0.985,
               "rectifier_module_kw": 100,        # assumption: 100 kW rectifier modules, N+1 (2N doubles)
               "bus_headroom": 1.25,              # bus current carries 25 % headroom over IT at nominal voltage
               "busway_frames_a": (400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200),
               "loss_saving_frac": 0.03,          # assumption: 3 % of IT power saved in distribution losses vs ac480 (vendor claims 3-5 %; we will measure)
               "copper_current_density_a_mm2": 2.0, "ac_feeder_v": 415, "ac_feeder_pf": 0.95, "copper_kg_per_mm2_m": 8.96e-3,
-              "pue_loss_adder": 0.015},          # replaces the 0.03 UPS double-conversion adder in pue_estimate
+              },
+}
+DC_CONVENTIONS: Dict[str, Dict[str, Any]] = {
+    "bipolar_400": {"label": "±400 VDC bipolar, high-resistance midpoint ground (OCP Diablo 400 convention)", "pole_v_to_ground": 400,
+                    "grounding": "midpoint of the ±400 V bus tied to ground through a high resistance (HRG): first fault flows a limited current, alarms, does not trip; insulation and clearances sized for 400 V to ground",
+                    "imd_arrangement": "one insulation monitoring device at the midpoint per rectifier section (pole-to-ground resistance both poles)",
+                    "spec": "OCP Diablo 400 v0.5.2 / v0.7.0 (±400 VDC, ±0.5 % regulation, 800 V rail-to-rail)"},
+    "unipolar_800": {"label": "800 VDC unipolar, return isolated from earth (NVIDIA / OCP LVDC SST v0.3 convention)", "pole_v_to_ground": 800,
+                     "grounding": "two-wire 800 VDC with the return isolated from protective earth (IT system): first fault undetected without insulation monitoring, so the IMD is mandatory; insulation and clearances sized for 800 V to ground",
+                     "imd_arrangement": "two-pole insulation monitoring device (positive and return to earth) per rectifier section, with fault location on the tap-offs",
+                     "spec": "OCP LVDC SST specification v0.3 (800 VDC unipolar, effective 2026-06-22); Diablo 400 800 VDC two-wire option"},
 }
 DC_BUSWAY_FRAMES = POWER_ARCHITECTURES["dc800"]["busway_frames_a"]
 
@@ -186,6 +205,8 @@ class Config:
     hardening: str = "H1"
     # Power distribution architecture (docs/FORWARD_ARCHITECTURE_DECISION.md): "ac480" today; "dc800" = 800 VDC bus option on BEN 150+.
     power_architecture: str = "ac480"
+    # DC convention for dc800 (ignored on ac480): "bipolar_400" (±400 V, HR midpoint, Diablo 400) or "unipolar_800" (800 V, isolated return, OCP SST v0.3).
+    dc_convention: str = "bipolar_400"
 
     def __post_init__(self):
         self.tier = canonical_tier(self.tier)
@@ -218,6 +239,8 @@ class Config:
             errs.append(f"unknown power_architecture {self.power_architecture}")
         elif self.tier not in POWER_ARCHITECTURES[self.power_architecture]["tiers"]:
             errs.append("800 VDC (dc800) is for BEN 150, BEN 500 and BEN 2000 only; BEN 5 and BEN 30 stay 480/208 V AC")
+        if self.dc_convention not in DC_CONVENTIONS:
+            errs.append(f"unknown dc_convention {self.dc_convention}")
         if self.hardening not in HARDENING:
             errs.append(f"unknown hardening {self.hardening}")
         if self.profile not in PROFILE_DEFAULTS:
@@ -348,7 +371,8 @@ class Config:
         # envelope solar/transmission gain, R-value 3.5 m2K/W (100 mm PIR), ΔT at design
         envelope_gain_kw = (area_m2 * (clim["t_design_c"] - 22) / 3.5 + 0.3 * clim["solar_w_m2"] * g["ext_l_m"] * g["ext_w_m"] * 0.25) / 1000
 
-        pue_est = round(total_kw / self.it_kw + (POWER_ARCHITECTURES["dc800"]["pue_loss_adder"] if dc800 else 0.03), 3)  # +0.03 UPS loss (ac480) / +0.015 rectifier loss (dc800)
+        # +0.03 UPS double-conversion loss (ac480); dc800: rectifier loss + rack DC shelf loss from the two stated (vendor-claim) efficiencies
+        pue_est = round(total_kw / self.it_kw + (dc["dc_pue_loss_adder"] if dc800 else 0.03), 3)
         # row length check per row (racks 600 mm + in-row/CDU units + 500 mm end zone) vs interior length
         rows = g.get("rows", 1)
         racks_per_row = math.ceil(self.racks / rows)
@@ -404,9 +428,12 @@ class Config:
         frame; rectifier modules of 100 kW with the configured redundancy; one insulation monitoring device per module; a 3 % distribution
         loss saving; copper by the simple area-ratio method (same current density, 2 DC conductors vs 3 AC phase conductors at 415 V)."""
         pa = POWER_ARCHITECTURES["dc800"]
+        conv = DC_CONVENTIONS[self.dc_convention]
         v = pa["bus_v_nominal"]
-        front_end_kw = total_kw / pa["rectifier_eff"]
-        bus_a = self.it_kw * 1000.0 / v * pa["bus_headroom"]
+        # the bus feeds the rack DC shelves (800 V -> 50 V), so the bus carries the IT load plus the shelf loss
+        bus_kw = self.it_kw / pa["rack_shelf_eff"]
+        front_end_kw = (total_kw + bus_kw - self.it_kw) / pa["rectifier_eff"]
+        bus_a = bus_kw * 1000.0 / v * pa["bus_headroom"]
         busway_a = next((f for f in pa["busway_frames_a"] if f >= bus_a), pa["busway_frames_a"][-1])
         n_rect = math.ceil(front_end_kw / pa["rectifier_module_kw"])
         if self.redundancy == "N+1":
@@ -418,14 +445,22 @@ class Config:
         # copper: area ∝ current at a fixed density; mass = conductors x area x length x 8.96e-3 kg/(mm²·m); length = row length + 5 m to the bus
         g = TIER_GEOMETRY[self.tier]
         length_m = g["int_l_m"] + 5.0
-        i_dc = self.it_kw * 1000.0 / v
+        i_dc = bus_kw * 1000.0 / v
         i_ac = self.it_kw * 1000.0 / (math.sqrt(3) * pa["ac_feeder_v"] * pa["ac_feeder_pf"])
         cu_dc = 2 * (i_dc / pa["copper_current_density_a_mm2"]) * length_m * pa["copper_kg_per_mm2_m"]
         cu_ac = 3 * (i_ac / pa["copper_current_density_a_mm2"]) * length_m * pa["copper_kg_per_mm2_m"]
         battery_kwh = self.it_kw * self.ups_minutes / 60 / 0.9
+        per_rack_kw = self.it_kw / self.racks
+        shelves_per_rack = math.ceil(per_rack_kw / pa["rack_shelf_kw"]) + (1 if self.redundancy in ("N+1", "2N") else 0)
         return {
-            "ac_dc_front_end_kw": round(front_end_kw, 1), "rectifier_eff": pa["rectifier_eff"],
-            "dc_bus_v_nominal": v, "dc_bus_v_pole": pa["pole_v_to_ground"], "dc_bus_v_min": pa["bus_v_min"], "dc_bus_v_max": pa["bus_v_max"],
+            "ac_dc_front_end_kw": round(front_end_kw, 1), "rectifier_eff": pa["rectifier_eff"], "rectifier_eff_basis": "vendor claim (SST/rectifier >98.5 % peak), sizing assumption",
+            "dc_convention": self.dc_convention, "dc_convention_label": conv["label"], "dc_grounding": conv["grounding"], "dc_imd_arrangement": conv["imd_arrangement"], "dc_convention_spec": conv["spec"],
+            "dc_bus_v_nominal": v, "dc_bus_v_pole": conv["pole_v_to_ground"], "dc_bus_v_min": pa["bus_v_min"], "dc_bus_v_max": pa["bus_v_max"],
+            "dc_window_v": [pa["bus_v_min"], pa["bus_v_max"]], "dc_window_basis": pa["window_basis"],
+            "dc_bus_kw": round(bus_kw, 1), "rack_shelf_kw": pa["rack_shelf_kw"], "rack_shelf_eff": pa["rack_shelf_eff"], "rack_shelf_eff_basis": "vendor claim (Delta 90 kW 800 V -> 50 V shelf, 98.5 % peak)",
+            "rack_shelves_per_rack": shelves_per_rack, "rack_shelves_total": shelves_per_rack * self.racks,
+            "rack_interface": "800 V -> 50 V DC shelf per rack (Delta 90 kW class) or an MGX 800 VDC power rack; no server takes 800 VDC directly",
+            "dc_pue_loss_adder": round((1.0 / pa["rectifier_eff"] - 1.0) + (1.0 / pa["rack_shelf_eff"] - 1.0), 4),
             "dc_bus_current_a": round(bus_a), "dc_busway_a": busway_a,
             "rectifier_module_kw": pa["rectifier_module_kw"], "rectifier_modules_n": n_rect, "rectifier_modules": n_rect_total,
             "rectifier_cabinets": math.ceil(n_rect_total / 4), "imd_count": n_rect_total,
@@ -494,10 +529,11 @@ def main(argv=None):
     ap.add_argument("--hardening", choices=list(HARDENING))
     ap.add_argument("--power-architecture", dest="power_architecture", choices=list(POWER_ARCHITECTURES),
                     help="ac480 (default, today) or dc800 (800 VDC bus option, BEN 150 and up)")
+    ap.add_argument("--dc-convention", dest="dc_convention", choices=list(DC_CONVENTIONS), help="dc800 only: bipolar_400 (±400 V, HR midpoint; default) or unipolar_800 (isolated return)")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args(argv)
     cfg = Config.preset(a.tier, a.profile, a.climate)
-    for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier", "hardening", "power_architecture"):
+    for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier", "hardening", "power_architecture", "dc_convention"):
         v = getattr(a, k)
         if v is not None:
             setattr(cfg, k, v)
@@ -514,7 +550,7 @@ def main(argv=None):
                   "ups_modules", "ups_kva_each", "battery_kwh", "airflow_cfm", "gross_kg", "pue_estimate", "row_length_mm", "row_fits", "nfpa_855_scope",
                   "controls_tier_resolved", "pods", "hardening_label", "transformers_total", "generators_total", "power_architecture"):
             print(f"  {k:24s} {d[k]}")
-        for k in ("ac_dc_front_end_kw", "dc_bus_v_nominal", "dc_bus_current_a", "dc_busway_a", "rectifier_modules", "imd_count", "battery_on_bus_kwh",
+        for k in ("ac_dc_front_end_kw", "dc_convention", "dc_bus_v_nominal", "dc_bus_v_pole", "dc_window_v", "dc_window_basis", "dc_bus_current_a", "dc_busway_a", "rectifier_modules", "imd_count", "rack_shelves_total", "battery_on_bus_kwh",
                   "dc_loss_saving_kw", "copper_saving_pct", "loop_flow_lpm", "heat_reuse_kw_available"):
             if k in d:
                 print(f"  {k:24s} {d[k]}")

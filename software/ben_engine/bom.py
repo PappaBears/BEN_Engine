@@ -230,6 +230,7 @@ def rule_variables(cfg: Config) -> Dict[str, float]:
         "dc_bus_current_a": d.get("dc_bus_current_a", 0),
         "imd_count": d.get("imd_count", 0),
         "battery_on_bus_kwh": d.get("battery_on_bus_kwh", 0),
+        "rack_shelves_total": d.get("rack_shelves_total", 0),
         "dlc_hd": 1 if cfg.cooling == "dlc_hd" else 0,
         "liquid_heat_kw": d.get("liquid_heat_kw", 0),
         "loop_flow_lpm": d.get("loop_flow_lpm", 0),
@@ -364,9 +365,10 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
     if cfg is not None:
         d = cfg.derived()
         if cfg.power_architecture == "dc800":
-            power_txt = (f"{d['voltage']} service · {d['service_breaker_a']} A · **800 VDC bus** (±400 V, {d['dc_bus_v_min']}–{d['dc_bus_v_max']} V window): "
+            power_txt = (f"{d['voltage']} service · {d['service_breaker_a']} A · **800 VDC bus**, {d['dc_convention_label']} ({d['dc_bus_v_min']}–{d['dc_bus_v_max']} V window: {d['dc_window_basis']}): "
                          f"AC/DC front end {d['ac_dc_front_end_kw']} kW, {d['rectifier_modules']} × {d['rectifier_module_kw']} kW rectifier modules ({cfg.redundancy}), "
-                         f"bus {d['dc_bus_current_a']} A → {d['dc_busway_a']} A busway, {d['imd_count']} insulation monitors · battery on bus {d['battery_on_bus_kwh']} kWh (800 V class, no UPS)")
+                         f"bus {d['dc_bus_current_a']} A → {d['dc_busway_a']} A busway, {d['imd_count']} insulation monitors · {d['rack_shelves_total']} × {d['rack_shelf_kw']} kW 800 V → 50 V rack shelves "
+                         f"(efficiencies are vendor claims) · battery on bus {d['battery_on_bus_kwh']} kWh (800 V class, no UPS)")
         else:
             power_txt = f"{d['voltage']} · {d['service_breaker_a']} A service · UPS {d['ups_modules']} × {d['ups_kva_each']} kVA · battery {d['battery_kwh']} kWh"
         loop_txt = (f" · W45 loop {d['loop_flow_lpm']} L/min at ΔT {d['loop_dt_design_k']:.0f} K, heat reuse {d['heat_reuse_kw_available']} kW available"

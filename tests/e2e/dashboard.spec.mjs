@@ -170,6 +170,43 @@ try {
     return `${info.racks} racks in ${info.rows} rows, ${info.hall.transformers} transformers, ${info.hall.generators} generators, ${info.dry} dry coolers, ${info.hall.fanwalls} fan walls`;
   });
 
+  // ---------------------------------------------------------------------------------------------- forward architecture (study): dc800 + dlc_hd
+  await step(`selector: ${L('ben150')} forward options dc800 + dlc_hd build the rectifier, DC busway, row CDUs and manifolds`, async () => {
+    await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben150')}")`);
+    await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben150');
+    const opts = await page.$$eval('select[name=power_architecture] option', os => os.map(o => o.value));
+    if (opts.join(',') !== 'ac480,dc800') throw new Error('power architecture options ' + opts.join(','));
+    await page.evaluate(() => {
+      const set = (name, v) => { const s = document.querySelector(`select[name=${name}]`); s.value = v; s.dispatchEvent(new Event('change')); };
+      set('power_architecture', 'dc800'); set('dc_convention', 'bipolar_400'); set('cooling', 'dlc_hd');
+      const kw = document.querySelector('input[type=range][max="150"]'); kw.value = 150; kw.dispatchEvent(new Event('input'));
+      const racks = document.querySelector('input[type=range][max="6"]'); racks.value = 2; racks.dispatchEvent(new Event('input'));
+    });
+    await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled && /800 VDC/.test(document.querySelector('.panel-body[data-panel="selector"]').textContent), null, { timeout: 8000, polling: 200 });
+    await page.click('#btn-apply-config');
+    await page.waitForFunction(() => window.__ben.store.config.power_architecture === 'dc800' && window.__ben.store.config.cooling === 'dlc_hd' && window.__ben.scene.rackCount() === 2, null, { timeout: 20000, polling: 200 });
+    const info = await page.evaluate(() => { const o = window.__ben.scene.objects; return { rect: !!o.rectifier, bus: !!o.dc_busway, ups: o.ups === o.rectifier, bat: !!o.battery, cdu1: !!o.cdu1, cdu2: !!o.cdu2, man1: !!o.manifold1, man2: !!o.manifold2, d: window.__ben.store.derived, st: window.__ben.store.state }; });
+    if (!info.rect || !info.bus || !info.ups || !info.bat) throw new Error('dc800 objects ' + JSON.stringify({ rect: info.rect, bus: info.bus, bat: info.bat }));
+    if (!info.cdu1 || !info.cdu2 || !info.man1 || !info.man2) throw new Error('dlc_hd objects missing');
+    if (info.d.dc_busway_a !== 400 || info.d.rectifier_modules !== 3 || info.d.loop_flow_lpm !== 193.8) throw new Error('derived forward numbers ' + JSON.stringify([info.d.dc_busway_a, info.d.rectifier_modules, info.d.loop_flow_lpm]));
+    const derivedTxt = await page.textContent('.panel-body[data-panel="selector"]');
+    if (!/Bus window/.test(derivedTxt) || !/Battery on bus/.test(derivedTxt) || !/Heat reuse/.test(derivedTxt) || !/Liquid loop/.test(derivedTxt)) throw new Error('derived table lacks DC / loop rows');
+    // state carries the new sensors once the twin runs
+    await page.waitForFunction(() => window.__ben.store.state && window.__ben.store.state.dc && window.__ben.store.state.loop, null, { timeout: 15000, polling: 300 });
+    const st = await page.evaluate(() => ({ v: window.__ben.store.state.dc.v_bus, imd: window.__ben.store.state.dc.imd_kohm, flow: window.__ben.store.state.loop.flow_lpm }));
+    if (!(st.v > 700 && st.imd > 500 && st.flow > 0)) throw new Error('forward state ' + JSON.stringify(st));
+    // hover the rectifier: tooltip names the part and the convention
+    const ok = await page.evaluate(() => window.__ben.scene.setHoverByKey('rectifier'));
+    if (!ok) throw new Error('rectifier not hoverable');
+    await page.waitForFunction(() => { const t = document.getElementById('tip'); return t && !t.hidden && /front end/i.test(t.textContent); }, null, { timeout: 5000, polling: 200 });
+    const tip = await page.textContent('#tip');
+    await page.evaluate(() => window.__ben.scene.clearHover());
+    await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true));
+    await page.waitForTimeout(1200);
+    await shot(page, `${SCREENS}/selector-ben150-forward.png`);
+    return `rectifier + DC busway + battery, 2 row CDUs, 2 manifolds; bus ${st.v.toFixed(0)} V, IMD ${st.imd.toFixed(0)} kΩ, loop ${st.flow.toFixed(0)} L/min; tooltip: ${tip.slice(0, 60).replace(/\s+/g, ' ')}`;
+  });
+
   // back to the default tier for the rest
   if (!ONLY) {
   await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${DEF.label}")`);

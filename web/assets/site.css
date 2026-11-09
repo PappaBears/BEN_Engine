@@ -63,3 +63,7 @@ output{color:var(--text);font-weight:700}
 code{font-family:'JetBrains Mono',Consolas,monospace;background:var(--panel);padding:2px 6px;border-radius:6px;font-size:.9em}
 footer{max-width:1200px;margin:0 auto;padding:32px 16px}
 @media (max-width:860px){.hero,.cfg-out{grid-template-columns:1fr}.risk{grid-template-columns:1fr}.top{padding:10px 16px}}
+
+/* configurator selects: long option labels (cooling, power architecture, DC convention) must not widen the column */
+.cfg-form select, .cfg-form input[type="text"] { max-width: 100%; min-width: 0; box-sizing: border-box; }
+.cfg-form label { min-width: 0; }

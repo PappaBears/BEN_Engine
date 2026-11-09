@@ -29,6 +29,17 @@
       "reason": "AIM Act < 700 GWP (COMPLIANCE §0 finding 2); audit F-07",
       "requested_by": "compliance",
       "approved_by": ""
+    },
+    {
+      "id": "DC-002",
+      "date": "2026-11-09",
+      "sheets": [
+        "forward-ben150/E-001 (800 VDC one-line, study)",
+        "forward-ben150/M-001 (W45 high-density liquid P&ID, study)"
+      ],
+      "reason": "Forward architecture option (docs/FORWARD_ARCHITECTURE_DECISION.md): power_architecture dc800 (±400 V bipolar HR midpoint or 800 V unipolar) and cooling dlc_hd added to the configuration model; study sheets generated for review by gen_drawings.py --forward for the BEN 150 forward prototype (150 kW, 2 racks). No change to the Rev C tier sets; nothing issued for construction; to be checked with the next revision.",
+      "requested_by": "engineering (forward program)",
+      "approved_by": ""
     }
   ]
 }

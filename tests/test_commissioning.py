@@ -11,9 +11,12 @@ def test_sim_commissioning_passes_and_signs(tmp_path):
     c = cm.Commissioning(cfg, sim=True, yes=True, seed=0, operator="QA", log=lambda m: None, fast=True,
                          clock="2026-01-01T00:00:00+00:00")
     rep = c.run(str(tmp_path / "report.md"))
-    assert [s.num for s in rep.steps] == list(range(1, 11))
+    assert [s.num for s in rep.steps] == list(range(1, 13))
     failed = [(s.num, s.notes) for s in rep.steps if not s.passed]
     assert rep.passed, failed
+    # forward-architecture steps are skipped with a stated reason on a standard AC / rear-door unit
+    assert rep.steps[9].values.get("skipped") and "dlc_hd" in rep.steps[9].notes[0]
+    assert rep.steps[10].values.get("skipped") and "dc800" in rep.steps[10].notes[0]
     md = (tmp_path / "report.md").read_text()
     assert "overall **PASS**" in md and "## Signature" in md and "QA" in md and "SHA-256" in md
     data = tmp_path / "report_data.csv"

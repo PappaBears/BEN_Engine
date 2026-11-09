@@ -5074,7 +5074,7 @@
  },
  {
   "code": "CLG-AIR-RESID-HD",
-  "name": "In-row fan-coil unit on the W45 loop for the 10 % residual air load (chilled-water in-row, 300 mm, 20 kW class, EC fans, ePM1 filter), one per row + 1",
+  "name": "In-row fan-coil unit on the W45 loop for the 10 % residual air load (chilled-water in-row, 300 mm, 20 kW class, 12 kW at W45 supply, EC fans, ePM1 filter), N+1",
   "manufacturer": "Vertiv / Schneider Electric (Uniflair / InRow CW class)",
   "mpn": "In-row CW 300 mm 20 kW class",
   "vendor": "RFQ",
@@ -5082,7 +5082,7 @@
   "unit": "ea",
   "unit_price_usd": 9500.0,
   "price_status": "estimate",
-  "price_source_note": "Estimate: chilled-water in-row units list $8-11k at 20 kW; the W45 supply limits sensible capacity, derated 40 % and still above the 10 % residual.",
+  "price_source_note": "Estimate: chilled-water in-row units list $8-11k at 20 kW; at a 40 C W45 supply the sensible capacity is derated to ~12 kW (vendor curves), sized N+1 for the residual 10 %.",
   "price_checked": null,
   "lead_time_weeks": 16,
   "availability_note": "Standard product.",
@@ -5091,9 +5091,34 @@
    "ben150",
    "ben500"
   ],
-  "qty_rule": "rows + 1",
+  "qty_rule": "ceil(it_kw*0.1*1.05/12) + 1",
   "applies_to_cooling": [
    "dlc_hd"
+  ]
+ },
+ {
+  "code": "PWR-DC-SHELF-50V",
+  "name": "800 V -> 50 V DC power shelf per rack, 90 kW class, N+1 modules, OCP ORv3 HPR busbar output (Delta 90 kW shelf / Flex 110 kW / LITEON class); racks do not take 800 VDC directly",
+  "manufacturer": "Delta Electronics / Flex / LITEON / Vertiv (to be qualified)",
+  "mpn": "800 VDC -> 50 VDC shelf 90 kW class",
+  "vendor": "RFQ",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 16000.0,
+  "price_status": "estimate",
+  "price_source_note": "Sampling 2026: Delta 90 kW 800 V -> 50 V shelf shown at OCP 2026 (98.5 % peak efficiency is a VENDOR CLAIM, research §1.2); no list price. Estimate $16,000 (~$180/kW) from ORv3 48 V HPR shelf pricing ($90-120/kW at 33 kW) plus 800 V input stage; the alternative is an MGX 800 VDC power rack supplied with the IT.",
+  "price_checked": null,
+  "lead_time_weeks": 24,
+  "availability_note": "Sampling 2026; MGX-class racks carry their own shelves (then qty 0 for those racks).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben150",
+   "ben500",
+   "ben2000"
+  ],
+  "qty_rule": "rack_shelves_total",
+  "applies_to_power": [
+   "dc800"
   ]
  }
 ]

@@ -19,7 +19,7 @@
 | 2-D thermal lattice-Boltzmann CFD per tier, recirculation profile into the twin | `software/ben_engine/cfd.py` | verified (runs, converges); relative tool only |
 | Calibration (GUM budgets, tares, placement effects) and analysis (parameter fit, 95 % prediction intervals, ride-through) | `calibration.py`, `analysis.py` | verified on synthetic data |
 | Automated sweeps with pass/fail and CSV | `sweeps.py` | verified (6/6 pass on BEN 150) |
-| Commissioning script, FAT/SAT, signed report with SHA-256 | `commissioning.py` | verified in simulation (10/10 steps) |
+| Commissioning script, FAT/SAT, signed report with SHA-256 | `commissioning.py` | verified in simulation (12/12 steps; steps 10–11 are the forward-architecture steps, skipped with the reason on AC units) |
 | Dashboard: 3-D twin, walkthrough, guided tour, hover tooltips with part and live values, sweeps, fault injection, I/O test, calibration, CFD, export, **proposal** | `dashboard/`, `api.py` | verified (26 API tests, Playwright e2e with screenshots) |
 | Proposal generator: selector → 16-section customer proposal, md/html/json, contract pre-fill | `proposal.py`, `docs/proposals/` | verified (16 tests; rendered and inspected) |
 | Deal package assembler: customer package + partner package as zips | `package.py` | verified (tests; sample built) |

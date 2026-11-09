@@ -1,5 +1,5 @@
 $ make -C firmware/ben-pod test
-# exit 0 · 2026-11-08T17:46:40+00:00
+# exit 0 · 2026-11-09T05:28:04+00:00
 make: Entering directory '/home/user/ben_engine/firmware/ben-pod'
 ./.build-host/test_core
 test/test_core/test_main.cpp:559:test_calibration_apply_gain_offset:PASS

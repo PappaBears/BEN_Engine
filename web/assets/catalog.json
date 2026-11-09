@@ -369,8 +369,11 @@
    "bus_v_nominal": 800,
    "bus_v_min": 760,
    "bus_v_max": 920,
+   "window_basis": "assumption pending OCP Diablo 400 \u00a79.3.1 / NVIDIA MGX power rack spec",
    "pole_v_to_ground": 400,
    "rectifier_eff": 0.985,
+   "rack_shelf_kw": 90,
+   "rack_shelf_eff": 0.985,
    "rectifier_module_kw": 100,
    "bus_headroom": 1.25,
    "busway_frames_a": [
@@ -388,13 +391,28 @@
    "copper_current_density_a_mm2": 2.0,
    "ac_feeder_v": 415,
    "ac_feeder_pf": 0.95,
-   "copper_kg_per_mm2_m": 0.00896,
-   "pue_loss_adder": 0.015
+   "copper_kg_per_mm2_m": 0.00896
   }
  },
  "dlc_hd_tiers": [
   "ben150",
   "ben500",
   "ben2000"
- ]
+ ],
+ "dc_conventions": {
+  "bipolar_400": {
+   "label": "\u00b1400 VDC bipolar, high-resistance midpoint ground (OCP Diablo 400 convention)",
+   "pole_v_to_ground": 400,
+   "grounding": "midpoint of the \u00b1400 V bus tied to ground through a high resistance (HRG): first fault flows a limited current, alarms, does not trip; insulation and clearances sized for 400 V to ground",
+   "imd_arrangement": "one insulation monitoring device at the midpoint per rectifier section (pole-to-ground resistance both poles)",
+   "spec": "OCP Diablo 400 v0.5.2 / v0.7.0 (\u00b1400 VDC, \u00b10.5 % regulation, 800 V rail-to-rail)"
+  },
+  "unipolar_800": {
+   "label": "800 VDC unipolar, return isolated from earth (NVIDIA / OCP LVDC SST v0.3 convention)",
+   "pole_v_to_ground": 800,
+   "grounding": "two-wire 800 VDC with the return isolated from protective earth (IT system): first fault undetected without insulation monitoring, so the IMD is mandatory; insulation and clearances sized for 800 V to ground",
+   "imd_arrangement": "two-pole insulation monitoring device (positive and return to earth) per rectifier section, with fault location on the tap-offs",
+   "spec": "OCP LVDC SST specification v0.3 (800 VDC unipolar, effective 2026-06-22); Diablo 400 800 VDC two-wire option"
+  }
+ }
 }

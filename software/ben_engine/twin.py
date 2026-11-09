@@ -56,6 +56,7 @@ class TwinParams:
     # dc800: AC/DC front end efficiency (rectifier / SST; POWER_ARCHITECTURES assumption), bus droop at full load (fraction of nominal),
     # battery open-circuit voltage at 0 % and 100 % SoC (800 V class LFP string), healthy insulation resistance
     rectifier_eff: float = 0.985
+    dc_shelf_eff: float = 0.985           # 800 V -> 50 V DC shelf per rack (Delta 90 kW class, 98.5 % peak VENDOR CLAIM); racks do not take 800 VDC directly
     dc_droop_frac: float = 0.02
     dc_batt_v_empty: float = 770.0     # string cutoff sits above the 760 V bus minimum: the battery is sized so the bus never leaves the window
     dc_batt_v_full: float = 880.0
@@ -158,6 +159,7 @@ class Twin:
         if name == "leak" and self.hd and self.leak_t0 is None:
             self.leak_t0 = self.t
             self.leak_isolated = False
+            self.leak_to_isolation_s = None      # a new leak starts a new measurement
         if name == "cooling_unit_fail":
             u = int(params.get("unit", 0))
             if u < len(self.cooling_units):
@@ -254,7 +256,7 @@ class Twin:
             it_kw = it_kw * (cfg.racks - 1) / cfg.racks
         if self.dc800:
             # battery on the bus: no double conversion; the AC/DC front end carries the rectifier loss, the rack DC busbar the pdu_eff
-            bus_kw = it_kw / p.pdu_eff
+            bus_kw = it_kw / p.dc_shelf_eff / p.pdu_eff        # rack DC shelf loss + rack busbar/whip loss
             ups_in_kw = bus_kw / p.rectifier_eff            # AC input of the front end (kept under the ups_in name for the meters)
             if on_battery:
                 self.ups_soc -= (bus_kw * h / 3600.0) / max(d["battery_kwh"], 0.1) * 100.0 * 0.9
@@ -464,13 +466,19 @@ class Twin:
             # pole voltages to ground: symmetric ±V/2 on a healthy midpoint; a ground fault pulls the faulted pole toward 0 V
             pole = self.faults.get("dc_ground_fault", {}).get("pole", "pos") if gf else None
             shift = (1.0 - min(1.0, self.imd_kohm / p.imd_healthy_kohm)) * 0.9 if gf else 0.0
-            v_pos = v / 2 * (1.0 - shift) if pole == "pos" else v / 2 * (1.0 + shift)
-            v_neg = -(v - v_pos)
-            i_bus = (getattr(self, "it_kw_now", 0.0) / p.pdu_eff) * 1000.0 / max(v, 1.0)
+            if self.cfg.dc_convention == "unipolar_800":
+                # isolated return: healthy bus floats near +V / 0 V against the IMD reference; a fault pulls the faulted conductor to ground
+                v_pos = v * (1.0 - shift) if pole == "pos" else v * (1.0 + 0.0)
+                v_neg = -(v - v_pos) if pole == "pos" else -v * shift
+            else:
+                v_pos = v / 2 * (1.0 - shift) if pole == "pos" else v / 2 * (1.0 + shift)
+                v_neg = -(v - v_pos)
+            i_bus = (getattr(self, "it_kw_now", 0.0) / p.dc_shelf_eff / p.pdu_eff) * 1000.0 / max(v, 1.0)
             extra["dc"] = {"v_bus": round(v + self._noise(0.5), 1), "v_bus_pos": round(v_pos + self._noise(0.3), 1), "v_bus_neg": round(v_neg + self._noise(0.3), 1),
                            "i_bus": round(i_bus + self._noise(0.5), 1), "imd_kohm": round(self.imd_kohm * (1.0 + self._noise(0.01)), 1),
                            "ground_fault": self.imd_kohm < 100.0, "arc_tripped_rack": None if self.arc_dark is None else self.arc_dark + 1,
-                           "rectifier_kw": round(getattr(self, "it_kw_now", 0.0) / p.pdu_eff / p.rectifier_eff, 2), "on_battery": (not self.utility_ok) and (not self.generator_on)}
+                           "rectifier_kw": round(getattr(self, "it_kw_now", 0.0) / p.dc_shelf_eff / p.pdu_eff / p.rectifier_eff, 2), "shelf_loss_kw": round(getattr(self, "it_kw_now", 0.0) * (1.0 / p.dc_shelf_eff - 1.0), 2),
+                           "convention": self.cfg.dc_convention, "on_battery": (not self.utility_ok) and (not self.generator_on)}
         if self.hd:
             extra["loop"] = {"supply_c": round(self.loop_supply_c + self._noise(p.sensor_noise_c), 2), "return_c": round(self.loop_return_c + self._noise(p.sensor_noise_c), 2),
                              "dt_k": round(getattr(self, "loop_dt_k", 0.0), 2), "flow_lpm": round(self.loop_flow_lpm + self._noise(0.5), 1),

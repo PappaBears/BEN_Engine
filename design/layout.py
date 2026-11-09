@@ -45,6 +45,12 @@ LIB: Dict[str, Dict[str, Any]] = {
     "rdhx":      {"w": 600, "d": 200,  "h": 2000, "kg": _CL["rdhx_drycooler"]["mass_kg"], "label": "Rear-door heat exchanger 35 kW", "code": "CLG-RDHX"},
     "cdu":       {"w": _CL["dlc_cdu"]["width_mm"], "d": 1070, "h": 2000, "kg": _CL["dlc_cdu"]["mass_kg"], "label": "Coolant distribution unit", "code": "CLG-CDU"},
     "pump_unit": {"w": 600, "d": 1070, "h": 2000, "kg": 350, "label": "Row CDU for RDHx loop", "code": "CLG-CDU-RDHX"},
+    # forward architecture (docs/FORWARD_ARCHITECTURE_DECISION.md): high-density row CDU, W45 in-row fan coil for the residual air,
+    # 800 VDC rectifier / SST cabinet and 800 V class battery string cabinet (footprints are catalogue-typical, vendors sampling 2026)
+    "cdu_hd":    {"w": _CL["dlc_hd"]["width_mm"], "d": 1070, "h": 2000, "kg": _CL["dlc_hd"]["mass_kg"], "label": "Row CDU 600 kW class, W45 loop, pumps N+1", "kw": _CL["dlc_hd"]["unit_kw"], "code": "CLG-CDU-HD"},
+    "inrow_cw300": {"w": 300, "d": 1070, "h": 2000, "kg": 170, "label": "In-row fan coil 300 mm on the W45 loop (residual air), 12 kW at W45", "kw": 12.0, "code": "CLG-AIR-RESID-HD"},
+    "rect":      {"w": 600, "d": 1000, "h": 2000, "kg": 400, "label": "AC/DC front-end cabinet 800 VDC (4 x 100 kW SiC rectifier / SST modules)", "code": "PWR-DC-RECT-CAB"},
+    "batt800":   {"w": 600, "d": 1000, "h": 2000, "kg": 450, "label": "Battery string cabinet 800 V class LFP, on the DC bus", "code": "PWR-BATT-800V"},
     "ups600":    {"w": 600, "d": 1000, "h": 2000, "kg": 350, "label": "Modular UPS frame 600", "code": "PWR-UPS-GVS100"},
     "ups800":    {"w": 800, "d": 1000, "h": 2000, "kg": 500, "label": "Modular UPS frame 800", "code": "PWR-UPS-GVS100"},
     "batt":      {"w": 600, "d": 1000, "h": 2000, "kg": 450, "label": "Li-ion battery cabinet 32.6 kWh", "code": "PWR-BATT-LI"},
@@ -69,7 +75,7 @@ LIB: Dict[str, Dict[str, Any]] = {
     "cyl_bank":  {"w": 1200, "d": 500, "h": 1600, "kg": 350, "label": "Clean-agent cylinder bank (per module zone)", "code": "FS-CLEAN-AGENT-HALL"},
 }
 # catalogue footprints used for the "as purchased" row check (purchasing/parts_catalog.json rules)
-CATALOG_FOOTPRINT = {"PWR-UPS-GVS100": 521, "PWR-BATT-LI": 600, "PWR-UPS-93PM50": 495, "STR-RACK48_depth": 1200}
+CATALOG_FOOTPRINT = {"PWR-UPS-GVS100": 521, "PWR-BATT-LI": 600, "PWR-UPS-93PM50": 495, "STR-RACK48_depth": 1200, "PWR-DC-RECT-CAB": 600, "PWR-BATT-800V_cab": 600}
 
 HOT_PLENUM = 200          # rear hot-aisle plenum between rack rear and wall (air layouts)
 END_ZONE = 500            # dead-end zone at the blind end: cylinder, BEN Controller panel, mech panel
@@ -236,8 +242,12 @@ def _air_units(lay: Layout, kw_air: float, redundancy: str, unit_key: str):
 
 
 # ------------------------------------------------------------------ resolver
-def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None) -> Layout:
-    cfg = Config.preset(canonical_tier(tier), profile, climate, hardening)
+def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None, cfg: Config | None = None) -> Layout:
+    """Resolve the layout of a tier preset, or of an explicit ``cfg`` (forward-architecture studies: dc800 / dlc_hd)."""
+    cfg = cfg if cfg is not None else Config.preset(canonical_tier(tier), profile, climate, hardening)
+    errs = cfg.validate()
+    if errs:
+        raise ValueError("; ".join(errs))
     d = cfg.derived()
     g = d["geometry"]
     lay = Layout(tier, cfg, d,
@@ -245,6 +255,8 @@ def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate"
                  ext_l=g["ext_l_m"] * 1000, ext_w=g["ext_w_m"] * 1000, ext_h=g["ext_h_m"] * 1000)
     tier = cfg.tier
     lay.tier = tier
+    lay.notes["dc800"] = cfg.power_architecture == "dc800"
+    lay.notes["dlc_hd"] = cfg.cooling == "dlc_hd"
     if lay.is_cabinet:
         _resolve_micro(lay)
     elif lay.is_hall:
@@ -259,6 +271,24 @@ def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate"
         _resolve_container(lay)
     _sensors(lay)
     return lay
+
+
+def resolve_config(cfg: Config) -> Layout:
+    """Layout for an explicit configuration (used by the forward prototype set, design/drawings/forward-ben150/)."""
+    return resolve(cfg.tier, cfg=cfg)
+
+
+def forward_prototype_config() -> Config:
+    """The forward prototype: BEN 150 at 150 kW in 2 racks (75 kW/rack), 800 VDC bus (±400 V, HR midpoint) and high-density DLC
+    (docs/FORWARD_ARCHITECTURE_DECISION.md §4 workstream E; BOM in docs/BOM-ben150-forward.md)."""
+    cfg = Config.preset("ben150")
+    cfg.power_architecture = "dc800"
+    cfg.dc_convention = "bipolar_400"
+    cfg.cooling = "dlc_hd"
+    cfg.it_kw = 150.0
+    cfg.racks = 2
+    cfg.site_name = "Forward prototype (test cell)"
+    return cfg
 
 
 def _resolve_micro(lay: Layout):
@@ -325,8 +355,15 @@ def _resolve_container(lay: Layout):
         items = []
         # power block nearest the door: UPS frame(s) (+ integrated battery) then battery cabinets
         ups_kva = d["ups_kva_each"]
-        rack_ups = ups_kva <= RACK_UPS_KVA_MAX   # BEN 30: 3 x 20 kVA rack modules in R1 (the catalog 93PM tower does not fit the row)
-        if not rack_ups:
+        dc800 = cfg.power_architecture == "dc800"
+        rack_ups = (ups_kva <= RACK_UPS_KVA_MAX) and not dc800   # BEN 30: 3 x 20 kVA rack modules in R1 (the catalog 93PM tower does not fit the row)
+        if dc800:
+            # 800 VDC: rectifier / SST cabinets (4 x 100 kW modules each) + 800 V class battery string cabinets on the bus; no UPS frame
+            for _ in range(d["rectifier_cabinets"]):
+                items.append(("power", "rect"))
+            for _ in range(math.ceil(d["battery_on_bus_kwh"] / BATT_CAB_KWH)):
+                items.append(("power", "batt800"))
+        elif not rack_ups:
             ups_key = "ups600" if ups_kva <= 150 else "ups800"
             frames = 2 if red == "2N" else 1
             for _ in range(frames):
@@ -356,6 +393,15 @@ def _resolve_container(lay: Layout):
             items += [("cooling", "cdu")] * d["cooling_units_total"]
             items += _interleave(racks, units)
             return items, rk["d"], HOT_PLENUM, rack_ups, {"n_air": n_air, "air_key": "inrow300", "n_cdu": d["cooling_units_total"]}
+        if cooling_mode == "dlc_hd":
+            # high-density DLC: 90 % of IT heat to the W45 loop; the stated 10 % residual air goes to in-row fan coils on the same loop
+            # (catalog CLG-AIR-RESID-HD qty rule: ceil(it_kw x 0.10 x 1.05 / 12) + 1); row CDUs 600 kW class, N+1
+            n_air = math.ceil(_CL["dlc_hd"]["air_residual"] * cfg.it_kw * 1.05 / LIB["inrow_cw300"]["kw"]) + 1
+            racks = [("rack", rack_key)] * cfg.racks
+            units = [("cooling", "inrow_cw300")] * n_air
+            items += [("cooling", "cdu_hd")] * d["cooling_units_total"]
+            items += _interleave(racks, units)
+            return items, rk["d"], HOT_PLENUM, rack_ups, {"n_air": n_air, "air_key": "inrow_cw300", "n_cdu": d["cooling_units_total"]}
         raise ValueError(cooling_mode)
 
     def row_len(items):
@@ -392,7 +438,16 @@ def _resolve_container(lay: Layout):
         _cat = None
     if _cat:
         lay_power = sum(LIB[k]["w"] for kind, k in items if kind == "power")
-        if not rack_ups:
+        if cfg.power_architecture == "dc800":
+            n_rc, kwh = _q("PWR-DC-RECT-CAB"), _q("PWR-BATT-800V")
+            n_b = math.ceil(kwh / BATT_CAB_KWH)
+            cat_power = n_rc * CATALOG_FOOTPRINT["PWR-DC-RECT-CAB"] + n_b * CATALOG_FOOTPRINT["PWR-BATT-800V_cab"]
+            rl_cat = rl - lay_power + cat_power
+            _chk(lay, "I-C21", "A-002", f"Row length with catalog 800 VDC power quantities ({n_rc} x rectifier cabinet @600 + {n_b} x 800 V battery cabinet @600 for {kwh} kWh) vs usable length",
+                 f"{rl_cat:.0f} vs {budget:.0f}", rl_cat, budget, "<=",
+                 resolution="" if rl_cat <= budget else f"Over by {rl_cat - budget:.0f} mm: fewer racks or a battery string above the rectifier cabinet")
+            lay.notes["catalog_power_mm"] = cat_power
+        elif not rack_ups:
             n_gvs, n_bat = _q("PWR-UPS-GVS100"), _q("PWR-BATT-LI")
             cat_power = n_gvs * CATALOG_FOOTPRINT["PWR-UPS-GVS100"] + n_bat * CATALOG_FOOTPRINT["PWR-BATT-LI"]
             rl_cat = rl - lay_power + cat_power
@@ -421,8 +476,8 @@ def _resolve_container(lay: Layout):
     x = 0.0
     counters: Dict[str, int] = {}
     codes = {k: v["code"] for k, v in LIB.items()}
-    tags = {"rack42": "R", "rack48": "R", "inrow300": "CU", "inrow600": "CU", "cdu": "CDU", "pump_unit": "PU",
-            "ups600": "UPS", "ups800": "UPS", "batt": "BAT"}
+    tags = {"rack42": "R", "rack48": "R", "inrow300": "CU", "inrow600": "CU", "inrow_cw300": "CU", "cdu": "CDU", "cdu_hd": "CDU", "pump_unit": "PU",
+            "ups600": "UPS", "ups800": "UPS", "batt": "BAT", "rect": "RECT", "batt800": "BAT"}
     for kind, key in items:
         spec = LIB[key]
         counters[tags[key]] = counters.get(tags[key], 0) + 1
@@ -434,6 +489,12 @@ def _resolve_container(lay: Layout):
             label = f"Modular UPS frame, {d['ups_modules']} x {d['ups_kva_each']} kVA modules" + (f" + {d['battery_kwh']} kWh Li-ion internal" if d["battery_kwh"] <= UPS_INTEGRATED_BATT_KWH else "")
         if kind == "rack" and cooling == "rdhx_drycooler":
             label = f"{spec['label']} + RDHx door"
+        if kind == "rack" and cooling == "dlc_hd":
+            label = f"{spec['label']} + cold plates, UQD manifold" + (f", 800 V -> 50 V DC shelf x{d['rack_shelves_per_rack']}" if cfg.power_architecture == "dc800" else "")
+        if key == "rect":
+            label = f"{spec['label']}: {d['rectifier_modules']} x {d['rectifier_module_kw']} kW modules in {d['rectifier_cabinets']} cabinet(s), {d['dc_convention_label'].split(',')[0]}, IMD"
+        if key == "batt800":
+            label = f"{spec['label']}, {d['battery_on_bus_kwh']} kWh total for {cfg.ups_minutes} min"
         it = Item(codes[key], tag, kind, label, x, y0, x + spec["w"], row_front, 0, spec["h"], kg=spec["kg"])
         lay.items.append(it)
         x += spec["w"]
@@ -481,13 +542,17 @@ def _resolve_container(lay: Layout):
     # exterior: service section on the blind end wall, condensers / dry cooler
     lay.items.append(Item("PWR-SVC-ENCL", "SVC", "power", f"Service section NEMA 4X: main breaker {d['service_breaker_a']} A + SPD + ATS (exterior, end wall)",
                           L + 160, W / 2 - 500, L + 160 + 400, W / 2 + 500, 600, 2000, mount="ext", kg=180, front="+x"))
-    if cooling == "inrow_dx" or lay.notes.get("n_air", 0):
+    if (cooling == "inrow_dx" or lay.notes.get("n_air", 0)) and lay.notes.get("air_key", "inrow300") in ("inrow300", "inrow600"):
         n_air = lay.notes["n_air"]
         cus = [i for i in lay.items if i.tag.startswith("CU")]
         for i, cu in enumerate(cus):
             lay.items.append(Item("CLG-COND", f"CND{i+1}", "cooling", "Roof condenser 20 kW class", cu.x0 - 150, 250, cu.x1 + 150, 1050, H + 120, H + 120 + 700, mount="roof", kg=80))
     if cooling in ("rdhx_drycooler", "dlc_cdu"):
         lay.items.append(Item("CLG-DRYCOOLER", "DC1", "cooling", "Dry cooler (site, on pad adjacent to blind end)", L + 1500, -200, L + 1500 + 2400, W + 200, 0, 2200, mount="ext", kg=900))
+    if cooling == "dlc_hd":
+        lay.items.append(Item("CLG-DRYCOOLER-W45", "DC1", "cooling", f"W45 dry cooler bank (site pad, {math.ceil(d['liquid_heat_kw'] * 1.15)} kW rejection at design ambient)", L + 1500, -200, L + 1500 + 2400, W + 200, 0, 2200, mount="ext", kg=900))
+        lay.items.append(Item("CLG-HRX", "HRX", "cooling", f"Heat-reuse plate heat exchanger (option), {d['heat_reuse_kw_available']} kW at the W45 return", L + 160, W / 2 + 700, L + 160 + 400, W / 2 + 1300, 300, 1500, mount="ext", kg=120, front="+x"))
+        lay.items.append(Item("CLG-ISOVALVE-ROW", "ISO1", "cooling", "Row isolation valves (supply + return, spring-return, position feedback), close on leak", lay.notes["row_end_x"] - 300, 100, lay.notes["row_end_x"], 400, 2300, 2450, mount="ceiling", kg=12))
     # overhead trays above the cold aisle: data tray and power tray
     ay = row_front
     lay.items.append(Item("STR-TRAY", "TR-D", "tray", "Cable tray 300 wide, data (overhead)", 0, ay + 100, L - END_ZONE, ay + 400, TRAY_Z, TRAY_Z + TRAY_H, mount="ceiling", kg=6 * L / 1000))
@@ -553,6 +618,17 @@ def _resolve_container(lay: Layout):
     if cooling == "dlc_cdu":
         _chk(lay, "I-C19", "M-001", "Residual air load (25 % IT) vs in-row 300 capacity x units (N)",
              f"{0.25*cfg.it_kw*1.05:.1f} kW vs {lay.notes['n_air']} x 20 kW", lay.notes["n_air"] * 20, 0.25 * cfg.it_kw * 1.05, ">=")
+    if cooling == "dlc_hd":
+        resid = _CL["dlc_hd"]["air_residual"]
+        _chk(lay, "I-C23", "M-001", f"Residual air load ({resid:.0%} IT, stated library value) vs W45 in-row fan coils x (units - 1)",
+             f"{resid*cfg.it_kw*1.05:.1f} kW vs {lay.notes['n_air'] - 1} x 12 kW", (lay.notes["n_air"] - 1) * 12, resid * cfg.it_kw * 1.05, ">=")
+        _chk(lay, "I-C24", "M-001", f"Row CDU capacity (N units) vs liquid heat x 1.05",
+             f"{(d['cooling_units_n']) * 600} vs {d['liquid_heat_kw'] * 1.05:.0f}", d["cooling_units_n"] * 600, d["liquid_heat_kw"] * 1.05, ">=")
+    if cfg.power_architecture == "dc800":
+        _chk(lay, "I-C25", "E-001", f"DC busway frame vs bus current with 25 % headroom ({d['dc_convention_label'].split(',')[0]})",
+             f"{d['dc_busway_a']} A vs {d['dc_bus_current_a']} A", d["dc_busway_a"], d["dc_bus_current_a"], ">=")
+        _chk(lay, "I-C26", "E-001", "Rectifier modules (N, 100 kW) vs AC/DC front-end load",
+             f"{d['rectifier_modules_n'] * d['rectifier_module_kw']} vs {d['ac_dc_front_end_kw']}", d["rectifier_modules_n"] * d["rectifier_module_kw"], d["ac_dc_front_end_kw"], ">=")
     # roof penetration positions clear of corrugation top rails (>= 300 from side rail)
     _chk(lay, "I-C20", "A-001", "Roof penetrations min 300 mm from side top rail", "line-set curbs at y=300 interior = 419 from ext side face", 419, 300, ">=",
          resolution="Line-set roof curbs 300 mm inboard of top side rail, between corrugation roof bows; see A-001")

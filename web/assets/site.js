@@ -1,4 +1,4 @@
-import { validate, derived, preset, canonicalTier, hardeningRecommended, powerArchitectures } from './selector.js';
+import { validate, derived, preset, canonicalTier, hardeningRecommended, powerArchitectures, dcConventions } from './selector.js';
 
 const $ = (s) => document.querySelector(s);
 const fmt = (n) => n.toLocaleString('en-US');
@@ -109,6 +109,10 @@ function writeForm() {
   }
   if (![...ps.options].some(o => o.value === c.power_architecture)) c.power_architecture = 'ac480';
   ps.value = c.power_architecture;
+  const cv = $('#dcConv'); cv.innerHTML = '';
+  if (!c.dc_convention) c.dc_convention = 'bipolar_400';
+  for (const [k, v] of Object.entries(dcConventions(CAT))) { const o = document.createElement('option'); o.value = k; o.textContent = v.label; cv.appendChild(o); }
+  cv.value = c.dc_convention; cv.closest('label').hidden = c.power_architecture !== 'dc800';
   $('#powerArchNote').textContent = c.power_architecture === 'dc800' ? 'Forward architecture study (docs/FORWARD_ARCHITECTURE_DECISION.md): sizing shown with its stated assumptions; listings for 800 VDC distribution are being confirmed in the program. Not a quotable option yet.' : ''; $('#redundancy').value = c.redundancy; $('#ups_minutes').value = c.ups_minutes; $('#generator').checked = c.generator;
   $('#hardeningSel').value = c.hardening;
   document.querySelectorAll('.sub').forEach(x => x.checked = c.subsystems.includes(x.value));
@@ -123,6 +127,7 @@ function readForm() {
   c.tier = $('#tier').value; c.it_kw = +$('#it_kw').value; c.racks = +$('#racks').value; c.cooling = $('#cooling').value;
   c.redundancy = $('#redundancy').value; c.ups_minutes = +$('#ups_minutes').value; c.generator = $('#generator').checked;
   c.power_architecture = $('#powerArch').value || 'ac480';
+  c.dc_convention = $('#dcConv').value || 'bipolar_400';
   c.hardening = $('#hardeningSel').value || c.hardening || 'H1';
   c.subsystems = [...document.querySelectorAll('.sub:checked')].map(x => x.value);
   c.white_label = $('#white_label').checked; c.brand = $('#brand').value || 'Schreiber AI';
@@ -139,9 +144,11 @@ function recompute() {
   const rows = [['Enclosure', d.enclosure], ['IT load', `${fmt(state.cfg.it_kw)} kW in ${layout}`], ['Cooling', `${d.cooling_units_total} × ${d.cooling_label} (${d.cooling_units_n} duty, ${state.cfg.redundancy})`], ['Cooling derate for climate', `${Math.round(d.cooling_derate * 100)} %`], ['Total electrical load', `${fmt(d.total_kw)} kW / ${fmt(d.total_kva)} kVA`], ['Service', `${d.voltage}, ${fmt(d.service_breaker_a)} A main (calc ${fmt(d.service_amps_calc)} A)`]];
   if (d.mv_service) rows.push(['Transformers', `${d.transformers_total} × ${fmt(d.transformer_kva)} kVA pad-mount (MV → 480 V, ${state.cfg.redundancy})`]);
   if (d.power_architecture === 'dc800') {
-    rows.push(['Power architecture', `800 VDC bus (±${d.dc_bus_v_pole} V to ground, ${d.dc_bus_v_min}–${d.dc_bus_v_max} V window) — forward option, study`]);
-    rows.push(['AC/DC front end', `${fmt(d.ac_dc_front_end_kw)} kW at ${Math.round(d.rectifier_eff * 1000) / 10} % (assumption) · ${d.rectifier_modules} × ${d.rectifier_module_kw} kW rectifier modules (${state.cfg.redundancy})`]);
-    rows.push(['DC bus', `${fmt(d.dc_bus_current_a)} A with 25 % headroom → ${fmt(d.dc_busway_a)} A busway · ${d.imd_count} insulation monitors`]);
+    rows.push(['Power architecture', `800 VDC bus — ${d.dc_convention_label}; ${d.dc_bus_v_pole} V to ground — forward option, study`]);
+    rows.push(['Bus window', `${d.dc_bus_v_min}–${d.dc_bus_v_max} V: working ${d.dc_window_basis}`]);
+    rows.push(['AC/DC front end', `${fmt(d.ac_dc_front_end_kw)} kW at ${Math.round(d.rectifier_eff * 1000) / 10} % (vendor claim) · ${d.rectifier_modules} × ${d.rectifier_module_kw} kW rectifier modules (${state.cfg.redundancy})`]);
+    rows.push(['Rack interface', `${d.rack_shelves_total} × ${d.rack_shelf_kw} kW 800 V → 50 V DC shelves (${d.rack_shelves_per_rack}/rack, ${Math.round(d.rack_shelf_eff * 1000) / 10} % vendor claim) or MGX 800 VDC power racks; no server takes 800 V directly`]);
+    rows.push(['DC bus', `${fmt(d.dc_bus_current_a)} A with 25 % headroom → ${fmt(d.dc_busway_a)} A busway · ${d.imd_count} insulation monitors (${d.dc_imd_arrangement})`]);
     rows.push(['Battery on bus', `${fmt(d.battery_on_bus_kwh)} kWh, ${d.battery_string_v}, ${state.cfg.ups_minutes} min — no UPS modules`]);
     rows.push(['Loss / copper (assumptions)', `${fmt(d.dc_loss_saving_kw)} kW distribution loss saved (3 % assumption) · copper ${fmt(d.copper_kg_dc_bus)} kg vs ${fmt(d.copper_kg_ac_feeders)} kg AC feeders (−${d.copper_saving_pct} %, area-ratio method)`]);
   } else {
@@ -179,7 +186,7 @@ function renderPrice(d) {
     <p class="muted small">Excludes site civil, utility service, permits and GPUs beyond the reference compute node unless Compute is selected. Managed service is priced separately.</p>
     <div class="bar"><span class="c" style="width:${pc(conf)}%"></span><span class="l" style="width:${pc(list)}%"></span><span class="e" style="width:${pc(est)}%"></span></div>
     <div class="legend"><span><i style="background:var(--green)"></i>Vendor-confirmed ${pc(conf)} %</span><span><i style="background:var(--cyan)"></i>List price ${pc(list)} %</span><span><i style="background:var(--amber)"></i>Estimate ${pc(est)} %</span></div>
-    <p class="small muted">Per kW IT: ${usd(total / state.cfg.it_kw)}. Priced ${t.priced_on}.</p>`;
+    <p class="small muted">Per kW IT: ${usd(total / state.cfg.it_kw)}. Priced ${t.priced_on}.</p>${(state.cfg.power_architecture === 'dc800' || state.cfg.cooling === 'dlc_hd') ? '<p class="small muted"><strong>Forward options are not in this table.</strong> The 800 VDC chain and the high-density liquid loop are costed only as estimates in <a href="../docs/BOM-ben150-forward.md">docs/BOM-ben150-forward.md</a> (forward prototype); the figure above still uses the standard AC / cooling pricing.</p>' : ''}`;
 }
 
 async function main() {
@@ -197,6 +204,7 @@ async function main() {
   $('#it_kw').oninput = () => { $('#itOut').value = $('#it_kw').value; recompute(); };
   for (const id of ['#racks', '#cooling', '#redundancy', '#ups_minutes', '#generator', '#hardeningSel', '#white_label', '#brand']) $(id).onchange = recompute;
   $('#powerArch').onchange = () => { readForm(); writeForm(); recompute(); };
+  $('#dcConv').onchange = recompute;
   document.querySelectorAll('.sub').forEach(x => x.onchange = recompute);
   $('#dlCfg').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(state.cfg, null, 2)], { type: 'application/json' })); a.download = `ben-config-${state.cfg.tier}.json`; a.click(); };
 }

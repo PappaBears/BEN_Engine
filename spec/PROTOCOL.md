@@ -80,6 +80,21 @@ certificate, `attested:true` when the PLC's project checksum matches the commiss
 | `relay1..2` (Pod E only) | 10 A relay | Axioline DO relay | out | — | — |
 | `pulse_kwh` | meter S0 pulse | Axioline counter input | DI IRQ | counter | — |
 
+### Forward architecture channels (additive, v1.1; present only when the unit has the option)
+
+Units built with the 800 VDC option (`power_architecture: dc800`) or the high-density liquid loop (`cooling: dlc_hd`, `docs/FORWARD_ARCHITECTURE_DECISION.md`) add these channels on the room Pod / PLC (`node1`); a unit without the option omits the keys. Twin state carries the same values under `state.dc` and `state.loop`; `sim_nodes.py` emits them with raw = engineering value × 10.
+
+| Channel | Source | PLC-connected equivalent | Range | Uncertainty (k=2) | Alarm |
+| --- | --- | --- | --- | --- | --- |
+| `V_bus_pos`, `V_bus_neg` | DC bus pole voltage to ground (IMD / divider, isolated) | Axioline AI, 0–10 V from a 1,000 V class divider | ±1,000 V | ±2 V | `dc_bus_voltage` when the bus leaves the window (760–920 V, working assumption); a faulted pole reads toward 0 V |
+| `I_bus` | DC bus shunt / Hall sensor | Axioline AI 4–20 mA | 0–3,200 A | ±0.5 % | — |
+| `IMD_kohm` | Insulation monitoring device (Bender iso685 class), Modbus TCP | — | 1–10,000 kΩ | per device | `dc_insulation_low` < 500 kΩ (warn), `dc_ground_fault` < 100 kΩ (critical, first fault alarms, does not trip) |
+| `dc_gf` | IMD relay contact | Axioline DI | 0/1 | — | mirrors `dc_ground_fault` |
+| `T_loop_sup`, `T_loop_ret` | Pt1000 in the W45 supply / return manifold | Axioline RTD | 0–80 °C | ±0.15 °C | `loop_supply_high` > 45 °C (warn) |
+| `F_loop` | Loop flow meter (magnetic / ultrasonic), 4–20 mA | Axioline AI | 0–2 × design L/min | ±2 % | `loop_flow_low` < 20 % of design (critical) |
+| `cdu_pump1..N` | CDU pump running status | Axioline DI / CDU Modbus | 0/1 | — | `cdu_pumpN_fail` (alarm) with standby status |
+| `loop_iso` | Row isolation valve closed (position switch) | Axioline DI | 0/1 | — | `loop_isolated` (critical) with the measured leak-to-isolation time |
+
 Channel names and JSON keys are identical to v1 so `lib/bencore` and the edge parsers are unchanged.
 A Pod that lacks a sensor omits the key. `relay3..4` exist only on PLC-connected I/O (`plcN`).
 

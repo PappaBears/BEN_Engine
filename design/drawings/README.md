@@ -43,7 +43,10 @@ python design/drawings/gen_drawings.py                 # all tiers, all sheets, 
 python design/drawings/gen_drawings.py --tier ben150   # one tier
 python design/drawings/gen_drawings.py --tier ben500 --sheet E-001 --sheet M-001
 python design/drawings/gen_drawings.py --dpi 150       # larger PNGs (default 110 dpi on an A1 sheet = 3642 px wide)
+python design/drawings/gen_drawings.py --forward       # forward prototype study set only: forward-ben150/E-001 (800 VDC) + M-001 (W45 liquid)
 ```
+
+**Forward architecture study set.** `design/drawings/forward-ben150/` holds E-001 (800 VDC one-line: AC/DC front end, DC busway ±400 V or 800 V unipolar, DC tap-offs, 800 V → 50 V rack shelves, battery on the bus, IMD, grounding / midpoint) and M-001 (W45 high-density liquid P&ID: row CDUs, manifolds, dry coolers, isolation valves, leak detection, heat-reuse HX) for the BEN 150 forward prototype (`layout.forward_prototype_config()`: 150 kW, 2 racks, dc800, dlc_hd). Title block status reads "ISSUED FOR REVIEW — forward architecture study"; the set is recorded as change DC-002 in `design/REVISION.json` and is not part of the Rev C tier sets. It is regenerated with `--forward` and checked with the next revision; nothing in it is issued for construction.
 
 Requirements: Python 3.13, numpy, matplotlib, pillow (no other dependencies). Runtime about 10 s per tier.
 

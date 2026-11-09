@@ -2,7 +2,7 @@
 import { api, h, fmt } from '../util.js';
 
 let catalog = null, draft = null, root = null, errorsEl = null, derivedEl = null, applyBtn = null, timer = null, ctxRef = null;
-const FIELDS = ['tier', 'profile', 'climate', 'it_kw', 'racks', 'cooling', 'redundancy', 'subsystems', 'white_label', 'brand', 'ups_minutes', 'generator', 'site_name', 'hardening', 'controls_tier', 'power_architecture'];
+const FIELDS = ['tier', 'profile', 'climate', 'it_kw', 'racks', 'cooling', 'redundancy', 'subsystems', 'white_label', 'brand', 'ups_minutes', 'generator', 'site_name', 'hardening', 'controls_tier', 'power_architecture', 'dc_convention'];
 const SEVERE = ['coastal', 'hot_arid', 'cold', 'high_altitude', 'hot_humid'];
 const recommendHardening = (profile, climate) => profile === 'public_sector' ? 'H3' : (SEVERE.includes(climate) ? 'H2' : 'H1');
 
@@ -51,8 +51,9 @@ function showDerived(d) {
   ];
   if (d.mv_service) rows.push(['Transformers', `${d.transformers_total} × ${d.transformer_kva.toLocaleString()} kVA pad-mount (MV → 480 V)`]);
   if (d.power_architecture === 'dc800') {
-    rows.push(['Power architecture', `800 VDC bus, ±${d.dc_bus_v_pole} V to ground (${d.dc_bus_v_min}–${d.dc_bus_v_max} V) — forward option, study`]);
-    rows.push(['AC/DC front end', `${d.ac_dc_front_end_kw.toLocaleString()} kW · ${d.rectifier_modules} × ${d.rectifier_module_kw} kW rectifier modules (${draft.redundancy})`]);
+    rows.push(['Power architecture', `800 VDC bus — ${d.dc_convention_label}; ${d.dc_bus_v_pole} V to ground — forward option, study`]);
+    rows.push(['Bus window', `${d.dc_bus_v_min}–${d.dc_bus_v_max} V (working ${d.dc_window_basis})`]);
+    rows.push(['AC/DC front end', `${d.ac_dc_front_end_kw.toLocaleString()} kW · ${d.rectifier_modules} × ${d.rectifier_module_kw} kW rectifier modules (${draft.redundancy}); ${d.rack_shelves_total} × ${d.rack_shelf_kw} kW 800→50 V rack shelves (efficiencies: vendor claims)`]);
     rows.push(['DC bus', `${d.dc_bus_current_a.toLocaleString()} A → ${d.dc_busway_a.toLocaleString()} A busway · ${d.imd_count} IMD`]);
     rows.push(['Battery on bus', `${d.battery_on_bus_kwh.toLocaleString()} kWh (${d.battery_string_v}) · no UPS modules`]);
     rows.push(['Loss / copper (assumed)', `−${d.dc_loss_saving_kw} kW distribution loss · copper −${d.copper_saving_pct} % (${d.copper_kg_dc_bus} vs ${d.copper_kg_ac_feeders} kg)`]);
@@ -85,6 +86,7 @@ function render() {
   if (!draft.hardening) draft.hardening = recommendHardening(draft.profile, draft.climate);
   if (!draft.controls_tier) draft.controls_tier = 'auto';
   if (!draft.power_architecture) draft.power_architecture = 'ac480';
+  if (!draft.dc_convention) draft.dc_convention = 'bipolar_400';
   const tierSel = sel('tier', Object.entries(tiers).map(([k, v]) => [k, `${v.label} — ${v.enclosure}`]), () => {
     const ng = tiers[draft.tier];
     draft.it_kw = Math.min(ng.it_kw_max, Math.max(ng.it_kw_min, draft.it_kw)); draft.racks = Math.min(ng.max_racks, Math.max(1, draft.racks));
@@ -95,7 +97,10 @@ function render() {
   const paTable = catalog.power_architectures || { ac480: { tiers: ['ben5', 'ben30', 'ben150', 'ben500', 'ben2000'] }, dc800: { tiers: ['ben150', 'ben500', 'ben2000'] } };
   const paLabel = { ac480: '480 V AC → UPS → AC PDUs (today)', dc800: '800 VDC bus, battery on bus — forward option (study)' };
   const paNote = h('div', { class: 'muted', style: { fontSize: '12px' } });
-  const updatePaNote = () => { paNote.textContent = draft.power_architecture === 'dc800' ? 'Forward architecture study: AC/DC front end → ±400 V DC busway → DC-input racks; sizing uses stated assumptions (docs/FORWARD_ARCHITECTURE_DECISION.md). Listings to be confirmed in the program.' : ''; };
+  const convTable = catalog.dc_conventions || { bipolar_400: { label: '±400 VDC bipolar, HR midpoint (OCP Diablo 400)' }, unipolar_800: { label: '800 VDC unipolar, isolated return (OCP LVDC SST v0.3)' } };
+  const convSel = sel('dc_convention', Object.entries(convTable).map(([k, v]) => [k, v.label]));
+  const convField = field('DC convention', convSel);
+  const updatePaNote = () => { paNote.textContent = draft.power_architecture === 'dc800' ? 'Forward architecture study: AC/DC front end → DC busway → 800 V→50 V rack shelves (or MGX power racks); sizing uses stated assumptions and vendor-claimed efficiencies (docs/FORWARD_ARCHITECTURE_DECISION.md, docs/research). Listings to be confirmed in the program.' : ''; convField.hidden = draft.power_architecture !== 'dc800'; };
   const paSel = sel('power_architecture', Object.entries(paTable).filter(([k, v]) => !v.tiers || v.tiers.includes(draft.tier)).map(([k]) => [k, paLabel[k] || k]), updatePaNote);
   updatePaNote();
   const hardeningTable = catalog.hardening || { H1: { label: 'H1 Standard', rating: 'NEMA 4X / IP66' }, H2: { label: 'H2 Severe environment', rating: 'IP66 + flood plinth' }, H3: { label: 'H3 Hardened / government', rating: 'IP66 + ballistic + forced-entry + HEMP option' } };
@@ -125,7 +130,7 @@ function render() {
     h('div', { class: 'field' }, h('label', {}, `IT load (${g.it_kw_min}–${g.it_kw_max} kW)`, kwOut), kw),
     h('div', { class: 'field' }, h('label', {}, `Racks (1–${g.max_racks})`, racksOut), racks),
     field('Cooling', sel('cooling', Object.entries(catalog.cooling).filter(([k]) => (g.kind !== 'hall' || k === 'dlc_cdu' || k === 'dlc_hd') && (k !== 'dlc_hd' || (catalog.dlc_hd_tiers || ['ben150', 'ben500', 'ben2000']).includes(draft.tier))).map(([k, v]) => [k, `${v.label} (${v.unit_kw} kW/unit, COP ${v.cop})${k === 'dlc_hd' ? ' — forward option' : ''}`]))),
-    field('Power architecture', paSel), paNote,
+    field('Power architecture', paSel), convField, paNote,
     h('div', { class: 'grid2' },
       field('Redundancy', sel('redundancy', catalog.redundancy.map(r => [r, r]))),
       field('UPS minutes', h('input', { type: 'number', min: 2, max: 60, value: draft.ups_minutes, onInput: (e) => { draft.ups_minutes = +e.target.value || 10; schedule(); } }))),
