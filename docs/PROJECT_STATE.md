@@ -26,6 +26,9 @@ Tiers renamed by IT power (BEN 5/30/150/500) with aliases; BEN 2000 prefabricate
 ## Audit (2026-11-08)
 Independent internal audit: 22 findings (4 major). All corrective actions worked; re-audit 17 PASS / 3 WARN / 0 FAIL. Drawing set Rev B checked by Ben Schreiber and issued for construction on 2026-11-08; Rev C (design change DC-001, BEN 5 cabinet AC to R-513A 5.5 kW) issued for review the same day and awaits the checker's signature. MSA 15.5 and the software licence now state SAT deliverables versus security-roadmap items exactly as the cybersecurity status table does. Open with suppliers: Rittal part number and price for the R-513A variant (RFQ 03). Paperwork ready set in `docs/contracts/ready/`.
 
+## Forward architecture (2026-11-09)
+800 VDC power (both OCP conventions) and high-density W45 liquid cooling are selectable options from BEN 150 up, with sizing, twin, sweeps, commissioning steps, BOM, study drawings, compliance and risk rows; existing presets unchanged. Research with 235 sources in `docs/research/`; USD 5 M gated program in `docs/programs/FORWARD_800V_LIQUID_PROGRAM.md`. All forward efficiencies and prices are vendor claims or estimates until the test cell measures them.
+
 ## Latest checkpoint
 `main` on github.com/PappaBears/BEN_Engine; see `git log`. Restore: clone the tag/commit and run the Quickstart commands in README.md.
 
