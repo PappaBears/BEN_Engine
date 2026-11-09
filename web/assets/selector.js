@@ -38,8 +38,14 @@ export function pyRound(x) {
   return Math.round(x);
 }
 const isMini = (g) => (g.kind ?? 'module') === 'minirack';
+// Rev 2 BEN 2000 = cluster of BEN 700 modules (config.REV2_GEOMETRY); lineup rev1 keeps the hall (cat.tiers)
+export function isCluster(cfg, cat) {
+  const tier = canonicalTier(cfg.tier, cat);
+  return lineupOf(cfg, cat) === 'rev2' && !!(cat.tiers_rev2 && cat.tiers_rev2[tier]);
+}
 export function geometry(cfg, cat) {
   const tier = canonicalTier(cfg.tier, cat);
+  if (isCluster(cfg, cat)) return cat.tiers_rev2[tier];
   const g = cat.tiers[tier];
   if (!isMini(g)) return g;
   const f = g.forms[cfg.form] || g.forms[g.default_form];
@@ -49,7 +55,14 @@ export function geometry(cfg, cat) {
   Object.assign(out, { form: cfg.form, form_label: f.label, it_kw_max_form: f.it_kw_max, rack_in: f.rack_in, door: f.door, insertion_loss_db: f.insertion_loss_db, reference: f.reference });
   return out;
 }
-function densityOf(cfg, g) {
+function densityOf(cfg, g, cat) {
+  if (g.kind === 'cluster') {
+    const n = g.modules, fp = n * g.ext_l_m * g.ext_w_m, vol = n * g.ext_l_m * g.ext_w_m * g.ext_h_m;
+    const yard = clusterYard(g, n, !!cfg.generator, cat);
+    return { lineup: 'rev2', kw_per_rack: +(cfg.it_kw / cfg.racks).toFixed(2), footprint_m2: +fp.toFixed(3), volume_m3: +vol.toFixed(3),
+      kw_per_m2_footprint: +(cfg.it_kw / fp).toFixed(2), kw_per_m3_volume: +(cfg.it_kw / vol).toFixed(2), kw_per_m2_module: +(cfg.it_kw / (fp / n) / n).toFixed(2),
+      kw_per_m2_yard: +(cfg.it_kw / yard.yard_area_m2).toFixed(2), kw_per_m2_site: +(cfg.it_kw / yard.site_area_m2).toFixed(2) };
+  }
   const fp = g.ext_l_m * g.ext_w_m, vol = fp * g.ext_h_m;
   return { lineup: 'rev2', kw_per_rack: +(cfg.it_kw / cfg.racks).toFixed(2), footprint_m2: +fp.toFixed(3), volume_m3: +vol.toFixed(3),
     kw_per_m2_footprint: +(cfg.it_kw / fp).toFixed(2), kw_per_m3_volume: +(cfg.it_kw / vol).toFixed(2) };
@@ -82,8 +95,8 @@ export function controlsTierResolved(cfg, cat) {
 export function validate(cfg, cat) {
   const errs = [];
   const tier = canonicalTier(cfg.tier, cat);
-  const g = cat.tiers[tier];
-  if (!g) return [`unknown tier ${cfg.tier}`];
+  if (!cat.tiers[tier]) return [`unknown tier ${cfg.tier}`];
+  const g = isCluster(cfg, cat) ? cat.tiers_rev2[tier] : cat.tiers[tier];
   if (!(g.it_kw_min <= cfg.it_kw && cfg.it_kw <= g.it_kw_max)) errs.push(`${g.label} supports ${g.it_kw_min}–${g.it_kw_max} kW IT, got ${cfg.it_kw}`);
   if (!(1 <= cfg.racks && cfg.racks <= g.max_racks)) errs.push(`${g.label} holds 1–${g.max_racks} racks, got ${cfg.racks}`);
   const cl = cat.cooling[cfg.cooling];
@@ -117,7 +130,7 @@ export function validate(cfg, cat) {
 function validateRev2(cfg, cat) {
   const errs = [];
   const tier = canonicalTier(cfg.tier, cat);
-  const g = cat.tiers[tier];
+  const g = isCluster(cfg, cat) ? cat.tiers_rev2[tier] : cat.tiers[tier];
   const lineup = lineupOf(cfg, cat), byL = tiersByLineup(cat);
   const hz = cfg.hardening ?? 'H1', ct = cfg.controls_tier ?? 'auto';
   if (!byL[lineup]) errs.push(`unknown lineup ${lineup}`);
@@ -143,7 +156,116 @@ function validateRev2(cfg, cat) {
     if (pr > g.max_rack_kw) errs.push(`${pr.toFixed(1)} kW/rack exceeds the ${g.max_rack_kw} kW GB300 NVL72-class rack limit of ${g.label}`);
     if (ct === 'lite') errs.push(`BEN Controls Lite is for BEN 5 and BEN 30 only; ${g.label} uses BEN Controls Pro`);
   }
+  if (g.kind === 'cluster' && cfg.racks % g.modules) errs.push(`${g.label} (Rev 2) is ${g.modules} BEN 700 modules: racks must split evenly over the modules (multiple of ${g.modules}), got ${cfg.racks}`);
   return errs;
+}
+
+// ---------------------------------------------------------------- Rev 2 BEN 2000 cluster (config.cluster_yard / Config._derived_cluster)
+export function clusterYard(g, modules, generator, cat) {
+  const Y = cat.cluster_yard;
+  const Lx = g.ext_l_m * 1000, Wy = g.ext_w_m * 1000;
+  const endw = (g.ext_l_m - g.int_l_m) * 500, side = (g.ext_w_m - g.int_w_m) * 500;
+  const pitch = Wy + Y.module_gap_mm;
+  const xf = Y.xfmr, sw = Y.swgr, gs = Y.genset;
+  const rects = {};
+  const sx0 = endw + g.int_l_m * 1000 + Y.skid_offset_mm;
+  const tx0 = sx0 + Y.skid_l_mm + Y.xfmr_gap_mm;
+  for (let k = 0; k < modules; k++) {
+    const y0 = k * pitch;
+    rects[`M${k + 1}`] = [0, y0, Lx, y0 + Wy];
+    rects[`SK${k + 1}`] = [sx0, y0 + side - Y.skid_overhang_mm, sx0 + Y.skid_l_mm, y0 + side + g.int_w_m * 1000 + Y.skid_overhang_mm];
+    const yc = y0 + Wy / 2;
+    rects[`T${k + 1}`] = [tx0, yc - xf.w / 2, tx0 + xf.d, yc + xf.w / 2];
+  }
+  const t1 = rects.T1;
+  rects.SWGR = [tx0, t1[1] - Y.swgr_gap_mm - sw.w, tx0 + sw.d, t1[1] - Y.swgr_gap_mm];
+  if (generator) for (let k = 0; k < modules; k++) { const y1 = -Y.gen_gap_mm - k * (gs.d + Y.gen_gap_mm); rects[`G${k + 1}`] = [0, y1 - gs.d, gs.w, y1]; }
+  const equip = Object.values(rects);
+  const ymin = Math.min(...equip.map(r => r[1])), ymax = Math.max(...equip.map(r => r[3]));
+  rects.APRON = [-Y.apron_mm, 0, 0, (modules - 1) * pitch + Wy];
+  const frontX1 = tx0 + Math.max(xf.d, sw.d) + Y.xfmr_front_mm;
+  rects['XF-CLEAR'] = [tx0 + xf.d, ymin, frontX1, ymax];
+  const off = Y.fence_offset_mm;
+  const fence = [-Y.apron_mm - off, ymin - off, frontX1 + off, ymax + off];
+  rects['LANE-W'] = [fence[0] - Y.lane_mm, fence[1], fence[0], fence[3]];
+  rects['LANE-E'] = [fence[2], fence[1], fence[2] + Y.lane_mm, fence[3]];
+  const site = [rects['LANE-W'][0], fence[1], rects['LANE-E'][2], fence[3]];
+  const siteL = (site[2] - site[0]) / 1000, siteW = (site[3] - site[1]) / 1000, yardL = (fence[2] - fence[0]) / 1000, yardW = (fence[3] - fence[1]) / 1000;
+  return { rects, fence, site, pitch_mm: pitch, endw_mm: endw, side_mm: side,
+    site_l_m: +siteL.toFixed(3), site_w_m: +siteW.toFixed(3), site_area_m2: +(siteL * siteW).toFixed(1),
+    yard_l_m: +yardL.toFixed(3), yard_w_m: +yardW.toFixed(3), yard_area_m2: +(yardL * yardW).toFixed(1) };
+}
+
+export function moduleConfig(cfg, cat) {
+  const g = geometry(cfg, cat), n = g.modules;
+  return { ...cfg, subsystems: [...(cfg.subsystems ?? ['power', 'cooling', 'compute', 'controls'])], tier: g.module_tier, it_kw: cfg.it_kw / n,
+    racks: Math.max(1, Math.floor(cfg.racks / n)), lineup: 'rev2', form: '' };
+}
+
+function derivedCluster(cfg, cat) {
+  const g = geometry(cfg, cat), Y = cat.cluster_yard, n = g.modules;
+  const m = moduleConfig(cfg, cat), md = derived(m, cat);
+  const out = {};
+  for (const [k, v] of Object.entries(md)) if (k !== 'geometry' && k !== 'climate') out[k] = v;
+  for (const [k, nd] of Object.entries(cat.cluster_sum_keys)) if (k in md) out[k] = nd === 0 ? md[k] * n : +(md[k] * n).toFixed(nd);
+  const kva = Y.xfmr_kva_sizes.find(s => s * Y.xfmr_loading_max >= md.total_kva) ?? Y.xfmr_kva_sizes[Y.xfmr_kva_sizes.length - 1];
+  const mvA = out.total_kva * 1000 / (Math.sqrt(3) * Y.mv_kv * 1000);
+  const yard = clusterYard(g, n, !!cfg.generator, cat);
+  const skidKw = 'liquid_heat_kw' in md ? Math.ceil(md.liquid_heat_kw * 1.15) : 0;
+  const R = yard.rects;
+  const pads = [...Array(n).keys()].map(k => R[`T${k + 1}`]).concat([R.SWGR]);
+  const padM2 = pads.reduce((a, r) => a + (r[2] - r[0] + 1200) * (r[3] - r[1] + 1200), 0) / 1e6;
+  const modulePadM2 = n * (g.ext_l_m + 1.2) * 3.64;
+  const swCy = (R.SWGR[1] + R.SWGR[3]) / 2;
+  let mvFeeder = 0;
+  for (let k = 0; k < n; k++) mvFeeder += Math.abs((R[`T${k + 1}`][1] + R[`T${k + 1}`][3]) / 2 - swCy) / 1000 + 6;
+  const lanes = ['LANE-W', 'LANE-E'].reduce((a, k) => a + (R[k][2] - R[k][0]) * (R[k][3] - R[k][1]), 0) / 1e6;
+  const clim = cat.climates[cfg.climate];
+  const dc800 = (cfg.power_architecture ?? 'ac480') === 'dc800';
+  Object.assign(out, {
+    tier_label: g.label, enclosure: g.enclosure, voltage: g.voltage, kind: 'cluster', modules: n,
+    module_tier: g.module_tier, module_label: md.tier_label, module_it_kw: +m.it_kw.toFixed(2), module_racks: m.racks,
+    module_service_breaker_a: md.service_breaker_a, module_total_kva: md.total_kva, module_gross_kg: md.gross_kg,
+    rows: n, racks_per_row: m.racks, per_rack_kw: +(cfg.it_kw / cfg.racks).toFixed(2),
+    mv_service: true, mv_kv: Y.mv_kv, mv_service_amps: +mvA.toFixed(1), mv_switchgear_ways: Y.swgr.ways, mv_switchgear_a: Y.swgr.amps,
+    transformer_kva: kva, transformers_total: n, transformer_loading_pct: +(100 * md.total_kva / kva).toFixed(1),
+    transformer_redundancy: 'one per module (N): a transformer fault takes one module to its battery and generator; the other modules run on',
+    skids: n, skid_rejection_kw_each: skidKw,
+    pue_estimate: +(out.total_kw / cfg.it_kw + (dc800 ? md.dc_pue_loss_adder : 0.03)).toFixed(3),
+    pue_basis: 'module chain (UPS / rectifier loss, CDU pumps, fan coils, controls); MV transformer losses are not in the estimate',
+    water: 'Closed W45 loop per module (no evaporative water at design in this climate); make-up and fill connection with treatment per skid'
+      + (clim.t_design_c + 8 <= 45 ? '' : '; adiabatic pre-cooling water on the skids at this climate (DEV-D2)'),
+    leak: 'Per module: leak rope under the CDUs and along the rear-plenum header, row isolation valves close on leak; per skid: pipe-bridge drip tray with a leak spot sensor',
+    controls: `Per module: ${md.controls_label} (PLC + edge, ${md.pods} BEN Pods); site: one supervisory BEN Controller (PLC + edge) on a fibre ring to the ${n} module controllers, MV switchgear and transformer monitoring`,
+    yard, site_area_m2: yard.site_area_m2, yard_area_m2: yard.yard_area_m2,
+    yard_pad_sqft: +(padM2 * 10.7639).toFixed(1), yard_surface_m2: +Math.max(0, yard.yard_area_m2 - padM2 - modulePadM2).toFixed(1),
+    lane_area_m2: +lanes.toFixed(1), mv_feeder_m: +mvFeeder.toFixed(1),
+    verified_max_kw: g.verified_max_kw, dc_ready: true,
+    module: Object.fromEntries(Object.entries(md).filter(([k]) => k !== 'geometry' && k !== 'climate')),
+    climate: clim, geometry: g,
+  });
+  Object.assign(out, densityOf(cfg, g, cat));
+  return out;
+}
+
+function presetCluster(tier, profile, climate, cat, hardening, lineup) {
+  const g = cat.tiers_rev2[tier], p = cat.profiles[profile], n = g.modules;
+  const it0 = ['ai_training', 'ai_inference'].includes(profile) ? g.it_kw_max : 0.8 * g.it_kw_max;
+  if (hardening == null) hardening = hardeningRecommended(profile, climate);
+  const cfg = { tier, profile, it_kw: pyRound(it0), racks: g.max_racks, cooling: 'dlc_hd', redundancy: p.redundancy, climate,
+    subsystems: ['power', 'cooling', 'compute', 'controls'], white_label: false, brand: 'Schreiber AI', ups_minutes: g.ups_minutes_default ?? 5,
+    generator: ['healthcare', 'public_sector', 'off_grid'].includes(profile), site_name: 'Demo site', controls_tier: 'auto', hardening,
+    power_architecture: 'ac480', dc_convention: 'bipolar_400', lineup, form: '' };
+  for (let racks = g.max_racks; racks >= 1; racks -= n) {
+    let it = Math.min(pyRound(it0), racks * g.max_rack_kw);
+    while (it >= g.it_kw_min) {
+      cfg.racks = racks; cfg.it_kw = it;
+      if (!validate(cfg, cat).length) return cfg;
+      it -= 10 * n;
+    }
+  }
+  cfg.racks = g.max_racks; cfg.it_kw = pyRound(it0);
+  return cfg;
 }
 
 function miniPower(cfg, cat) {
@@ -209,7 +331,7 @@ function derivedMinirack(cfg, cat) {
     noise_quiet_up_to_kw: +(200 * 10 ** ((target - M.noise_src_dba[f.noise_source] + f.insertion_loss_db) / 15) / 1000).toFixed(2),
     heat_to_room_w: Math.round(heatW), heat_to_room_btu_h: Math.round(heatW * 3.412), closet_vent_cfm: Math.round(ventCfm),
     office_design_c: M.office_design_c, office_max_c: M.office_max_c, climate: clim, geometry: g,
-    ...densityOf(cfg, g),
+    ...densityOf(cfg, g, cat),
   };
 }
 
@@ -264,6 +386,7 @@ function applyDense(cfg, cat, out, upsKvaN, area, hz, dc) {
 
 export function derived(cfg, cat) {
   const tier = canonicalTier(cfg.tier, cat);
+  if (isCluster(cfg, cat)) return derivedCluster(cfg, cat);
   if (cat.tiers[tier] && isMini(cat.tiers[tier])) return derivedMinirack(cfg, cat);
   const g = cat.tiers[tier], cl = cat.cooling[cfg.cooling], clim = cat.climates[cfg.climate];
   const hzKey = cfg.hardening ?? 'H1';
@@ -281,7 +404,7 @@ export function derived(cfg, cat) {
   const pf = 0.95, totalKva = totalKw / pf;
   const upsN = cfg.it_kw / pf * 1.15;
   let upsModules = cfg.redundancy === 'N' ? 1 : 2;
-  let upsKvaEach = Math.round(upsN);
+  let upsKvaEach = pyRound(upsN);
   const dc800 = (cfg.power_architecture ?? 'ac480') === 'dc800';
   let dc = {};
   if (dc800) {
@@ -305,7 +428,7 @@ export function derived(cfg, cat) {
       dc_bus_v_nominal: v, dc_bus_v_pole: conv.pole_v_to_ground, dc_bus_v_min: P.bus_v_min, dc_bus_v_max: P.bus_v_max, dc_window_v: [P.bus_v_min, P.bus_v_max], dc_window_basis: P.window_basis,
       dc_bus_kw: +busKw.toFixed(1), rack_shelf_kw: P.rack_shelf_kw, rack_shelf_eff: P.rack_shelf_eff, rack_shelves_per_rack: shelvesPerRack, rack_shelves_total: shelvesPerRack * cfg.racks,
       dc_pue_loss_adder: +((1 / P.rectifier_eff - 1) + (1 / P.rack_shelf_eff - 1)).toFixed(4),
-      dc_bus_current_a: Math.round(busA), dc_busway_a: buswayA, rectifier_module_kw: P.rectifier_module_kw, rectifier_modules_n: nRect, rectifier_modules: nRectTotal,
+      dc_bus_current_a: pyRound(busA), dc_busway_a: buswayA, rectifier_module_kw: P.rectifier_module_kw, rectifier_modules_n: nRect, rectifier_modules: nRectTotal,
       rectifier_cabinets: Math.ceil(nRectTotal / 4), imd_count: nRectTotal, battery_on_bus_kwh: +battKwh.toFixed(1), battery_string_v: '800 V class',
       dc_loss_saving_kw: +(cfg.it_kw * P.loss_saving_frac).toFixed(1), dc_loss_saving_frac: P.loss_saving_frac,
       copper_kg_dc_bus: +cuDc.toFixed(1), copper_kg_ac_feeders: +cuAc.toFixed(1), copper_saving_pct: +(100 * (1 - cuDc / cuAc)).toFixed(1) };
@@ -355,11 +478,12 @@ export function derived(cfg, cat) {
     cooling_label: cl.label, cooling_units_n: nUnits, cooling_units_total: nTotal,
     cooling_unit_kw_derated: +unitKw.toFixed(1), cooling_derate: +derate.toFixed(3), cooling_elec_kw: +coolElec.toFixed(2),
     total_kw: +totalKw.toFixed(1), total_kva: +totalKva.toFixed(1), voltage: g.voltage,
-    service_amps_calc: Math.round(serviceAmps), service_breaker_a: breaker,
+    service_amps_calc: pyRound(serviceAmps), service_breaker_a: breaker,
     ups_modules: upsModules, ups_kva_each: upsKvaEach, battery_kwh: +batteryKwh.toFixed(1),
-    airflow_cfm: Math.round(airflow), payload_kg: Math.round(payload), gross_kg: Math.round(gross),
+    airflow_cfm: pyRound(airflow), payload_kg: pyRound(payload), gross_kg: pyRound(gross),
     envelope_gain_kw: +envGain.toFixed(2), pue_estimate: +(totalKw / cfg.it_kw + (dc800 ? dc.dc_pue_loss_adder : 0.03)).toFixed(3),
-    power_architecture: cfg.power_architecture ?? 'ac480', dc_ready: dcTable(cat).tiers.includes(tier), ...dc, ...loop,
+    power_architecture: cfg.power_architecture ?? 'ac480', power_architecture_label: (powerArchitectures(cat)[cfg.power_architecture ?? 'ac480'] || {}).label,
+    dc_ready: dcTable(cat).tiers.includes(tier), ...dc, ...loop,
     row_length_mm: Math.trunc(rowLen), row_fits: rowFits, rows, racks_per_row: racksPerRow, nfpa_855_scope: nfpa855,
     mv_service: mvService, transformer_kva: xfmrKva, transformers_total: xfmrTotal,
     generators_total: gensTotal, generator_kw_each: genKwEach,
@@ -372,7 +496,7 @@ export function derived(cfg, cat) {
     pods,
   };
   if (g.liquid_first) applyDense(cfg, cat, out, upsN, area, hz, dc);
-  if (lineupOf(cfg, cat) === 'rev2') Object.assign(out, densityOf(cfg, g));
+  if (lineupOf(cfg, cat) === 'rev2') Object.assign(out, densityOf(cfg, g, cat));
   return out;
 }
 
@@ -410,6 +534,7 @@ export function preset(tier, profile = 'ai_inference', climate = 'temperate', ca
   const byL = tiersByLineup(cat);
   if (!byL[lineup] || !byL[lineup].includes(tier)) throw new Error(`${tier} is not in lineup ${lineup}`);
   const g0 = cat.tiers[tier];
+  if (lineup === 'rev2' && cat.tiers_rev2 && cat.tiers_rev2[tier]) return presetCluster(tier, profile, climate, cat, hardening, lineup);
   if (isMini(g0)) return presetMinirack(tier, profile, climate, lineup, form);
   if (g0.liquid_first) return presetDense(tier, profile, climate, cat, hardening, lineup);
   const cfg = presetRev1(tier, profile, climate, cat, hardening);

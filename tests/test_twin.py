@@ -78,7 +78,7 @@ def test_sensor_specs_cover_nodes():
 
 def test_ben2000_twin_rows_and_sensors():
     """BEN 2000 hall: 40-48 racks placed in `rows` rows across the interior width, nodes per two racks, room sensors per module."""
-    cfg = Config.preset("ben2000", "ai_inference")
+    cfg = Config.preset("ben2000", "ai_inference", lineup="rev1")   # the Rev 1 hall
     d = cfg.derived()
     tw = Twin(cfg, seed=0)
     assert cfg.racks == 48 and d["rows"] == 4

@@ -39,6 +39,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import (CLIMATE_DESIGN, COOLING_LIBRARY, PROFILE_DEFAULTS, TIER_GEOMETRY, TIER_ALIASES, HARDENING, CONTROLS_TIERS, Config, canonical_tier)
 from .config import TIERS_BY_LINEUP, LINEUPS, DENSE_FOOTPRINTS, DENSE_RULES, MINIRACK, POWER_ARCHITECTURES, DLC_HD_TIERS
+from .config import REV2_GEOMETRY, CLUSTER_YARD, CLUSTER_SUM_KEYS  # Rev 2 BEN 2000 cluster
 from .twin import Twin, TwinParams
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -702,7 +703,9 @@ async def catalog():
             "redundancy": ["N", "N+1", "2N"], "subsystems": ["power", "cooling", "compute", "controls"], "faults": list(Twin.FAULTS),
             # Rev 2: lineups, dense-tier footprints / rules, BEN 1 constants, power-architecture tier lists, dlc_hd tiers
             "lineups": list(LINEUPS), "tiers_by_lineup": TIERS_BY_LINEUP, "dense_footprints": DENSE_FOOTPRINTS, "dense_rules": DENSE_RULES, "minirack": MINIRACK,
-            "power_architectures": {k: {"tiers": list(v["tiers"]), "label": v["label"]} for k, v in POWER_ARCHITECTURES.items()}, "dlc_hd_tiers": list(DLC_HD_TIERS)}
+            "power_architectures": {k: {"tiers": list(v["tiers"]), "label": v["label"]} for k, v in POWER_ARCHITECTURES.items()}, "dlc_hd_tiers": list(DLC_HD_TIERS),
+            # Rev 2 BEN 2000 = cluster of BEN 700 modules (lineup rev2); "tiers" keeps the Rev 1 hall
+            "tiers_rev2": {t: {**g, "rows": g["modules"]} for t, g in REV2_GEOMETRY.items()}, "cluster_yard": CLUSTER_YARD, "cluster_sum_keys": CLUSTER_SUM_KEYS}
 
 
 @app.get("/api/sensors")

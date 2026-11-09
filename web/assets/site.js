@@ -41,18 +41,20 @@ function heroSources(tier, lineup) {
   return lineup === 'rev2' ? [`assets/rev2/hero-${tier}.svg`, ...(HERO_FALLBACK[tier] || tier !== 'ben1' ? [rev1] : [])] : [rev1];
 }
 const lineupTiers = () => tiersByLineup(CAT)[state.lineup];
+// Rev 2 BEN 2000 = three BEN 700 modules on a shared yard (CAT.tiers_rev2); lineup rev1 keeps the hall (CAT.tiers)
+const tierGeom = (k) => (state.lineup === 'rev2' && CAT.tiers_rev2 && CAT.tiers_rev2[k]) || CAT.tiers[k];
 
 async function load(url, fallback) { try { const r = await fetch(url); if (!r.ok) throw 0; return await r.json(); } catch { return fallback; } }
 
 function buildTiers() {
   const g = $('#tierGrid'); g.innerHTML = '';
   for (const k of lineupTiers()) {
-    const t = CAT.tiers[k];
+    const t = tierGeom(k);
     const d = derived(preset(k, state.profile, state.climate, CAT, null, state.lineup), CAT);
     const el = document.createElement('article'); el.className = 'card';
     const service = d.mv_service ? `${t.voltage}; ${d.transformers_total} × ${fmt(d.transformer_kva)} kVA transformers at preset` : `${t.voltage}, ${d.service_breaker_a} A at preset`;
-    const racks = (t.rows ?? 1) > 1 ? `up to ${t.max_racks} × ${t.rack_u}U in ${t.rows} rows` : `up to ${t.max_racks} × ${t.rack_u}U`;
-    const footprint = (t.modules ?? 1) > 1 ? `${t.ext_l_m} × ${t.ext_w_m} × ${t.ext_h_m} m hall (${t.modules} modules) + power module + plant yard` : `${t.ext_l_m} × ${t.ext_w_m} × ${t.ext_h_m} m`;
+    const racks = t.kind === 'cluster' ? `up to ${t.max_racks} × ${t.rack_u}U, ${t.max_racks / t.modules} per module` : (t.rows ?? 1) > 1 ? `up to ${t.max_racks} × ${t.rack_u}U in ${t.rows} rows` : `up to ${t.max_racks} × ${t.rack_u}U`;
+    const footprint = t.kind === 'cluster' ? `${t.modules} × ${t.ext_l_m} × ${t.ext_w_m} m modules on a ${fmt(d.yard_area_m2)} m² yard (${d.kw_per_m2_footprint} kW/m² of module footprint)` : (t.modules ?? 1) > 1 ? `${t.ext_l_m} × ${t.ext_w_m} × ${t.ext_h_m} m hall (${t.modules} modules) + power module + plant yard` : `${t.ext_l_m} × ${t.ext_w_m} × ${t.ext_h_m} m`;
     el.dataset.tier = k;
     el.innerHTML = `<h3>${t.label}<span class="kw">${fmt(t.it_kw_min)}–${fmt(t.it_kw_max)} kW</span></h3>
       <p class="muted">${t.enclosure}</p>
@@ -120,7 +122,7 @@ function hardeningNote() {
   $('#hardeningNote').textContent = `${h ? h.rating + '; coating ' + h.coating + '. ' : ''}Recommended for ${CAT.profiles[state.profile].label} in ${CAT.climates[state.climate].label}: ${rec}` + (rec !== chosen ? ` (you chose ${chosen})` : '');
 }
 function writeForm() {
-  const c = state.cfg; c.tier = canonicalTier(c.tier, CAT); const t = CAT.tiers[c.tier];
+  const c = state.cfg; c.tier = canonicalTier(c.tier, CAT); const t = tierGeom(c.tier);
   if (!c.hardening) c.hardening = hardeningRecommended(c.profile || state.profile, c.climate || state.climate);
   $('#tier').value = c.tier;
   const mini = t.kind === 'minirack';
@@ -165,7 +167,7 @@ function writeForm() {
   hero.src = srcs[0];
   const cap = hero.closest('figure') && hero.closest('figure').querySelector('figcaption');
   if (cap) cap.textContent = `${t.label} · ${t.enclosure} · up to ${fmt(t.it_kw_max)} kW IT · generated from the configuration model`;
-  hero.alt = t.kind === 'hall' ? `Isometric illustration of the ${t.label} prefabricated data hall: three joined modules, a power module and a plant yard with dry coolers and generators` : `Isometric illustration of a ${t.label} ${t.kind === 'cabinet' ? 'outdoor cabinet' : 'container data center'} with the Schreiber AI mark on the side`;
+  hero.alt = t.kind === 'cluster' ? `Isometric illustration of the ${t.label}: three BEN 700 liquid-first modules side by side on a yard, each with its heat-rejection skid and pad-mount transformer` : t.kind === 'hall' ? `Isometric illustration of the ${t.label} prefabricated data hall: three joined modules, a power module and a plant yard with dry coolers and generators` : `Isometric illustration of a ${t.label} ${t.kind === 'cabinet' ? 'outdoor cabinet' : 'container data center'} with the Schreiber AI mark on the side`;
 }
 function readForm() {
   const c = state.cfg;
@@ -210,18 +212,23 @@ function recompute() {
     rows.push(['Noise at 1 m (estimate)', `${d.noise_dba_est} dBA (target ${d.noise_dba_target})${d.noise_ok ? '' : ` — meets the target up to ${d.noise_quiet_up_to_kw} kW`}`]);
   }
   if (d.liquid_first) {
-    rows.push(['Row (door end first)', `${d.row_items.join(' · ')} — ${fmt(d.row_length_mm)} of ${fmt(Math.round(((d.geometry || CAT.tiers[state.cfg.tier]).int_l_m) * 1000))} mm`]);
+    rows.push([d.kind === 'cluster' ? 'Row of each module (door end first)' : 'Row (door end first)', `${d.row_items.join(' · ')} — ${fmt(d.row_length_mm)} of ${fmt(Math.round(((d.geometry || CAT.tiers[state.cfg.tier]).int_l_m) * 1000))} mm`]);
     rows.push(['Power gear inside', `${d.ups_frames} UPS frame(s), ${d.battery_cabinets} lithium cabinet(s) ${fmt(d.battery_kwh_installed)} kWh (${d.battery_minutes_installed} min), ${d.swbd_sections ? d.swbd_sections + ' switchboard section(s)' : '600 A panelboard on the end wall'}`]);
     rows.push(['Residual air', `${d.fancoils_total} in-row fan coils on an ${d.trim_loop_c} °C trim loop (${fmt(d.trim_loop_kw)} kW trim chiller on the skid)`]);
   }
   if (d.lineup === 'rev2') rows.push(['Density', `${d.kw_per_rack} kW/rack · ${d.kw_per_m2_footprint} kW/m² footprint · ${d.kw_per_m3_volume} kW/m³`]);
+  if (d.kind === 'cluster') {
+    rows.push(['Cluster', `${d.modules} × ${d.module_label} modules of ${fmt(d.module_it_kw)} kW (${d.module_racks} racks each), each the stand-alone ${d.module_label}; verified maximum ${fmt(d.verified_max_kw)} kW`]);
+    rows.push(['Yard', `${d.mv_kv} kV service, 15 kV switchgear (${d.mv_switchgear_ways}-way), ${d.transformers_total} × ${fmt(d.transformer_kva)} kVA pad-mount transformers (one per module), ${d.skids} heat-rejection skids`]);
+    rows.push(['Site density', `${d.kw_per_m2_yard} kW/m² of fenced yard (${fmt(d.yard_area_m2)} m²) · ${d.kw_per_m2_site} kW/m² including the fire and service lanes (${fmt(d.site_area_m2)} m²)`]);
+  }
   if (state.cfg.cooling === 'dlc_hd') {
     rows.push(['Liquid loop', `${d.loop_water_class} warm water, ${d.loop_supply_design_c}/${d.loop_return_design_c} °C, ${fmt(d.loop_flow_lpm)} L/min at ΔT ${d.loop_dt_design_k} K`]);
     rows.push(['Heat reuse available', `${fmt(d.heat_reuse_kw_available)} kW at the return (${Math.round(d.air_residual * 100)} % of IT heat stays on the air side)`]);
   }
-  rows.push(['Generators', d.generators_total ? `${d.generators_total} × ${fmt(d.generator_kw_each)} kW standby${d.mv_service ? ' (N+1, 48 h fuel)' : ''}` : 'none (option)']);
+  rows.push(['Generators', d.generators_total ? `${d.generators_total} × ${fmt(d.generator_kw_each)} kW standby${d.kind === 'hall' ? ' (N+1, 48 h fuel)' : (d.kind === 'cluster' ? ' (one per module)' : '')}` : 'none (option)']);
   rows.push(['Hardening', `${d.hardening_label}: ${d.hardening_rating}`]);
-  rows.push(['Airflow', `${fmt(d.airflow_cfm)} cfm`], ['Gross mass', `${fmt(d.gross_kg)} kg${d.modules > 1 ? ` (${d.modules} modules + power module)` : ''}`], ['Estimated PUE', d.pue_estimate], ['Environmental class', `ASHRAE ${d.ashrae_class}`]);
+  rows.push(['Airflow', `${fmt(d.airflow_cfm)} cfm`], ['Gross mass', `${fmt(d.gross_kg)} kg${d.kind === 'cluster' ? ` (${d.modules} modules)` : (d.modules > 1 ? ` (${d.modules} modules + power module)` : '')}`], ['Estimated PUE', d.pue_estimate], ['Environmental class', `ASHRAE ${d.ashrae_class}`]);
   $('#sizing').innerHTML = `<h3>Sizing</h3><table>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`;
   renderPrice(d);
   const q = encodeURIComponent(JSON.stringify(state.cfg));
@@ -248,7 +255,7 @@ function renderPrice(d) {
     <p class="muted small">Excludes site civil, utility service, permits and GPUs beyond the reference compute node unless Compute is selected. Managed service is priced separately.</p>
     <div class="bar"><span class="c" style="width:${pc(conf)}%"></span><span class="l" style="width:${pc(list)}%"></span><span class="e" style="width:${pc(est)}%"></span></div>
     <div class="legend"><span><i style="background:var(--green)"></i>Vendor-confirmed ${pc(conf)} %</span><span><i style="background:var(--cyan)"></i>List price ${pc(list)} %</span><span><i style="background:var(--hold)"></i>Estimate ${pc(est)} %</span></div>
-    <p class="small muted">Per kW IT: ${usd(total / state.cfg.it_kw)}. Priced ${t.priced_on}.</p>${(state.cfg.power_architecture === 'dc800' || state.cfg.cooling === 'dlc_hd') ? '<p class="small muted"><strong>Forward options are not in this table.</strong> The 800 VDC chain and the high-density liquid loop are costed only as estimates in <a href="../docs/BOM-ben150-forward.md">docs/BOM-ben150-forward.md</a> (forward prototype); the figure above still uses the standard AC / cooling pricing.</p>' : ''}`;
+    <p class="small muted">Per kW IT: ${usd(total / state.cfg.it_kw)}. Priced ${t.priced_on}.</p>${t.kind === 'cluster' ? `<p class="small muted">${d.tier_label}: ${t.modules} × ${t.module_tier.replace('ben', 'BEN ')} modules plus the shared yard (transformers, 15 kV switchgear, MV feeders and interconnect, yard and lanes: ${usd(t.yard_cost_usd / (1 - t.margin))} of the price at the preset). Status: ${t.status}.</p>` : ''}${(state.cfg.power_architecture === 'dc800' || (state.cfg.cooling === 'dlc_hd' && !d.liquid_first)) ? '<p class="small muted"><strong>Forward options are not in this table.</strong> The 800 VDC chain and the high-density liquid loop are costed only as estimates in <a href="../docs/BOM-ben150-forward.md">docs/BOM-ben150-forward.md</a> (forward prototype); the figure above still uses the standard AC / cooling pricing.</p>' : ''}`;
 }
 
 async function main() {

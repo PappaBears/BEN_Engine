@@ -77,11 +77,16 @@ function showDerived(d) {
     rows.push(['Residual air', `${d.fancoils_total} fan coils · ${d.trim_loop_c} °C trim loop · ${d.trim_loop_kw} kW trim chiller (skid)`]);
   }
   if (d.lineup === 'rev2') rows.push(['Density', `${d.kw_per_rack} kW/rack · ${d.kw_per_m2_footprint} kW/m² · ${d.kw_per_m3_volume} kW/m³`]);
+  if (d.kind === 'cluster') {
+    rows.push(['Cluster', `${d.modules} × ${d.module_label} modules of ${d.module_it_kw} kW (${d.module_racks} racks each) · verified max ${d.verified_max_kw.toLocaleString()} kW`]);
+    rows.push(['MV yard', `${d.mv_kv} kV · ${d.mv_service_amps} A · 15 kV switchgear ${d.mv_switchgear_ways}-way · ${d.skids} heat-rejection skids`]);
+    rows.push(['Site density', `${d.kw_per_m2_yard} kW/m² fenced yard (${d.yard_area_m2} m²) · ${d.kw_per_m2_site} kW/m² incl. lanes (${d.site_area_m2} m²)`]);
+  }
   if (d.loop_flow_lpm !== undefined) {
     rows.push(['Liquid loop', `${d.loop_water_class} · ${d.loop_supply_design_c}/${d.loop_return_design_c} °C · ${d.loop_flow_lpm.toLocaleString()} L/min at ΔT ${d.loop_dt_design_k} K`]);
     rows.push(['Heat reuse', `${d.heat_reuse_kw_available.toLocaleString()} kW available at the return`]);
   }
-  rows.push(['Generators', d.generators_total ? `${d.generators_total} × ${d.generator_kw_each.toLocaleString()} kW${d.mv_service ? ' (N+1, 48 h fuel)' : ''}` : 'none']);
+  rows.push(['Generators', d.generators_total ? `${d.generators_total} × ${d.generator_kw_each.toLocaleString()} kW${d.kind === 'hall' ? ' (N+1, 48 h fuel)' : (d.kind === 'cluster' ? ' (one per module)' : '')}` : 'none']);
   rows.push(
     ['Cooling', `${d.cooling_units_total} × ${d.cooling_unit_kw_derated} kW (${d.cooling_units_n} duty, derate ${d.cooling_derate})`],
     ['Layout', d.rows > 1 ? `${d.rows} rows of ${d.racks_per_row} racks · ${d.row_length_mm} mm per row` : `single row · ${d.row_length_mm} mm`],
@@ -97,8 +102,9 @@ function showDerived(d) {
 }
 
 function render() {
-  const allTiers = catalog.tiers, g = allTiers[draft.tier];
   draft.lineup = lineupOf(draft);
+  // Rev 2 BEN 2000 is the cluster of BEN 700 modules (catalog.tiers_rev2); lineup rev1 keeps the hall (catalog.tiers)
+  const allTiers = draft.lineup === 'rev2' ? { ...catalog.tiers, ...(catalog.tiers_rev2 || {}) } : catalog.tiers, g = allTiers[draft.tier];
   const lineupTiers = (catalog.tiers_by_lineup || { rev1: REV1, rev2: Object.keys(allTiers) })[draft.lineup];
   const tiers = Object.fromEntries(lineupTiers.map(t => [t, allTiers[t]]));
   const mini = isMini(g);

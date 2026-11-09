@@ -249,6 +249,13 @@ def rule_variables(cfg: Config) -> Dict[str, float]:
         "ups_battery_packs": d.get("ups_battery_packs", 0),
         "controls_mini": 1 if d["controls_tier_resolved"] == "mini" else 0,
         "profile_ai": 1 if cfg.profile in ("ai_training", "ai_inference") else 0,
+        # Rev 2 BEN 2000 cluster yard (docs/REV2_DECISION.md §2b); zero on every other configuration
+        "cluster": 1 if d["kind"] == "cluster" else 0,
+        "yard_pad_sqft": d.get("yard_pad_sqft", 0),
+        "yard_area_m2": d.get("yard_area_m2", 0),
+        "yard_surface_m2": d.get("yard_surface_m2", 0),
+        "lane_area_m2": d.get("lane_area_m2", 0),
+        "mv_feeder_m": d.get("mv_feeder_m", 0),
     }
 
 
@@ -262,6 +269,8 @@ def generate_bom(cfg: Config, catalog: List[Dict[str, Any]] | None = None) -> Li
     subs = set(cfg.subsystems)
     if not subs:
         return []
+    if cfg.is_cluster():
+        return _generate_cluster_bom(cfg, catalog)
     variables = rule_variables(cfg)
     controls_tier = cfg.controls_tier_resolved()
     rows: List[Dict[str, Any]] = []
@@ -313,6 +322,67 @@ def generate_bom(cfg: Config, catalog: List[Dict[str, Any]] | None = None) -> Li
     return rows
 
 
+def _part_applies(p: Dict[str, Any], cfg: Config, controls_tier: str, subs: set) -> bool:
+    """The cooling / controls / hardening / power / lineup / subsystem filters of generate_bom (tier filter excluded)."""
+    for key, val in (("applies_to_cooling", cfg.cooling), ("applies_to_controls", controls_tier), ("applies_to_hardening", cfg.hardening),
+                     ("applies_to_power", cfg.power_architecture), ("applies_to_lineups", getattr(cfg, "lineup", "rev1"))):
+        f = p.get(key)
+        if f and val not in f:
+            return False
+    prefix = p["code"].split("-", 1)[0]
+    return prefix in ALWAYS_PREFIXES or subsystem_of(p["code"]) in subs
+
+
+def _generate_cluster_bom(cfg: Config, catalog: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Rev 2 BEN 2000 (docs/REV2_DECISION.md §2b): the BOM of one BEN 700 module (Config.module_config(), the same generator and catalog lines
+    as a stand-alone BEN 700) times the number of modules, plus the shared yard: catalog lines for ben2000 limited to lineup rev2 (qty_rule),
+    and existing lines carrying a ``cluster_qty_rule`` (evaluated once for the yard). Lines of the same code are merged; ``scope`` says where
+    each quantity comes from. The Rev 1 hall lines of ben2000 never enter this path."""
+    n = cfg.derived()["modules"]
+    mrows = generate_bom(cfg.module_config(), catalog)
+    rows: List[Dict[str, Any]] = []
+    for r in mrows:
+        q = dict(r)
+        q["qty"] = r["qty"] * n
+        q["ext_price_usd"] = round(q["qty"] * r["unit_price_usd"], 2)
+        q["scope"] = f"{n} x module"
+        rows.append(q)
+    by_code = {r["code"]: r for r in rows}
+    variables = rule_variables(cfg)
+    ct = cfg.controls_tier_resolved()
+    subs = set(cfg.subsystems)
+    for p in catalog:
+        yard_line = cfg.tier in p["applies_to_tiers"] and p.get("applies_to_lineups") == ["rev2"]
+        if not (yard_line or "cluster_qty_rule" in p):
+            continue
+        if not _part_applies(p, cfg, ct, subs):
+            continue
+        qty = eval_qty_rule(p["qty_rule"] if yard_line else p["cluster_qty_rule"], variables)
+        qty = math.ceil(qty - 1e-9) if not float(qty).is_integer() else int(qty)
+        if qty <= 0:
+            continue
+        price = float(p["unit_price_usd"])
+        note = p.get("cluster_note", "")
+        if p["code"] in by_code:
+            r = by_code[p["code"]]
+            r["qty"] += qty
+            r["ext_price_usd"] = round(r["qty"] * r["unit_price_usd"], 2)
+            r["scope"] = f"{n} x module + yard ({qty}: {note})" if note else f"{n} x module + yard ({qty})"
+            continue
+        row = {
+            "code": p["code"], "subsystem": subsystem_of(p["code"]), "name": p["name"],
+            "manufacturer": p.get("manufacturer", ""), "mpn": p.get("mpn", ""), "vendor": p.get("vendor", ""), "vendor_url": p.get("vendor_url", ""),
+            "unit": p["unit"], "qty": qty, "unit_price_usd": round(price, 2), "ext_price_usd": round(qty * price, 2),
+            "price_status": p["price_status"], "price_checked": p.get("price_checked"), "price_source_note": p.get("price_source_note", ""),
+            "lead_time_weeks": p.get("lead_time_weeks"), "availability_note": p.get("availability_note", ""),
+            "qty_rule": p["qty_rule"] if yard_line else p["cluster_qty_rule"],
+            "refrigerant": p.get("refrigerant", ""), "gwp": p.get("gwp"), "scope": "yard" + (f": {note}" if note else ""),
+        }
+        rows.append(row)
+        by_code[p["code"]] = row
+    return rows
+
+
 def totals(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     by_sub: Dict[str, float] = {}
     by_status = {s: 0.0 for s in STATUSES}
@@ -345,6 +415,7 @@ def _confirmed_pct_ex_compute(rows: List[Dict[str, Any]]) -> float:
 CSV_FIELDS = ["code", "subsystem", "name", "manufacturer", "mpn", "vendor", "vendor_url", "unit", "qty",
               "unit_price_usd", "ext_price_usd", "price_status", "price_checked", "lead_time_weeks",
               "availability_note", "price_source_note", "qty_rule", "refrigerant", "gwp"]
+CSV_FIELDS_CLUSTER = CSV_FIELDS + ["scope"]     # Rev 2 BEN 2000 cluster rows say where each quantity comes from
 GWP_LIMIT = 700   # AIM Act Technology Transitions: data-center / IT-room cooling installed from 2027-01-01
 
 
@@ -361,7 +432,7 @@ def to_csv(rows: List[Dict[str, Any]], path: Path | str) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+        w = csv.DictWriter(f, fieldnames=CSV_FIELDS_CLUSTER if any(r.get("scope") for r in rows) else CSV_FIELDS, extrasaction="ignore")
         w.writeheader()
         for r in rows:
             w.writerow(r)
@@ -391,6 +462,14 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
             power_txt = f"{d['voltage']} · {d['service_breaker_a']} A service · UPS {d['ups_modules']} × {d['ups_kva_each']} kVA · battery {d['battery_kwh']} kWh"
         loop_txt = (f" · W45 loop {d['loop_flow_lpm']} L/min at ΔT {d['loop_dt_design_k']:.0f} K, heat reuse {d['heat_reuse_kw_available']} kW available"
                     if cfg.cooling == "dlc_hd" else "")
+        if d["kind"] == "cluster":
+            out.append(f"**Cluster (Rev 2 BEN 2000, docs/REV2_DECISION.md §2b):** {d['modules']} × {d['module_label']} modules of {d['module_it_kw']:g} kW in "
+                       f"{d['module_racks']} racks ({d['kw_per_rack']:g} kW/rack) on a shared yard: {d['mv_kv']} kV service {d['mv_service_amps']} A, 15 kV switchgear "
+                       f"{d['mv_switchgear_ways']}-way (1 source + {d['modules']} transformer ways), {d['transformers_total']} × {d['transformer_kva']:,} kVA pad-mount transformers "
+                       f"(one per module, {d['transformer_loading_pct']} % loaded), {d['skids']} heat-rejection skids. Module lines are the stand-alone {d['module_label']} BOM "
+                       f"(`Config.module_config()`) × {d['modules']}; yard lines are the `ben2000` lines limited to lineup rev2 and existing lines with a `cluster_qty_rule`; "
+                       f"the **Scope** column says which. In a cluster module, SITE-ELEC (480 V service interconnect, per ampere) carries the transformer-secondary trench, "
+                       f"conduit and cable to the module service section.\n")
         out.append(f"**Configuration:** {d['tier_label']} · {cfg.profile} · {d['hardening_label']} · {cfg.it_kw:.0f} kW IT in {cfg.racks} rack(s) · "
                    f"{d['cooling_label']} ({d['cooling_units_total']} units, {cfg.redundancy}){loop_txt} · {power_txt} · generator {'yes' if cfg.generator else 'no'} · controls: {d['controls_label']} "
                    f"({d['pods']} BEN Pods) · subsystems: {', '.join(cfg.subsystems)}\n")
@@ -408,12 +487,14 @@ def to_markdown(rows: List[Dict[str, Any]], cfg: Config | None = None, title: st
     out.append("")
     has_gwp = any(r.get("gwp") is not None for r in rows)   # GWP column present when the BOM holds a refrigerant-charged line
     gwp_h = " Refrigerant / GWP |" if has_gwp else ""
-    out.append(f"| Code | Item | Mfr / MPN | Vendor | Qty | Unit | Unit USD | Ext USD | Status | Checked | Lead wk |{gwp_h} Note |")
-    out.append("|---|---|---|---|---:|---|---:|---:|---|---|---:|" + ("---|" if has_gwp else "") + "---|")
+    has_scope = any(r.get("scope") for r in rows)           # Rev 2 BEN 2000 cluster: module x n / yard
+    sc_h = " Scope |" if has_scope else ""
+    out.append(f"| Code | Item |{sc_h} Mfr / MPN | Vendor | Qty | Unit | Unit USD | Ext USD | Status | Checked | Lead wk |{gwp_h} Note |")
+    out.append("|---|---|" + ("---|" if has_scope else "") + "---|---|---:|---|---:|---:|---|---|---:|" + ("---|" if has_gwp else "") + "---|")
     for r in rows:
         vendor = f"[{_md_escape(r['vendor'])}]({r['vendor_url']})" if r.get("vendor_url") else _md_escape(r["vendor"])
-        cells = [
-            r["code"], _md_escape(r["name"]), _md_escape(f"{r['manufacturer']} {r['mpn']}".strip()), vendor,
+        cells = [r["code"], _md_escape(r["name"])] + ([_md_escape(r.get("scope", ""))] if has_scope else []) + [
+            _md_escape(f"{r['manufacturer']} {r['mpn']}".strip()), vendor,
             f"{r['qty']:,}", _md_escape(r["unit"]), f"{r['unit_price_usd']:,.2f}", f"{r['ext_price_usd']:,.2f}",
             r["price_status"], r["price_checked"] or "—", str(r["lead_time_weeks"] if r["lead_time_weeks"] is not None else "—"),
         ]

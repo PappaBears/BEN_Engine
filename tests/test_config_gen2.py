@@ -23,22 +23,22 @@ def test_canonical_keys_are_the_only_geometry_keys():
 
 
 def test_ben2000_preset_valid_and_dlc_only():
-    c = Config.preset("ben2000")
+    c = Config.preset("ben2000", lineup="rev1")
     assert not c.validate()
     assert c.cooling == "dlc_cdu" and c.generator is True
     d = c.derived()
     assert d["kind"] == "hall" and d["modules"] == 3 and d["rows"] == 4 and d["mv_service"] is True
     assert 800 <= c.it_kw <= 2000 and c.racks <= 48
     for cooling in ("rdhx_drycooler", "inrow_dx", "cabinet_dx"):
-        c2 = Config.preset("ben2000"); c2.cooling = cooling
+        c2 = Config.preset("ben2000", lineup="rev1"); c2.cooling = cooling
         assert any("dlc_cdu" in e for e in c2.validate()), cooling
-    c3 = Config.preset("ben2000"); c3.controls_tier = "lite"
+    c3 = Config.preset("ben2000", lineup="rev1"); c3.controls_tier = "lite"
     assert c3.validate()
     assert d["controls_tier_resolved"] == "pro"
 
 
 def test_ben2000_mv_sizing_numbers():
-    d = Config.preset("ben2000", "ai_training", "hot_arid").derived()
+    d = Config.preset("ben2000", "ai_training", "hot_arid", lineup="rev1").derived()
     assert d["voltage"].startswith("12.47 kV")
     assert d["transformer_kva"] == 2500 and d["transformers_total"] == 2       # N+1 -> 2N transformer pair
     assert d["ups_modules"] == 2 and 1800 <= d["ups_kva_each"] <= 2000
@@ -48,7 +48,7 @@ def test_ben2000_mv_sizing_numbers():
 
 
 def test_transformers_total_for_2n_and_n():
-    c = Config.preset("ben2000", "healthcare")
+    c = Config.preset("ben2000", "healthcare", lineup="rev1")
     assert c.redundancy == "2N"
     assert c.derived()["transformers_total"] == 2 * math.ceil(c.derived()["total_kva"] / 2250)
     c.redundancy = "N"
@@ -99,7 +99,7 @@ def test_pods_formula_follows_racks_and_modules():
 
 
 def test_row_fit_for_four_rows():
-    c = Config.preset("ben2000", "ai_inference"); d = c.derived()
+    c = Config.preset("ben2000", "ai_inference", lineup="rev1"); d = c.derived()
     assert c.racks == 48 and d["rows"] == 4 and d["racks_per_row"] == 12
     assert d["row_fits"] and d["row_length_mm"] <= TIER_GEOMETRY["ben2000"]["int_l_m"] * 1000
     # single-row tiers report rows == 1 and racks_per_row == racks
@@ -107,7 +107,7 @@ def test_row_fit_for_four_rows():
         c = Config.preset(t); d = c.derived()
         assert d["rows"] == 1 and d["racks_per_row"] == c.racks
     # the per-row check is what validate() uses
-    c = Config.preset("ben2000"); c.racks = 48; c.it_kw = 2000
+    c = Config.preset("ben2000", lineup="rev1"); c.racks = 48; c.it_kw = 2000
     assert not c.validate()
 
 

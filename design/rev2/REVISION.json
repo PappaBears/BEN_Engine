@@ -64,7 +64,24 @@
       "reason": "docs/audit/EN-001_working_space_liner.md",
       "requested_by": "design authority (finding of the lineup engineer)",
       "approved_by": ""
+    },
+    {
+      "id": "R2-05",
+      "date": "2026-11-09",
+      "title": "BEN 2000 becomes three BEN 700 modules on a shared yard",
+      "sheets": ["ben2000/A-000 (new: site plan)", "ben2000/A-001 (cluster elevations, BEN 700 module sheet reference)", "ben2000/E-001 (12.47 kV one-line to three modules)", "ben2000/INDEX.md", "INTERFERENCE_CHECKS.md"],
+      "summary": "Lineup rev2 BEN 2000 is a cluster of three BEN 700 modules (config.REV2_GEOMETRY, kind 'cluster'): preset 3 x 5 racks x 133.3 kW = 2,000 kW (verified maximum 3 x 705 = 2,115 kW), dlc_hd, N+1 inside every module. Each module is the stand-alone BEN 700 (Config.module_config(); design/layout.py _resolve_dense I-D1..I-D20 unchanged, check I-K1). Shared yard per config.cluster_yard(): 12.47 kV service, 15 kV pad-mounted 4-way switchgear (1 source + 3 fault-interrupter ways), one 1,000 kVA FR3 pad-mount transformer per module, one heat-rejection skid per module, 3,048 mm between modules, door-end fire / crane lane and yard-end service lane; yard checks I-K2..I-K24 (I-K6 fire separation and I-K11 utility clearance are STUDY items for the AHJ / utility). The set references the BEN 700 module sheets instead of duplicating them. The Rev 2.A hall sheets drawn before this change are kept unchanged in ben2000/superseded-hall-2.A/. Rev 1 hall (lineup rev1, design/drawings/ben2000/) unchanged.",
+      "reason": "docs/REV2_DECISION.md §2b (operator direction 2026-11-09: dense all-in-one up to 2 MW)",
+      "requested_by": "operator (Rev 2 decision §2b)",
+      "approved_by": ""
     }
   ],
-  "superseded_sets": []
+  "superseded_sets": [
+    {
+      "path": "design/drawings/rev2/ben2000/superseded-hall-2.A/",
+      "drawing_rev": "2.A",
+      "superseded_by": "R2-05",
+      "note": "Rev 2.A sheets of the BEN 2000 hall (14 sheets) drawn before docs/REV2_DECISION.md §2b; kept unchanged, not for construction. The Rev 1 hall set of record is design/drawings/ben2000/."
+    }
+  ]
 }

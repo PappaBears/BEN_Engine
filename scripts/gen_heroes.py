@@ -8,6 +8,7 @@ dry coolers in a plant yard. Run after any geometry change: ``python scripts/gen
 from __future__ import annotations
 
 import math
+import zlib
 import os
 import sys
 
@@ -322,7 +323,7 @@ def _band_parts(fields, u0, avail, bh, fs_max, ground, lead="#4C9DFF", text="#B2
     return parts
 
 
-def livery_side(c: "Canvas", x0, y0, L, Wd, Hh, label, rated, mark="mark-deep", band_frac=0.066, outdoor=True):
+def livery_side(c: "Canvas", x0, y0, L, Wd, Hh, label, rated, mark="mark-deep", band_frac=0.066, outdoor=True, prefix=None):
     """Data plate band along the bottom of the +y face, v2 mark, product line and tier number (brand/v2/livery side art)."""
     bl = _brandlib()
     ku = c.scale * COS30          # local u units per metre along x on the skewed face
@@ -342,7 +343,7 @@ def livery_side(c: "Canvas", x0, y0, L, Wd, Hh, label, rated, mark="mark-deep", 
     lock_em = 1.28 + len("SCHREIBER AI") * 0.36 * CAPS_EM + 0.36 * 0.6 / 34 * 12
     mh = min(Hh * 0.30 * kv, 34, 0.46 * u_len / lock_em)
     vl = 0.93 * v_len - mh       # baseline of the lockup row: its top sits 7 % below the roof edge
-    face.append(f'<g transform="translate({0.06 * u_len:.1f},{-vl:.1f})">' + bl.embed(mark, 0, -mh, mh, prefix=f"hm{abs(hash(label)) % 997}_") +
+    face.append(f'<g transform="translate({0.06 * u_len:.1f},{-vl:.1f})">' + bl.embed(mark, 0, -mh, mh, prefix=prefix or f"hm{zlib.crc32(label.encode()) % 997}_") +
                 f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.52:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="800" font-size="{mh * 0.36:.1f}" letter-spacing="0.6" fill="{ink}">SCHREIBER AI</text>'
                 f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.08:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="700" font-size="{mh * 0.24:.1f}" letter-spacing="1.2" fill="{sub}">BEN ENGINE</text></g>')
     # tier number right-aligned on the face, no wider than 40 % of it
@@ -428,6 +429,67 @@ def hero_v2_hall(g, d, cfg):
     return body + "\n" + "\n".join(plumes) + "\n" + livery_side(c, 0, 0, L, Wd, Hh, g["label"], f"RATED {cfg.it_kw:g} kW IT")
 
 
+def hero_v2_cluster(g, d, cfg):
+    """Rev 2 BEN 2000 (docs/REV2_DECISION.md §2b): three BEN 700 modules side by side on the yard, each with its heat-rejection skid and
+    pad-mount transformer behind the blind end, positions from config.cluster_yard() (m). Drawn back to front so each row covers the one
+    behind it; the livery of every module is on its own +y face (clipped to the face, text fitted)."""
+    Y = d["yard"]
+    R = {k: [v / 1000.0 for v in r] for k, r in Y["rects"].items()}
+    n = d["modules"]
+    L, Wd, Hh = g["ext_l_m"], g["ext_w_m"], g["ext_h_m"]
+    x_max = max(R[f"T{k + 1}"][2] for k in range(n)) + 0.6
+    y_max = R[f"M{n}"][3] + 0.6
+    scale = 26.0
+    while True:
+        c = Canvas(scale=scale, ox=W / 2 - (x_max - y_max) * COS30 * scale / 2 + 10, oy=H / 2 + 50 - ((x_max + y_max) * SIN30 * scale) / 2)
+        top = min(c.P(0, R[f"M{k + 1}"][1], Hh)[1] for k in range(n))
+        if top < 78:
+            c.oy += 78 - top
+        left = c.P(0, y_max, 0)[0]
+        right = c.P(x_max, 0, 0)[0]
+        bottom = c.P(x_max, y_max, 0)[1]
+        if bottom <= H - 8 and left >= 8 and right <= W - 8:
+            break
+        scale *= 0.96
+    Canvas.brand = lambda self, *a, **k: ""
+    # yard ground (inside the fence) and the lanes
+    fx0, fy0, fx1, fy1 = [v / 1000.0 for v in Y["fence"]]
+    c.slab(fx0, max(fy0, -1.5), fx1 - fx0, fy1 - max(fy0, -1.5), fill="#16263D")
+    body = [_recolor("\n".join(c.out))]
+    c.out = []
+    plumes = []
+    for k in range(n):
+        m, sk, t = R[f"M{k + 1}"], R[f"SK{k + 1}"], R[f"T{k + 1}"]
+        y0 = m[1]
+        draw_module(c, 0, y0, L, Wd, Hh, g["label"], 0, dry_coolers=0)
+        # skid: steel base, dry-cooler bank, trim chiller, supply / return to the blind end (thermal ramp)
+        sl, sw_ = sk[2] - sk[0], sk[3] - sk[1]
+        c.box(sk[0], sk[1], 0, sl, sw_, 0.25, side="#6B7F99", end="#58708E", top="#8EA7C8", sw=0.6)
+        c.box(sk[0], sk[1] + 0.1, 0.25, sl, sw_ - 0.2, 1.7, side=SIDE_L, end=END_L, top=TOP_L, sw=0.8)
+        n_fan = max(2, round(sl / 1.2))
+        for f in range(n_fan):
+            fx = sk[0] + (f + 0.5) * sl / n_fan
+            c.ring(fx, sk[1] + sw_ * 0.33, 1.97, min(0.42, sl / n_fan / 2 - 0.08))
+            c.ring(fx, sk[1] + sw_ * 0.72, 1.97, min(0.42, sl / n_fan / 2 - 0.08))
+            plumes.append((k, heat_plume(c, fx, sk[1] + sw_ * 0.5, 2.05, h=1.3, w=0.33)))
+        for k2, col in enumerate(("#5CD6FF", "#FF8A3D")):
+            a, b = c.P(L, y0 + Wd * (0.35 + 0.15 * k2), 0.5), c.P(sk[0], y0 + Wd * (0.35 + 0.15 * k2), 0.5)
+            c.out.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" stroke="{col}" stroke-width="2.2"/>')
+        # pad-mount transformer (Shop White cabinet, Night Navy door strip)
+        c.box(t[0], t[1], 0, t[2] - t[0], t[3] - t[1], 1.9, side="#CBD6E4", end="#B9C6D8", top="#DCE4EF", sw=0.8)
+        row = _recolor("\n".join(c.out))
+        c.out = []
+        body.append(row + "\n" + "\n".join(p_ for kk, p_ in plumes if kk == k))
+        body.append(livery_side(c, 0, y0, L, Wd, Hh, "BEN 700", f"BEN 2000 · M{k + 1}", prefix=f"cl{k + 1}_"))
+    # 15 kV switchgear in the transformer column (behind transformer 1)
+    swr = R["SWGR"]
+    if swr[1] > -1.5:
+        c.box(swr[0], swr[1], 0, swr[2] - swr[0], swr[3] - swr[1], 2.0, side="#CBD6E4", end="#B9C6D8", top="#DCE4EF", sw=0.8)
+        body.insert(1, _recolor("\n".join(c.out)))
+        c.out = []
+    return "\n".join(body)
+
+
 def hero_v2_ben1(g, d, cfg):
     """BEN 1: the 12U sound-damped office cabinet (Night Navy, S2 band) on a desk, with a small screen for scale."""
     fm = g["forms"]["cab12"]
@@ -493,10 +555,12 @@ def _wrap(text: str, width: int) -> list:
 
 
 def render_v2(tier: str) -> str:
-    g = TIER_GEOMETRY[tier]
     cfg = Config.preset(tier, lineup="rev2")
+    g = cfg.geometry() if cfg.is_cluster() else TIER_GEOMETRY[tier]
     d = cfg.derived()
-    if g["kind"] == "minirack":
+    if g["kind"] == "cluster":
+        body = hero_v2_cluster(g, d, cfg)
+    elif g["kind"] == "minirack":
         body = hero_v2_ben1(g, d, cfg)
     elif g["kind"] == "cabinet":
         body = hero_v2_cabinet(g, d, cfg)

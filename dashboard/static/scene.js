@@ -271,7 +271,12 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   // --------------------------------------------------------------------------- build
   function rebuild(p) {
     payload = p;
-    const cfg = p.config, d = p.derived, geo = d.geometry;
+    // Rev 2 BEN 2000 = three BEN 700 modules on a shared yard: module 1 is built live from the module numbers (d.module), modules 2..n by
+    // the same dense builders shifted across the yard, then the yard (pad-mount transformers, 15 kV switchgear, generators, lanes).
+    const clusterD = p.derived.kind === 'cluster' ? p.derived : null;
+    const cfg = clusterD ? { ...p.config, tier: clusterD.module_tier, racks: clusterD.module_racks, it_kw: clusterD.module_it_kw } : p.config;
+    const d = clusterD ? { ...clusterD.module, geometry: clusterD.geometry, climate: clusterD.climate } : p.derived, geo = d.geometry;
+    G.cluster = clusterD;
     const kind = d.kind || geo.kind || (cfg.tier === 'ben5' || cfg.tier === 'micro' ? 'cabinet' : 'module');
     const mini = kind === 'minirack';                       // Rev 2 BEN 1: indoor mini rack in an office corner
     const micro = kind === 'cabinet' || mini, hall = kind === 'hall';
@@ -325,15 +330,49 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     if (G.subs.has('compute')) buildRacks(cfg, d);
     if (G.subs.has('cooling')) { if (G.hall) buildHallCooling(cfg, d); else buildCooling(cfg, d); }
     if (G.subs.has('power')) { if (G.hall) buildHallPower(cfg, d); else buildPower(cfg, d); }
-    if (G.subs.has('controls')) buildControls(cfg, d, p.sensors || []);
+    const sensorsM = clusterD ? (p.sensors || []).filter(s => { const m = /_r(\d+)/.exec(s.id); return !m || Number(m[1]) <= clusterD.module_racks; }) : (p.sensors || []);
+    if (G.subs.has('controls')) buildControls(cfg, d, sensorsM);
     buildFx(cfg, d);
+    if (clusterD) buildCluster(cfg, d, clusterD);
     buildTour(cfg, d);
-    const sh = G.hall ? G.extL * 1.2 : G.extL;
+    const sh = G.hall ? G.extL * 1.2 : (clusterD ? clusterD.yard.site_l_m * 0.6 : G.extL);
     sun.shadow.camera.left = -sh; sun.shadow.camera.right = sh; sun.shadow.camera.top = sh; sun.shadow.camera.bottom = -sh; sun.shadow.camera.updateProjectionMatrix();
     scene.fog.density = micro ? 0.02 : (hall ? 0.004 : 0.08 / Math.max(4, G.extL));
     setCamera(mode.camera, true);
     if (state) update(state);
     applyCutaway();
+  }
+
+  /** Rev 2 BEN 2000: modules 2..n with the same builders as module 1 (shifted by the yard pitch, -z = site +y), then the shared yard from
+   *  config.cluster_yard(): pad-mount transformers, 15 kV switchgear, generators when fitted, the yard slab and the two lanes. Module 1 keeps
+   *  the cutaway roof / walls, the sensors and the airflow particles; racks and CDUs of every module are live (twin rack i -> module floor(i / 5)). */
+  function buildCluster(cfg, d, cd) {
+    const keep = { roof, wallPos, wallNeg };
+    const pitch = cd.yard.pitch_mm / 1000;
+    const sx = (x) => x / 1000 - G.extL / 2, sz = (y) => -(y / 1000 - G.extW / 2);
+    for (let k = 1; k < cd.modules; k++) {
+      const before = Object.fromEntries(Object.entries(groups).map(([n, g]) => [n, g.children.length]));
+      buildShell(cfg, d); buildHardening(cfg, d); buildInterior(cfg, d);
+      if (G.subs.has('compute')) buildRacks(cfg, d);
+      if (G.subs.has('cooling')) buildCooling(cfg, d);
+      if (G.subs.has('power')) buildPower(cfg, d);
+      for (const [n, g] of Object.entries(groups)) for (let i = before[n]; i < g.children.length; i++) g.children[i].position.z -= k * pitch;
+    }
+    ({ roof, wallPos, wallNeg } = keep);
+    const R = cd.yard.rects, g = groups.power;
+    const fe = cd.yard.fence, slab = box((fe[2] - fe[0]) / 1000, 0.05, (fe[3] - fe[1]) / 1000, MAT.pad, (sx(fe[0]) + sx(fe[2])) / 2, -0.03, (sz(fe[1]) + sz(fe[3])) / 2);
+    slab.castShadow = false; groups.shell.add(slab); objects.yard = slab;
+    for (const ln of ['LANE-W', 'LANE-E']) { const r = R[ln]; const m = box((r[2] - r[0]) / 1000, 0.04, (r[3] - r[1]) / 1000, MAT.ground, (sx(r[0]) + sx(r[2])) / 2, -0.02, (sz(r[1]) + sz(r[3])) / 2); m.castShadow = false; groups.shell.add(m); }
+    const add = (r, h, mat, type, id, extra = {}) => {
+      const w = (r[2] - r[0]) / 1000, dd = (r[3] - r[1]) / 1000;
+      const m = box(w, h, dd, mat, (sx(r[0]) + sx(r[2])) / 2, h / 2, (sz(r[1]) + sz(r[3])) / 2);
+      m.userData = { type, id, ...extra }; edges(m, 0, 0.3); g.add(m); pickables.push(m); return m;
+    };
+    for (let k = 0; k < cd.modules; k++) {
+      objects[`transformer${k + 1}`] = add(R[`T${k + 1}`], 1.9, MAT.cooling, 'transformer', `transformer${k + 1}`, { index: k, label: `T${k + 1} ${cd.transformer_kva.toLocaleString()} kVA, 12.47 kV–480Y/277 V (module ${k + 1})` });
+      if (R[`G${k + 1}`]) objects[`generator${k + 1}`] = add(R[`G${k + 1}`], 2.6, MAT.powerDark, 'generator', `generator${k + 1}`, { index: k });
+    }
+    objects.mvswgr = add(R.SWGR, 2.0, MAT.power, 'switchgear', 'mvswgr', { label: '15 kV pad-mounted switchgear, 4-way' });
   }
 
   function buildShell(cfg, d) {
@@ -1269,6 +1308,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const outdoor = G.hall ? 22 : (objects.generator ? 2.6 : 0) + 2.2; // utility pedestal / generator stand outside the ends (hall: power module + yards)
     const R = 0.5 * Math.hypot(extL + outdoor, extW + (G.hall ? 16 : 1.2), extH + 0.9);
     const centre = [G.hall ? -4 : (objects.generator ? 0 : -0.6), extH * 0.45, G.hall ? 1.5 : 0];
+    if (G.cluster && (name === 'exterior_iso' || name === 'roof')) {   // the whole yard: modules, skids, transformers, lanes
+      const y = G.cluster.yard, site = y.site;
+      const cx = ((site[0] + site[2]) / 2) / 1000 - extL / 2, cz = -(((site[1] + site[3]) / 2) / 1000 - extW / 2);
+      const Rc = 0.5 * Math.hypot(y.site_l_m, y.site_w_m, extH);
+      const v = name === 'roof' ? new THREE.Vector3(-0.2, 1.0, 0.6) : new THREE.Vector3(-0.7, 0.5, 0.95);
+      const dd = fitDistance(Rc * (name === 'roof' ? 0.75 : 0.9)); v.normalize().multiplyScalar(dd);
+      return { pos: [cx + v.x, extH * 0.4 + v.y, cz + v.z], look: [cx, extH * 0.3, cz], cutaway: false };
+    }
     if (G.hall) {
       const z0 = G.rowZ[0], zc0 = z0 - (rackD / 2 + G.aisleW / 2), zh0 = z0 + rackD / 2 + G.aisleW / 2;
       switch (name) {
@@ -1418,6 +1465,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const zc = G.zOff - (rackD / 2 + G.coldW / 2), zh = G.zOff + rackD / 2 + G.hotW / 2;
     const st = state || {};
     const hz = `${d.hardening_label || cfg.hardening || 'H1'}: ${d.hardening_rating || 'NEMA 4X / IP66'}`;
+    if (G.cluster && (name === 'exterior_iso' || name === 'roof')) {   // the whole yard: modules, skids, transformers, lanes
+      const y = G.cluster.yard, site = y.site;
+      const cx = ((site[0] + site[2]) / 2) / 1000 - extL / 2, cz = -(((site[1] + site[3]) / 2) / 1000 - extW / 2);
+      const Rc = 0.5 * Math.hypot(y.site_l_m, y.site_w_m, extH);
+      const v = name === 'roof' ? new THREE.Vector3(-0.2, 1.0, 0.6) : new THREE.Vector3(-0.7, 0.5, 0.95);
+      const dd = fitDistance(Rc * (name === 'roof' ? 0.75 : 0.9)); v.normalize().multiplyScalar(dd);
+      return { pos: [cx + v.x, extH * 0.4 + v.y, cz + v.z], look: [cx, extH * 0.3, cz], cutaway: false };
+    }
     if (G.hall) {
       const z0 = G.rowZ[0], zc0 = z0 - (rackD / 2 + G.aisleW / 2), zh0 = z0 + rackD / 2 + G.aisleW / 2, pmX = objects.pm ? objects.pm.position.x : -extL / 2 - 6;
       const stops = [
@@ -1508,7 +1563,8 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     // Rev 2 livery of the current build: { lineup, bandText, bodyColor, bandTexture, productLine, whiteLabel, brand }
     livery: () => livery && { lineup: livery.lineup, bandText: livery.bandText, bodyColor: livery.bodyColor, bandTexture: !!livery.bandTexture, productLine: livery.productLine || '', whiteLabel: !!livery.whiteLabel, brand: livery.brand || '' },
     // Rev 2: counts of the dense-row parts and the BEN 1 contents, for tests and the tour
-    rev2Objects: () => { const n = (t) => pickables.filter(o => o.userData && o.userData.type === t).length; return { mini: !!G.mini, form: G.form, dense: !!G.dense, fancoils: n('fancoil'), cdus: n('cdu'), ups: n('ups'), batteries: n('battery'), switchgear: n('switchgear'), skid: !!objects.skid, aiBoxes: n('ai_box'), pods: n('pod'), desk: !!objects.desk, fans: n('cooling') }; }, hallObjects: () => ({ powermodule: !!objects.pm, transformers: pickables.filter(o => o.userData && o.userData.type === 'transformer').length, generators: pickables.filter(o => o.userData && o.userData.type === 'generator').length, fanwalls: pickables.filter(o => o.userData && o.userData.type === 'fanwall').length, plinth: !!objects.plinth, vestibule: !!objects.vestibule }),
+    rev2Objects: () => { const n = (t) => pickables.filter(o => o.userData && o.userData.type === t).length; return { mini: !!G.mini, form: G.form, dense: !!G.dense, fancoils: n('fancoil'), cdus: n('cdu'), ups: n('ups'), batteries: n('battery'), switchgear: n('switchgear'), skid: !!objects.skid, aiBoxes: n('ai_box'), pods: n('pod'), desk: !!objects.desk, fans: n('cooling') }; }, clusterObjects: () => ({ cluster: !!G.cluster, modules: G.cluster ? G.cluster.modules : 0, transformers: pickables.filter(o => o.userData && o.userData.type === 'transformer').length, mvswgr: !!objects.mvswgr, yard: !!objects.yard, skids: pickables.filter(o => o.userData && o.userData.type === 'skid').length, cdus: pickables.filter(o => o.userData && o.userData.type === 'cdu').length }),
+    hallObjects: () => ({ powermodule: !!objects.pm, transformers: pickables.filter(o => o.userData && o.userData.type === 'transformer').length, generators: pickables.filter(o => o.userData && o.userData.type === 'generator').length, fanwalls: pickables.filter(o => o.userData && o.userData.type === 'fanwall').length, plinth: !!objects.plinth, vestibule: !!objects.vestibule }),
     mode, camera, objects, G,
     focus(sel) { // orbit camera to an object
       const obj = targetObject(sel); if (!obj) return; const c = new THREE.Box3().setFromObject(obj).getCenter(new THREE.Vector3());

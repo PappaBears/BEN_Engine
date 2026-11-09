@@ -147,27 +147,26 @@ try {
     return 'rackCount 1';
   });
 
-  // ---------------------------------------------------------------------------------------------- BEN 2000 hall
-  await step(`selector: ${L('ben2000')} builds the hall (rows, power module, yard, hardening)`, async () => {
+  // ---------------------------------------------------------------------------------------------- BEN 2000 (Rev 2): three BEN 700 modules on a shared yard
+  await step(`selector: ${L('ben2000')} builds the Rev 2 cluster (three BEN 700 modules, transformers, 15 kV switchgear, skids, hardening)`, async () => {
     await page.click(`.panel-body[data-panel="selector"] .row button:has-text("${L('ben2000')}")`);
     await page.waitForFunction(() => document.querySelector('select[name=tier]').value === 'ben2000');
     await page.evaluate(() => { const s = document.querySelector('select[name=hardening]'); s.value = 'H3'; s.dispatchEvent(new Event('change')); });
     await page.waitForFunction(() => !document.querySelector('#btn-apply-config').disabled, null, { timeout: 5000, polling: 200 });
     await page.click('#btn-apply-config');
-    await page.waitForFunction(() => window.__ben.store.config.tier === 'ben2000' && window.__ben.scene.rackCount() === window.__ben.store.config.racks, null, { timeout: 30000, polling: 200 });
-    const info = await page.evaluate(() => ({ racks: window.__ben.scene.rackCount(), cfgRacks: window.__ben.store.config.racks, rows: window.__ben.scene.rowCount(), dry: window.__ben.scene.dryCoolerCount(), d: window.__ben.store.derived, hall: window.__ben.scene.hallObjects(), hz: window.__ben.store.config.hardening }));
-    if (info.racks !== info.cfgRacks) throw new Error(`scene racks ${info.racks} != config ${info.cfgRacks}`);
-    if (info.rows !== info.d.rows) throw new Error(`rows ${info.rows} != derived ${info.d.rows}`);
-    if (!info.d.mv_service || info.d.transformers_total < 2) throw new Error('derived MV service / transformers missing');
-    if (!info.hall.powermodule || info.hall.transformers !== info.d.transformers_total || info.hall.generators !== info.d.generators_total) throw new Error('hall objects ' + JSON.stringify(info.hall));
-    if (info.dry !== info.d.cooling_units_total) throw new Error(`dry coolers ${info.dry} != ${info.d.cooling_units_total}`);
-    if (info.hz !== 'H3' || !info.hall.vestibule || !info.hall.plinth) throw new Error('H3 hardening visuals missing ' + JSON.stringify(info.hall));
+    await page.waitForFunction(() => window.__ben.store.config.tier === 'ben2000' && window.__ben.store.derived.kind === 'cluster' && window.__ben.scene.rackCount() === window.__ben.store.config.racks, null, { timeout: 30000, polling: 200 });
+    const info = await page.evaluate(() => ({ racks: window.__ben.scene.rackCount(), cfgRacks: window.__ben.store.config.racks, d: window.__ben.store.derived, cl: window.__ben.scene.clusterObjects(), hall: window.__ben.scene.hallObjects(), hz: window.__ben.store.config.hardening }));
+    if (info.racks !== info.cfgRacks || info.cfgRacks !== info.d.modules * info.d.module_racks) throw new Error(`scene racks ${info.racks} != config ${info.cfgRacks}`);
+    if (!info.d.mv_service || info.d.transformers_total !== info.d.modules) throw new Error('derived MV service / one transformer per module missing');
+    if (!info.cl.cluster || info.cl.transformers !== info.d.transformers_total || !info.cl.mvswgr || !info.cl.yard) throw new Error('cluster yard objects ' + JSON.stringify(info.cl));
+    if (info.cl.cdus !== info.d.cooling_units_total || info.cl.skids !== info.d.skids) throw new Error('module CDUs / skids ' + JSON.stringify(info.cl));
+    if (info.hz !== 'H3' || !info.hall.plinth) throw new Error('H3 hardening visuals missing ' + JSON.stringify(info.hall));
     const derivedTxt = await page.textContent('.panel-body[data-panel="selector"]');
-    if (!/Transformers/.test(derivedTxt) || !/Generators/.test(derivedTxt) || !/Hardening/.test(derivedTxt)) throw new Error('derived table lacks MV/generator/hardening rows');
+    if (!/Transformers/.test(derivedTxt) || !/Cluster/.test(derivedTxt) || !/Site density/.test(derivedTxt) || !/Hardening/.test(derivedTxt)) throw new Error('derived table lacks cluster / MV / site density / hardening rows');
     await page.evaluate(() => window.__ben.scene.setCamera('exterior_iso', true));
     await page.waitForTimeout(1500);
     await shot(page, `${SCREENS}/selector-ben2000.png`);
-    return `${info.racks} racks in ${info.rows} rows, ${info.hall.transformers} transformers, ${info.hall.generators} generators, ${info.dry} dry coolers, ${info.hall.fanwalls} fan walls`;
+    return `${info.racks} racks in ${info.d.modules} modules, ${info.cl.transformers} transformers x ${info.d.transformer_kva} kVA, ${info.cl.cdus} CDUs, ${info.cl.skids} skids, ${info.d.kw_per_m2_footprint} kW/m2 module footprint`;
   });
 
   // ---------------------------------------------------------------------------------------------- forward architecture (study): dc800 + dlc_hd

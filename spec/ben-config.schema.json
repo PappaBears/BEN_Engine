@@ -316,5 +316,15 @@
       "ben700",
       "ben2000"
     ]
+  },
+  "x-tier-limits-rev2": {
+    "ben2000": {
+      "it_kw_min": 1200,
+      "it_kw_max": 2000,
+      "max_racks": 15,
+      "kind": "cluster",
+      "modules": 3,
+      "rows": 3
+    }
   }
 }

@@ -185,6 +185,107 @@ DENSE_RULES: Dict[str, Any] = {
     "trim_loop_c": 18.0,
 }
 
+# ---------------------------------------------------------------- Rev 2 BEN 2000: a cluster of BEN 700 modules (docs/REV2_DECISION.md §2b)
+# The Rev 1 BEN 2000 hall stays in TIER_GEOMETRY["ben2000"] and is what lineup "rev1" loads (frozen). Lineup "rev2" loads the entry
+# below instead (Config.geometry()): three BEN 700 modules, each sized and checked exactly as a stand-alone BEN 700 (_apply_dense,
+# design/layout.py _resolve_dense I-D1..I-D20), on a shared medium-voltage and heat-rejection yard (design/layout.py I-K checks).
+REV2_GEOMETRY: Dict[str, Dict[str, Any]] = {
+    "ben2000": {
+        "label": "BEN 2000",
+        "enclosure": "Three BEN 700 liquid-first 40 ft modules (all-in-one, sealed to IP66) on a shared yard: 12.47 kV switchgear, one pad-mount "
+                     "transformer and one heat-rejection skid per module",
+        "kind": "cluster", "modules": 3, "module_tier": "ben700", "positioning": "core", "lineup": "rev2", "liquid_first": True,
+        # module envelope (one BEN 700); the site footprint comes from cluster_yard()
+        "ext_l_m": 12.192, "ext_w_m": 2.438, "ext_h_m": 2.896,
+        "int_l_m": 11.85, "int_w_m": 2.20, "int_h_m": 2.49,
+        "max_racks": 15, "rack_u": 48, "it_kw_min": 1200, "it_kw_max": 2000, "max_rack_kw": 155,
+        "default_cooling": "dlc_hd", "voltage": "12.47 kV MV service → one 12.47 kV–480Y/277 V pad-mount transformer per module",
+        "tare_kg": 3 * 4300, "ups_minutes_default": 5,
+        # 3 x the BEN 700 verified maximum (705 kW in 5 racks: scripts/gen_density.py max_fit, docs/DENSITY.md)
+        "verified_max_kw": 2115,
+        "target_note": "Rev 2 decision §2b: three BEN 700 modules (3 x 705 kW verified = 2,115 kW), sold as up to 2,000 kW",
+    },
+}
+CLUSTER_TIERS = tuple(REV2_GEOMETRY)
+
+# Yard rules of the cluster (site plan, mm). Every clearance is checked in design/layout.py (I-K checks) against the rule it cites; values that
+# need a local authority or utility number are reported there as STUDY. Footprints marked "estimate" were not read from a datasheet.
+CLUSTER_YARD: Dict[str, Any] = {
+    "module_gap_mm": 3048,      # clear between module long sides: IFC 2021 1207.8.3 / NFPA 855 outdoor ESS 10 ft (3,048) to exposures (each module holds a lithium ESS)
+    "door_leaf_mm": 1219,       # ISO cargo door leaf (half of 2,438); swings 270 deg and folds back against the side wall
+    "door_leaf_folded_mm": 150, # folded leaf + hinge projection from the side wall (estimate)
+    "apron_mm": 1500,           # door-end apron: the cargo leaves swing inside it, not into the fire lane
+    "lane_mm": 6100,            # fire apparatus access road / crane lane (IFC 503.2.1: 20 ft = 6,096) on the door end; service lane on the yard end
+    # heat-rejection skid: position and size from the module layout (design/layout.py _resolve_dense item DC1 for modules > 300 kW)
+    "skid_offset_mm": 1500, "skid_l_mm": 4800, "skid_overhang_mm": 200, "skid_h_mm": 2400,
+    "xfmr_gap_mm": 1500,        # back of the pad-mount transformer to the skid
+    "xfmr": {"w": 2100, "d": 2100, "h": 1900, "kg": 4300,
+             "src": "estimate: typical three-phase 1,000 kVA dead-front pad-mount footprint and mass, not read from a datasheet"},
+    "xfmr_front_mm": 3000,      # working / hot-stick clearance in front of the transformer and switchgear doors (typical US utility standard 10 ft; local value)
+    "xfmr_kva_sizes": [750, 1000, 1500, 2000, 2500],
+    "xfmr_loading_max": 0.9,    # same loading rule as the Rev 1 hall (config derived(): total_kva / (kVA x 0.9))
+    "mv_kv": 12.47,
+    "swgr": {"w": 2600, "d": 1900, "h": 2000, "kg": 2500, "ways": 4, "amps": 600,
+             "src": "design/layout.py LIB mv_swgr (15 kV pad-mounted switchgear 4-way, catalogue-typical) and catalog PWR-MV-SWGR (600 A)"},
+    "swgr_gap_mm": 3000,        # switchgear to transformer 1 (side to side)
+    "genset": {"w": 12000, "d": 3200, "h": 4000, "kg": 22000, "src": "design/layout.py LIB genset (1,250 kW L2 enclosure), used as the envelope of the module generator"},
+    "gen_gap_mm": 3000,         # generator enclosure to module / to the next enclosure (NFPA 37 4.1.4: 1.5 m min; 3 m for service and radiator discharge, as I-H15)
+    "fence_offset_mm": 1000,    # yard fence 1 m outside the equipment and clearance zones
+}
+
+# Cluster derived(): the module numbers summed over the modules (key -> decimals of the rounding); everything else is per module.
+CLUSTER_SUM_KEYS: Dict[str, int] = {
+    "cooling_units_n": 0, "cooling_units_total": 0, "cooling_elec_kw": 2, "total_kw": 1, "total_kva": 1, "ups_modules": 0, "battery_kwh": 1,
+    "airflow_cfm": 0, "payload_kg": 0, "gross_kg": 0, "envelope_gain_kw": 2, "pods": 0, "generators_total": 0, "envelope_area_m2": 1,
+    "ups_frames": 0, "ups_frames_n": 0, "fancoils_n": 0, "fancoils_total": 0, "trim_loop_kw": 1, "battery_cabinets": 0, "battery_kwh_installed": 1,
+    "swbd_sections": 0, "liquid_heat_kw": 1, "loop_flow_lpm": 1, "heat_reuse_kw_available": 1,
+    "ac_dc_front_end_kw": 1, "dc_bus_kw": 1, "rectifier_modules_n": 0, "rectifier_modules": 0, "rectifier_cabinets": 0, "imd_count": 0,
+    "rack_shelves_total": 0, "battery_on_bus_kwh": 1, "dc_loss_saving_kw": 1, "copper_kg_dc_bus": 1, "copper_kg_ac_feeders": 1,
+}
+
+
+def cluster_yard(module_geometry: Dict[str, Any], modules: int, generator: bool) -> Dict[str, Any]:
+    """Site plan of the cluster in site millimetres (x along the modules from the door-end face of the modules, y across from the outer long
+    face of module 1). Modules side by side at CLUSTER_YARD["module_gap_mm"]; each module's skid where the module layout puts it; one pad-mount
+    transformer per module behind its skid; the 12.47 kV switchgear in the transformer column beside transformer 1; generators (when fitted)
+    in a row beside module 1; fence 1 m outside; fire / crane lane on the door end and service lane on the yard end, outside the fence."""
+    Y = CLUSTER_YARD
+    g = module_geometry
+    Lx, Wy = g["ext_l_m"] * 1000.0, g["ext_w_m"] * 1000.0
+    endw, side = (g["ext_l_m"] - g["int_l_m"]) * 500.0, (g["ext_w_m"] - g["int_w_m"]) * 500.0
+    pitch = Wy + Y["module_gap_mm"]
+    xf, sw, gs = Y["xfmr"], Y["swgr"], Y["genset"]
+    rects: Dict[str, List[float]] = {}
+    sx0 = endw + g["int_l_m"] * 1000.0 + Y["skid_offset_mm"]
+    tx0 = sx0 + Y["skid_l_mm"] + Y["xfmr_gap_mm"]
+    for k in range(modules):
+        y0 = k * pitch
+        rects[f"M{k + 1}"] = [0.0, y0, Lx, y0 + Wy]
+        rects[f"SK{k + 1}"] = [sx0, y0 + side - Y["skid_overhang_mm"], sx0 + Y["skid_l_mm"], y0 + side + g["int_w_m"] * 1000.0 + Y["skid_overhang_mm"]]
+        yc = y0 + Wy / 2.0
+        rects[f"T{k + 1}"] = [tx0, yc - xf["w"] / 2.0, tx0 + xf["d"], yc + xf["w"] / 2.0]
+    t1 = rects["T1"]
+    rects["SWGR"] = [tx0, t1[1] - Y["swgr_gap_mm"] - sw["w"], tx0 + sw["d"], t1[1] - Y["swgr_gap_mm"]]
+    if generator:
+        for k in range(modules):
+            y1 = -Y["gen_gap_mm"] - k * (gs["d"] + Y["gen_gap_mm"])
+            rects[f"G{k + 1}"] = [0.0, y1 - gs["d"], gs["w"], y1]
+    equip = list(rects.values())
+    ymin, ymax = min(r[1] for r in equip), max(r[3] for r in equip)
+    rects["APRON"] = [-Y["apron_mm"], 0.0, 0.0, (modules - 1) * pitch + Wy]
+    front_x1 = tx0 + max(xf["d"], sw["d"]) + Y["xfmr_front_mm"]
+    rects["XF-CLEAR"] = [tx0 + xf["d"], ymin, front_x1, ymax]
+    off = Y["fence_offset_mm"]
+    fence = [-Y["apron_mm"] - off, ymin - off, front_x1 + off, ymax + off]
+    rects["LANE-W"] = [fence[0] - Y["lane_mm"], fence[1], fence[0], fence[3]]
+    rects["LANE-E"] = [fence[2], fence[1], fence[2] + Y["lane_mm"], fence[3]]
+    site = [rects["LANE-W"][0], fence[1], rects["LANE-E"][2], fence[3]]
+    site_l, site_w = (site[2] - site[0]) / 1000.0, (site[3] - site[1]) / 1000.0
+    yard_l, yard_w = (fence[2] - fence[0]) / 1000.0, (fence[3] - fence[1]) / 1000.0
+    return {"rects": rects, "fence": fence, "site": site, "pitch_mm": pitch, "endw_mm": endw, "side_mm": side,
+            "site_l_m": round(site_l, 3), "site_w_m": round(site_w, 3), "site_area_m2": round(site_l * site_w, 1),
+            "yard_l_m": round(yard_l, 3), "yard_w_m": round(yard_w, 3), "yard_area_m2": round(yard_l * yard_w, 1)}
+
 # BEN 1 (mini rack) sizing constants. Every number is a stated design value; vendor sources in purchasing/parts_catalog.json.
 MINIRACK: Dict[str, Any] = {
     "office_design_c": 23.0, "office_max_c": 30.0,
@@ -353,6 +454,8 @@ class Config:
 
     # ------------------------------------------------------------ geometry (BEN 1 forms replace the tier dimensions)
     def geometry(self) -> Dict[str, Any]:
+        if self.lineup == "rev2" and self.tier in REV2_GEOMETRY:
+            return REV2_GEOMETRY[self.tier]          # Rev 2 BEN 2000 = cluster of BEN 700 modules; lineup rev1 keeps the hall
         g = TIER_GEOMETRY[self.tier]
         if g.get("kind") != "minirack":
             return g
@@ -366,9 +469,9 @@ class Config:
     # ------------------------------------------------------------ validation
     def validate(self) -> List[str]:
         errs: List[str] = []
-        g = TIER_GEOMETRY.get(self.tier)
-        if g is None:
+        if self.tier not in TIER_GEOMETRY:
             return [f"unknown tier {self.tier}"]
+        g = self.geometry()
         if not (g["it_kw_min"] <= self.it_kw <= g["it_kw_max"]):
             errs.append(f"{g['label']} supports {g['it_kw_min']}–{g['it_kw_max']} kW IT, got {self.it_kw}")
         if not (1 <= self.racks <= g["max_racks"]):
@@ -412,13 +515,13 @@ class Config:
         if not errs and self.tier not in ("ben5",) + MINIRACK_TIERS:
             d = self.derived()
             if not d["row_fits"]:
-                errs.append(f"{d['rows']} row(s) of {d['racks_per_row']} racks + cooling units is {d['row_length_mm']} mm per row, exceeds interior {int(TIER_GEOMETRY[self.tier]['int_l_m']*1000)} mm; use fewer racks, rear-door or liquid cooling")
+                errs.append(f"{d['rows']} row(s) of {d['racks_per_row']} racks + cooling units is {d['row_length_mm']} mm per row, exceeds interior {int(g['int_l_m']*1000)} mm; use fewer racks, rear-door or liquid cooling")
         return errs
 
     def _validate_rev2(self) -> List[str]:
         """Rules added in Rev 2 (lineup, BEN 1, liquid-first tiers). None of them can fire on a valid Rev 1 configuration."""
         errs: List[str] = []
-        g = TIER_GEOMETRY[self.tier]
+        g = self.geometry() if self.is_cluster() else TIER_GEOMETRY[self.tier]
         if self.lineup not in LINEUPS:
             errs.append(f"unknown lineup {self.lineup}")
         elif self.tier not in TIERS_BY_LINEUP[self.lineup]:
@@ -455,7 +558,26 @@ class Config:
                 errs.append(f"{self.it_kw / max(self.racks, 1):.1f} kW/rack exceeds the {g['max_rack_kw']} kW GB300 NVL72-class rack limit of {g['label']}")
             if self.controls_tier == "lite":
                 errs.append(f"BEN Controls Lite is for BEN 5 and BEN 30 only; {g['label']} uses BEN Controls Pro")
+        if g.get("kind") == "cluster":
+            n = g["modules"]
+            if self.racks % n:
+                errs.append(f"{g['label']} (Rev 2) is {n} BEN 700 modules: racks must split evenly over the modules (multiple of {n}), got {self.racks}")
         return errs
+
+    # ------------------------------------------------------------ Rev 2 BEN 2000 cluster
+    def is_cluster(self) -> bool:
+        return self.lineup == "rev2" and self.tier in REV2_GEOMETRY
+
+    def module_config(self) -> "Config":
+        """The configuration of ONE module of a Rev 2 BEN 2000 cluster: a BEN 700 with 1/modules of the IT load and racks and the same
+        cooling, redundancy, power architecture, climate, hardening, generator and controls choices."""
+        g = self.geometry()
+        n = g["modules"]
+        return Config(tier=g["module_tier"], profile=self.profile, it_kw=self.it_kw / n, racks=max(1, self.racks // n), cooling=self.cooling,
+                      redundancy=self.redundancy, climate=self.climate, subsystems=list(self.subsystems), white_label=self.white_label,
+                      brand=self.brand, ups_minutes=self.ups_minutes, generator=self.generator, site_name=self.site_name,
+                      controls_tier=self.controls_tier, hardening=self.hardening, power_architecture=self.power_architecture,
+                      dc_convention=self.dc_convention, lineup="rev2", form="")
 
     # ------------------------------------------------------------ controls tier
     def controls_tier_resolved(self) -> str:
@@ -473,6 +595,8 @@ class Config:
 
     # ------------------------------------------------------------ derived sizing
     def derived(self) -> Dict[str, Any]:
+        if self.is_cluster():
+            return self._derived_cluster()
         g = TIER_GEOMETRY[self.tier]
         if g["kind"] == "minirack":
             return self._derived_minirack()
@@ -625,8 +749,66 @@ class Config:
             out.update(self._density(g))
         return out
 
+    # ------------------------------------------------------------ Rev 2: BEN 2000 cluster of BEN 700 modules
+    def _derived_cluster(self) -> Dict[str, Any]:
+        """Rev 2 BEN 2000: the module derived() (a BEN 700 at 1/n of the load, sized by _apply_dense) with the counts, loads and masses
+        summed over the n modules (CLUSTER_SUM_KEYS), plus the shared yard: 12.47 kV service, one pad-mount transformer per module (smallest
+        standard size loaded <= 90 %), the 4-way 15 kV switchgear (1 source + 3 transformer ways), one heat-rejection skid per module and the
+        site plan of cluster_yard(). Per-module keys (row, service breaker, UPS frame size, battery minutes) stay per module."""
+        g, Y = self.geometry(), CLUSTER_YARD
+        n = g["modules"]
+        m = self.module_config()
+        md = m.derived()
+        out = {k: v for k, v in md.items() if k not in ("geometry", "climate")}
+        for k, nd in CLUSTER_SUM_KEYS.items():
+            if k in md:
+                out[k] = md[k] * n if nd == 0 else round(md[k] * n, nd)
+        kva = next((s for s in Y["xfmr_kva_sizes"] if s * Y["xfmr_loading_max"] >= md["total_kva"]), Y["xfmr_kva_sizes"][-1])
+        mv_a = out["total_kva"] * 1000.0 / (math.sqrt(3) * Y["mv_kv"] * 1000.0)
+        yard = cluster_yard(g, n, self.generator)
+        skid_kw = math.ceil(md["liquid_heat_kw"] * 1.15) if "liquid_heat_kw" in md else 0
+        R = yard["rects"]
+        pads = [R[f"T{k + 1}"] for k in range(n)] + [R["SWGR"]]
+        pad_m2 = sum((r[2] - r[0] + 1200.0) * (r[3] - r[1] + 1200.0) for r in pads) / 1e6
+        module_pad_m2 = n * (g["ext_l_m"] + 1.2) * 3.64          # the module SITE-PAD rule: (L + 1.2) x 3.64 m per module
+        sw_cy = (R["SWGR"][1] + R["SWGR"][3]) / 2.0
+        mv_feeder_m = sum(abs((R[f"T{k + 1}"][1] + R[f"T{k + 1}"][3]) / 2.0 - sw_cy) / 1000.0 + 6.0 for k in range(n))
+        lanes_m2 = sum((R[k][2] - R[k][0]) * (R[k][3] - R[k][1]) for k in ("LANE-W", "LANE-E")) / 1e6
+        out.update({
+            "tier_label": g["label"], "enclosure": g["enclosure"], "voltage": g["voltage"], "kind": "cluster", "modules": n,
+            "module_tier": g["module_tier"], "module_label": md["tier_label"], "module_it_kw": round(m.it_kw, 2), "module_racks": m.racks,
+            "module_service_breaker_a": md["service_breaker_a"], "module_total_kva": md["total_kva"], "module_gross_kg": md["gross_kg"],
+            "rows": n, "racks_per_row": m.racks, "per_rack_kw": round(self.it_kw / self.racks, 2),
+            "mv_service": True, "mv_kv": Y["mv_kv"], "mv_service_amps": round(mv_a, 1), "mv_switchgear_ways": Y["swgr"]["ways"], "mv_switchgear_a": Y["swgr"]["amps"],
+            "transformer_kva": kva, "transformers_total": n, "transformer_loading_pct": round(100.0 * md["total_kva"] / kva, 1),
+            "transformer_redundancy": "one per module (N): a transformer fault takes one module to its battery and generator; the other modules run on",
+            "skids": n, "skid_rejection_kw_each": skid_kw,
+            "pue_estimate": round(out["total_kw"] / self.it_kw + (md["dc_pue_loss_adder"] if self.power_architecture == "dc800" else 0.03), 3),
+            "pue_basis": "module chain (UPS / rectifier loss, CDU pumps, fan coils, controls); MV transformer losses are not in the estimate",
+            "water": ("Closed W45 loop per module (no evaporative water at design in this climate); make-up and fill connection with treatment per skid"
+                      + ("" if CLIMATE_DESIGN[self.climate]["t_design_c"] + 8.0 <= 45 else "; adiabatic pre-cooling water on the skids at this climate (DEV-D2)")),
+            "leak": "Per module: leak rope under the CDUs and along the rear-plenum header, row isolation valves close on leak; per skid: pipe-bridge drip tray with a leak spot sensor",
+            "controls": f"Per module: {md['controls_label']} (PLC + edge, {md['pods']} BEN Pods); site: one supervisory BEN Controller (PLC + edge) on a fibre ring to the {n} module controllers, MV switchgear and transformer monitoring",
+            "yard": yard, "site_area_m2": yard["site_area_m2"], "yard_area_m2": yard["yard_area_m2"],
+            "yard_pad_sqft": round(pad_m2 * 10.7639, 1), "yard_surface_m2": round(max(0.0, yard["yard_area_m2"] - pad_m2 - module_pad_m2), 1),
+            "lane_area_m2": round(lanes_m2, 1), "mv_feeder_m": round(mv_feeder_m, 1),
+            "verified_max_kw": g["verified_max_kw"], "dc_ready": True,
+            "module": {k: v for k, v in md.items() if k not in ("geometry", "climate")},
+            "climate": CLIMATE_DESIGN[self.climate], "geometry": g,
+        })
+        out.update(self._density(g))
+        return out
+
     # ------------------------------------------------------------ Rev 2: density metrics
     def _density(self, g: Dict[str, Any]) -> Dict[str, Any]:
+        if g.get("kind") == "cluster":
+            n = g["modules"]
+            fp, vol = n * g["ext_l_m"] * g["ext_w_m"], n * g["ext_l_m"] * g["ext_w_m"] * g["ext_h_m"]
+            yard = cluster_yard(g, n, self.generator)
+            return {"lineup": self.lineup, "kw_per_rack": round(self.it_kw / self.racks, 2), "footprint_m2": round(fp, 3), "volume_m3": round(vol, 3),
+                    "kw_per_m2_footprint": round(self.it_kw / fp, 2), "kw_per_m3_volume": round(self.it_kw / vol, 2),
+                    "kw_per_m2_module": round(self.it_kw / (fp / n) / n, 2),
+                    "kw_per_m2_yard": round(self.it_kw / yard["yard_area_m2"], 2), "kw_per_m2_site": round(self.it_kw / yard["site_area_m2"], 2)}
         fp = g["ext_l_m"] * g["ext_w_m"]
         vol = fp * g["ext_h_m"]
         return {"lineup": self.lineup, "kw_per_rack": round(self.it_kw / self.racks, 2), "footprint_m2": round(fp, 3), "volume_m3": round(vol, 3),
@@ -850,6 +1032,8 @@ class Config:
         if tier not in TIERS_BY_LINEUP[lineup]:
             raise ValueError(f"{tier} is not in lineup {lineup}: {TIERS_BY_LINEUP[lineup]}")
         g = TIER_GEOMETRY[tier]
+        if lineup == "rev2" and tier in REV2_GEOMETRY:
+            return cls._preset_cluster(tier, profile, climate, hardening, lineup)
         if g["kind"] == "minirack":
             return cls._preset_minirack(tier, profile, climate, lineup, form)
         if g.get("liquid_first"):
@@ -889,6 +1073,30 @@ class Config:
                 if not cfg.validate():
                     return cfg
                 it -= 10.0
+        cfg.racks, cfg.it_kw = g["max_racks"], float(round(it0))
+        return cfg
+
+    @classmethod
+    def _preset_cluster(cls, tier: str, profile: str, climate: str, hardening: str | None, lineup: str) -> "Config":
+        """Rev 2 BEN 2000: AI profiles at the nominal 2,000 kW (3 x 5 racks x 133.3 kW: GB300 NVL72-class racks inside their 132-155 kW band,
+        each module 666.7 kW, under the BEN 700 rating), others at 80 %, dlc_hd, the profile's redundancy inside every module. If a module does
+        not fit (2N), the load steps down 10 kW per module and then one rack per module at a time, the same rule as _preset_dense."""
+        g = REV2_GEOMETRY[tier]
+        n = g["modules"]
+        p = PROFILE_DEFAULTS[profile]
+        it0 = g["it_kw_max"] if profile in ("ai_training", "ai_inference") else 0.8 * g["it_kw_max"]
+        if hardening is None:
+            hardening = "H3" if profile == "public_sector" else ("H2" if climate in ("coastal", "hot_arid", "cold", "high_altitude", "hot_humid") else "H1")
+        cfg = cls(tier=tier, profile=profile, it_kw=float(round(it0)), racks=g["max_racks"], cooling="dlc_hd", redundancy=p["redundancy"],
+                  climate=climate, generator=profile in ("healthcare", "public_sector", "off_grid"), hardening=hardening,
+                  ups_minutes=g.get("ups_minutes_default", 5), lineup=lineup)
+        for racks in range(g["max_racks"], 0, -n):
+            it = min(float(round(it0)), racks * g["max_rack_kw"])
+            while it >= g["it_kw_min"]:
+                cfg.racks, cfg.it_kw = racks, float(it)
+                if not cfg.validate():
+                    return cfg
+                it -= 10.0 * n
         cfg.racks, cfg.it_kw = g["max_racks"], float(round(it0))
         return cfg
 

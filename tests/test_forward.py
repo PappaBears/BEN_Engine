@@ -10,7 +10,7 @@ import pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
 sys.path.insert(0, os.path.join(ROOT, "design"))
-from ben_engine.config import Config, TIER_GEOMETRY, TIERS_BY_LINEUP, PRESETS, COOLING_LIBRARY, POWER_ARCHITECTURES, DC_CONVENTIONS
+from ben_engine.config import Config, TIER_GEOMETRY, TIERS_BY_LINEUP, PRESETS, PRESETS_REV1, COOLING_LIBRARY, POWER_ARCHITECTURES, DC_CONVENTIONS
 from ben_engine.bom import load_catalog, generate_bom, totals, rule_variables
 from ben_engine.twin import Twin
 from ben_engine import sweeps as sw
@@ -31,7 +31,7 @@ def forward():
 # --------------------------------------------------------------------------- config
 def test_options_default_off_and_presets_unchanged():
     for t in TIERS_BY_LINEUP["rev1"]:   # Rev 2 liquid-first tiers default to dlc_hd (tests/test_rev2_lineup.py)
-        c = PRESETS[t]
+        c = PRESETS_REV1[t]   # Rev 1 presets (the Rev 2 BEN 2000 is the dlc_hd cluster: tests/test_cluster.py)
         assert c.power_architecture == "ac480" and c.cooling != "dlc_hd" and c.dc_convention == "bipolar_400"
         d = c.derived()
         assert d["power_architecture"] == "ac480" and "dc_bus_current_a" not in d and "loop_flow_lpm" not in d
@@ -114,7 +114,7 @@ def test_bom_power_and_cooling_filters(catalog):
     assert {"CLG-CDU-HD", "CLG-MANIFOLD-HD", "CLG-DRYCOOLER-W45", "CLG-LEAK-RACK", "CLG-ISOVALVE-ROW", "CLG-HRX"} <= hd_codes
     # the AC presets never see a DC or dlc_hd line
     for t in TIERS_BY_LINEUP["rev1"]:
-        codes = {r["code"] for r in generate_bom(PRESETS[t], catalog)}
+        codes = {r["code"] for r in generate_bom(PRESETS_REV1[t], catalog)}
         assert not codes & dc_codes and not codes & hd_codes, t
     rows = {r["code"]: r for r in generate_bom(forward(), catalog)}
     d = forward().derived()

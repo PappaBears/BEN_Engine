@@ -373,7 +373,9 @@ def _schedule(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, A
     max_lead = max((r["lead_time_weeks"] or 0) for r in rows) if rows else 0
     long_lead = [{"code": r["code"], "name": r["name"], "lead_time_weeks": r["lead_time_weeks"], "qty": r["qty"], "unit": r["unit"],
                   "ext_price_usd": r["ext_price_usd"], "vendor": r["vendor"]} for r in leads[:5]]
-    hall = TIER_GEOMETRY[cfg.tier]["kind"] == "hall"
+    kind = cfg.geometry()["kind"]
+    hall = kind in ("hall", "cluster")            # Rev 2 BEN 2000 cluster: factory-built modules + MV yard gear shipped direct to site, as the hall
+    cluster = kind == "cluster"
     w_h3 = s["survey"]
     w_h4 = w_h3 + s["release"]
     w_container = w_h4 + s["short_lead"]
@@ -402,13 +404,13 @@ def _schedule(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, A
         {"week": 0, "milestone": "Order and risk acknowledgement signed", "owner": "Customer + Schreiber AI", "hold": "-", "path": "critical"},
         {"week": w_h3, "milestone": "Site survey and site requirements sign-off", "owner": "Customer + ENG", "hold": "H3", "path": "critical"},
         {"week": w_h4, "milestone": "Engineering release: configuration frozen, IFC drawings, BOM; long-lead purchase orders placed", "owner": "ENG", "hold": "H4", "path": "critical"},
-        {"week": w_container, "milestone": ("Wide-body module shells received and inspected; structural and envelope work starts (per module)" if hall else "Container / cabinet received and inspected; structural and envelope work starts"), "owner": "FAC", "hold": "W6, H7, W8", "path": "critical"},
+        {"week": w_container, "milestone": ("Three 40 ft module shells received and inspected; structural and envelope work starts (per module)" if cluster else "Wide-body module shells received and inspected; structural and envelope work starts (per module)" if hall else "Container / cabinet received and inspected; structural and envelope work starts"), "owner": "FAC", "hold": "W6, H7, W8", "path": "critical"},
         {"week": w_permits, "milestone": "Permits issued (building, electrical, mechanical, fire plan review)", "owner": "Customer / AHJ", "hold": "-", "path": "parallel"},
         {"week": w_fit_out_done, "milestone": (f"Longest-lead factory item on the floor ({factory_lead} weeks from release); module mechanical and electrical fit-out complete; site gear (MV transformers, switchgear, generators) ships direct to site at {site_lead} weeks" if hall else f"Longest-lead item on the floor ({max_lead} weeks from release); mechanical and electrical fit-out complete"), "owner": "FAC + SUB", "hold": "H10", "path": "critical"},
         {"week": w_civil, "milestone": "Site pad, grounding and utility feeder complete and surveyed", "owner": "Customer civil", "hold": "H16", "path": "parallel"},
         {"week": w_fat, "milestone": "Cooling, controls and firmware complete; factory acceptance test incl. 24 h burn-in", "owner": "FAC + ENG; customer witness", "hold": "H11, W12, H13", "path": "critical"},
         {"week": w_ship, "milestone": "Transport prep and shipping", "owner": "LOG", "hold": "-", "path": "critical"},
-        {"week": w_setdown, "milestone": ("Modules set and site-joined, power module and MV gear set, hook-up and pre-energisation check (long-lead site gear on site)" if hall else "Set-down, hook-up and pre-energisation check"), "owner": "LOG + SUB + AHJ", "hold": "W17, H18", "path": "critical"},
+        {"week": w_setdown, "milestone": ("Modules set on their pads, skids, pad-mount transformers and 12.47 kV switchgear set on the yard, hook-up and pre-energisation check (long-lead site gear on site)" if cluster else "Modules set and site-joined, power module and MV gear set, hook-up and pre-energisation check (long-lead site gear on site)" if hall else "Set-down, hook-up and pre-energisation check"), "owner": "LOG + SUB + AHJ", "hold": "W17, H18", "path": "critical"},
         {"week": w_sat, "milestone": "Site acceptance test and fire marshal acceptance", "owner": "ENG + customer + AHJ", "hold": "H19", "path": "critical"},
         {"week": w_turnover, "milestone": "Training and turnover; unit in service", "owner": "ENG + customer", "hold": "W20", "path": "critical"},
     ]
@@ -419,12 +421,13 @@ def _schedule(cfg: Config, rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, A
 
 
 # ----------------------------------------------------------------------------- document readers
-def _drawing_index(tier: str) -> Tuple[List[List[str]], str]:
+def _drawing_index(tier: str, cluster: bool = False) -> Tuple[List[List[str]], str]:
     if TIER_GEOMETRY[tier]["kind"] == "minirack":
         return ([["A-001", "Mini rack general arrangement, U stack and desk / closet footprint", "1:5"], ["E-001", "Power: outlet circuit, UPS, PDU one-line", "NTS"],
                  ["C-001", "BEN Pods, network and BEN Care enrolment", "NTS"]],
                 "Rev 2.A set generated from the configuration at order confirmation (design/layout.py BEN 1 resolver, checks I-B1..I-B7)")
-    md = _read(REPO_ROOT / "design" / "drawings" / tier / "INDEX.md")
+    # Rev 2 BEN 2000 cluster: its own Rev 2 set (site plan, module reference, MV one-line); the Rev 1 folder holds the hall
+    md = _read(REPO_ROOT / "design" / "drawings" / ("rev2/" + tier if cluster else tier) / "INDEX.md")
     rows: List[List[str]] = []
     for headers, trs in _md_tables(md):
         if headers and headers[0].lower().startswith("sheet"):
@@ -577,7 +580,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
     weeks_in_service = milestones[-1]["week"] if milestones[-1]["path"] == "critical" else max(m["week"] for m in milestones if m["path"] == "critical")
 
     # ---- document inputs
-    sheets, dwg_status = _drawing_index(cfg.tier)
+    sheets, dwg_status = _drawing_index(cfg.tier, cfg.is_cluster())
     prof_row, clim_row = _compliance_rows(cfg.profile, cfg.climate)
     if prof_row is None:
         notes.append("COMPLIANCE.md section 11 row not found; built-in summary used")

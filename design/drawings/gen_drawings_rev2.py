@@ -829,9 +829,359 @@ BEN1_GENS = {"A-001": ben1_a001, "E-001": ben1_e001, "C-001": ben1_c001, "I-001"
 
 
 # ====================================================================== INDEX and driver
+# ====================================================================== Rev 2 BEN 2000: three BEN 700 modules on a shared yard (§2b, R2-05)
+CLUSTER_SHEETS = [("A-000", "Site plan — three BEN 700 modules and the shared yard"), ("A-001", "Cluster arrangement — elevations and BEN 700 module sheet reference"),
+                  ("E-001", "Power one-line — 12.47 kV service to three BEN 700 modules")]
+MODULE_SET = "../ben700"          # the module sheets every module is built to (not duplicated here)
+
+
+def _cluster_checks_table(sh, lay, x, y, ids=None, sheets=None, w=470.0, title="INTERFERENCE AND CODE CHECKS (design/layout.py)"):
+    rows = []
+    for c in lay.checks:
+        if (ids and c.id not in ids) or (sheets and c.sheet not in sheets):
+            continue
+        res = c.resolution.replace("STUDY: ", "")
+        first = res.split("; ")[0]
+        rows.append([c.id, c.description, c.formula, c.result, (first[:150] + " …") if len(first) > 150 else first])
+    return sh.table(x, y, ["ID", "CHECK", "NUMBERS", "RESULT", "RESOLUTION / STUDY NOTE (full text: INDEX.md)"], rows,
+                    [w * 0.065, w * 0.43, w * 0.17, w * 0.065, w * 0.27], h=1.65, rowh=3.6, title=title)
+
+
+def _cluster_notes(sh, x, y, title, lines, w=RW, h=1.9):
+    return sh.notes(x, y, title, lines, w=w, h=h, lead=3.0)
+
+
+def cluster_a000(lay, out, n=1, total=3):
+    sh = sheet(lay, "A-000", CLUSTER_SHEETS[0][1], "1:100", n, total)
+    d, cfg = lay.d, lay.cfg
+    yard = d["yard"]; R = yard["rects"]
+    s_ = 100.0
+    sx0, sy0, sx1, sy1 = yard["site"]
+    ox = 32.0 - sx0 / s_
+    oy = TOP - 46.0 - sy1 / s_
+    v = DK.View(sh, s_, ox, oy)
+    sh.view_title(30, TOP - 8, "SITE PLAN — BEN 2000 (REV 2): THREE BEN 700 MODULES, SHARED 12.47 kV AND HEAT-REJECTION YARD", "1:100")
+    # lanes, fence, apron, clearance zones
+    for k_ in ("LANE-W", "LANE-E"):
+        r = R[k_]
+        v.hatch_rect(r[0], r[1], r[2], r[3], hatch="..", ec=V2["fog"], fc="#F3F6FA", z=0.5)
+    v.rect(*yard["fence"], fc="none", ec=V2["slate"], lw=0.7, ls=(0, (6, 3)))
+    v.hatch_rect(*R["APRON"], hatch="//", ec=V2["fog"], z=0.6)
+    v.hatch_rect(*R["XF-CLEAR"], hatch="\\\\", ec=V2["fog"], z=0.6)
+    # modules: envelope + interior items (no labels at this scale)
+    mods = lay.notes["module_layouts"]
+    for k in range(d["modules"]):
+        m = R[f"M{k + 1}"]
+        v.rect(m[0], m[1], m[2], m[3], fc="#FFFFFF", ec=V2["ink"], lw=0.9, z=1)
+        for it in lay.items:
+            if not it.tag.startswith(f"M{k + 1}-") or it.mount in ("ceiling",) or it.kind in ("tray", "envelope") or it.tag.endswith("-LEAK") or it.tag.endswith("-FC") and it.kind == "structure":
+                continue
+            if it.code == "CTL-POD":
+                continue
+            v.item(it, label=False, show_front=False, alpha=0.9 if it.mount != "ext" else 1.0)
+        v.text(m[0] + 300, m[3] + 180, f"M{k + 1}  BEN 700 module {k + 1}: {d['module_it_kw']:g} kW, {d['module_racks']} racks x {d['kw_per_rack']:g} kW (sheets {MODULE_SET}/)",
+               h=1.8, bold=True, c=V2["ink"], z=6)
+        v.text(m[0] + 150, (m[1] + m[3]) / 2, "DOOR", h=1.5, rot=90, ha="center", va="center", c=V2["slate"], z=6)
+        sk = R[f"SK{k + 1}"]
+        v.text((sk[0] + sk[2]) / 2, (sk[1] + sk[3]) / 2, f"SK{k + 1}\nskid {d['skid_rejection_kw_each']} kW", h=1.6, ha="center", va="center", bold=True, z=6)
+    # transformers, switchgear, generators
+    for k in range(d["modules"]):
+        t = R[f"T{k + 1}"]
+        v.rect(t[0], t[1], t[2], t[3], fc=DK.FILL["power"], ec=DK.EDGE["power"], lw=0.8, z=3)
+        v.text((t[0] + t[2]) / 2, (t[1] + t[3]) / 2, f"T{k + 1}\n{d['transformer_kva']:,} kVA", h=1.6, ha="center", va="center", bold=True, z=6)
+        v.line(t[2] - 120, t[1] + 200, t[2] - 120, t[3] - 200, c=DK.EDGE["power"], lw=1.4)        # door face
+    swr = R["SWGR"]
+    v.rect(swr[0], swr[1], swr[2], swr[3], fc=DK.FILL["power"], ec=DK.EDGE["power"], lw=0.8, z=3)
+    v.text((swr[0] + swr[2]) / 2, (swr[1] + swr[3]) / 2, "SWGR\n15 kV\n4-way", h=1.6, ha="center", va="center", bold=True, z=6)
+    for k in range(d["modules"]):
+        g_ = R.get(f"G{k + 1}")
+        if g_:
+            v.rect(g_[0], g_[1], g_[2], g_[3], fc=DK.FILL["power"], ec=DK.EDGE["power"], lw=0.8, z=3)
+            v.text((g_[0] + g_[2]) / 2, (g_[1] + g_[3]) / 2, f"G{k + 1}  generator {d['generator_kw_each']} kW, 480 V, module {k + 1}", h=1.7, ha="center", va="center", bold=True, z=6)
+    # MV feeders (dashed, Deep Cobalt) and 480 V secondaries (Power)
+    xr = R["T1"][0] - 500
+    v.line((swr[0] + swr[2]) / 2, swr[3], (swr[0] + swr[2]) / 2, swr[3] + 400, c=V2["deep"], lw=0.9, ls="--")
+    v.line((swr[0] + swr[2]) / 2, swr[3] + 400, xr, swr[3] + 400, c=V2["deep"], lw=0.9, ls="--")
+    for k in range(d["modules"]):
+        t = R[f"T{k + 1}"]
+        cy = (t[1] + t[3]) / 2
+        v.line(xr, swr[3] + 400, xr, cy, c=V2["deep"], lw=0.9, ls="--")
+        v.line(xr, cy, t[0], cy, c=V2["deep"], lw=0.9, ls="--")
+        svc = lay.find(f"M{k + 1}-SVC")
+        sk = R[f"SK{k + 1}"]
+        if svc:     # 480 V secondary in its own duct, north of the skid (in the gap between skids), to the module service section
+            yl = sk[3] + 450
+            for a_, b_ in (((t[0], t[3] - 250), (t[0] - 250, t[3] - 250)), ((t[0] - 250, t[3] - 250), (t[0] - 250, yl)), ((t[0] - 250, yl), (svc.x1 + 250, yl)),
+                           ((svc.x1 + 250, yl), (svc.x1 + 250, svc.cy)), ((svc.x1 + 250, svc.cy), (svc.x1, svc.cy))):
+                v.line(a_[0], a_[1], b_[0], b_[1], c=DK.EDGE["power"], lw=0.9)
+    v.leader(xr, (R["T1"][1] + R["T1"][3]) / 2 - 1600, -6, -12, f"12.47 kV radial feeders in ductbank, {d['mv_feeder_m']:g} m route (PWR-MV-FEEDER)", h=1.7)
+    # dimensions (values from config.cluster_yard; check IDs in brackets)
+    m1, m2, m3 = R["M1"], R["M2"], R[f"M{d['modules']}"]
+    v.dim_h(m3[0], m3[2], m3[3], 7, label=f"{m3[2] - m3[0]:,.0f} BEN 700 MODULE")
+    v.dim_h(R["APRON"][0], 0, m3[3], 7, label=f"{-R['APRON'][0]:,.0f}")
+    v.dim_h(R["LANE-W"][0], R["LANE-W"][2], sy1, 4, label=f"{R['LANE-W'][2] - R['LANE-W'][0]:,.0f} LANE (I-K18)")
+    v.dim_h(R["LANE-E"][0], R["LANE-E"][2], sy1, 4, label=f"{R['LANE-E'][2] - R['LANE-E'][0]:,.0f} SERVICE LANE")
+    v.dim_h(R["SK1"][2], R["T1"][0], R["T1"][1], -5, label=f"{R['T1'][0] - R['SK1'][2]:,.0f} (I-K8)")
+    v.dim_h(R["T1"][2], R["XF-CLEAR"][2], R["T1"][1], -5, label=f"{R['XF-CLEAR'][2] - R['T1'][2]:,.0f} (I-K11)")
+    v.dim_h(sx0, sx1, sy0, -8, label=f"SITE {sx1 - sx0:,.0f} (yard inside the fence {yard['fence'][2] - yard['fence'][0]:,.0f})")
+    v.dim_v(sy0, sy1, sx0, -8, label=f"{sy1 - sy0:,.0f}")
+    for k in range(d["modules"] - 1):
+        a, b = R[f"M{k + 1}"], R[f"M{k + 2}"]
+        v.dim_v(a[3], b[1], 2500, 0, label=f"{b[1] - a[3]:,.0f}", side="right")
+        v.text(3200, (a[3] + b[1]) / 2, "I-K3 / I-K4 / I-K6", h=1.5, va="center", c=V2["slate"], z=6)
+        ta, tb = R[f"T{k + 1}"], R[f"T{k + 2}"]
+        v.dim_v(ta[3], tb[1], (ta[0] + ta[2]) / 2, 0, label=f"{tb[1] - ta[3]:,.0f} (I-K9)", side="right")
+        sa, sb = R[f"SK{k + 1}"], R[f"SK{k + 2}"]
+        v.dim_v(sa[3], sb[1], (sa[0] + sa[2]) / 2, 0, label=f"{sb[1] - sa[3]:,.0f} (I-K17)", side="right")
+    v.dim_v(swr[3], R["T1"][1], (swr[0] + swr[2]) / 2 + 400, 0, label=f"{R['T1'][1] - swr[3]:,.0f} (I-K10)", side="right")
+    # labels
+    lw_ = R["LANE-W"]
+    v.text((lw_[0] + lw_[2]) / 2, (R["M1"][1] + lw_[1]) / 2 + 1500, "FIRE APPARATUS AND CRANE LANE (IFC 503)", h=2.0, rot=90, ha="center", va="center", bold=True, c=V2["slate"], z=6)
+    le = R["LANE-E"]
+    v.text((le[0] + le[2]) / 2, (le[1] + le[3]) / 2, "SERVICE LANE: TRANSFORMER AND SKID DELIVERY", h=2.0, rot=90, ha="center", va="center", bold=True, c=V2["slate"], z=6)
+    xc = R["XF-CLEAR"]
+    v.text((xc[0] + xc[2]) / 2, (xc[1] + xc[3]) / 2, "3,000 WORKING / HOT-STICK CLEARANCE (UTILITY STANDARD, STUDY)", h=1.6, rot=90, ha="center", va="center", c=V2["slate"], z=6)
+    v.leader(R["APRON"][0] + 750, m1[1] + 300, 10, -9, "Door-end apron: cargo leaves swing here (I-K5)", h=1.7)
+    fe = yard["fence"]
+    v.leader(fe[2] - 1500, fe[1], -4, 8, "Yard fence 2.4 m, 1 m outside equipment and clearances", h=1.7)
+    cx, cy = (lw_[0] + lw_[2]) / 2, (R["M2"][1] + R["M2"][3]) / 2
+    v.circle(cx, cy, 900, fc="none", ec=V2["stop"], lw=0.8)
+    v.text(cx, cy + 1200, "CRANE", h=1.5, ha="center", va="bottom", c=V2["stop"], bold=True, z=6, bg="#F3F6FA")
+    for k in (0, d["modules"] - 1):
+        mm = R[f"M{k + 1}"]
+        v.line(cx, cy, (mm[0] + mm[2]) / 2, (mm[1] + mm[3]) / 2, c=V2["stop"], lw=0.5, ls=":")
+    v.text(cx - 2800, cy + 2600, f"pick radius <= {max(c.value for c in lay.checks if c.id == 'I-K20'):,.0f} (I-K20)", h=1.5, c=V2["stop"], z=6)
+    sh.north_arrow(470, TOP - 26, "SITE NORTH: PER SITE SURVEY")
+    # legend of the plan
+    ly = oy + sy0 / s_ - 16
+    yy = sh.legend(30, ly, [("rack", "GB300-class liquid rack (module interior per " + MODULE_SET + "/A-002)"), ("cooling", "CDU / fan coil / heat-rejection skid"),
+                            ("power", "Power gear, pad-mount transformer, 15 kV switchgear"), ("structure", "Module exterior items (service section, cylinder enclosure, heat-reuse HX)")], h=1.9)
+    sh.text(150, ly, "Hatched: lanes (dots), door-end apron and transformer working clearance (lines). Dashed blue: 12.47 kV feeders. Solid gold: 480 V secondaries to each module service section.", h=1.8, c=V2["slate"])
+    # checks table (A-000 / A-001 / M-001 / S-001 checks; E-001 ones on E-001)
+    _cluster_checks_table(sh, lay, 30, yy - 6, sheets=("A-000", "M-001", "S-001"))
+    # right column: yard schedule, notes, deviations
+
+    def sch(x, y):
+        rows = [["Modules", f"{d['modules']} x BEN 700 (40 ft, liquid-first, all-in-one), {d['module_it_kw']:g} kW, {d['module_racks']} racks each; gross {d['module_gross_kg']:,} kg each"],
+                ["Cluster IT", f"{cfg.it_kw:g} kW in {cfg.racks} racks ({d['kw_per_rack']:g} kW/rack); verified max {d['verified_max_kw']:,} kW (3 x 705)"],
+                ["Module footprint", f"{d['footprint_m2']:g} m2 -> {d['kw_per_m2_footprint']:g} kW/m2"],
+                ["Fenced yard", f"{yard['yard_l_m']:g} x {yard['yard_w_m']:g} m = {d['yard_area_m2']:g} m2 -> {d['kw_per_m2_yard']:g} kW/m2"],
+                ["Site incl. lanes", f"{yard['site_l_m']:g} x {yard['site_w_m']:g} m = {d['site_area_m2']:g} m2 -> {d['kw_per_m2_site']:g} kW/m2"],
+                ["MV service", f"{d['mv_kv']} kV, {d['mv_service_amps']} A at {d['total_kva']:,} kVA; 15 kV pad-mounted switchgear 4-way (1 source + 3 FI ways)"],
+                ["Transformers", f"{d['transformers_total']} x {d['transformer_kva']:,} kVA FR3, 12.47 kV-480Y/277 V, one per module ({d['transformer_loading_pct']} % loaded); footprint estimate (DEV-K1)"],
+                ["Heat rejection", f"{d['skids']} skids (one per module): W45 dry coolers {d['skid_rejection_kw_each']} kW + trim chiller each, 1.5 m from the blind end"],
+                ["Module gap", f"{R['M2'][1] - R['M1'][3]:,.0f} mm clear (each module holds a {d['module']['battery_kwh_installed']} kWh lithium ESS, I-K3)"],
+                ["Generators", f"{d['generators_total']} x {d['generator_kw_each']} kW (one per module, ATS in each module's service section)" if cfg.generator else "none in this preset (profiles healthcare / public sector / off-grid add one per module)"]]
+        y = sh.table(x, y, ["ITEM", "VALUE"], rows, [RW * 0.22, RW * 0.78], title="YARD SCHEDULE (config.cluster_yard, Config.derived())", h=1.85)
+        y -= 6
+        return _cluster_notes(sh, x, y, "SITE NOTES", [
+            f"Every module is a stand-alone BEN 700 built to {MODULE_SET}/ (A-001 ... C-001) unchanged; its interior checks I-D1..I-D20 run per module (I-K1.1-I-K1.3).",
+            "Coordinates: x from the door-end face of the modules, y from the outer face of module 1; every module has its rack wall to the south and its aisle to the north.",
+            "STUDY items need the AHJ / utility value before IFC: I-K6 (fire separation if the modules are classed as buildings) and I-K11 (utility clearance in front of pad-mount doors).",
+            "Site civil (pads, ground grid, ductbank, yard surfacing, lanes) by the customer's civil contractor to the PE-stamped site package (SVC-PE).",
+            "Survey: pads level to +/- 3 mm over each module footprint; transformer and switchgear pads per the utility's standard drawing."], w=RW)
+    y = sch(RX, TOP - 6)
+    G.deviation_note(sh, lay, RX, y - 4)
+    sh.title_block()
+    sh.save(os.path.join(out, "A-000"))
+
+
+def cluster_a001(lay, out, n=2, total=3):
+    sh = sheet(lay, "A-001", CLUSTER_SHEETS[1][1], "1:50 / 1:100", n, total)
+    d, cfg = lay.d, lay.cfg
+    yard = d["yard"]; R = yard["rects"]
+    g = d["geometry"]
+    el, ew, eh = g["ext_l_m"] * 1000, g["ext_w_m"] * 1000, g["ext_h_m"] * 1000
+    nmod = d["modules"]
+    # ---- end elevation from the door end (1:50): modules side by side, skids and transformers behind (hidden lines)
+    s1 = 50.0
+    sh.view_title(30, TOP - 8, "END ELEVATION FROM THE DOOR END (LOOKING EAST)", "1:50")
+    v = DK.View(sh, s1, 40.0, TOP - 90.0)
+    for k in range(nmod):
+        m = R[f"M{k + 1}"]
+        y0, y1 = m[1], m[3]
+        sk = R[f"SK{k + 1}"]
+        v.rect(sk[1], 0, sk[3], CLUSTER_YARD_H(), fc="none", ec=DK.EDGE["cooling"], lw=0.5, ls="--")
+        v.rect(y0, 0, y1, eh, fc="#F4F7FB", ec=V2["ink"], lw=0.9, z=2)
+        v.line((y0 + y1) / 2, 150, (y0 + y1) / 2, eh - 150, c=V2["ink"], lw=0.5)
+        v.rect(y0 + 60, 150, y1 - 60, eh - 100, fc="none", ec=V2["slate"], lw=0.4)
+        v.text((y0 + y1) / 2, eh + 120, f"M{k + 1}", h=2.6, ha="center", va="bottom", bold=True)
+        v.text((y0 + y1) / 2, eh / 2, "CARGO DOORS\n2 leaves, 270 deg", h=1.6, ha="center", va="center", c=V2["slate"], z=4)
+    v.line(R["M1"][1] - 600, 0, R[f"M{nmod}"][3] + 2000, 0, c=V2["ink"], lw=0.8)
+    for k in range(nmod - 1):
+        a, b = R[f"M{k + 1}"], R[f"M{k + 2}"]
+        v.dim_h(a[3], b[1], eh, 6, label=f"{b[1] - a[3]:,.0f} clear (I-K3)")
+    v.dim_h(R["M1"][1], R[f"M{nmod}"][3], 0, -8, label=f"{R[f'M{nmod}'][3] - R['M1'][1]:,.0f} modules row")
+    v.dim_v(0, eh, R["M1"][1], -6, label=f"{eh:,.0f}")
+    v.text(R["M1"][1], -1300, "Dashed: heat-rejection skid behind each module (2,400 high, I-K17). Folded cargo leaves project <= 150 mm into the gap (I-K4).", h=1.7, c=V2["slate"])
+    # ---- side elevation of module 1 + skid + transformer + lanes (1:100)
+    s2 = 100.0
+    yv = TOP - 175.0
+    sh.view_title(30, yv + 12, "SIDE ELEVATION — MODULE 1, SKID, TRANSFORMER (LOOKING NORTH)", "1:100")
+    v2 = DK.View(sh, s2, 40.0 - R["LANE-W"][0] / s2, yv - 50)
+    v2.line(R["LANE-W"][0], 0, R["LANE-E"][2], 0, c=V2["ink"], lw=0.8)
+    v2.rect(0, 0, el, eh, fc="#F4F7FB", ec=V2["ink"], lw=0.9, z=2)
+    v2.text(el / 2, eh / 2, f"BEN 700 MODULE 1 — {d['module_it_kw']:g} kW, {d['module_racks']} racks (side elevation and livery: {MODULE_SET}/A-001)", h=1.8, ha="center", va="center", z=4)
+    sk = R["SK1"]
+    v2.rect(sk[0], 0, sk[2], CLUSTER_YARD_H(), fc=DK.FILL["cooling"], ec=DK.EDGE["cooling"], lw=0.8, z=2)
+    v2.text((sk[0] + sk[2]) / 2, CLUSTER_YARD_H() / 2, f"SK1 W45 dry coolers\n+ trim chiller", h=1.6, ha="center", va="center", z=4)
+    t = R["T1"]
+    v2.rect(t[0], 0, t[2], CLUSTER_XF()["h"], fc=DK.FILL["power"], ec=DK.EDGE["power"], lw=0.8, z=2)
+    v2.text((t[0] + t[2]) / 2, CLUSTER_XF()["h"] + 200, f"T1 {d['transformer_kva']:,} kVA", h=1.6, ha="center", va="bottom", bold=True, z=4)
+    svc = lay.find("M1-SVC")
+    if svc:
+        v2.rect(svc.x0, svc.z0, svc.x1, svc.z1, fc=DK.FILL["power"], ec=DK.EDGE["power"], lw=0.6, z=3)
+    v2.dim_h(0, el, eh, 6, label=f"{el:,.0f}")
+    v2.dim_h(el, sk[0], 0, -6, label=f"{sk[0] - el:,.0f}")
+    v2.dim_h(sk[0], sk[2], CLUSTER_YARD_H(), 6, label=f"{sk[2] - sk[0]:,.0f}")
+    v2.dim_h(sk[2], t[0], 0, -6, label=f"{t[0] - sk[2]:,.0f} (I-K8)")
+    v2.dim_h(t[2], R["XF-CLEAR"][2], 0, -6, label=f"{R['XF-CLEAR'][2] - t[2]:,.0f} (I-K11)")
+    v2.dim_h(R["LANE-W"][0], R["LANE-W"][2], 0, -12, label=f"{R['LANE-W'][2] - R['LANE-W'][0]:,.0f} lane")
+    v2.dim_h(R["LANE-E"][0], R["LANE-E"][2], 0, -12, label=f"{R['LANE-E'][2] - R['LANE-E'][0]:,.0f} lane")
+    v2.dim_v(0, CLUSTER_YARD_H(), sk[2], 4, label=f"{CLUSTER_YARD_H():,.0f}", side="right")
+    # ---- module sheet reference (the BEN 700 set, read from its INDEX)
+    idx = open(os.path.join(OUT_ROOT, "ben700", "INDEX.md"), encoding="utf-8").read()
+    rows = []
+    for ln in idx.splitlines():
+        m_ = re.match(r"^\| ([A-Z]-\d{3}) \| (.+?) \(sheet", ln)
+        if m_:
+            rows.append([f"{MODULE_SET}/{m_.group(1)}", m_.group(2), "every module, unchanged"])
+    yt = yv - 92
+    yt = sh.table(30, yt, ["MODULE SHEET", "TITLE", "APPLIES TO"], rows, [70, 260, 110], h=1.9, rowh=4.0,
+                  title=f"BEN 700 MODULE SHEETS (Rev {REV['drawing_rev']}) — NOT DUPLICATED HERE")
+    md = d["module"]
+    sh.text(30, yt - 6, f"Module as built for this cluster: {md['tier_label']} at {d['module_it_kw']:g} kW, {d['module_racks']} racks, row {' '.join(md['row_items'][:7])} … "
+            f"({md['row_length_mm']:,} of {md['row_budget_mm'] + md['end_zone_mm']:,} mm), {md['cooling_units_total']} CDUs, {md['ups_frames']} UPS frames, {md['battery_cabinets']} battery cabinets, "
+            f"main {md['service_breaker_a']:,} A. The module sheets are drawn at 700 kW (BEN 700 preset); the 666.7 kW module uses the same row and gear.", h=1.8, c=V2["ink"])
+    _cluster_checks_table(sh, lay, 30, yt - 14, ids=[f"I-K1.{k + 1}" for k in range(nmod)] + ["I-K2", "I-K23"], title="MODULE CHECKS")
+
+    def sch(x, y):
+        rows = [["IT load", f"{cfg.it_kw:g} kW = {nmod} x {d['module_it_kw']:g} kW"], ["Racks", f"{cfg.racks} = {nmod} x {d['module_racks']}, {d['kw_per_rack']:g} kW per rack (GB300 NVL72 class)"],
+                ["Cooling", f"dlc_hd W45, {d['cooling_units_total']} CDUs ({d['cooling_units_n']} N), {d['fancoils_total']} fan coils, {d['liquid_heat_kw']:g} kW to liquid, {d['loop_flow_lpm']:g} L/min total"],
+                ["Power", f"{d['ups_frames']} Galaxy VL frames, {d['battery_cabinets']} Li cabinets ({d['battery_kwh_installed']:g} kWh, {d['battery_minutes_installed']:g} min)"],
+                ["Total load", f"{d['total_kw']:,} kW / {d['total_kva']:,} kVA, PUE est. {d['pue_estimate']} ({d['pue_basis']})"],
+                ["Mass", f"{d['gross_kg']:,} kg = {nmod} x {d['module_gross_kg']:,} kg"],
+                ["Water", d["water"]], ["Leak", d["leak"]], ["Controls", d["controls"]],
+                ["Density", f"{d['kw_per_m2_footprint']:g} kW/m2 module footprint; {d['kw_per_m2_yard']:g} fenced yard; {d['kw_per_m2_site']:g} site incl. lanes"]]
+        y = sh.table(x, y, ["ITEM", "VALUE"], rows, [RW * 0.2, RW * 0.8], title="CLUSTER SCHEDULE (Config.derived())", h=1.85)
+        y -= 6
+        return _cluster_notes(sh, x, y, "NOTES", [
+            "Livery: each module carries its own data plate band (BEN 700 module n of BEN 2000) per brand/v2/livery; the site sign is not on this set.",
+            "Module set-down from the door-end lane by a 100 t AT crane (I-K20, I-K21); lift plan by the crane contractor.",
+            "The modules are not joined: no site seams, no shared envelope; each keeps its own fire suppression, leak detection and controls."], w=RW)
+    y = sch(RX, TOP - 6)
+    G.deviation_note(sh, lay, RX, y - 4)
+    sh.title_block()
+    sh.save(os.path.join(out, "A-001"))
+
+
+def CLUSTER_YARD_H():
+    return L.CLUSTER_YARD["skid_h_mm"]
+
+
+def CLUSTER_XF():
+    return L.CLUSTER_YARD["xfmr"]
+
+
+def cluster_e001(lay, out, n=3, total=3):
+    sh = sheet(lay, "E-001", CLUSTER_SHEETS[2][1], "NTS", n, total)
+    d, cfg = lay.d, lay.cfg
+    nmod = d["modules"]
+    md = d["module"]
+    sh.view_title(30, TOP - 8, "POWER ONE-LINE — 12.47 kV SERVICE, ONE PAD-MOUNT TRANSFORMER PER BEN 700 MODULE", "NTS")
+    xc = 250.0
+    y = TOP - 26
+    sh.text(xc, y, f"UTILITY {d['mv_kv']} kV 3φ (grounded wye), {d['total_kva']:,} kVA, {d['mv_service_amps']} A", h=2.8, bold=True, ha="center")
+    sh.text(xc, y - 4, "SITE-MV-INTERCONNECT: primary metering, riser, ductbank, protection study (utility)", h=1.8, ha="center", c=DK.MUTED)
+    sh.line(xc, y - 6, xc, y - 12, lw=1.2)
+    sh.circle(xc, y - 16, 4, lw=0.8); sh.text(xc, y - 16, "M", h=1.8, ha="center", va="center")
+    sh.text(xc + 6, y - 16, "primary metering (utility)", h=1.7, va="center", c=DK.MUTED)
+    sh.line(xc, y - 20, xc, y - 28, lw=1.2)
+    ys = y - 28
+    sh.rect(60, ys - 46, 380, 46, fc=DK.FILL["power"], ec=DK.EDGE["power"], lw=0.9)
+    sh.text(64, ys - 5, f"SWGR — 15 kV PAD-MOUNTED SWITCHGEAR, {L.CLUSTER_YARD['swgr']['amps']} A, 4-WAY, SF6-FREE, DEAD-FRONT (PWR-MV-SWGR-3FI)", h=2.2, bold=True)
+    sh.line(70, ys - 16, 430, ys - 16, lw=2.0)
+    sh.text(72, ys - 14.5, "15 kV BUS", h=1.7, c=DK.MUTED)
+    DK.sym_breaker(sh, xc, ys - 10, "WAY 1", "source, load-break", w=8)
+    xs = [xc + (k - (nmod - 1) / 2) * 120 for k in range(nmod)]
+    fla = d["transformer_kva"] * 1000 / (math.sqrt(3) * d["mv_kv"] * 1000)
+    for k, x in enumerate(xs):
+        sh.line(x, ys - 16, x, ys - 22, lw=1.0)
+        DK.sym_breaker(sh, x, ys - 28, f"WAY {k + 2}", f"fault interrupter, trip ~{2 * fla:.0f} A", w=8)
+        sh.line(x, ys - 33, x, ys - 46, lw=1.0)
+    sh.text(64, ys - 43, "Working space NFPA 70 Table 110.34(A) 1,500 (cond. 2, I-K12); utility clearance 3,000 front (I-K11, STUDY)", h=1.7, c=DK.MUTED)
+    yt = ys - 46
+    for k, x in enumerate(xs):
+        sh.line(x, yt, x, yt - 14, lw=1.0, ls="--", c=V2["deep"])
+        sh.text(x + 2, yt - 8, "15 kV EPR 1/0 Al\nductbank", h=1.6, c=V2["deep"])
+        # transformer symbol
+        sh.circle(x, yt - 20, 6, lw=0.9); sh.circle(x, yt - 29, 6, lw=0.9)
+        sh.text(x + 9, yt - 19, f"T{k + 1}  {d['transformer_kva']:,} kVA", h=2.2, bold=True)
+        sh.text(x + 9, yt - 23, "12.47 kV Δ — 480Y/277 V", h=1.7, c=DK.MUTED)
+        sh.text(x + 9, yt - 26.5, f"FR3, {d['transformer_loading_pct']} % loaded", h=1.7, c=DK.MUTED)
+        sh.text(x + 9, yt - 30, f"FLA sec. {d['transformer_kva'] * 1000 / (math.sqrt(3) * 480):.0f} A", h=1.7, c=DK.MUTED)
+        sh.line(x, yt - 35, x, yt - 46, lw=1.2)
+        sh.text(x + 2, yt - 41, "480 V secondary\n(SITE-ELEC)", h=1.6, c=DK.MUTED)
+        # module service section and module box
+        DK.sym_box(sh, x - 48, yt - 82, 96, 36, f"M{k + 1}-SVC — SERVICE SECTION", [f"Main CB {d['module_service_breaker_a']:,} A, 480 V (I-K14)", "NEMA 4X, module blind end",
+                                                                                  "Type 1 SPD; GES bond to yard grid", ("ATS + generator G%d" % (k + 1)) if cfg.generator else "Generator inlet (option)"], kind="power", title_h=2.2)
+        sh.line(x, yt - 82, x, yt - 90, lw=1.2)
+        DK.sym_box(sh, x - 52, yt - 150, 104, 60, f"BEN 700 MODULE {k + 1}", [f"{d['module_it_kw']:g} kW IT, {d['module_racks']} racks x {d['kw_per_rack']:g} kW",
+                                                                            f"SWBD1 {md['service_breaker_a']:,} A + bypass" if md["swbd_sections"] else f"PNL-D {md['service_breaker_a']} A",
+                                                                            f"{md['ups_frames']} x Galaxy VL 500 kVA, {cfg.redundancy}", f"{md['battery_cabinets']} x 32.6 kWh Li ({md['battery_minutes_installed']:g} min)",
+                                                                            f"{md['cooling_units_total']} CDUs + {md['fancoils_total']} fan coils on UPS / mech.", f"one-line: {MODULE_SET}/E-001",
+                                                                            f"skid SK{k + 1}: mechanical bus"], kind="rack", title_h=2.4)
+        if cfg.generator:
+            gx = x + 54
+            sh.circle(gx + 6, yt - 64, 5, lw=0.8); sh.text(gx + 6, yt - 64, "G", h=2.2, ha="center", va="center", bold=True)
+            sh.text(gx - 2, yt - 72, f"G{k + 1} {d['generator_kw_each']} kW", h=1.6, c=DK.MUTED)
+            sh.line(gx + 1, yt - 64, x + 48, yt - 64, lw=0.8)
+    # site controls and metering
+    yc = yt - 170
+    sh.text(30, yc, "SITE SUPERVISORY CONTROLS AND METERING", h=2.8, bold=True)
+    for i, ln in enumerate([d["controls"] + ".", f"Meters: one on the MV incomer and one per transformer secondary ({d['transformers_total'] + 1} x PWR-METER / PWR-CT, yard lines).",
+                            "Switchgear and transformer alarms (fault-interrupter trip, low liquid level, over-temperature, pressure relief) to the supervisory controller by dry contact.",
+                            "Each module's EPO acts on its own module only; there is no site-wide EPO of the IT (an MV trip is the utility's / switchgear's protection)."]):
+        for kk, part in enumerate(_wrap(ln, 140)):
+            sh.text(34 if kk == 0 else 38, yc - 5 - (i * 2 + kk) * 3.0, ("• " if kk == 0 else "") + part, h=1.85)
+    yg = yc - 34
+    sh.text(30, yg, "GROUNDING (NFPA 70 250, IEEE 80)", h=2.8, bold=True)
+    for i, ln in enumerate(["Yard ground grid bonding every transformer, the switchgear and the three module grids (SITE-GROUND x " + str(d["transformers_total"] + 1) + " in the yard)",
+                            "Transformer X0 bonded at the transformer (separately derived system); module GES as the stand-alone BEN 700",
+                            "Step and touch potential study for the MV yard with the protection study (IEEE 80); fence bonded to the grid"]):
+        sh.text(34, yg - 5 - i * 3.2, "• " + ln, h=1.85)
+    _cluster_checks_table(sh, lay, 30, yg - 26, sheets=("E-001",), title="ELECTRICAL CHECKS (design/layout.py)")
+
+    def sch(x, y):
+        rows = [["Service", f"{d['mv_kv']} kV, {d['total_kva']:,} kVA, {d['mv_service_amps']} A (I-K16 vs 600 A)"],
+                ["Switchgear", "15 kV pad-mounted, 600 A, 4-way: 1 source + 3 fault-interrupter ways (I-K15)"],
+                ["Transformers", f"{d['transformers_total']} x {d['transformer_kva']:,} kVA, one per module, N (failure domain = one module); loaded {d['transformer_loading_pct']} % (I-K13)"],
+                ["Module service", f"{d['module_service_breaker_a']:,} A main per module = transformer secondary protection, <= 125 % FLA (I-K14)"],
+                ["MV feeders", f"{d['mv_feeder_m']:g} m of route, radial, 15 kV EPR 133 % in ductbank"],
+                ["Generators", f"{d['generators_total']} x {d['generator_kw_each']} kW, one per module (480 V, ATS in the module service section)" if cfg.generator else "none in this preset"],
+                ["Module chain", f"per {MODULE_SET}/E-001 (SWBD, UPS frames, battery groups, rack feeds)"]]
+        y = sh.table(x, y, ["ITEM", "VALUE"], rows, [RW * 0.22, RW * 0.78], title="ELECTRICAL SCHEDULE (preliminary)", h=1.85)
+        y -= 6
+        return _cluster_notes(sh, x, y, "ELECTRICAL NOTES", [
+            "ALL RATINGS ARE PRELIMINARY: utility protection study, short-circuit, coordination and arc-flash study (NFPA 70E) by a licensed engineer before energisation.",
+            "Transformer size is the smallest standard size loaded <= 90 % (config rule); its footprint and mass are estimates (DEV-K1). Price lines PWR-MV-XFMR-750 / -1000 are scaled estimates.",
+            "Why one transformer per module (not one shared 2,500 kVA unit): each module keeps the 1,200 A service it is checked with as a stand-alone BEN 700, no 4,000 A low-voltage switchgear "
+            "and no long 480 V runs; a transformer fault takes one module, not the site.",
+            "Only a licensed electrician lands conductors and energises (CTP-E1 HOLD); MV work by a qualified MV contractor with the utility."], w=RW)
+    y = sch(RX, TOP - 6)
+    G.deviation_note(sh, lay, RX, y - 4)
+    sh.title_block()
+    sh.save(os.path.join(out, "E-001"))
+
+
+CLUSTER_GENS = {"A-000": cluster_a000, "A-001": cluster_a001, "E-001": cluster_e001}
+
+
 def _sheet_list(lay):
     if lay.is_minirack:
         return BEN1_SHEETS
+    if lay.is_cluster:
+        return CLUSTER_SHEETS
     return G.sheets_for(lay)
 
 
@@ -850,8 +1200,17 @@ def write_index(lay, out, rel):
     lines += ["", f"Status: **{REV['status_long']}** — Rev {REV['drawing_rev']}, {REV['issue_date']}. Drawn: BEN Engine generator; {checked}.", "",
               "| Rev | Date | Description | Checked |", "|---|---|---|---|",
               f"| {REV['drawing_rev']} | {REV['issue_date']} | {REV['notes_short']} | {REV['checker'] or 'not checked'} |", ""]
-    if lay.is_container or lay.is_hall:
+    if lay.is_container or lay.is_hall or lay.is_cluster:
         lines += ["## EN-001 working space (docs/audit/EN-001_working_space_liner.md)", "", en001_status(lay), ""]
+    if lay.is_cluster:
+        d = lay.d
+        lines += ["## Cluster (docs/REV2_DECISION.md §2b, change register R2-05)", "",
+                  f"Three BEN 700 modules built to the module set [{MODULE_SET}/]({MODULE_SET}/INDEX.md) unchanged (the module sheets are not duplicated here), on a shared yard: "
+                  f"{d['mv_kv']} kV service, 15 kV pad-mounted switchgear (1 source + {d['modules']} transformer ways), one {d['transformer_kva']:,} kVA pad-mount transformer and one "
+                  f"heat-rejection skid per module. {d['modules']} x {d['module_it_kw']:g} kW = {lay.cfg.it_kw:g} kW in {lay.cfg.racks} racks ({d['kw_per_rack']:g} kW/rack); "
+                  f"{d['kw_per_m2_footprint']:g} kW/m² of module footprint, {d['kw_per_m2_yard']:g} kW/m² of fenced yard ({d['yard_area_m2']:g} m²), {d['kw_per_m2_site']:g} kW/m² of site "
+                  f"including the two 6.1 m lanes ({d['site_area_m2']:g} m²). STUDY checks need the AHJ's or the utility's value before this set can be checked for construction. "
+                  "The superseded Rev 2.A sheets of the hall (drawn before §2b) are kept in [superseded-hall-2.A/](superseded-hall-2.A/INDEX.md).", ""]
     if lay.deviations:
         lines += ["## Configuration deviations applied on this set", ""] + [f"- {dv}" for dv in lay.deviations] + [""]
     lines += ["## Interference checks for this tier (design/layout.py)", "", L.checks_table([lay]), ""]
@@ -860,6 +1219,9 @@ def write_index(lay, out, rel):
 
 
 def en001_status(lay):
+    if lay.is_cluster:
+        return ("BEN 2000 cluster: each module as BEN 700 (277 V to ground, ENV-LINER-NC, checks I-D4, I-D6, I-D20 per module through I-K1); yard MV working space "
+                "NFPA 70 Table 110.34(A) (I-K12) and utility clearance in front of pad-mount doors (I-K11, STUDY)")
     if lay.is_hall:
         return ("BEN 2000 hall: cold aisles are designed to condition 2 (1,100 >= 1,067, I-H4) and the 4,000 A switchgear to condition 3 (I-H7); the liner does not set "
                 "the working space. Open item: the 900 mm contained hot aisle is egress only; if rack-rear PDU breakers are to be serviced energised, condition 2 (1,067) applies there — "
@@ -877,6 +1239,8 @@ def generate(lay, out, sheets_only=None, dpi=110):
     os.makedirs(out, exist_ok=True)
     if lay.is_minirack:
         gens = {no: (lambda lay, out, fn=fn, n=i: fn(lay, out, n, len(BEN1_SHEETS))) for i, (no, fn) in enumerate(BEN1_GENS.items(), 1)}
+    elif lay.is_cluster:
+        gens = {no: (lambda lay, out, fn=fn, n=i: fn(lay, out, n, len(CLUSTER_SHEETS))) for i, (no, fn) in enumerate(CLUSTER_GENS.items(), 1)}
     elif lay.is_hall:
         gens = G.hall_generators(lay)
     else:
@@ -914,6 +1278,7 @@ def main(argv=None):
     ap.add_argument("--tier", action="append")
     ap.add_argument("--sheet", action="append")
     ap.add_argument("--dpi", type=int, default=110)
+    ap.add_argument("--index-only", action="store_true", help="rewrite INDEX.md files, rev2/INDEX.md and INTERFERENCE_CHECKS.md without redrawing sheets")
     a = ap.parse_args(argv)
     apply_brand_v2()
     _patch_right_column()
@@ -922,22 +1287,23 @@ def main(argv=None):
     for t, form, lay in sel:
         prepare(lay)
         out = os.path.join(OUT_ROOT, t, form) if form else os.path.join(OUT_ROOT, t)
-        generate(lay, out, a.sheet, a.dpi)
+        if not a.index_only:
+            generate(lay, out, a.sheet, a.dpi)
         write_index(lay, out, os.path.relpath(out, HERE))
-    if not a.tier:
+    if not a.tier or a.index_only:
         lays = [x[2] for x in all_lays]
         with open(os.path.join(OUT_ROOT, "INTERFERENCE_CHECKS.md"), "w") as f:
             f.write(f"# Interference checks — Rev 2 lineup, drawing set Rev {REV['drawing_rev']} (generated by gen_drawings_rev2.py)\n\n")
-            f.write("Result key: OK = passes; OK* = passes after the documented resolution; FAIL = does not pass as given (informative checks say 'Not used' / 'Not required').\n\n")
+            f.write("Result key: OK = passes; OK* = passes after the documented resolution; STUDY = the numbers pass but the rule needs a local authority / utility value (BEN 2000 yard); FAIL = does not pass as given (informative checks say 'Not used' / 'Not required').\n\n")
             f.write(L.checks_table(lays) + "\n\n## Deviations applied\n\n" + L.deviations_md(lays) + "\n")
         idx = [f"# BEN Engine Rev 2 — drawing set Rev {REV['drawing_rev']} ({REV['status_title']}, {REV['issue_date']})", "",
-               f"Record: `{REV['path']}` (change register R2-01..R2-04). Generator: `python design/drawings/gen_drawings_rev2.py --lineup rev2`. "
+               f"Record: `{REV['path']}` (change register {REV['change_register'][0]['id']}..{REV['change_register'][-1]['id']}). Generator: `python design/drawings/gen_drawings_rev2.py --lineup rev2`. "
                "Rev 1 sets in `design/drawings/<tier>/` are frozen (docs/REVISION_POLICY.md).", "",
                "| Tier | Folder | Sheets | EN-001 |", "|---|---|---|---|"]
         for t, form, lay in all_lays:
             folder = f"{t}/{form}" if form else t
             nsh = len(_sheet_list(lay))
-            idx.append(f"| {lay.d['tier_label']}{' ' + form if form else ''} | [{folder}/]({folder}/INDEX.md) | {nsh} | {en001_status(lay).split('.')[0]} |")
+            idx.append(f"| {lay.d['tier_label']}{' ' + form if form else ''} | [{folder}/]({folder}/INDEX.md) | {nsh} | {en001_status(lay).split('. ')[0].rstrip('.')} |")
         idx += ["", "All interference checks: [INTERFERENCE_CHECKS.md](INTERFERENCE_CHECKS.md).", ""]
         with open(os.path.join(OUT_ROOT, "INDEX.md"), "w") as f:
             f.write("\n".join(idx))

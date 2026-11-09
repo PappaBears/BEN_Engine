@@ -3,7 +3,7 @@ import json, sys, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "software"))
 from ben_engine.config import TIER_GEOMETRY, COOLING_LIBRARY, PROFILE_DEFAULTS, CLIMATE_DESIGN, CONTROLS_TIERS, CONTROLS_PRO_PROFILES, HARDENING, TIER_ALIASES, POWER_ARCHITECTURES, DLC_HD_TIERS, DC_CONVENTIONS
-from ben_engine.config import TIERS_BY_LINEUP, LINEUPS, DENSE_FOOTPRINTS, DENSE_RULES, MINIRACK
+from ben_engine.config import TIERS_BY_LINEUP, LINEUPS, DENSE_FOOTPRINTS, DENSE_RULES, MINIRACK, REV2_GEOMETRY, CLUSTER_YARD, CLUSTER_SUM_KEYS
 schema = {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "https://schreiberai.com/schemas/ben-config.schema.json",
@@ -33,6 +33,7 @@ schema = {
  "x-power-architectures": {k: {"tiers": list(v["tiers"])} for k, v in POWER_ARCHITECTURES.items()},
  "x-dlc-hd-tiers": list(DLC_HD_TIERS),
  "x-tiers-by-lineup": TIERS_BY_LINEUP,
+ "x-tier-limits-rev2": {t: {"it_kw_min": g["it_kw_min"], "it_kw_max": g["it_kw_max"], "max_racks": g["max_racks"], "kind": g["kind"], "modules": g["modules"], "rows": g["modules"]} for t, g in REV2_GEOMETRY.items()},
 }
 json.dump(schema, open(os.path.join(ROOT, "spec/ben-config.schema.json"), "w"), indent=2)
 tiers = {t: {**g, "rows": g.get("rows", 1)} for t, g in TIER_GEOMETRY.items()}  # every tier carries kind/modules/rows
@@ -41,6 +42,8 @@ json.dump({"tiers": tiers, "tier_aliases": dict(TIER_ALIASES), "hardening": HARD
            "power_architectures": {k: {**v, "tiers": list(v["tiers"]), "busway_frames_a": list(v.get("busway_frames_a", []))} for k, v in POWER_ARCHITECTURES.items()},
            "dlc_hd_tiers": list(DLC_HD_TIERS), "dc_conventions": DC_CONVENTIONS,
            # Rev 2 (docs/REV2_DECISION.md §2): lineups, BEN 1 forms and constants, dense-tier footprints and rules
-           "lineups": list(LINEUPS), "tiers_by_lineup": TIERS_BY_LINEUP, "dense_footprints": DENSE_FOOTPRINTS, "dense_rules": DENSE_RULES, "minirack": MINIRACK},
+           "lineups": list(LINEUPS), "tiers_by_lineup": TIERS_BY_LINEUP, "dense_footprints": DENSE_FOOTPRINTS, "dense_rules": DENSE_RULES, "minirack": MINIRACK,
+           # Rev 2 BEN 2000 = cluster of BEN 700 modules (docs/REV2_DECISION.md §2b); "tiers" keeps the Rev 1 hall for lineup rev1
+           "tiers_rev2": {t: {**g, "rows": g["modules"]} for t, g in REV2_GEOMETRY.items()}, "cluster_yard": CLUSTER_YARD, "cluster_sum_keys": CLUSTER_SUM_KEYS},
           open(os.path.join(ROOT, "web/assets/catalog.json"), "w"), indent=1)
 print("schema + catalog regenerated")

@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "software"))
 sys.path.insert(0, str(ROOT / "design"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from ben_engine.config import (Config, TIER_GEOMETRY, TIERS_BY_LINEUP, PROFILE_DEFAULTS, CLIMATE_DESIGN, PRESETS, PRESETS_REV1,  # noqa: E402
+from ben_engine.config import (CLUSTER_TIERS, Config, TIER_GEOMETRY, TIERS_BY_LINEUP, PROFILE_DEFAULTS, CLIMATE_DESIGN, PRESETS, PRESETS_REV1,  # noqa: E402
                                canonical_tier, DENSE_FOOTPRINTS, MINIRACK)
 from ben_engine.bom import generate_bom, load_catalog, totals, rule_variables, eval_qty_rule  # noqa: E402
 from ben_engine.twin import Twin  # noqa: E402
@@ -58,8 +58,8 @@ def test_alias_and_lineup_loading():
     for t in NEW:
         with pytest.raises(ValueError):
             Config.preset(t, lineup="rev1")
-    # Rev 1 tiers in both lineups: same configuration, density keys only in rev2
-    for t in TIERS_BY_LINEUP["rev1"]:
+    # Rev 1 tiers in both lineups: same configuration, density keys only in rev2 (except BEN 2000: Rev 2 is the BEN 700 cluster, §2b)
+    for t in [x for x in TIERS_BY_LINEUP["rev1"] if x not in CLUSTER_TIERS]:
         a, b = Config.preset(t, lineup="rev1"), Config.preset(t, lineup="rev2")
         da, db = a.derived(), b.derived()
         assert {k: v for k, v in db.items() if k in da} == da and "lineup" not in da and db["lineup"] == "rev2"

@@ -151,10 +151,10 @@
     "estimate": 10215.277777777777
    },
    "base": {
-    "total": 177762.58333333334,
+    "total": 179512.58333333334,
     "confirmed": 44538.972222222226,
     "list": 0.0,
-    "estimate": 133223.61111111112
+    "estimate": 134973.61111111112
    }
   },
   "priced_on": "2026-11-09",
@@ -192,10 +192,10 @@
     "estimate": 8748.611111111111
    },
    "base": {
-    "total": 209433.5277777778,
+    "total": 211183.5277777778,
     "confirmed": 27952.972222222223,
     "list": 0.0,
-    "estimate": 181480.55555555556
+    "estimate": 183230.55555555556
    }
   },
   "priced_on": "2026-11-09",
@@ -233,10 +233,10 @@
     "estimate": 12659.722222222223
    },
    "base": {
-    "total": 287940.69444444444,
+    "total": 291440.69444444444,
     "confirmed": 33496.944444444445,
     "list": 0.0,
-    "estimate": 254443.75
+    "estimate": 257943.75
    }
   },
   "priced_on": "2026-11-09",
@@ -274,10 +274,10 @@
     "estimate": 10215.277777777777
    },
    "base": {
-    "total": 367537.98611111107,
+    "total": 371037.98611111107,
     "confirmed": 32705.347222222223,
     "list": 0.0,
-    "estimate": 334832.6388888889
+    "estimate": 338332.6388888889
    }
   },
   "priced_on": "2026-11-09",
@@ -287,44 +287,50 @@
   "racks": 5
  },
  "ben2000": {
-  "preset_it_kw": 1600.0,
-  "preset_cooling_units": 7,
+  "preset_it_kw": 2000.0,
+  "preset_cooling_units": 9,
   "by_subsystem": {
    "power": {
-    "total": 7540615.236111111,
-    "confirmed": 979191.6250000001,
+    "total": 2688004.125,
+    "confirmed": 1656024.9583333333,
     "list": 0.0,
-    "estimate": 6561423.611111111
+    "estimate": 1031979.1666666667
    },
    "cooling": {
-    "total": 3309472.2222222225,
+    "total": 3492508.3333333335,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 3309472.2222222225
+    "estimate": 3492508.3333333335
    },
    "compute": {
-    "total": 45420029.45833333,
-    "confirmed": 45389362.791666664,
+    "total": 90056170.75,
+    "confirmed": 463254.0833333334,
     "list": 0.0,
-    "estimate": 30666.666666666668
+    "estimate": 89592916.66666667
    },
    "controls": {
-    "total": 85460.56944444445,
-    "confirmed": 49636.958333333336,
-    "list": 216.66666666666669,
-    "estimate": 35606.944444444445
+    "total": 79282.29166666667,
+    "confirmed": 42686.458333333336,
+    "list": 325.0,
+    "estimate": 36270.833333333336
    },
    "base": {
-    "total": 5453388.388888889,
-    "confirmed": 52224.5,
+    "total": 1868926.4583333335,
+    "confirmed": 98116.04166666667,
     "list": 0.0,
-    "estimate": 5401163.888888889
+    "estimate": 1770810.4166666667
    }
   },
   "priced_on": "2026-11-09",
   "margin": 0.28,
   "lineup": "rev2",
   "form": null,
-  "racks": 48
+  "racks": 15,
+  "kind": "cluster",
+  "modules": 3,
+  "module_tier": "ben700",
+  "module_it_kw": 666.67,
+  "yard_cost_usd": 968498.61,
+  "status": "layout-checked (I-K yard checks, 2 STUDY items for the AHJ / utility), priced from catalog estimates; not a quote"
  }
 }

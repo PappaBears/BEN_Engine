@@ -88,7 +88,7 @@ def test_cli(tmp_path, capsys):
 def test_ben2000_hall_is_modelled_per_row_bay_and_tiles_results():
     """BEN 2000: one row bay of the hall is solved (100 mm cells) and per-rack results are tiled over the rows."""
     import time
-    cfg = Config.preset("ben2000")
+    cfg = Config.preset("ben2000", lineup="rev1")   # the Rev 1 hall
     d = cfg.derived()
     lay = cfd.build_layout(cfg)
     assert lay.dx == 0.1 and len(lay.rack_cells) == d["racks_per_row"]

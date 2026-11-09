@@ -127,7 +127,7 @@ def test_ben5_has_fs_but_no_clean_agent(catalog):
 def test_controls_pod_count_rule(catalog):
     """BEN Pods: two per rack (cold and hot face) + room + outdoor on container tiers, 3 on BEN 5."""
     for tier in TIERS:
-        cfg = Config.preset(tier)
+        cfg = Config.preset(tier, lineup="rev1")   # Rev 1 lineup: BEN 2000 is the hall (Rev 2 cluster: tests/test_cluster.py)
         rows = {r["code"]: r for r in generate_bom(cfg, catalog)}
         expected = 3 if tier == "ben5" else cfg.racks * 2 + 2 * cfg.derived()["modules"]
         assert rows["CTL-POD"]["qty"] == expected
@@ -204,7 +204,7 @@ def test_ben5_cabinet_is_nema_4x_and_ip66_sealing_lines_everywhere(catalog):
 
 
 def test_rule_variables_expose_generation2_terms():
-    v = rule_variables(Config.preset("ben2000"))
+    v = rule_variables(Config.preset("ben2000", lineup="rev1"))
     for k in ("transformers_total", "generators_total", "modules", "rows", "hardening_H2", "hardening_H3", "envelope_area_m2", "mv_service"):
         assert k in v, k
     assert v["modules"] == 3 and v["rows"] == 4 and v["mv_service"] == 1 and v["hardening_H2"] == 0 and v["hardening_H3"] == 0
@@ -212,7 +212,7 @@ def test_rule_variables_expose_generation2_terms():
 
 
 def test_ben2000_bom_has_mv_service_generators_and_modules(catalog):
-    cfg = Config.preset("ben2000")
+    cfg = Config.preset("ben2000", lineup="rev1")   # the Rev 1 hall
     d = cfg.derived()
     rows = {r["code"]: r for r in generate_bom(cfg, catalog)}
     t = totals(list(rows.values()))

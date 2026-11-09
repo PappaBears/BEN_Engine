@@ -82,8 +82,8 @@ def test_schedule_derived_from_bom_lead_times(built):
         release = next(m["week"] for m in p.milestones if m["hold"] == "H4")
         fat = next(m["week"] for m in p.milestones if "H13" in m["hold"])
         setdown = next(m["week"] for m in p.milestones if "H18" in m["hold"])
-        if Config.from_dict(p.config).derived()["kind"] == "hall":
-            # BEN 2000: modules are FAT-tested while MV gear / generators ship direct to site; set-down waits for them
+        if Config.from_dict(p.config).derived()["kind"] in ("hall", "cluster"):
+            # BEN 2000 (Rev 1 hall, Rev 2 cluster): modules are FAT-tested while MV gear / generators ship direct to site; set-down waits for them
             assert setdown - release >= max_lead and fat < setdown
         else:
             assert fat - release >= max_lead

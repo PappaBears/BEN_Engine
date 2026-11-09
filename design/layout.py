@@ -32,6 +32,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(_HERE), "software"))
 from ben_engine.config import Config, TIER_GEOMETRY, COOLING_LIBRARY, CLIMATE_DESIGN, HARDENING, TIER_ALIASES, canonical_tier  # noqa: E402
 from ben_engine.config import TIERS_BY_LINEUP, DENSE_FOOTPRINTS, DENSE_RULES, MINIRACK  # noqa: E402  (Rev 2)
+from ben_engine.config import CLUSTER_YARD, cluster_yard  # noqa: E402  (Rev 2 BEN 2000 cluster)
 
 # ------------------------------------------------------------------ component library (mm)
 # All footprints are catalogue-typical for the class of equipment; see DESIGN_BASIS.md §9.
@@ -148,6 +149,9 @@ class Check:
     @property
     def passed(self): return self.result.startswith("OK")
 
+    @property
+    def failed(self): return self.result == "FAIL"
+
 
 @dataclass
 class Sensor:
@@ -202,6 +206,11 @@ class Layout:
     def is_hall(self): return self.kind == "hall"
 
     @property
+    def is_cluster(self):
+        """Rev 2 BEN 2000: three BEN 700 modules on a shared yard (site coordinates, see _resolve_cluster)."""
+        return self.kind == "cluster"
+
+    @property
     def modules(self) -> int: return self.d["modules"]
 
     @property
@@ -233,11 +242,16 @@ class Layout:
 
 
 # ------------------------------------------------------------------ helpers
-def _chk(lay: Layout, id_, sheet, desc, formula, value, limit, comp, resolution=""):
+def _chk(lay: Layout, id_, sheet, desc, formula, value, limit, comp, resolution="", study=""):
+    """Record a check. ``study``: the limit is a value a local authority / utility sets (or a code reading the AHJ must accept); a passing
+    check is then reported STUDY with that reason in the resolution, not OK (Rev 2 cluster yard checks)."""
     ok = (value <= limit) if comp == "<=" else (value >= limit)
     res = "OK" if ok else "FAIL"
     if ok and resolution:
         res = "OK*"
+    if ok and study:
+        res = "STUDY"
+        resolution = (resolution + " " if resolution else "") + "STUDY: " + study
     lay.checks.append(Check(id_, sheet, desc, formula, round(value, 1), limit, comp, res, resolution))
     return ok
 
@@ -269,6 +283,9 @@ def resolve(tier: str, profile: str = "ai_inference", climate: str = "temperate"
     lay.tier = tier
     lay.notes["dc800"] = cfg.power_architecture == "dc800"
     lay.notes["dlc_hd"] = cfg.cooling == "dlc_hd"
+    if lay.is_cluster:
+        _resolve_cluster(lay)
+        return lay
     if lay.is_cabinet:
         _resolve_micro(lay)
     elif lay.is_minirack:
@@ -973,6 +990,145 @@ def _resolve_dense(lay: Layout):
                           f"with its rear extension: W {W:.0f} - {plenum} plenum - 1,200 = {W - plenum - 1200:.0f} mm aisle, below the 900 mm egress, so it is not used in a 2.2 m module.")
     if CLIMATE_DESIGN[cfg.climate]["t_design_c"] + 8.0 > 45:
         lay.deviations.append(f"DEV-D2: {lay.notes['heat_rejection']}.")
+
+
+# ------------------------------------------------------------------ Rev 2: BEN 2000 cluster of BEN 700 modules (docs/REV2_DECISION.md §2b)
+# Site coordinates (mm): x along the modules from their door-end exterior face, y across from the outer long face of module 1, z up.
+# Module k (1-based) interior point (x, y) sits at site (endw + x, (k-1) * pitch + side + y): the rack wall of every module faces -y.
+IBC_WALKWAY = 1118          # 44 in: IBC 1020.2 corridor width, used conservatively for the exterior path between modules
+CRANE_RADIUS_MAX = 20000    # planning value of I-H19: 100 t AT crane, ~25 t at 20 m radius (lift plan by the crane contractor)
+CRANE_KG_AT_RADIUS = 25000
+FM54_LESS_FLAMMABLE = 900   # FR3 (listed less-flammable liquid) pad-mount to a non-combustible wall / equipment: FM DS 5-4, NFPA 70 450.23 (as I-H16)
+IFC_LANE_MIN = 6096         # IFC 503.2.1: 20 ft unobstructed width of a fire apparatus access road
+IFC_HOSE_LAY = 45720        # IFC 503.1.1: 150 ft from the access road to every portion of the exterior walls
+NEC_110_34_COND2_9KV = 1500 # NFPA 70 Table 110.34(A), 2,501-9,000 V nominal to ground (12.47Y/7.2 kV), condition 2
+
+
+def _resolve_cluster(lay: Layout):
+    """Rev 2 BEN 2000: n BEN 700 modules, each resolved by the stand-alone dense resolver (resolve() -> _resolve_dense, unchanged) from
+    Config.module_config(), placed on the yard of config.cluster_yard() (the same function config.derived() uses for the site area), plus the
+    shared yard items (pad-mount transformers, 12.47 kV switchgear, generators when fitted, apron, lanes, fence). Checks I-K1..I-K22."""
+    cfg, d = lay.cfg, lay.d
+    Y = CLUSTER_YARD
+    n = d["modules"]
+    yard = d["yard"]
+    R = yard["rects"]
+    pitch, endw, side = yard["pitch_mm"], yard["endw_mm"], yard["side_mm"]
+    mcfg = cfg.module_config()
+    mods = [resolve(mcfg.tier, cfg=mcfg) for _ in range(n)]
+    lay.notes.update({"module_layouts": mods, "yard": yard, "pitch_mm": pitch, "endw_mm": endw, "side_mm": side, "site_coords": True,
+                      "module_cfg": mcfg, "cluster": True})
+    lay.L, lay.W = yard["site"][2] - yard["site"][0], yard["site"][3] - yard["site"][1]
+    for k, ml in enumerate(mods):
+        ox, oy = endw, k * pitch + side
+        for it in ml.items:
+            lay.items.append(Item(it.code, f"M{k + 1}-{it.tag}", it.kind, it.label, it.x0 + ox, it.y0 + oy, it.x1 + ox, it.y1 + oy, it.z0, it.z1,
+                                  mount=it.mount, kg=it.kg, front=it.front, note=f"module {k + 1}"))
+        for sn in ml.sensors:
+            lay.sensors.append(Sensor(f"m{k + 1}_{sn.id}", sn.kind, f"m{k + 1}_{sn.node}", sn.x + ox, sn.y + oy, sn.z, sn.channel))
+        lay.items.append(Item("STR-CONT40", f"M{k + 1}", "envelope", f"BEN 700 module {k + 1}: 40 ft liquid-first all-in-one, {mcfg.it_kw:.1f} kW in {mcfg.racks} racks",
+                              *R[f"M{k + 1}"], 0, lay.ext_h, mount="ext", kg=d["module_gross_kg"]))
+    xf, sw, gs = Y["xfmr"], Y["swgr"], Y["genset"]
+    for k in range(n):
+        lay.items.append(Item(f"PWR-MV-XFMR-{d['transformer_kva']}", f"T{k + 1}", "power",
+                              f"Pad-mount transformer {d['transformer_kva']:,} kVA 12.47 kV-480Y/277 V, FR3, feeds module {k + 1} ({d['transformer_loading_pct']} % loaded)",
+                              *R[f"T{k + 1}"], 0, xf["h"], mount="ext", kg=xf["kg"], front="+x"))
+    lay.items.append(Item("PWR-MV-SWGR-3FI", "SWGR", "power", f"15 kV pad-mounted switchgear, {sw['amps']} A, 4-way: 1 source + {n} fault-interrupter transformer ways",
+                          *R["SWGR"], 0, sw["h"], mount="ext", kg=sw["kg"], front="+x"))
+    if cfg.generator:
+        for k in range(n):
+            lay.items.append(Item("PWR-GEN-DENSE", f"G{k + 1}", "power", f"Generator {d['generator_kw_each']} kW, 480 V, L2 enclosure with sub-base tank, module {k + 1} ATS",
+                                  *R[f"G{k + 1}"], 0, gs["h"], mount="ext", kg=gs["kg"]))
+    lay.items.append(Item("STR-APRON", "APRON", "structure", f"Door-end apron {Y['apron_mm']} mm (cargo leaves swing here)", *R["APRON"], 0, 0, mount="ext"))
+    lay.items.append(Item("STR-XFCLEAR", "XF-CLEAR", "structure", f"Working / hot-stick clearance {Y['xfmr_front_mm']} mm in front of the transformer and switchgear doors", *R["XF-CLEAR"], 0, 0, mount="ext"))
+    lay.items.append(Item("SITE-LANE-CLUSTER", "LANE-W", "structure", f"Fire apparatus and crane lane {Y['lane_mm']} mm (door end)", *R["LANE-W"], 0, 0, mount="ext"))
+    lay.items.append(Item("SITE-LANE-CLUSTER", "LANE-E", "structure", f"Service lane {Y['lane_mm']} mm (transformer and skid delivery)", *R["LANE-E"], 0, 0, mount="ext"))
+    lay.items.append(Item("SITE-YARD-CLUSTER", "FENCE", "structure", "Yard fence 2.4 m chain-link, 1 m outside the equipment and clearance zones", *yard["fence"], 0, 2400, mount="ext"))
+
+    # ---------------------------------------------------------------- checks
+    for k, ml in enumerate(mods):
+        fails = [c.id for c in ml.checks if c.failed]
+        _chk(lay, f"I-K1.{k + 1}", "A-000", f"Module {k + 1} (BEN 700 at {mcfg.it_kw:.1f} kW in {mcfg.racks} racks, {mcfg.redundancy}) passes the stand-alone dense resolver unchanged (_resolve_dense, I-D1..I-D20)",
+             f"{len(ml.checks) - len(fails)}/{len(ml.checks)} module checks pass" + (f"; FAIL {', '.join(fails)}" if fails else ""), len(fails), 0, "<=")
+    dev = 0.0
+    for k, ml in enumerate(mods):
+        dc = ml.find("DC1")
+        r = R[f"SK{k + 1}"]
+        ox, oy = endw, k * pitch + side
+        dev = max(dev, abs(dc.x0 + ox - r[0]), abs(dc.x1 + ox - r[2]), abs(dc.y0 + oy - r[1]), abs(dc.y1 + oy - r[3]))
+    _chk(lay, "I-K2", "A-000", "Heat-rejection skid of every module where the module layout puts it (item DC1 of _resolve_dense) vs the yard rule (config.CLUSTER_YARD skid_*)",
+         f"max deviation {dev:.0f} mm", dev, 1, "<=")
+    gap = R["M2"][1] - R["M1"][3]
+    _chk(lay, "I-K3", "A-000", f"Clear distance between adjacent modules (each holds a {d['module']['battery_kwh_installed']} kWh lithium ESS, NFPA 855 scope) vs 3,048 (10 ft): IFC 2021 1207.8.3 / NFPA 855 outdoor ESS clearance to exposures",
+         f"{gap:.0f} vs 3048", gap, 3048, ">=", resolution="10 ft is used without the reduction to 3 ft that UL 9540A large-scale fire test data accepted by the AHJ would allow; the edition adopted locally governs")
+    walk = gap - 2 * Y["door_leaf_folded_mm"]
+    _chk(lay, "I-K4", "A-000", f"Exterior path between modules with both cargo leaves folded back ({Y['door_leaf_folded_mm']} mm each) vs 1,118 (44 in, IBC 1020.2 corridor width used conservatively)",
+         f"{gap:.0f} - 2 x {Y['door_leaf_folded_mm']} = {walk:.0f} vs {IBC_WALKWAY}", walk, IBC_WALKWAY, ">=")
+    _chk(lay, "I-K5", "A-000", f"Door swing: cargo leaf ({Y['door_leaf_mm']} mm) swings inside the door-end apron, clear of the fire lane", f"{Y['door_leaf_mm']} vs apron {Y['apron_mm']}",
+         Y["door_leaf_mm"], Y["apron_mm"], "<=")
+    _chk(lay, "I-K6", "A-000", "Fire separation between modules if the AHJ classifies each module as a building: fire separation distance to the imaginary line between them vs 914 (IBC Table 705.8: no openings below 3 ft)",
+         f"{gap / 2:.0f} vs 914", gap / 2, 914, ">=",
+         study="at 1,524 mm (5 ft) IBC Table 705.8 limits openings on the facing long sides (protected openings 15 %) and Table 602 can require 1-hour exterior walls by construction type "
+               "and occupancy; the steel ISO modules are non-combustible but unrated. If the AHJ treats the modules as listed equipment (NFPA 855 / NFPA 75 enclosures), I-K3 governs. "
+               "Options: AHJ ruling, or widen the gap to 6,096 (FSD 10 ft). The openings on the long sides (personnel door, louvres) are to be confirmed on the module drawings")
+    t1, m1 = R["T1"], R["M1"]
+    to_wall = t1[0] - max(m1[2], max(i.x1 for i in lay.items if i.tag.startswith("M1-") and i.mount == "ext" and i.tag != "M1-DC1" and i.y0 < t1[3] and i.y1 > t1[1]))
+    _chk(lay, "I-K7", "A-000", "Pad-mount transformer (FR3 listed less-flammable liquid) to the nearest module wall or wall-mounted exterior item vs 900 (NFPA 70 450.23, FM DS 5-4; as I-H16)",
+         f"{to_wall:.0f} vs {FM54_LESS_FLAMMABLE}", to_wall, FM54_LESS_FLAMMABLE, ">=")
+    to_skid = t1[0] - R["SK1"][2]
+    _chk(lay, "I-K8", "A-000", "Pad-mount transformer to its heat-rejection skid (non-combustible steel equipment) vs 900 (same rule)", f"{to_skid:.0f} vs {FM54_LESS_FLAMMABLE}", to_skid, FM54_LESS_FLAMMABLE, ">=")
+    t_gap = R["T2"][1] - R["T1"][3]
+    _chk(lay, "I-K9", "A-000", "Transformer to transformer side clearance vs 900 (FM DS 5-4 less-flammable liquid; utility side clearance for cabinet access)", f"{t_gap:.0f} vs {FM54_LESS_FLAMMABLE}",
+         t_gap, FM54_LESS_FLAMMABLE, ">=")
+    sw_t = R["T1"][1] - R["SWGR"][3]
+    _chk(lay, "I-K10", "A-000", "Switchgear to transformer 1 clearance vs 900 (same rule)", f"{sw_t:.0f} vs {FM54_LESS_FLAMMABLE}", sw_t, FM54_LESS_FLAMMABLE, ">=")
+    front = R["XF-CLEAR"][2] - R["XF-CLEAR"][0]
+    _chk(lay, "I-K11", "A-000", "Working and hot-stick clearance in front of the transformer and switchgear compartment doors", f"{front:.0f} vs 3000", front, 3000, ">=",
+         study="3,000 mm (10 ft) is the common US utility requirement for pad-mount equipment doors; the serving utility's standard sets the value (and side / back clearances)")
+    sw_ws = R["XF-CLEAR"][2] - R["SWGR"][2]
+    _chk(lay, "I-K12", "E-001", "15 kV switchgear working space, NFPA 70 Table 110.34(A): 2,501-9,000 V to ground (12.47Y/7.2 kV), condition 2 = 1,500", f"{sw_ws:.0f} vs {NEC_110_34_COND2_9KV}",
+         sw_ws, NEC_110_34_COND2_9KV, ">=")
+    mrated = Config.from_dict({**mcfg.to_dict(), "it_kw": float(TIER_GEOMETRY[mcfg.tier]["it_kw_max"])})
+    kva_rated = mrated.derived()["total_kva"]
+    _chk(lay, "I-K13", "E-001", f"Transformer size: module total kVA vs 90 % of {d['transformer_kva']:,} kVA (config loading rule; smallest standard size that passes)",
+         f"{d['module_total_kva']} vs {0.9 * d['transformer_kva']:.0f}", d["module_total_kva"], 0.9 * d["transformer_kva"], "<=",
+         resolution="" if kva_rated <= 0.9 * d["transformer_kva"] else
+         f"sized for this load: at the BEN 700 rating ({TIER_GEOMETRY[mcfg.tier]['it_kw_max']} kW, {kva_rated:.1f} kVA) the module would need the next size up")
+    fla = d["transformer_kva"] * 1000 / (math.sqrt(3) * 480)
+    _chk(lay, "I-K14", "E-001", f"Module main breaker ({d['module_service_breaker_a']} A) as transformer secondary protection vs 125 % of secondary full-load current (NFPA 70 Table 450.3(A), primary over 1,000 V, secondary <= 1,000 V)",
+         f"{d['module_service_breaker_a']} vs 1.25 x {fla:.0f} = {1.25 * fla:.0f}", d["module_service_breaker_a"], 1.25 * fla, "<=")
+    _chk(lay, "I-K15", "E-001", f"Switchgear ways: 1 source + {n} transformer ways vs the {sw['ways']}-way frame", f"{1 + n} vs {sw['ways']}", 1 + n, sw["ways"], "<=")
+    _chk(lay, "I-K16", "E-001", f"12.47 kV service current (total {d['total_kva']} kVA) vs switchgear continuous rating {sw['amps']} A", f"{d['mv_service_amps']} vs {sw['amps']}", d["mv_service_amps"], sw["amps"], "<=")
+    sk_gap = R["SK2"][1] - R["SK1"][3]
+    _chk(lay, "I-K17", "M-001", f"Clear gap between adjacent heat-rejection skids vs skid height ({Y['skid_h_mm']} mm): side-by-side V-type dry coolers spaced at least one unit height to limit warm-air recirculation",
+         f"{sk_gap:.0f} vs {Y['skid_h_mm']}", sk_gap, Y["skid_h_mm"], ">=",
+         resolution="rule of thumb from dry-cooler installation guidance (estimate); confirm with the selected unit's installation manual, or a CFD of the yard")
+    lane = R["LANE-W"][2] - R["LANE-W"][0]
+    _chk(lay, "I-K18", "A-000", "Fire apparatus access road width vs 6,096 (IFC 503.2.1, 20 ft)", f"{lane:.0f} vs {IFC_LANE_MIN}", lane, IFC_LANE_MIN, ">=")
+    far = max(r[2] for kx, r in R.items() if kx.startswith("M")) - R["LANE-W"][2] + (R["M1"][3] - R["M1"][1]) / 2
+    _chk(lay, "I-K19", "A-000", "Hose-lay distance from the door-end lane to the farthest exterior wall of a module (along the path between modules) vs 45,720 (IFC 503.1.1, 150 ft)",
+         f"{far:.0f} vs {IFC_HOSE_LAY}", far, IFC_HOSE_LAY, "<=", resolution="the service lane on the yard end also reaches the skids and transformers; the AHJ approves the route")
+    cx, cy = (R["LANE-W"][0] + R["LANE-W"][2]) / 2, (R[f"M{(n + 1) // 2}"][1] + R[f"M{(n + 1) // 2}"][3]) / 2
+    rad = max(math.hypot((r[0] + r[2]) / 2 - cx, (r[1] + r[3]) / 2 - cy) for kx, r in R.items() if kx.startswith("M"))
+    _chk(lay, "I-K20", "A-000", f"Crane access: module set from the door-end lane (crane at mid-lane opposite module {(n + 1) // 2}), radius to the farthest module centre vs {CRANE_RADIUS_MAX} (planning value of I-H19)",
+         f"{rad:.0f} vs {CRANE_RADIUS_MAX}", rad, CRANE_RADIUS_MAX, "<=")
+    _chk(lay, "I-K21", "S-001", f"Module pick mass (gross {d['module_gross_kg']} kg, racks fitted) vs {CRANE_KG_AT_RADIUS} kg at {CRANE_RADIUS_MAX / 1000:.0f} m (100 t AT crane planning value, as I-H19)",
+         f"{d['module_gross_kg']} vs {CRANE_KG_AT_RADIUS}", d["module_gross_kg"], CRANE_KG_AT_RADIUS, "<=", resolution="lift plan and load chart from the crane contractor; racks can be set after the module to cut the pick to the module tare + fit-out")
+    ex, ey = (R["LANE-E"][0] + R["LANE-E"][2]) / 2, 0.0
+    trad = max(math.hypot((R[f"T{k + 1}"][0] + R[f"T{k + 1}"][2]) / 2 - ex, 0.0) for k in range(n))
+    _chk(lay, "I-K22", "A-000", f"Transformer delivery from the service lane: radius to the transformer centre vs {CRANE_RADIUS_MAX} (boom truck or the module crane; transformer mass {xf['kg']} kg, estimate)",
+         f"{trad:.0f} vs {CRANE_RADIUS_MAX}", trad, CRANE_RADIUS_MAX, "<=")
+    _chk(lay, "I-K23", "A-000", f"Cluster IT load vs {n} x the BEN 700 verified maximum (705 kW in 5 racks, docs/DENSITY.md); module load vs the BEN 700 rating",
+         f"{cfg.it_kw:.0f} vs {d['verified_max_kw']} (module {mcfg.it_kw:.1f} vs {TIER_GEOMETRY[mcfg.tier]['it_kw_max']})", max(cfg.it_kw / d["verified_max_kw"], mcfg.it_kw / TIER_GEOMETRY[mcfg.tier]["it_kw_max"]), 1.0, "<=")
+    if cfg.generator:
+        g_gap = R["M1"][1] - R["G1"][3]
+        _chk(lay, "I-K24", "A-000", "Generator enclosure to module 1 and to the next enclosure vs 3,000 (NFPA 37 4.1.4: 1.5 m minimum; 3 m for service and radiator discharge, as I-H15)",
+             f"{min(g_gap, (R['G1'][1] - R['G2'][3]) if n > 1 else g_gap):.0f} vs 3000", min(g_gap, (R["G1"][1] - R["G2"][3]) if n > 1 else g_gap), 3000, ">=")
+    lay.deviations.append(f"DEV-K1: pad-mount transformer footprint {xf['w']} x {xf['d']} mm and mass {xf['kg']} kg are estimates ({xf['src']}); the yard keeps "
+                          f"{to_skid:.0f} mm behind and {front:.0f} mm in front, so a larger unit fits by moving the service lane.")
+    for k, ml in enumerate(mods[:1]):
+        for dv in ml.deviations:
+            lay.deviations.append(f"Every module: {dv}")
 
 
 # ------------------------------------------------------------------ Rev 2: BEN 1 mini rack

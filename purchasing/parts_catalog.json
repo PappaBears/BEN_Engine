@@ -971,7 +971,9 @@
    "ben300",
    "ben700"
   ],
-  "qty_rule": "ups_modules + 1 + transformers_total"
+  "qty_rule": "ups_modules + 1 + transformers_total",
+  "cluster_qty_rule": "transformers_total + 1",
+  "cluster_note": "transformer secondary and MV incomer energy metering"
  },
  {
   "code": "PWR-CT",
@@ -997,7 +999,9 @@
    "ben300",
    "ben700"
   ],
-  "qty_rule": "ups_modules + 1 + transformers_total"
+  "qty_rule": "ups_modules + 1 + transformers_total",
+  "cluster_qty_rule": "transformers_total + 1",
+  "cluster_note": "CTs for the yard meters"
  },
  {
   "code": "PWR-FEEDER",
@@ -1781,7 +1785,9 @@
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1 if modules <= 1 else modules + 1"
+  "qty_rule": "1 if modules <= 1 else modules + 1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "site supervisory BEN Controller (over the three module controllers)"
  },
  {
   "code": "CTL-IO-DIO",
@@ -1949,7 +1955,9 @@
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "site supervisory controller network switch"
  },
  {
   "code": "CTL-EDGE",
@@ -1977,7 +1985,9 @@
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "2 if modules > 1 else 1"
+  "qty_rule": "2 if modules > 1 else 1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "site supervisory edge computer (cluster dashboard, historian)"
  },
  {
   "code": "CTL-PANEL",
@@ -2005,7 +2015,9 @@
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "site supervisory controller enclosure"
  },
  {
   "code": "CTL-PANEL-BUILD",
@@ -2033,7 +2045,9 @@
   "applies_to_controls": [
    "pro"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "site supervisory controller UL 508A build"
  },
  {
   "code": "CTL-SETRA264",
@@ -2769,7 +2783,9 @@
    "ben300",
    "ben700"
   ],
-  "qty_rule": "ceil((tier_len_m+1.2)*3.64*10.76)"
+  "qty_rule": "ceil((tier_len_m+1.2)*3.64*10.76)",
+  "cluster_qty_rule": "yard_pad_sqft",
+  "cluster_note": "transformer and switchgear pads (footprint + 0.6 m margin each side)"
  },
  {
   "code": "SITE-CRANE",
@@ -2908,7 +2924,9 @@
    "ben300",
    "ben700"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "transformers_total + 1",
+  "cluster_note": "yard ground grid: one electrode system per transformer + one bonding the switchgear and the module grids"
  },
  {
   "code": "SITE-FIBER",
@@ -2934,7 +2952,9 @@
    "ben300",
    "ben700"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "site fibre ring between the module controllers and the supervisory controller"
  },
  {
   "code": "SITE-PERMIT",
@@ -3186,7 +3206,9 @@
    "ben300",
    "ben700"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "PE-stamped yard one-line, grounding and pad anchorage"
  },
  {
   "code": "STR-FLOORCHAN",
@@ -4176,7 +4198,9 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "12.47 kV utility interconnect of the cluster yard (primary metering, riser, ductbank to the switchgear, protection study)"
  },
  {
   "code": "SITE-CRANE-HALL",
@@ -4236,7 +4260,9 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "site, electrical and fire permits of the yard (the module lines carry the per-module permit)"
  },
  {
   "code": "SVC-AE-HALL",
@@ -4296,7 +4322,9 @@
   "applies_to_tiers": [
    "ben2000"
   ],
-  "qty_rule": "1"
+  "qty_rule": "1",
+  "cluster_qty_rule": "1",
+  "cluster_note": "NETA acceptance tests of the switchgear and the three transformers, relay settings, integrated systems test"
  },
  {
   "code": "STR-FLOOD-PLINTH",
@@ -6127,5 +6155,143 @@
    "rev2"
   ],
   "qty_rule": "ceil(tier_len_m*2.55/2.97*1.1)"
+ },
+ {
+  "code": "PWR-MV-XFMR-750",
+  "name": "Pad-mount transformer 750 kVA, 12.47 kV delta - 480Y/277 V, FR3 natural ester (less-flammable, listed), dead-front radial feed, bayonet + current-limiting fuses, taps (one per BEN 700 module of a Rev 2 BEN 2000)",
+  "manufacturer": "Prolec GE / Eaton Cooper / ABB-Hitachi",
+  "mpn": "PM-750-12.47-480Y",
+  "vendor": "transformer distributor (RFQ)",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 47600.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $47,600: scaled from the PWR-MV-XFMR-2500 estimate ($98,000, basis on that line) by the 0.6 power rule on kVA ((750/2500)^0.6 = 0.486); no 750 kVA price was read. Quote required.",
+  "price_checked": null,
+  "lead_time_weeks": 48,
+  "availability_note": "40-60 wk new (2026, as PWR-MV-XFMR-2500); order at engineering release.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "transformers_total if transformer_kva == 750 else 0"
+ },
+ {
+  "code": "PWR-MV-XFMR-1000",
+  "name": "Pad-mount transformer 1,000 kVA, 12.47 kV delta - 480Y/277 V, FR3 natural ester (less-flammable, listed), dead-front radial feed, bayonet + current-limiting fuses, taps (one per BEN 700 module of a Rev 2 BEN 2000)",
+  "manufacturer": "Prolec GE / Eaton Cooper / ABB-Hitachi",
+  "mpn": "PM-1000-12.47-480Y",
+  "vendor": "transformer distributor (RFQ)",
+  "vendor_url": "",
+  "unit": "ea",
+  "unit_price_usd": 56600.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $56,600: scaled from the PWR-MV-XFMR-2500 estimate ($98,000, basis on that line) by the 0.6 power rule on kVA ((1000/2500)^0.6 = 0.577); no 1,000 kVA price was read. Quote required.",
+  "price_checked": null,
+  "lead_time_weeks": 48,
+  "availability_note": "40-60 wk new (2026, as PWR-MV-XFMR-2500); order at engineering release.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "transformers_total if transformer_kva == 1000 else 0"
+ },
+ {
+  "code": "PWR-MV-SWGR-3FI",
+  "name": "Pad-mounted 15 kV class switchgear, 600 A, 4-way configured 1 source way + 3 fault-interrupter transformer ways, SF6-free, dead-front (S&C Vista / Eaton VFI class), one way per BEN 700 module",
+  "manufacturer": "S&C Electric / Eaton Cooper Power",
+  "mpn": "Vista 15 kV 4-way 1S+3FI (or VFI)",
+  "vendor": "S&C / Eaton distributor (RFQ)",
+  "vendor_url": "https://www.sandc.com/vista-guide21",
+  "unit": "ea",
+  "unit_price_usd": 185000.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $185,000: same 4-way frame and price basis as PWR-MV-SWGR (quote-only gear; utility bid tabs $120-220k for 4-way 15 kV fault-interrupter gear), configured with 3 fault-interrupter ways instead of 2. Quote required.",
+  "price_checked": null,
+  "lead_time_weeks": 40,
+  "availability_note": "32-52 wk (2026 MV gear lead times).",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "1"
+ },
+ {
+  "code": "PWR-MV-FEEDER",
+  "name": "15 kV radial feeder, switchgear to each pad-mount transformer: 1/0 AWG Al 15 kV EPR 133 % three single conductors + neutral, PVC ductbank, elbows and terminations (per metre of route)",
+  "manufacturer": "MV contractor",
+  "mpn": "MV-FEEDER-15KV",
+  "vendor": "MV contractor (RFQ)",
+  "vendor_url": "",
+  "unit": "m",
+  "unit_price_usd": 1200.0,
+  "price_status": "estimate",
+  "price_source_note": "Estimate $1,200/m: the ductbank rate in the SITE-MV-INTERCONNECT basis ($1,200/m); route length = sum of the switchgear-to-transformer distances on the yard plan + 6 m risers and slack per feeder (Config.derived()['mv_feeder_m']).",
+  "price_checked": null,
+  "lead_time_weeks": 8,
+  "availability_note": "MV cable 6-12 wk.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "ceil(mv_feeder_m)"
+ },
+ {
+  "code": "SITE-YARD-CLUSTER",
+  "name": "Cluster yard surfacing and enclosure: 150 mm crushed stone on geotextile, 2.4 m chain-link fence with two gates, bollards at the transformers and switchgear (per m2 of fenced yard outside the module and equipment pads)",
+  "manufacturer": "local site contractor",
+  "mpn": "YARD-SURF",
+  "vendor": "local",
+  "vendor_url": "",
+  "unit": "m2",
+  "unit_price_usd": 45.0,
+  "price_status": "estimate",
+  "price_source_note": "Engineering estimate $45/m2 of fenced yard: crushed stone 150 mm on geotextile ~$20/m2, fence and gates spread over the yard ~$15/m2 at this aspect ratio, bollards ~$10/m2; not quoted, +/-50 % by region.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Regional.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "ceil(yard_surface_m2)"
+ },
+ {
+  "code": "SITE-LANE-CLUSTER",
+  "name": "Fire apparatus / crane lane and service lane: all-weather compacted aggregate road base for 75,000 lb apparatus (IFC 503.2.3), 6.1 m wide (per m2)",
+  "manufacturer": "local site contractor",
+  "mpn": "LANE-AGG",
+  "vendor": "local",
+  "vendor_url": "",
+  "unit": "m2",
+  "unit_price_usd": 65.0,
+  "price_status": "estimate",
+  "price_source_note": "Engineering estimate $65/m2: 300 mm compacted aggregate base on geotextile with proof-roll, no paving; not quoted, +/-50 % by region and subgrade.",
+  "price_checked": null,
+  "lead_time_weeks": 4,
+  "availability_note": "Regional.",
+  "moq": 1,
+  "applies_to_tiers": [
+   "ben2000"
+  ],
+  "applies_to_lineups": [
+   "rev2"
+  ],
+  "qty_rule": "ceil(lane_area_m2)"
  }
 ]

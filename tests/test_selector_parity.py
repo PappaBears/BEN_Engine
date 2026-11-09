@@ -49,6 +49,11 @@ MINI_KEYS = ("form", "noise_dba_est", "noise_dba_target", "noise_ok", "outlet_ci
              "ups_runtime_min_est", "ups_battery_packs", "heat_to_room_w", "heat_to_room_btu_h", "closet_vent_cfm", "cooling_elec_kw", "ashrae_class", "total_kw")
 DENSE_KEYS = ("row_items", "ups_frames", "ups_frames_n", "fancoils_total", "battery_cabinets", "battery_kwh_installed", "battery_minutes_installed",
               "swbd_sections", "panelboard_wall", "trim_loop_kw", "row_budget_mm", "nfpa_855_scope", "liquid_load")
+# Rev 2 BEN 2000 cluster of BEN 700 modules (config.Config._derived_cluster, cluster_yard)
+CLUSTER_KEYS = ("module_it_kw", "module_racks", "module_service_breaker_a", "module_total_kva", "module_gross_kg", "transformer_kva", "transformers_total",
+                "transformer_loading_pct", "mv_service_amps", "mv_switchgear_ways", "site_area_m2", "yard_area_m2", "yard_pad_sqft", "yard_surface_m2",
+                "lane_area_m2", "mv_feeder_m", "kw_per_m2_site", "kw_per_m2_yard", "kw_per_m2_module", "skids", "skid_rejection_kw_each", "water", "leak",
+                "controls", "liquid_heat_kw", "loop_flow_lpm", "verified_max_kw", "module", "yard")
 
 
 @needs_node
@@ -59,6 +64,9 @@ DENSE_KEYS = ("row_items", "ups_frames", "ups_frames_n", "fancoils_total", "batt
     ("ben700", "ai_training", "hot_arid", None, "rev2"), ("ben700", "private_cloud", "temperate", None, "rev2"), ("ben1000", "healthcare", "temperate", None, "rev2"),
     # carried tiers under both lineups (Rev 1 numbers are frozen; rev2 adds the density keys)
     ("ben150", "healthcare", "hot_humid", None, "rev1"), ("ben500", "ai_training", "cold", None, "rev2"), ("ben5", "private_cloud", "temperate", None, "rev1"),
+    # BEN 2000: Rev 2 cluster of three BEN 700 modules (§2b), Rev 1 hall unchanged
+    ("ben2000", "ai_training", "temperate", None, "rev2"), ("ben2000", "healthcare", "hot_arid", None, "rev2"), ("ben2000", "private_cloud", "coastal", None, "rev2"),
+    ("ben2000", "off_grid", "cold", None, "rev2"), ("ben2000", "ai_training", "hot_arid", None, "rev1"), ("ben2000", "healthcare", "temperate", None, "rev1"),
 ])
 def test_parity_rev2(tier, profile, climate, form, lineup):
     cfg = Config.preset(tier, profile, climate, lineup=lineup, form=form)
@@ -76,7 +84,7 @@ def test_parity_rev2(tier, profile, climate, form, lineup):
     for k in ("tier", "it_kw", "racks", "cooling", "redundancy", "hardening", "generator", "ups_minutes", "lineup", "form"):
         assert js["cfg"][k] == getattr(cfg, k), (k, js["cfg"][k], getattr(cfg, k))
     keys = REV2_KEYS if lineup == "rev2" else PARITY_KEYS
-    keys = keys + (MINI_KEYS if py["kind"] == "minirack" else ()) + (DENSE_KEYS if py.get("liquid_first") else ())
+    keys = keys + (MINI_KEYS if py["kind"] == "minirack" else ()) + (DENSE_KEYS if py.get("liquid_first") else ()) + (CLUSTER_KEYS if py["kind"] == "cluster" else ())
     for k in keys:
         if k == "liquid_load":
             continue
@@ -96,6 +104,9 @@ def test_validate_rules_parity_rev2():
         ("ben1", dict(redundancy="2N")), ("ben1", dict(controls_tier="pro")), ("ben1", dict(power_architecture="dc800")), ("ben1", dict(form="rack19")),
         ("ben300", dict(cooling="dlc_cdu")), ("ben300", dict(racks=1)), ("ben300", dict(controls_tier="lite")), ("ben700", dict(racks=7, it_kw=700.0)),
         ("ben700", dict(lineup="rev1")), ("ben150", dict(hardening="IND")), ("ben150", dict(controls_tier="mini")), ("ben30", dict(cooling="office_air")),
+        # Rev 2 BEN 2000 cluster
+        ("ben2000", dict(racks=14)), ("ben2000", dict(cooling="dlc_cdu")), ("ben2000", dict(it_kw=1000.0)), ("ben2000", dict(it_kw=2400.0, racks=15)),
+        ("ben2000", dict(racks=12, it_kw=2000.0)), ("ben2000", dict(controls_tier="lite")), ("ben2000", dict(racks=48, cooling="dlc_cdu", it_kw=1600.0)),
     ]
     for tier, ch in cases:
         cfg = Config.preset(tier)

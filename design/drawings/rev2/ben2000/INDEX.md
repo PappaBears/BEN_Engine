@@ -1,25 +1,14 @@
 # BEN 2000 — drawing set Rev 2.A (ISSUED FOR REVIEW)
 
 Generated 2026-11-09 by `design/drawings/gen_drawings_rev2.py --lineup rev2` from `Config.preset('ben2000', lineup='rev2')`; revision from `design/rev2/REVISION.json`. Brand v2 title block (brand/v2/titleblock-spec.md). The Rev 1 set of this tier, where one exists, stays in `design/drawings/ben2000/` (frozen).
-Configuration: ben2000 | ai_inference | 1600 kW IT | 48 racks | cooling dlc_cdu | N+1 | temperate | H1 | lineup rev2
-Enclosure: Prefabricated wide-body modular hall (3 site-joined 12.2 m modules) + power module + plant yard, IP66 envelope — NEMA 4X / IP66 (H1 Standard).
+Configuration: ben2000 | ai_inference | 2000 kW IT | 15 racks | cooling dlc_hd | N+1 | temperate | H1 | lineup rev2
+Enclosure: Three BEN 700 liquid-first 40 ft modules (all-in-one, sealed to IP66) on a shared yard: 12.47 kV switchgear, one pad-mount transformer and one heat-rejection skid per module — NEMA 4X / IP66 (H1 Standard).
 
 | Sheet | Title | Files |
 |---|---|---|
-| A-000 | Site plan (sheet 1/14) | [A-000.svg](A-000.svg), [A-000.png](A-000.png) |
-| A-001 | General arrangement (sheet 2/14) | [A-001.svg](A-001.svg), [A-001.png](A-001.png) |
-| A-001-M1 | Module 1 general arrangement (sheet 3/14) | [A-001-M1.svg](A-001-M1.svg), [A-001-M1.png](A-001-M1.png) |
-| A-001-M2 | Module 2 general arrangement (sheet 4/14) | [A-001-M2.svg](A-001-M2.svg), [A-001-M2.png](A-001-M2.png) |
-| A-001-M3 | Module 3 general arrangement (sheet 5/14) | [A-001-M3.svg](A-001-M3.svg), [A-001-M3.png](A-001-M3.png) |
-| A-002 | Interior layout plan (sheet 6/14) | [A-002.svg](A-002.svg), [A-002.png](A-002.png) |
-| A-002-M1 | Module 1 interior layout (sheet 7/14) | [A-002-M1.svg](A-002-M1.svg), [A-002-M1.png](A-002-M1.png) |
-| A-002-M2 | Module 2 interior layout (sheet 8/14) | [A-002-M2.svg](A-002-M2.svg), [A-002-M2.png](A-002-M2.png) |
-| A-002-M3 | Module 3 interior layout (sheet 9/14) | [A-002-M3.svg](A-002-M3.svg), [A-002-M3.png](A-002-M3.png) |
-| A-003 | Envelope section and hardening (sheet 10/14) | [A-003.svg](A-003.svg), [A-003.png](A-003.png) |
-| S-001 | Foundation and anchoring (sheet 11/14) | [S-001.svg](S-001.svg), [S-001.png](S-001.png) |
-| E-001 | Power one-line (MV service) (sheet 12/14) | [E-001.svg](E-001.svg), [E-001.png](E-001.png) |
-| M-001 | Cooling P&ID (sheet 13/14) | [M-001.svg](M-001.svg), [M-001.png](M-001.png) |
-| C-001 | Controls layout (sheet 14/14) | [C-001.svg](C-001.svg), [C-001.png](C-001.png) |
+| A-000 | Site plan — three BEN 700 modules and the shared yard (sheet 1/3) | [A-000.svg](A-000.svg), [A-000.png](A-000.png) |
+| A-001 | Cluster arrangement — elevations and BEN 700 module sheet reference (sheet 2/3) | [A-001.svg](A-001.svg), [A-001.png](A-001.png) |
+| E-001 | Power one-line — 12.47 kV service to three BEN 700 modules (sheet 3/3) | [E-001.svg](E-001.svg), [E-001.png](E-001.png) |
 
 Status: **ISSUED FOR REVIEW — not for construction until checked** — Rev 2.A, 2026-11-09. Drawn: BEN Engine generator; Checked: blank (the operator signs; the set is not for construction until a checker is named in design/rev2/REVISION.json).
 
@@ -29,30 +18,43 @@ Status: **ISSUED FOR REVIEW — not for construction until checked** — Rev 2.A
 
 ## EN-001 working space (docs/audit/EN-001_working_space_liner.md)
 
-BEN 2000 hall: cold aisles are designed to condition 2 (1,100 >= 1,067, I-H4) and the 4,000 A switchgear to condition 3 (I-H7); the liner does not set the working space. Open item: the 900 mm contained hot aisle is egress only; if rack-rear PDU breakers are to be serviced energised, condition 2 (1,067) applies there — see EN-001 §5.
+BEN 2000 cluster: each module as BEN 700 (277 V to ground, ENV-LINER-NC, checks I-D4, I-D6, I-D20 per module through I-K1); yard MV working space NFPA 70 Table 110.34(A) (I-K12) and utility clearance in front of pad-mount doors (I-K11, STUDY)
+
+## Cluster (docs/REV2_DECISION.md §2b, change register R2-05)
+
+Three BEN 700 modules built to the module set [../ben700/](../ben700/INDEX.md) unchanged (the module sheets are not duplicated here), on a shared yard: 12.47 kV service, 15 kV pad-mounted switchgear (1 source + 3 transformer ways), one 1,000 kVA pad-mount transformer and one heat-rejection skid per module. 3 x 666.67 kW = 2000 kW in 15 racks (133.33 kW/rack); 22.43 kW/m² of module footprint, 3.36 kW/m² of fenced yard (594.6 m²), 2.35 kW/m² of site including the two 6.1 m lanes (849.9 m²). STUDY checks need the AHJ's or the utility's value before this set can be checked for construction. The superseded Rev 2.A sheets of the hall (drawn before §2b) are kept in [superseded-hall-2.A/](superseded-hall-2.A/INDEX.md).
+
+## Configuration deviations applied on this set
+
+- DEV-K1: pad-mount transformer footprint 2100 x 2100 mm and mass 4300 kg are estimates (estimate: typical three-phase 1,000 kVA dead-front pad-mount footprint and mass, not read from a datasheet); the yard keeps 1500 mm behind and 3000 mm in front, so a larger unit fits by moving the service lane.
+- Every module: DEV-D1: GB300 NVL72 racks are drawn 600 x 1068 (NVIDIA MGX / Supermicro / Cisco datasheet). The Vertiv SmartIT enclosure is 1,200 deep with its rear extension: W 2200 - 200 plenum - 1,200 = 800 mm aisle, below the 900 mm egress, so it is not used in a 2.2 m module.
 
 ## Interference checks for this tier (design/layout.py)
 
 | Tier | ID | Sheet | Check | Numbers | Limit | Result | Resolution |
 |---|---|---|---|---|---|---|---|
-| BEN 2000 | I-H0 | A-001 | Hall external width vs 3 road sections of 3,660 mm joined side by side | 3 x 3660 = 10980 vs ext 11000 | <= 11000 | **OK** |  |
-| BEN 2000 | I-H1 | A-002 | Width stack (4 rows, cold 1100 / hot 900 aisles, racks 1070 deep, fan wall 1000) vs interior width | 10380 vs 10400 | <= 10400 | **OK** |  |
-| BEN 2000 | I-H2 | A-002 | Config row_length_mm (racks + CDUs + 500 end zone) vs interior length, config rule | 8900 vs 35800 | <= 35800 | **OK** |  |
-| BEN 2000 | I-H3 | A-002 | Row footprint (12 racks x 600 + 2 CDU ends) vs IT-zone length (bays 2-3) | 8400 vs 22800 | <= 22800 | **OK*** | Rows centred; 14400 mm spare split to the two row-end service zones (staging, spares). Hall holds 48 racks at up to 80 kW DLC = 3,840 kW; preset 1600 kW |
-| BEN 2000 | I-H4 | A-002 | Cold aisle width vs NEC 110.26 condition 2 (1067, equipment on both sides) and 900 egress | 1100 vs 1067 | >= 1067 | **OK** |  |
-| BEN 2000 | I-H5 | A-002 | Contained hot aisle width vs 900 egress (doors at both ends) | 900 vs 900 | >= 900 | **OK** |  |
-| BEN 2000 | I-H6 | A-002 | Fan-wall discharge aisle (cold aisle 3 in front of the fan wall) vs 1067 | 1100 vs 1067 | >= 1067 | **OK** |  |
-| BEN 2000 | I-H7 | E-001 | 480 V switchgear 4,000 A working space, NEC 110.26(A)(1) condition 3 (grounded/live both sides) at 480 V: drawn 1500 vs 1,200 min; two entrances >= 610 x 2,000 (110.26(C)(2), >= 1,200 A and > 1.8 m wide) | 1500 vs 1200 | >= 1200 | **OK*** | 1,500 drawn: 1,200 cond. 3 minimum + 300 for drawout breaker lift truck; rear access 1,000; two exits from the switchgear room |
-| BEN 2000 | I-H8 | A-000 | Power module depth stack (switchgear + working space + UPS row + 1,200 aisle + battery rooms) vs 3 sections (11.0 m) | 9400 vs 10980 | <= 10980 | **OK** |  |
-| BEN 2000 | I-H9 | A-000 | Two 4,000 A lineups side by side + 1,200 between + ends vs power module length | 11600 vs 12200 | <= 12200 | **OK** |  |
-| BEN 2000 | I-H10 | M-001 | CDU capacity on the common secondary header vs IT x 1.05 + one 300 kW spare (row 4 alone has 1 CDU = 300 kW < row load 400 kW, so per-row CDUs would not carry N) | 7 x 300 = 2100 vs 1980 | >= 1980 | **OK*** | CDUs feed one ring-main secondary header so N+1 is system-wide ([2, 2, 2, 1] per row); per-row isolation valves, header sized DN150 |
-| BEN 2000 | I-H11 | M-001 | Residual air (25 % of IT) vs fan-wall units N (one per module) | 420 vs 600 | >= 420 | **OK** |  |
-| BEN 2000 | I-H12 | A-003 | Overhead stack: rack 2,200 + manifold + busway (top) vs interior height - 300 for lights and sprinkler/clean-agent nozzles | 2950 vs 3300 | <= 3300 | **OK** |  |
-| BEN 2000 | I-H13 | A-003 | Road section travel height (4,200 + 600 lowboy deck) vs 4,880 (16 ft) permit route limit | 4200 + 600 = 4800 vs 4880 | <= 4880 | **OK*** | Lowboy / drop-deck trailer, route survey and superload permits (SITE-FREIGHT-WB); 3.66 m width needs escorts |
-| BEN 2000 | I-H14 | E-001 | Lithium battery energy per room vs NFPA 855 600 kWh group limit (UL 9540A large-scale test above it), 2-hour separation between rooms | 296 kWh per room vs 600 | <= 600 | **OK** |  |
-| BEN 2000 | I-H15 | A-000 | Generator enclosure to hall / power module clearance vs 3,000 (NFPA 37 1.5 m min to combustible walls; 3 m for service and radiator discharge) | 3000 vs 3000 | >= 3000 | **OK** |  |
-| BEN 2000 | I-H16 | A-000 | FR3 ester pad-mount transformer to power module clearance vs 900 (FM 5-4 / IEEE C57.12 less-flammable liquid, non-combustible wall) | 3000 vs 900 | >= 900 | **OK** |  |
-| BEN 2000 | I-H17 | A-000 | Setback / fire lane around the hall vs 6,000 (IFC 503 fire apparatus access 6.1 m) | 6100 vs 6100 | >= 6100 | **OK*** | Fire lane is the 6 m crane lane on the south side plus the 6 m yard; AHJ confirms the access route |
-| BEN 2000 | I-H18 | S-001 | Rack footprint load (1,000 kg on 0.6 x 1.07 m) vs 200 mm slab-on-grade design 20 kN/m2 | 15.3 kN/m2 vs 20 | <= 20 | **OK** |  |
-| BEN 2000 | I-H19 | S-001 | Road section lift mass (tare per section + 800 kg fit-out) vs 100 t AT crane at 20 m radius (~25 t) | 7467 vs 25000 | <= 25000 | **OK** |  |
-| BEN 2000 | I-H20 | A-001 | Hall gross mass (config) vs slab + grade beams design 1,200 t | 109070 vs 1200000 | <= 1.2e+06 | **OK** |  |
+| BEN 2000 | I-K1.1 | A-000 | Module 1 (BEN 700 at 666.7 kW in 5 racks, N+1) passes the stand-alone dense resolver unchanged (_resolve_dense, I-D1..I-D20) | 19/19 module checks pass | <= 0 | **OK** |  |
+| BEN 2000 | I-K1.2 | A-000 | Module 2 (BEN 700 at 666.7 kW in 5 racks, N+1) passes the stand-alone dense resolver unchanged (_resolve_dense, I-D1..I-D20) | 19/19 module checks pass | <= 0 | **OK** |  |
+| BEN 2000 | I-K1.3 | A-000 | Module 3 (BEN 700 at 666.7 kW in 5 racks, N+1) passes the stand-alone dense resolver unchanged (_resolve_dense, I-D1..I-D20) | 19/19 module checks pass | <= 0 | **OK** |  |
+| BEN 2000 | I-K2 | A-000 | Heat-rejection skid of every module where the module layout puts it (item DC1 of _resolve_dense) vs the yard rule (config.CLUSTER_YARD skid_*) | max deviation 0 mm | <= 1 | **OK** |  |
+| BEN 2000 | I-K3 | A-000 | Clear distance between adjacent modules (each holds a 130.4 kWh lithium ESS, NFPA 855 scope) vs 3,048 (10 ft): IFC 2021 1207.8.3 / NFPA 855 outdoor ESS clearance to exposures | 3048 vs 3048 | >= 3048 | **OK*** | 10 ft is used without the reduction to 3 ft that UL 9540A large-scale fire test data accepted by the AHJ would allow; the edition adopted locally governs |
+| BEN 2000 | I-K4 | A-000 | Exterior path between modules with both cargo leaves folded back (150 mm each) vs 1,118 (44 in, IBC 1020.2 corridor width used conservatively) | 3048 - 2 x 150 = 2748 vs 1118 | >= 1118 | **OK** |  |
+| BEN 2000 | I-K5 | A-000 | Door swing: cargo leaf (1219 mm) swings inside the door-end apron, clear of the fire lane | 1219 vs apron 1500 | <= 1500 | **OK** |  |
+| BEN 2000 | I-K6 | A-000 | Fire separation between modules if the AHJ classifies each module as a building: fire separation distance to the imaginary line between them vs 914 (IBC Table 705.8: no openings below 3 ft) | 1524 vs 914 | >= 914 | **STUDY** | STUDY: at 1,524 mm (5 ft) IBC Table 705.8 limits openings on the facing long sides (protected openings 15 %) and Table 602 can require 1-hour exterior walls by construction type and occupancy; the steel ISO modules are non-combustible but unrated. If the AHJ treats the modules as listed equipment (NFPA 855 / NFPA 75 enclosures), I-K3 governs. Options: AHJ ruling, or widen the gap to 6,096 (FSD 10 ft). The openings on the long sides (personnel door, louvres) are to be confirmed on the module drawings |
+| BEN 2000 | I-K7 | A-000 | Pad-mount transformer (FR3 listed less-flammable liquid) to the nearest module wall or wall-mounted exterior item vs 900 (NFPA 70 450.23, FM DS 5-4; as I-H16) | 7240 vs 900 | >= 900 | **OK** |  |
+| BEN 2000 | I-K8 | A-000 | Pad-mount transformer to its heat-rejection skid (non-combustible steel equipment) vs 900 (same rule) | 1500 vs 900 | >= 900 | **OK** |  |
+| BEN 2000 | I-K9 | A-000 | Transformer to transformer side clearance vs 900 (FM DS 5-4 less-flammable liquid; utility side clearance for cabinet access) | 3386 vs 900 | >= 900 | **OK** |  |
+| BEN 2000 | I-K10 | A-000 | Switchgear to transformer 1 clearance vs 900 (same rule) | 3000 vs 900 | >= 900 | **OK** |  |
+| BEN 2000 | I-K11 | A-000 | Working and hot-stick clearance in front of the transformer and switchgear compartment doors | 3000 vs 3000 | >= 3000 | **STUDY** | STUDY: 3,000 mm (10 ft) is the common US utility requirement for pad-mount equipment doors; the serving utility's standard sets the value (and side / back clearances) |
+| BEN 2000 | I-K12 | E-001 | 15 kV switchgear working space, NFPA 70 Table 110.34(A): 2,501-9,000 V to ground (12.47Y/7.2 kV), condition 2 = 1,500 | 3200 vs 1500 | >= 1500 | **OK** |  |
+| BEN 2000 | I-K13 | E-001 | Transformer size: module total kVA vs 90 % of 1,000 kVA (config loading rule; smallest standard size that passes) | 751.4 vs 900 | <= 900 | **OK** |  |
+| BEN 2000 | I-K14 | E-001 | Module main breaker (1200 A) as transformer secondary protection vs 125 % of secondary full-load current (NFPA 70 Table 450.3(A), primary over 1,000 V, secondary <= 1,000 V) | 1200 vs 1.25 x 1203 = 1504 | <= 1503.52 | **OK** |  |
+| BEN 2000 | I-K15 | E-001 | Switchgear ways: 1 source + 3 transformer ways vs the 4-way frame | 4 vs 4 | <= 4 | **OK** |  |
+| BEN 2000 | I-K16 | E-001 | 12.47 kV service current (total 2254.2 kVA) vs switchgear continuous rating 600 A | 104.4 vs 600 | <= 600 | **OK** |  |
+| BEN 2000 | I-K17 | M-001 | Clear gap between adjacent heat-rejection skids vs skid height (2400 mm): side-by-side V-type dry coolers spaced at least one unit height to limit warm-air recirculation | 2886 vs 2400 | >= 2400 | **OK*** | rule of thumb from dry-cooler installation guidance (estimate); confirm with the selected unit's installation manual, or a CFD of the yard |
+| BEN 2000 | I-K18 | A-000 | Fire apparatus access road width vs 6,096 (IFC 503.2.1, 20 ft) | 6100 vs 6096 | >= 6096 | **OK** |  |
+| BEN 2000 | I-K19 | A-000 | Hose-lay distance from the door-end lane to the farthest exterior wall of a module (along the path between modules) vs 45,720 (IFC 503.1.1, 150 ft) | 15911 vs 45720 | <= 45720 | **OK*** | the service lane on the yard end also reaches the skids and transformers; the AHJ approves the route |
+| BEN 2000 | I-K20 | A-000 | Crane access: module set from the door-end lane (crane at mid-lane opposite module 2), radius to the farthest module centre vs 20000 (planning value of I-H19) | 12873 vs 20000 | <= 20000 | **OK** |  |
+| BEN 2000 | I-K21 | S-001 | Module pick mass (gross 19300 kg, racks fitted) vs 25000 kg at 20 m (100 t AT crane planning value, as I-H19) | 19300 vs 25000 | <= 25000 | **OK*** | lift plan and load chart from the crane contractor; racks can be set after the module to cut the pick to the module tare + fit-out |
+| BEN 2000 | I-K22 | A-000 | Transformer delivery from the service lane: radius to the transformer centre vs 20000 (boom truck or the module crane; transformer mass 4300 kg, estimate) | 8100 vs 20000 | <= 20000 | **OK** |  |
+| BEN 2000 | I-K23 | A-000 | Cluster IT load vs 3 x the BEN 700 verified maximum (705 kW in 5 racks, docs/DENSITY.md); module load vs the BEN 700 rating | 2000 vs 2115 (module 666.7 vs 700) | <= 1 | **OK** |  |
