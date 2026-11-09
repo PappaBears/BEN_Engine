@@ -13,11 +13,15 @@ import math
 from dataclasses import dataclass, field, asdict
 from typing import Literal, Dict, Any, List
 
-Tier = Literal["ben5", "ben30", "ben150", "ben500", "ben2000"]
-Hardening = Literal["H1", "H2", "H3"]
+Tier = Literal["ben1", "ben5", "ben30", "ben150", "ben300", "ben500", "ben700", "ben2000"]
+Hardening = Literal["H1", "H2", "H3", "IND"]
+Lineup = Literal["rev1", "rev2"]
+Form = Literal["rack10", "cab12"]
 
 # Generation-1 keys (container-length names) are accepted everywhere and normalised to the power-based keys.
-TIER_ALIASES: Dict[str, str] = {"micro": "ben5", "ben10": "ben30", "ben20": "ben150", "ben40": "ben500"}
+# Rev 2: "ben1000" was the working name of the 40 ft liquid-first flagship; it does not fit at 1,000 kW with real footprints
+# (design/layout.py I-D checks, docs/DENSITY.md) and is sold as BEN 700, so the old key loads as ben700.
+TIER_ALIASES: Dict[str, str] = {"micro": "ben5", "ben10": "ben30", "ben20": "ben150", "ben40": "ben500", "ben1000": "ben700"}
 
 
 def canonical_tier(t: str) -> str:
@@ -85,6 +89,116 @@ TIER_GEOMETRY: Dict[str, Dict[str, Any]] = {
         "rows": 4,
         "default_cooling": "dlc_cdu", "voltage": "12.47 kV MV service → 480 V 3ph", "tare_kg": 3 * 14000 + 18000,
     },
+    # ---------------------------------------------------------------- Rev 2 tiers (docs/REV2_DECISION.md §2). Rev 1 entries above are frozen.
+    "ben1": {
+        # Indoor mini rack. Top-level dimensions are the cab12 form; the selected form's dimensions replace them (Config.geometry()).
+        "label": "BEN 1", "enclosure": "Indoor mini rack: 10-inch 8U desk / shelf rack or 19-inch 12U sound-damped office cabinet",
+        "kind": "minirack", "modules": 1, "positioning": "core", "lineup": "rev2", "indoor": True,
+        "ext_l_m": 0.688, "ext_w_m": 0.952, "ext_h_m": 0.744,
+        "int_l_m": 0.48, "int_w_m": 0.80, "int_h_m": 0.53,
+        "max_racks": 1, "rack_u": 12, "it_kw_min": 0.2, "it_kw_max": 1.5,
+        "default_cooling": "office_air", "voltage": "120 V 1ph 15/20 A plug-in",
+        "voltage_option": "230 V 1ph 10/16 A (IEC C14 / C20 inlet) option for export; same UPS family in the 230 V (I) variant",
+        "tare_kg": 75, "default_form": "cab12",
+        "forms": {
+            # DeskPi RackMate T1 class: 281 W x 200 D (shelf) x 451 H mm incl. handles (computingforgeeks / CNX listings; DeskPi wiki not read).
+            # Depth carried as 260 mm = 200 mm shelf + 60 mm rear cable and PDU space. Open frame: no sound damping.
+            "rack10": {"label": "10-inch 8U desk / shelf mini rack (open or semi-enclosed)", "rack_in": 10,
+                       "ext_l_m": 0.281, "ext_w_m": 0.260, "ext_h_m": 0.451, "int_l_m": 0.222, "int_w_m": 0.200, "int_h_m": 0.356,
+                       "rack_u": 8, "it_kw_max": 0.6, "tare_kg": 4, "insertion_loss_db": 0.0, "noise_source": "desktop",
+                       "door": False, "reference": "DeskPi RackMate T1 (10-inch 8U)"},
+            # APC NetShelter CX Mini 12U (AR4000MV family): 744 H x 688 W x 952 D mm, 75 kg, 18.5 dB broadband noise reduction at 1 m
+            # (APC sales sheet as quoted by resellers, 2026-11-09). Internal: 12U x 44.45 = 533 mm, usable depth ~ 800 mm.
+            "cab12": {"label": "19-inch 12U sound-damped office cabinet", "rack_in": 19,
+                      "ext_l_m": 0.688, "ext_w_m": 0.952, "ext_h_m": 0.744, "int_l_m": 0.48, "int_w_m": 0.80, "int_h_m": 0.53,
+                      "rack_u": 12, "it_kw_max": 1.5, "tare_kg": 75, "insertion_loss_db": 18.5, "noise_source": "rack",
+                      "door": True, "reference": "APC NetShelter CX Mini 12U (AR4000MVX431)"},
+        },
+    },
+    "ben300": {
+        # Liquid-first 20 ft: two GB300 NVL72-class racks (132-155 kW each), row CDUs N+1 on the W45 loop, residual air in in-row
+        # fan coils on a trim loop, UPS + lithium + 480 V distribution inside; heat rejection on an adjacent dry-cooler skid.
+        "label": "BEN 300", "enclosure": "20 ft high-cube ISO-frame module, liquid-first, sealed to IP66",
+        "kind": "module", "modules": 1, "positioning": "core", "lineup": "rev2", "liquid_first": True,
+        "ext_l_m": 6.058, "ext_w_m": 2.438, "ext_h_m": 2.896,
+        "int_l_m": 5.75, "int_w_m": 2.20, "int_h_m": 2.49,
+        "max_racks": 2, "rack_u": 48, "it_kw_min": 150, "it_kw_max": 300, "max_rack_kw": 155,
+        "default_cooling": "dlc_hd", "voltage": "480 V 3ph", "tare_kg": 2600, "ups_minutes_default": 5,
+    },
+    "ben700": {
+        # Liquid-first 40 ft flagship. Target was 1,000 kW in 7 racks; with real footprints the single row holds 5 racks and
+        # 705 kW (DENSE_FOOTPRINTS, design/layout.py I-D2), so the tier is named for 700 kW (5 x 140 kW).
+        "label": "BEN 700", "enclosure": "40 ft high-cube ISO-frame module, liquid-first, all-in-one, sealed to IP66",
+        "kind": "module", "modules": 1, "positioning": "core", "lineup": "rev2", "liquid_first": True,
+        "ext_l_m": 12.192, "ext_w_m": 2.438, "ext_h_m": 2.896,
+        "int_l_m": 11.85, "int_w_m": 2.20, "int_h_m": 2.49,
+        "max_racks": 5, "rack_u": 48, "it_kw_min": 400, "it_kw_max": 700, "max_rack_kw": 155,
+        "default_cooling": "dlc_hd", "voltage": "480 V 3ph", "tare_kg": 4300, "ups_minutes_default": 5,
+        "target_note": "Rev 2 decision target BEN 1000 (500-1,000 kW, up to 7 racks); verified maximum 705 kW in 5 racks, sold as BEN 700",
+    },
+}
+
+# Product lineups (docs/REVISION_POLICY.md rule 3). A saved configuration without a lineup key is Rev 1.
+LINEUPS = ("rev1", "rev2")
+TIERS_BY_LINEUP: Dict[str, List[str]] = {
+    "rev1": ["ben5", "ben30", "ben150", "ben500", "ben2000"],
+    "rev2": ["ben1", "ben5", "ben30", "ben150", "ben300", "ben500", "ben700", "ben2000"],
+}
+REV1_TIERS = tuple(TIERS_BY_LINEUP["rev1"])
+DENSE_TIERS = ("ben300", "ben700")
+MINIRACK_TIERS = ("ben1",)
+
+# Rev 2 dense-tier footprints (mm; w = length along the row, d = depth from the rack wall). One table feeds config.derived(),
+# design/layout.py and the dashboard so they agree. Sources were read on 2026-11-09; see "src".
+DENSE_FOOTPRINTS: Dict[str, Dict[str, Any]] = {
+    "rack": {"w": 600, "d": 1068, "h": 2236, "kg": 1500, "kw_max": 155,
+             "label": "GB300 NVL72-class liquid rack, 48U MGX, 600 x 1068 x 2236 mm",
+             "src": "Supermicro / Cisco GB300 NVL72 datasheet 600 W x 1068 D x 2236 H mm; ~1.36-1.5 t loaded (GPU Smith, HPE). "
+                    "Vertiv SmartIT for GB300 is 600 x 1200 D with its rear extension and 2286 mm high: that depth leaves an 800 mm aisle "
+                    "behind a 200 mm plenum in a 2.2 m module and is not used"},
+    "cdu": {"w": 600, "d": 1200, "h": 2000, "kg": 550, "kw": 600,
+            "label": "Row CDU 600 kW (Vertiv CoolChip CDU 600 class), W45 secondary",
+            "src": "Vertiv CoolChip CDU 600 product page / brochure: 2000 H x 600 W x 1200 D mm, 480 kg dry / 550 kg wet, 600 kW at 4 K approach"},
+    "fancoil": {"w": 300, "d": 1070, "h": 2000, "kg": 170, "kw": 20,
+                "label": "In-row chilled-water fan coil 300 mm, 20 kW on the 18 °C trim loop",
+                "src": "300 mm in-row chilled-water class (Schneider InRow RC / Vertiv CRV CW); 20 kW at 18 °C water is a design value, NOT verified. "
+                       "W45 water cannot cool room air, so the residual-air coils run on a trim loop from the skid chiller"},
+    "ups": {"w": 850, "d": 925, "h": 1970, "kg": 900, "kva": 500,
+            "label": "Galaxy VL UPS frame up to 500 kW, internal N+1 power modules",
+            "src": "Schneider Galaxy VL brochure footprint 850 W x 925 D mm (GVL200K500DS max depth 925 mm); mass not read (900 kg assumed)"},
+    "batt": {"w": 600, "d": 1000, "h": 2000, "kg": 650, "kwh": 32.6, "kw": 200,
+             "label": "Galaxy Lithium-ion battery cabinet, 16 x 2.04 kWh",
+             "src": "32.6 kWh per cabinet (catalog PWR-BATT-LI); 200 kW per cabinet from Schneider's Galaxy VL 2000 kW system = 10 cabinets; "
+                    "600 x 1000 mm footprint and 650 kg not read from the manual (Rev 1 layout value)"},
+    "swbd": {"w": 915, "d": 610, "h": 2286, "kg": 600, "a_per_section": 1200,
+             "label": "480 V switchboard section 36 in W x 24 in D (Square D QED-2 class), main + maintenance bypass",
+             "src": "QED-2 bid specification: 36 in wide x 24 in deep sections; one section to 1,200 A, two sections to 2,500 A (ABB Emax 2000 A needs 60 in depth)"},
+    "rect": {"w": 600, "d": 1000, "h": 2000, "kg": 400, "label": "AC/DC front-end cabinet 800 VDC (4 x 100 kW)", "src": "Rev 1 forward study value"},
+    "batt800": {"w": 600, "d": 1000, "h": 2000, "kg": 650, "kwh": 32.6, "kw": 200, "label": "800 V class battery cabinet on the bus", "src": "Rev 1 forward study value"},
+}
+DENSE_RULES: Dict[str, Any] = {
+    "end_zone_mm": 350,          # blind end: controls panel (305 deep) on the end wall; the FK-5-1-12 cylinder sits in a heated exterior enclosure
+    "rear_plenum_mm": 200,       # behind racks and fan coils (residual-air return); CDUs and power gear back onto the wall
+    "panelboard_max_a": 600,     # at or below: wall-mounted 600 A panelboard on the end wall; above: floor switchboard sections in the row
+    "rack_top_min_mm": 250,      # top power entry + lights over the aisle; liquid connections from the rear plenum, low
+    "trim_loop_c": 18.0,
+}
+
+# BEN 1 (mini rack) sizing constants. Every number is a stated design value; vendor sources in purchasing/parts_catalog.json.
+MINIRACK: Dict[str, Any] = {
+    "office_design_c": 23.0, "office_max_c": 30.0,
+    "aux_kw": 0.015,              # fanless edge computer (10-15 W) + 2 BEN Pods; 0 when BEN Care runs on the customer's box
+    "ups_eff": 0.97,              # line-interactive UPS in line mode incl. charger standby
+    "design_rise_k": 10.0,        # cabinet extraction design temperature rise
+    # 120 V lithium line-interactive 2U models (APC Smart-UPS Li-ion): VA, W, delivered Wh at full load (runtime x W)
+    "ups_models": [
+        {"va": 1000, "w": 800, "wh": 104, "model": "APC SMTL1000RM2UC (1000 VA / 800 W, 2U, LiFePO4, 5-15P)", "plug": "NEMA 5-15P"},
+        {"va": 2200, "w": 1920, "wh": 192, "model": "APC SMTL2200RM2UC (2200 VA / 1920 W, 2U, Li-ion, 5-20P)", "plug": "NEMA 5-20P"},
+    ],
+    "ups_headroom": 1.25,
+    "noise_src_dba": {"desktop": 38.0, "rack": 52.0},   # sound pressure at 1 m of the IT at 200 W; +15 dB per decade of power
+    "noise_target_dba": {"rack10": 50.0, "cab12": 45.0},
+    "kg_per_kw_it": 30.0,
 }
 
 HARDENING: Dict[str, Dict[str, Any]] = {
@@ -95,6 +209,10 @@ HARDENING: Dict[str, Dict[str, Any]] = {
            "features": ["sand/dust ePM1 filtration with weather hoods", "hurricane-rated door hardware", "roof snow guards", "stainless fasteners, sacrificial anodes", "intrusion detection and lighting"]},
     "H3": {"label": "H3 Hardened / government", "rating": "NEMA 4X / IP66 + ballistic (UL 752) + forced-entry (ASTM F3038) + HEMP shielding option (MIL-STD-188-125-1)", "coating": "ISO 12944 C5-M", "wind_ms_min": 67, "mass_kg_m2": 48.0,
            "features": ["ballistic wall panels UL 752 level selectable", "IK10 impact doors, forced-entry rated", "80 dB shielded enclosure with filtered penetrations (option)", "TEMPEST-ready separation", "secure vestibule / mantrap", "two-factor access, tamper detection, audit trail in BEN Care", "CMMC / NIST 800-171 controls pack"]},
+    # Rev 2: BEN 1 is indoor and has no hardening levels
+    "IND": {"label": "Indoor (no hardening levels)", "rating": "UL 62368-1 listed parts, IP20 indoor, NEMA 12 option for dusty closets", "coating": "powder coat, indoor", "wind_ms_min": 0, "mass_kg_m2": 0.0,
+            "features": ["listed IT, UPS and PDU parts (UL 62368-1)", "IP20 indoor; NEMA 12 gasketed option for dusty closets", "lockable door (cab12)"],
+            "tiers": ["ben1"]},
 }
 
 COOLING_LIBRARY: Dict[str, Dict[str, Any]] = {
@@ -108,17 +226,21 @@ COOLING_LIBRARY: Dict[str, Dict[str, Any]] = {
     # 600 kW row CDU, 100-250 kW per rack, air-side residual 10 %. Allowed on BEN 150 and up (DLC_HD_TIERS). Option, default off.
     "dlc_hd":         {"label": "High-density direct liquid cooling (W45 loop, 600 kW row CDU)", "unit_kw": 600.0, "cop": 20.0, "medium": "liquid", "max_rack_kw": 250, "width_mm": 600, "mass_kg": 500,
                        "water_class": "W45", "air_residual": 0.10},
+    # Rev 2, BEN 1 only: office air through a filtered, sound-damped extraction path; no refrigerant. unit_kw = cabinet extraction capacity
+    # at a 10 K rise (design value; the cabinet vendor's heat rating is to be checked); cop = heat moved / fan power.
+    "office_air":     {"label": "Office air: filtered, sound-damped extraction path (no refrigerant)", "unit_kw": 1.6, "cop": 40.0, "medium": "air", "max_rack_kw": 1.5,
+                       "width_mm": 0, "mass_kg": 2, "refrigerant": None, "noise_dba": 45, "design_rise_k": 10.0, "indoor": True},
 }
-DLC_HD_TIERS = ("ben150", "ben500", "ben2000")
+DLC_HD_TIERS = ("ben150", "ben500", "ben2000", "ben300", "ben700")
 
 # ---------------------------------------------------------------- power architecture (docs/FORWARD_ARCHITECTURE_DECISION.md §1, §2)
 # "ac480" is today's chain (480 V AC -> UPS -> 208/415 V PDUs); "dc800" is the forward option: AC/DC front end (SiC rectifier or
 # solid-state transformer) -> 800 VDC busway (±400 V to ground) -> DC breakers -> racks with DC input; lithium battery on the bus
 # (no double conversion). Every number below is a stated design assumption for the study, not a measurement.
 POWER_ARCHITECTURES: Dict[str, Dict[str, Any]] = {
-    "ac480": {"label": "480 V AC → UPS → 208/415 V AC PDUs (today)", "tiers": ("ben5", "ben30", "ben150", "ben500", "ben2000")},
+    "ac480": {"label": "480 V AC → UPS → 208/415 V AC PDUs (today)", "tiers": ("ben5", "ben30", "ben150", "ben500", "ben2000", "ben1", "ben300", "ben700")},
     "dc800": {"label": "800 VDC bus: AC/DC front end → DC busway → DC-input racks, battery on bus (forward option)",
-              "tiers": ("ben150", "ben500", "ben2000"),
+              "tiers": ("ben150", "ben500", "ben2000", "ben300", "ben700"),
               # WORKING ASSUMPTION, not a sourced figure: a 760–920 V operating window was found in no primary source (research §1.5);
               # to be replaced by OCP Diablo 400 table 9.3.1 / the NVIDIA MGX power-rack spec once read in full.
               "bus_v_nominal": 800, "bus_v_min": 760, "bus_v_max": 920, "window_basis": "assumption pending OCP Diablo 400 §9.3.1 / NVIDIA MGX power rack spec",
@@ -155,7 +277,11 @@ CONTROLS_TIERS: Dict[str, Dict[str, Any]] = {
              "for": ["ben5", "ben30"]},
     "pro":  {"label": "BEN Controls Pro", "controller": "Phoenix Contact PLCnext AXC F 2152 + Axioline F I/O",
              "edge": "OnLogic Karbon 400 industrial edge computer (TPM 2.0)", "panel": "UL 508A listed BEN Controller panel",
-             "for": ["ben30", "ben150", "ben500", "ben2000"]},
+             "for": ["ben30", "ben150", "ben500", "ben2000", "ben300", "ben700"]},
+    # Rev 2: BEN 1. No controller panel; the BEN Care agent runs on the customer's own box or a small fanless edge computer.
+    "mini": {"label": "BEN Controls Mini", "controller": "none: 2 BEN Pods (Pod W) on the BEN Mesh, hardware watchdog in the Pod",
+             "edge": "BEN Care agent on the customer's own box, or a small fanless edge (OnLogic CL210-class or RevPi Connect S)",
+             "panel": "none (Pods clip to the rack rails)", "for": ["ben1"]},
 }
 # BEN 30 profiles that default to BEN Controls Pro
 CONTROLS_PRO_PROFILES = ("healthcare", "public_sector", "ai_training")
@@ -207,9 +333,32 @@ class Config:
     power_architecture: str = "ac480"
     # DC convention for dc800 (ignored on ac480): "bipolar_400" (±400 V, HR midpoint, Diablo 400) or "unipolar_800" (800 V, isolated return, OCP SST v0.3).
     dc_convention: str = "bipolar_400"
+    # Product lineup (docs/REVISION_POLICY.md rule 3): "rev2" for new configurations; Config.from_dict() loads a saved configuration
+    # without the key as "rev1" so every Rev 1 quote reproduces exactly (tests/test_rev1_frozen.py).
+    lineup: str = "rev2"
+    # BEN 1 form (Rev 2): "rack10" = 10-inch 8U desk / shelf rack (<= 0.6 kW), "cab12" = 19-inch 12U sound-damped cabinet (<= 1.5 kW).
+    # Empty on every other tier.
+    form: str = ""
 
     def __post_init__(self):
         self.tier = canonical_tier(self.tier)
+        if self.tier in MINIRACK_TIERS:
+            if not self.form:
+                self.form = "rack10" if self.it_kw <= TIER_GEOMETRY[self.tier]["forms"]["rack10"]["it_kw_max"] else "cab12"
+            if self.hardening == "H1":      # the dataclass default; BEN 1 is indoor and has no hardening levels
+                self.hardening = "IND"
+
+    # ------------------------------------------------------------ geometry (BEN 1 forms replace the tier dimensions)
+    def geometry(self) -> Dict[str, Any]:
+        g = TIER_GEOMETRY[self.tier]
+        if g.get("kind") != "minirack":
+            return g
+        f = g["forms"].get(self.form) or g["forms"][g["default_form"]]
+        out = {k: v for k, v in g.items() if k != "forms"}
+        out.update({k: f[k] for k in ("ext_l_m", "ext_w_m", "ext_h_m", "int_l_m", "int_w_m", "int_h_m", "rack_u", "tare_kg")})
+        out.update({"form": self.form, "form_label": f["label"], "it_kw_max_form": f["it_kw_max"], "rack_in": f["rack_in"], "door": f["door"],
+                    "insertion_loss_db": f["insertion_loss_db"], "reference": f["reference"]})
+        return out
 
     # ------------------------------------------------------------ validation
     def validate(self) -> List[str]:
@@ -256,18 +405,63 @@ class Config:
             errs.append(f"unknown controls_tier {self.controls_tier}")
         elif self.controls_tier == "lite" and self.tier in ("ben150", "ben500", "ben2000"):
             errs.append("BEN Controls Lite is for BEN 5 and BEN 30 only; BEN 150 and up use BEN Controls Pro")
-        if not errs and self.tier != "ben5":
+        errs += self._validate_rev2()
+        if not errs and self.tier not in ("ben5",) + MINIRACK_TIERS:
             d = self.derived()
             if not d["row_fits"]:
                 errs.append(f"{d['rows']} row(s) of {d['racks_per_row']} racks + cooling units is {d['row_length_mm']} mm per row, exceeds interior {int(TIER_GEOMETRY[self.tier]['int_l_m']*1000)} mm; use fewer racks, rear-door or liquid cooling")
+        return errs
+
+    def _validate_rev2(self) -> List[str]:
+        """Rules added in Rev 2 (lineup, BEN 1, liquid-first tiers). None of them can fire on a valid Rev 1 configuration."""
+        errs: List[str] = []
+        g = TIER_GEOMETRY[self.tier]
+        if self.lineup not in LINEUPS:
+            errs.append(f"unknown lineup {self.lineup}")
+        elif self.tier not in TIERS_BY_LINEUP[self.lineup]:
+            errs.append(f"{g['label']} is not in lineup {self.lineup} (lineups: " + ", ".join(f"{k}: {' '.join(v)}" for k, v in TIERS_BY_LINEUP.items()) + ")")
+        if self.hardening == "IND" and self.tier not in MINIRACK_TIERS:
+            errs.append("hardening IND (indoor) is for BEN 1 only")
+        if self.controls_tier == "mini" and self.tier not in MINIRACK_TIERS:
+            errs.append("BEN Controls Mini is for BEN 1 only")
+        if self.cooling == "office_air" and self.tier not in MINIRACK_TIERS:
+            errs.append("office_air cooling is for BEN 1 only")
+        if self.tier in MINIRACK_TIERS:
+            if self.form not in g["forms"]:
+                errs.append(f"unknown BEN 1 form {self.form!r} (rack10 or cab12)")
+            elif self.it_kw > g["forms"][self.form]["it_kw_max"]:
+                errs.append(f"BEN 1 {self.form} carries up to {g['forms'][self.form]['it_kw_max']} kW IT, got {self.it_kw}; use cab12")
+            if self.cooling != "office_air":
+                errs.append("BEN 1 uses office_air cooling only (no dc800, no dlc_hd; liquid only inside the IT device)")
+            if self.power_architecture != "ac480":
+                errs.append("BEN 1 is a 120 V plug-in unit: dc800 does not apply")
+            if self.hardening != "IND":
+                errs.append("BEN 1 is indoor: hardening levels H1-H3 do not apply (IND)")
+            if self.generator:
+                errs.append("BEN 1 has no generator (plug-in UPS only)")
+            if self.redundancy == "2N":
+                errs.append("BEN 1 has one UPS; for 2N use two BEN 1 units")
+            if self.controls_tier in ("lite", "pro"):
+                errs.append("BEN 1 uses BEN Controls Mini (2 BEN Pods + BEN Care agent)")
+            if not errs and self.form in g["forms"] and self._minirack_amps() > 16.0:
+                errs.append(f"BEN 1 draws {self._minirack_amps():.1f} A at 120 V, above the 16 A continuous limit of a 20 A circuit; use the 230 V option")
+        if g.get("liquid_first"):
+            if self.cooling != "dlc_hd":
+                errs.append(f"{g['label']} is liquid-first: dlc_hd only")
+            if self.it_kw / max(self.racks, 1) > g["max_rack_kw"]:
+                errs.append(f"{self.it_kw / max(self.racks, 1):.1f} kW/rack exceeds the {g['max_rack_kw']} kW GB300 NVL72-class rack limit of {g['label']}")
+            if self.controls_tier == "lite":
+                errs.append(f"BEN Controls Lite is for BEN 5 and BEN 30 only; {g['label']} uses BEN Controls Pro")
         return errs
 
     # ------------------------------------------------------------ controls tier
     def controls_tier_resolved(self) -> str:
         """Resolve ``controls_tier`` "auto": Lite for BEN 5, Pro for BEN 150/500/2000, and for BEN 30 Lite unless the
         profile is one where the buyer expects a PLC and a UL 508A panel (healthcare, public sector, AI training)."""
-        if self.controls_tier in ("lite", "pro"):
+        if self.controls_tier in ("lite", "pro", "mini"):
             return self.controls_tier
+        if self.tier in MINIRACK_TIERS:
+            return "mini"
         if self.tier == "ben5":
             return "lite"
         if self.tier == "ben30":
@@ -277,6 +471,8 @@ class Config:
     # ------------------------------------------------------------ derived sizing
     def derived(self) -> Dict[str, Any]:
         g = TIER_GEOMETRY[self.tier]
+        if g["kind"] == "minirack":
+            return self._derived_minirack()
         cl = COOLING_LIBRARY[self.cooling]
         clim = CLIMATE_DESIGN[self.climate]
         per_rack_kw = self.it_kw / self.racks
@@ -395,7 +591,7 @@ class Config:
                     "liquid_heat_kw": round(liquid_kw, 1), "loop_flow_lpm": round(liquid_kw / (4.18 * 10.0) * 60.0, 1),
                     "heat_reuse_kw_available": round(liquid_kw, 1), "air_residual": cl["air_residual"]}
 
-        return {
+        out = {
             "power_architecture": self.power_architecture, "power_architecture_label": POWER_ARCHITECTURES[self.power_architecture]["label"],
             "dc_ready": self.tier in POWER_ARCHITECTURES["dc800"]["tiers"],
             **dc, **loop,
@@ -420,6 +616,156 @@ class Config:
             "pods": pods,
             "climate": clim, "geometry": g,
         }
+        if g.get("liquid_first"):
+            self._apply_dense(out, ups_kva_n, area_m2, hz, dc)
+        if self.lineup == "rev2":
+            out.update(self._density(g))
+        return out
+
+    # ------------------------------------------------------------ Rev 2: density metrics
+    def _density(self, g: Dict[str, Any]) -> Dict[str, Any]:
+        fp = g["ext_l_m"] * g["ext_w_m"]
+        vol = fp * g["ext_h_m"]
+        return {"lineup": self.lineup, "kw_per_rack": round(self.it_kw / self.racks, 2), "footprint_m2": round(fp, 3), "volume_m3": round(vol, 3),
+                "kw_per_m2_footprint": round(self.it_kw / fp, 2), "kw_per_m3_volume": round(self.it_kw / vol, 2)}
+
+    # ------------------------------------------------------------ Rev 2: liquid-first dense tiers (BEN 300 / BEN 700)
+    def dense_row_items(self, d: Dict[str, Any]) -> List[str]:
+        """Row order from the door end: switchboard sections, power (battery / UPS interleaved, or rectifier + 800 V battery), CDUs,
+        then the racks with the fan coils spread between them. Keys index DENSE_FOOTPRINTS."""
+        items: List[str] = ["swbd"] * d["swbd_sections"]
+        if self.power_architecture == "dc800":
+            items += ["rect"] * d["rectifier_cabinets"] + ["batt800"] * d["battery_cabinets"]
+        else:
+            b, u = d["battery_cabinets"], d["ups_frames"]
+            while b or u:
+                if b:
+                    items.append("batt"); b -= 1
+                if u:
+                    items.append("ups"); u -= 1
+        items += ["cdu"] * d["cooling_units_total"]
+        nr, nf = self.racks, d["fancoils_total"]
+        slots = set(round((i + 0.5) * (nr + nf) / nf - 0.5) for i in range(nf)) if nf else set()
+        ri = fi = 0
+        for k in range(nr + nf):
+            if (k in slots and fi < nf) or ri >= nr:
+                items.append("fancoil"); fi += 1
+            else:
+                items.append("rack"); ri += 1
+        return items
+
+    def _apply_dense(self, out: Dict[str, Any], ups_kva_n: float, area_m2: float, hz: Dict[str, Any], dc: Dict[str, Any]) -> None:
+        g, F, R = TIER_GEOMETRY[self.tier], DENSE_FOOTPRINTS, DENSE_RULES
+        mult = 2 if self.redundancy == "2N" else 1
+        resid = COOLING_LIBRARY[self.cooling].get("air_residual", 0.10)
+        fc_n = math.ceil(resid * self.it_kw * 1.05 / F["fancoil"]["kw"])
+        fc_total = fc_n + 1 if self.redundancy == "N+1" else fc_n * mult
+        batt_need_kwh = (dc["battery_on_bus_kwh"] if self.power_architecture == "dc800" else out["battery_kwh"])
+        batt_cab = max(math.ceil(batt_need_kwh / F["batt"]["kwh"]), math.ceil(self.it_kw / F["batt"]["kw"])) * mult
+        if self.power_architecture == "dc800":
+            frames_n, frames, kva_each = 0, 0, 0
+        else:
+            frames_n = math.ceil(ups_kva_n / F["ups"]["kva"])
+            frames, kva_each = frames_n * mult, round(ups_kva_n / frames_n)
+        brk = out["service_breaker_a"]
+        swbd = 0 if brk <= R["panelboard_max_a"] else (1 if brk <= F["swbd"]["a_per_section"] else (2 if brk <= 2500 else 3))
+        out.update({"ups_modules": frames, "ups_kva_each": kva_each, "ups_frames": frames, "ups_frames_n": frames_n,
+                    "fancoils_n": fc_n, "fancoils_total": fc_total, "fancoil_kw": F["fancoil"]["kw"],
+                    "trim_loop_kw": round(resid * self.it_kw * 1.1, 1), "trim_loop_c": R["trim_loop_c"],
+                    "battery_cabinets": batt_cab, "battery_kwh_installed": round(batt_cab * F["batt"]["kwh"], 1),
+                    "battery_minutes_installed": round(batt_cab * F["batt"]["kwh"] * 0.9 * 60 / self.it_kw, 1),
+                    "swbd_sections": swbd, "panelboard_wall": swbd == 0, "liquid_first": True,
+                    "rack_envelope_mm": [F["rack"]["w"], F["rack"]["d"], F["rack"]["h"]], "rack_kw_max": g["max_rack_kw"]})
+        items = self.dense_row_items(out)
+        row_mm = sum(F[k]["w"] for k in items) + R["end_zone_mm"]
+        rect = out.get("rectifier_cabinets", 0) if self.power_architecture == "dc800" else 0
+        payload = (self.racks * F["rack"]["kg"] + out["cooling_units_total"] * F["cdu"]["kg"] + fc_total * F["fancoil"]["kg"]
+                   + frames * F["ups"]["kg"] + batt_cab * F["batt"]["kg"] + swbd * F["swbd"]["kg"] + rect * F["rect"]["kg"] + area_m2 * hz["mass_kg_m2"])
+        out.update({"row_items": items, "row_length_mm": int(row_mm), "row_fits": row_mm <= g["int_l_m"] * 1000,
+                    "row_budget_mm": int(g["int_l_m"] * 1000 - R["end_zone_mm"]), "end_zone_mm": R["end_zone_mm"],
+                    "payload_kg": round(payload), "gross_kg": round(payload + g["tare_kg"]),
+                    "nfpa_855_scope": batt_cab * F["batt"]["kwh"] >= 20.0})
+
+    # ------------------------------------------------------------ Rev 2: BEN 1 mini rack
+    def _minirack_power(self) -> Dict[str, float]:
+        M = MINIRACK
+        cl = COOLING_LIBRARY["office_air"]
+        cool = self.it_kw / cl["cop"]
+        total = self.it_kw + cool + M["aux_kw"] + self.it_kw * (1.0 / M["ups_eff"] - 1.0)
+        kva = total / 0.95
+        return {"cool": cool, "total": total, "kva": kva, "amps": kva * 1000.0 / 120.0}
+
+    def _minirack_amps(self) -> float:
+        return self._minirack_power()["amps"]
+
+    def _derived_minirack(self) -> Dict[str, Any]:
+        """BEN 1 sizing: 120 V plug-in, line-interactive lithium UPS, office-air extraction; every watt ends up in the room."""
+        g, M = self.geometry(), MINIRACK
+        f = TIER_GEOMETRY[self.tier]["forms"].get(self.form) or TIER_GEOMETRY[self.tier]["forms"]["cab12"]
+        cl = COOLING_LIBRARY[self.cooling] if self.cooling in COOLING_LIBRARY else COOLING_LIBRARY["office_air"]
+        clim = CLIMATE_DESIGN[self.climate]
+        hz = HARDENING.get(self.hardening, HARDENING["IND"])
+        pw = self._minirack_power()
+        it_w = self.it_kw * 1000.0
+        n_units = math.ceil(self.it_kw * 1.05 / cl["unit_kw"])
+        n_total = n_units + 1 if self.redundancy == "N+1" else (2 * n_units if self.redundancy == "2N" else n_units)
+        amps = pw["amps"]
+        if amps <= 12.0:
+            brk, outlet = 15, "NEMA 5-15R on a dedicated 15 A, 120 V circuit (12 A continuous at 80 %)"
+        elif amps <= 16.0:
+            brk, outlet = 20, "NEMA 5-20R on a dedicated 20 A, 120 V circuit (16 A continuous at 80 %)"
+        else:
+            brk, outlet = 30, "exceeds a 120 V 20 A circuit: use the 230 V option"
+        need_w = it_w * M["ups_headroom"]
+        ups = next((u for u in M["ups_models"] if u["w"] >= need_w), M["ups_models"][-1])
+        runtime = ups["wh"] / max(it_w, 1.0) * 60.0
+        packs = 0 if runtime >= self.ups_minutes else math.ceil((self.ups_minutes * it_w / 60.0 - ups["wh"]) / ups["wh"])
+        battery_kwh = self.it_kw * self.ups_minutes / 60 / 0.9
+        src = M["noise_src_dba"][f["noise_source"]] + 15.0 * math.log10(max(it_w, 50.0) / 200.0)
+        inside = src - f["insertion_loss_db"]
+        noise = 10.0 * math.log10(10 ** (inside / 10.0) + 10 ** (28.0 / 10.0))     # + cabinet extraction fans, 28 dBA at 1 m
+        target = M["noise_target_dba"][self.form if self.form in M["noise_target_dba"] else "cab12"]
+        heat_w = pw["total"] * 1000.0
+        vent_cfm = heat_w / (1.18 * 1006 * 5.0) / 0.000471947
+        airflow = it_w / (1.18 * 1006 * cl.get("design_rise_k", 10.0)) / 0.000471947
+        area = 2 * (g["ext_l_m"] * g["ext_h_m"] + g["ext_w_m"] * g["ext_h_m"]) + g["ext_l_m"] * g["ext_w_m"]
+        ups_kg = 16 if ups["va"] <= 1000 else 28
+        payload = self.it_kw * M["kg_per_kw_it"] + ups_kg * (1 + packs)
+        ct = self.controls_tier_resolved()
+        quiet_kw = 200.0 * 10 ** ((target - M["noise_src_dba"][f["noise_source"]] + f["insertion_loss_db"]) / 15.0) / 1000.0
+        note = (f"All {heat_w:.0f} W ({heat_w * 3.412:.0f} BTU/h) of BEN 1 goes into the room; the room's air conditioning must remove it. "
+                f"In an open office with central HVAC that is one or two people's worth of heat. In a closed closet it is not: give the closet a "
+                f"transfer fan or door grille moving at least {vent_cfm:.0f} cfm (holds the closet within 5 K of the office), or a dedicated "
+                f"{max(0.5, math.ceil(heat_w * 3.412 / 6000.0) / 2):.1f} ton split unit. Keep the inlet side 300 mm clear of walls.")
+        out = {
+            "power_architecture": "ac480", "power_architecture_label": "120 V plug-in → line-interactive lithium UPS → rack PDU (BEN 1)",
+            "dc_ready": False,
+            "tier_label": g["label"], "enclosure": f"{g['form_label']} ({g['reference']} class)", "form": self.form, "form_label": g["form_label"],
+            "per_rack_kw": round(self.it_kw / self.racks, 2),
+            "cooling_label": cl["label"], "cooling_units_n": n_units, "cooling_units_total": n_total,
+            "cooling_unit_kw_derated": round(cl["unit_kw"], 1), "cooling_derate": 1.0, "cooling_elec_kw": round(pw["cool"], 3),
+            "total_kw": round(pw["total"], 3), "total_kva": round(pw["kva"], 3),
+            "voltage": g["voltage"], "voltage_option": g["voltage_option"], "service_amps_calc": round(amps / 0.8), "service_breaker_a": brk,
+            "outlet_amps": round(amps, 1), "outlet_circuit": outlet, "outlet_circuit_a": brk,
+            "ups_modules": 1, "ups_kva_each": ups["va"] / 1000.0, "ups_va": ups["va"], "ups_w": ups["w"], "ups_model": ups["model"], "ups_plug": ups["plug"],
+            "ups_runtime_min_est": round(runtime, 1), "ups_battery_packs": packs, "battery_kwh": round(battery_kwh, 3),
+            "airflow_cfm": round(airflow), "payload_kg": round(payload), "gross_kg": round(payload + g["tare_kg"]),
+            "envelope_gain_kw": 0.0, "pue_estimate": round(pw["total"] / self.it_kw, 3),
+            "row_length_mm": int(g["ext_l_m"] * 1000), "row_fits": True, "rows": 1, "racks_per_row": 1, "nfpa_855_scope": battery_kwh >= 20.0,
+            "mv_service": False, "transformer_kva": 0, "transformers_total": 0, "generators_total": 0, "generator_kw_each": 0,
+            "modules": 1, "kind": "minirack",
+            "hardening": self.hardening, "hardening_label": hz["label"], "hardening_rating": hz["rating"], "hardening_coating": hz["coating"],
+            "hardening_recommended": "IND", "envelope_area_m2": round(area, 2),
+            "ashrae_class": PROFILE_DEFAULTS[self.profile]["ashrae"],
+            "controls_tier_resolved": ct, "controls_label": CONTROLS_TIERS[ct]["label"], "pods": 2,
+            "noise_dba_est": round(noise, 1), "noise_dba_target": target, "noise_ok": noise <= target, "noise_quiet_up_to_kw": round(quiet_kw, 2),
+            "noise_basis": f"IT sound pressure at 1 m {src:.1f} dBA ({f['noise_source']} gear, +15 dB per decade of power) less {f['insertion_loss_db']} dB cabinet insertion loss, + 28 dBA extraction fans",
+            "heat_to_room_w": round(heat_w), "heat_to_room_btu_h": round(heat_w * 3.412), "closet_vent_cfm": round(vent_cfm),
+            "room_cooling_note": note, "office_design_c": M["office_design_c"], "office_max_c": M["office_max_c"],
+            "climate": clim, "geometry": g,
+        }
+        out.update(self._density(g))
+        return out
 
     # ------------------------------------------------------------ 800 VDC sizing (forward option)
     def _derived_dc800(self, total_kw: float) -> Dict[str, Any]:
@@ -479,14 +825,71 @@ class Config:
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "Config":
+        """Load a saved configuration. A dict without ``lineup`` is a Rev 1 configuration (every quote saved before Rev 2) when its tier
+        is a Rev 1 tier, so it reproduces exactly; a Rev 2-only tier without the key loads as rev2."""
         known = {k: v for k, v in d.items() if k in cls.__dataclass_fields__}
         if "tier" in known:
             known["tier"] = canonical_tier(str(known["tier"]))
+        if "lineup" not in known:
+            known["lineup"] = "rev1" if known.get("tier", "ben150") in REV1_TIERS else "rev2"
         return cls(**known)
 
     @classmethod
-    def preset(cls, tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None) -> "Config":
+    def preset(cls, tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None,
+               lineup: str = "rev2", form: str | None = None) -> "Config":
+        """Preset for ``tier`` in ``lineup``. Rev 1 tiers follow the Rev 1 rules in both lineups (frozen; tests/test_rev1_frozen.py);
+        BEN 1 and the liquid-first tiers have their own rules (_preset_minirack, _preset_dense)."""
         tier = canonical_tier(tier)
+        if lineup not in LINEUPS:
+            raise ValueError(f"unknown lineup {lineup}; valid: {LINEUPS}")
+        if tier not in TIERS_BY_LINEUP[lineup]:
+            raise ValueError(f"{tier} is not in lineup {lineup}: {TIERS_BY_LINEUP[lineup]}")
+        g = TIER_GEOMETRY[tier]
+        if g["kind"] == "minirack":
+            return cls._preset_minirack(tier, profile, climate, lineup, form)
+        if g.get("liquid_first"):
+            return cls._preset_dense(tier, profile, climate, hardening, lineup)
+        cfg = cls._preset_rev1(tier, profile, climate, hardening)
+        cfg.lineup = lineup
+        return cfg
+
+    @classmethod
+    def _preset_minirack(cls, tier: str, profile: str, climate: str, lineup: str, form: str | None) -> "Config":
+        """BEN 1: AI inference on two desktop AI boxes in the 10-inch rack; AI training, healthcare and public sector in the lockable
+        12U cabinet with a 2U single-GPU server; everyone else a 0.4 kW 10-inch rack. Hardening IND, no generator, 10 min UPS."""
+        form = form or ("cab12" if profile in ("ai_training", "healthcare", "public_sector") else "rack10")
+        if form == "cab12":
+            it = 1.5 if profile == "ai_training" else 1.0
+        else:
+            it = 0.6 if profile == "ai_inference" else 0.4
+        return cls(tier=tier, profile=profile, it_kw=it, racks=1, cooling="office_air", redundancy="N" if form == "rack10" else "N+1",
+                   climate=climate, generator=False, hardening="IND", ups_minutes=10, controls_tier="auto", lineup=lineup, form=form)
+
+    @classmethod
+    def _preset_dense(cls, tier: str, profile: str, climate: str, hardening: str | None, lineup: str) -> "Config":
+        """BEN 300 / BEN 700: AI profiles at the nominal maximum, others at 80 %, all racks, dlc_hd. If the profile's redundancy (2N)
+        does not fit the single row, the IT load steps down 10 kW at a time and then one rack at a time until it does."""
+        g = TIER_GEOMETRY[tier]
+        p = PROFILE_DEFAULTS[profile]
+        it0 = g["it_kw_max"] if profile in ("ai_training", "ai_inference") else 0.8 * g["it_kw_max"]
+        if hardening is None:
+            hardening = "H3" if profile == "public_sector" else ("H2" if climate in ("coastal", "hot_arid", "cold", "high_altitude", "hot_humid") else "H1")
+        cfg = cls(tier=tier, profile=profile, it_kw=float(round(it0)), racks=g["max_racks"], cooling="dlc_hd", redundancy=p["redundancy"],
+                  climate=climate, generator=profile in ("healthcare", "public_sector", "off_grid"), hardening=hardening,
+                  ups_minutes=g.get("ups_minutes_default", 5), lineup=lineup)
+        for racks in range(g["max_racks"], 0, -1):
+            it = min(float(round(it0)), racks * g["max_rack_kw"])
+            while it >= g["it_kw_min"]:
+                cfg.racks, cfg.it_kw = racks, float(it)
+                if not cfg.validate():
+                    return cfg
+                it -= 10.0
+        cfg.racks, cfg.it_kw = g["max_racks"], float(round(it0))
+        return cfg
+
+    @classmethod
+    def _preset_rev1(cls, tier: str, profile: str = "ai_inference", climate: str = "temperate", hardening: str | None = None) -> "Config":
+        """The Rev 1 preset rule, unchanged (frozen)."""
         g = TIER_GEOMETRY[tier]
         p = PROFILE_DEFAULTS[profile]
         it_kw = min(g["it_kw_max"], max(g["it_kw_min"], p["rack_kw"] * g["max_racks"] * 0.8))
@@ -512,7 +915,9 @@ class Config:
         return cfg
 
 
-PRESETS = {t: Config.preset(t) for t in TIER_GEOMETRY}
+# Rev 2 presets (default for new work) and the frozen Rev 1 presets (byte-identical derived() to the Rev 1 release).
+PRESETS = {t: Config.preset(t, lineup="rev2") for t in TIERS_BY_LINEUP["rev2"]}
+PRESETS_REV1 = {t: Config.preset(t, lineup="rev1") for t in TIERS_BY_LINEUP["rev1"]}
 
 
 def main(argv=None):
@@ -530,9 +935,11 @@ def main(argv=None):
     ap.add_argument("--power-architecture", dest="power_architecture", choices=list(POWER_ARCHITECTURES),
                     help="ac480 (default, today) or dc800 (800 VDC bus option, BEN 150 and up)")
     ap.add_argument("--dc-convention", dest="dc_convention", choices=list(DC_CONVENTIONS), help="dc800 only: bipolar_400 (±400 V, HR midpoint; default) or unipolar_800 (isolated return)")
+    ap.add_argument("--lineup", default="rev2", choices=list(LINEUPS), help="product lineup (rev1 = frozen Rev 1 rules)")
+    ap.add_argument("--form", choices=["rack10", "cab12"], help="BEN 1 form")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args(argv)
-    cfg = Config.preset(a.tier, a.profile, a.climate)
+    cfg = Config.preset(a.tier, a.profile, a.climate, lineup=a.lineup, form=a.form)
     for k in ("it_kw", "racks", "cooling", "redundancy", "controls_tier", "hardening", "power_architecture", "dc_convention"):
         v = getattr(a, k)
         if v is not None:

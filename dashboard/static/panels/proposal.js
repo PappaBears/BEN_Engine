@@ -44,7 +44,7 @@ async function run(kind) {
         h('div', {}, h('strong', {}, r.proposal_id), ' · ', r.customer, ' · ', r.site),
         rows.length ? h('table', { class: 'kv' }, h('thead', {}, h('tr', {}, h('th', {}, 'Option'), h('th', {}, 'Capital'), h('th', {}, 'Recurring'))), h('tbody', {}, ...rows)) : null,
         h('div', { class: 'row' },
-          h('a', { class: 'btn btn-primary', href: r.html_url, target: '_blank', rel: 'noopener' }, 'Open proposal (HTML)'),
+          h('a', { class: 'btn', href: r.html_url, target: '_blank', rel: 'noopener' }, 'Open proposal (HTML)'),
           h('a', { class: 'btn', href: r.md_url, download: r.proposal_id + '.md' }, 'Markdown'),
           h('a', { class: 'btn', href: r.json_url, download: r.proposal_id + '.json' }, 'JSON')));
     } else {

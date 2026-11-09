@@ -325,6 +325,92 @@ Common "what to do if it fails": stop, record, do not adjust more than one thing
 | **Pass** | Loop energy balance within 5 % at every load; BTU meter within 10 %; supply ≤ 45 °C; the stated `heat_reuse_kw_available` is within 10 % of the measured value or the configuration model is corrected. |
 | **If it fails** | Flow meter or probe calibration (repeat E1 on the loop sensors); air-side share larger than 10 % (fan-coil load measured separately; correct `air_residual` in the library); supply above 45 °C: dry-cooler sizing or fouling (R39). |
 
+## Rev 2 experiments (added 2026-11-09)
+
+| ID | Experiment | Where | Scripted | Proves |
+| --- | --- | --- | --- | --- |
+| E21 | Noise at 1 m (BEN 1) | Bench (burn-in shelf), handover | no | The mini rack meets the office comfort target at full load |
+| E22 | Heat to room and input current (BEN 1) | Bench, handover | partly | The heat figure on the quote is true and the circuit stays under the 80 % rule |
+| E23 | UPS runtime (BEN 1) | Bench, handover, quarterly (self-test) | partly | The UPS carries the real load long enough for a clean shutdown |
+| E24 | Filter-clog alarm (BEN 1) | Bench | yes | A blocked intake raises the BEN Pod alarm before the IT throttles |
+| E25 | Single-rack isolation (BEN 300, BEN 1000) | twin, FAT | partly | One rack can be isolated (valves and tap-off) with the other racks unaffected; the failure domain in the proposal is real |
+
+BEN 1 experiments run on the burn-in shelf for every unit before shipping (`docs/MANUFACTURING_STRATEGY.md` §12) and E21–E23 again at the customer's site at handover with the unit in its final place. They need only a Class 2 sound level meter, a plug-in power meter (or the UPS's own input reading), a stopwatch and a dummy load (the AI box running a fixed benchmark); no load banks.
+
+## E21 — Noise at 1 m (BEN 1)
+
+| | |
+| --- | --- |
+| **Purpose** | Show that the mini rack is acceptable in an office: measure A-weighted sound level at 1 m at idle and full load. |
+| **Hypothesis** | With the cab12 door closed, ≤ 45 dBA at 1 m in front at full load and ≤ 35 dBA at idle; rack10 ≤ 45 dBA at 1 m at full load (the AI box's own fan is the limit). |
+| **Setup** | Unit in its final place (handover) or on the burn-in shelf (bench); background level measured first with the unit off and recorded; doors and windows as normal. |
+| **Instrumentation** | IEC 61672 Class 2 (or better) sound level meter, A-weighting, slow response; tripod at 1.0 m from the front face, 1.2 m high (seated ear height). |
+| **Procedure** | 1. Unit off: record background for 30 s (L_Aeq). 2. Idle: 2 min L_Aeq. 3. Full load (fixed benchmark on the AI box for 15 min so fans settle): 2 min L_Aeq. 4. Repeat step 3 at 1 m to the left side. |
+| **Data to record** | Background, idle and full-load L_Aeq per position; fan speeds; room and intake temperature. |
+| **Analysis** | Unit level = measured level corrected for background (subtract energetically if within 3–10 dB; if less than 3 dB above background, report "at or below background"). |
+| **Pass** | Full load ≤ 45 dBA and idle ≤ 35 dBA (cab12, door closed); rack10 ≤ 45 dBA at full load. Value written on the handover sheet; later annual checks compare against it (`MAINTENANCE.md` §10). |
+| **If it fails** | Door not closed or seal missing; a fan at maximum (check intake temperature, E22); move the unit away from a reflecting corner; replace a noisy fan. |
+
+## E22 — Heat to room and input current (BEN 1)
+
+| | |
+| --- | --- |
+| **Purpose** | Prove the heat-to-room figure on the quote (BTU/h) and that the input current stays inside the 80 % rule for the circuit. |
+| **Hypothesis** | At full IT load the UPS input power equals IT power + UPS losses + fans within 5 %, i.e. ≤ 0.66 kW (2,250 BTU/h) for rack10 and ≤ 1.65 kW (5,600 BTU/h) for cab12; input current ≤ 12 A (15 A circuit) or ≤ 16 A (20 A circuit); the room temperature rise with the site's vent path or cooling stays ≤ 5 K above the room's normal temperature after 2 h. |
+| **Setup** | Unit at full load (fixed benchmark); room in normal use; BEN Pod intake and exhaust probes logging; room thermometer away from the exhaust. |
+| **Instrumentation** | Plug-in power meter between the receptacle and the UPS (or the UPS input reading), BEN Pod `T_in_1`, `T_out_1`, room probe; 1-min logging for 2 h. |
+| **Procedure** | 1. Record room temperature with the unit at idle for 15 min. 2. Full load for 2 h. 3. Record input W and A every 10 min, intake and exhaust temperatures, room temperature. |
+| **Data to record** | Input W, A and power factor; IT W (from the AI box or PDU); room temperature at 0, 60 and 120 min; intake temperature. |
+| **Analysis** | Heat to room = input W (all electrical input becomes heat in the room); BTU/h = W × 3.412. Compare with the quote. Room rise compared with the site check (`SITE_REQUIREMENTS.md` §15). |
+| **Pass** | Heat within 5 % of the quote; current inside the 80 % rule; room rise ≤ 5 K at 2 h; intake temperature ≤ 30 °C. |
+| **If it fails** | Heat high: an extra device was added (R45) or the AI box is over its configured power cap. Room rise high: the vent path or room cooling is not as signed in the site check (R41) — the unit does not stay on site in that room until it is fixed. |
+
+## E23 — UPS runtime (BEN 1)
+
+| | |
+| --- | --- |
+| **Purpose** | Measure how long the UPS carries the real load and prove that the AI box and NAS shut down cleanly before the battery is empty. |
+| **Hypothesis** | At full load the UPS carries the IT for at least the configured `ups_minutes` ({{BEN1_UPS_MINUTES}} min in the BEN 1 preset); at the shutdown threshold BEN Controls Mini commands an orderly shutdown of the AI box and NAS; on mains return the unit restarts in a defined order. |
+| **Setup** | Full load; backups up to date; customer told; nothing irreplaceable running. Twin: not used (the vendor runtime curve is the prediction). |
+| **Instrumentation** | UPS `runtime_min`, `soc_pct`, input status; BEN Pod event log; stopwatch. |
+| **Procedure** | 1. Pull the UPS input plug (or open the circuit breaker). 2. Time to the shutdown command, to IT off, and the remaining SoC. 3. Restore power; time to everything back up and the dashboard green. |
+| **Data to record** | Runtime to shutdown command, IT off time, SoC at IT off, restart time, any errors in the AI box or NAS logs. |
+| **Analysis** | Compare runtime with the vendor curve at the measured load; record as the handover value. Quarterly self-tests (`MAINTENANCE.md` §10) compare against it. |
+| **Pass** | Runtime ≥ configured minutes; clean shutdown with no file-system errors; automatic restart in order. |
+| **If it fails** | Short runtime: battery not fully charged (wait 8 h and repeat) or a weak pack (replace, R47); no shutdown command: UPS USB/network link to BEN Controls Mini not configured. |
+
+## E24 — Filter-clog alarm (BEN 1)
+
+| | |
+| --- | --- |
+| **Purpose** | Prove that a blocked intake filter raises an alarm through the BEN Pod before the AI box throttles. |
+| **Hypothesis** | Covering 75 % of the intake filter with a card raises intake-to-exhaust ΔT and fan speed; the BEN Pod `filter_clog` warning is raised within 15 min at full load, before the AI box reports thermal throttling. |
+| **Setup** | Bench (burn-in shelf), full load, filter clean, Pod logging at 1 Hz. |
+| **Instrumentation** | BEN Pod `T_in_1`, `T_out_1`, fan tachometer (cab12) or the AI box fan reading; AI box throttle flag. |
+| **Procedure** | 1. 15 min baseline. 2. Cover 75 % of the filter area. 3. Log until the alarm or 30 min. 4. Remove the cover; confirm the alarm clears. |
+| **Data to record** | Time to alarm, ΔT and fan speed at alarm, any throttle flag, time to clear. |
+| **Analysis** | Alarm must lead throttling; set the threshold from the bench data if the default does not. |
+| **Pass** | Alarm ≤ 15 min; no throttle flag before the alarm; alarm clears after the cover is removed. |
+| **If it fails** | Threshold too high: adjust the ΔT threshold in BEN Controls Mini and repeat; probe placement wrong: move the exhaust probe out of the direct fan stream. |
+
+## Dense tiers BEN 300 and BEN 1000: which experiments apply
+
+Liquid is the default on BEN 300 and BEN 1000, so **E18 (CDU pump failover), E19 (leak-to-isolation) and E20 (W45 ΔT and heat-reuse accounting) are mandatory at FAT and SAT on every unit**, no longer forward-architecture-only, and they are run with every rack position loaded (liquid load banks at FAT, the customer's IT at SAT only after the FAT values are in hand). Changes against the E18–E20 text above: E18 is run per CDU **and** with one whole CDU stopped (N+1 CDUs are the default on the dense tiers, R49); E19 is run on every rack at FAT and by rotation afterwards (`MAINTENANCE.md` §11); E20 is run at 40 / 70 / 100 % of the configured IT kW and the reconciliation result is the source of the measured density figure in `docs/DENSITY.md`. **E17** applies only when `dc800` is selected (study). E1–E14 apply as for BEN 150 (BEN 300) and BEN 500 (BEN 1000); E16-style transfer testing applies where a BEN 1000 is fed from two transformers.
+
+## E25 — Single-rack isolation (BEN 300, BEN 1000)
+
+| | |
+| --- | --- |
+| **Purpose** | Prove that one rack can be taken out (liquid isolated and tap-off opened) while the others carry on, so the single-fault failure domain printed in the proposal (R48) is real. |
+| **Hypothesis** | Closing the isolation valves of rack k and opening its tap-off leaves every other rack's flow within ±10 % of its set value and its inlet coolant temperature within 1 K; CDU pumps rebalance without a low-flow alarm; reopening restores rack k without air in the loop. Twin: no rack-isolation fault is modelled yet; add one before the first BEN 300 FAT so the expected curve exists (see the rule at the top of this guide). |
+| **Setup** | FAT, liquid load banks on every rack at 80 % load; loop settled; per-rack flow meters logging at 1 Hz. |
+| **Instrumentation** | Per-rack `F_rack_k`, `T_loop_sup`, `T_loop_ret`, CDU pump speed and ΔP, tap-off breaker status, `power.pdu_kw[]`. |
+| **Procedure** | For each rack: 1. Baseline 10 min. 2. Open the tap-off, close the rack valves; log 10 min. 3. Reopen valves (vent at the high point), close the tap-off; log 10 min. |
+| **Data to record** | Other racks' flow and supply temperature deviation, CDU response, alarms, time to restore, air-vent volume. |
+| **Analysis** | Worst deviation across the other racks; kW lost per single fault = the isolated rack's kW (proposal figure). |
+| **Pass** | Other racks within ±10 % flow and 1 K supply; no low-flow alarm; restore clean. |
+| **If it fails** | Rebalancing too slow: CDU pressure control tuning; large flow swing: missing or mis-set rack balancing valve; air: venting procedure. |
+
 ## Appendix — running the scripted experiments
 
 ```

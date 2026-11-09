@@ -16,7 +16,17 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "high"
+  "severity": "high",
+  "tiers": [
+   "ben1",
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R02",
@@ -35,7 +45,16 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R03",
@@ -54,7 +73,16 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R04",
@@ -67,7 +95,16 @@
    "ai_training",
    "ai_inference"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R05",
@@ -80,7 +117,16 @@
    "ai_training",
    "ai_inference"
   ],
-  "severity": "high"
+  "severity": "high",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R06",
@@ -99,7 +145,16 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R07",
@@ -113,7 +168,16 @@
    "healthcare",
    "public_sector"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R08",
@@ -127,7 +191,16 @@
    "ai_inference",
    "private_cloud"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R09",
@@ -146,7 +219,16 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000",
+   "ben5"
+  ]
  },
  {
   "id": "R10",
@@ -160,7 +242,16 @@
    "off_grid",
    "public_sector"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R11",
@@ -175,7 +266,17 @@
    "industrial_ot",
    "private_cloud"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben1",
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R12",
@@ -189,7 +290,17 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben1",
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R13",
@@ -202,7 +313,16 @@
    "disaster_recovery",
    "off_grid"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R14",
@@ -221,7 +341,17 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben1",
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R15",
@@ -240,7 +370,16 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "high"
+  "severity": "high",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R16",
@@ -254,7 +393,12 @@
    "private_cloud",
    "industrial_ot"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150"
+  ]
  },
  {
   "id": "R17",
@@ -268,7 +412,16 @@
    "ai_training",
    "private_cloud"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R18",
@@ -287,7 +440,16 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "high"
+  "severity": "high",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R19",
@@ -306,7 +468,17 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben1",
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R20",
@@ -325,7 +497,16 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R21",
@@ -339,7 +520,16 @@
    "ai_inference",
    "private_cloud"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R22",
@@ -353,7 +543,14 @@
    "healthcare",
    "public_sector"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R23",
@@ -372,7 +569,15 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R24",
@@ -384,7 +589,15 @@
   "profiles": [
    "ai_training"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R25",
@@ -398,7 +611,17 @@
    "public_sector",
    "private_cloud"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben1",
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R26",
@@ -412,7 +635,15 @@
    "public_sector",
    "off_grid"
   ],
-  "severity": "medium"
+  "severity": "medium",
+  "tiers": [
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R27",
@@ -517,7 +748,16 @@
    "H2",
    "H3"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R32",
@@ -534,7 +774,16 @@
   "hardening": [
    "H3"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R33",
@@ -549,7 +798,16 @@
   "hardening": [
    "H3"
   ],
-  "severity": "low"
+  "severity": "low",
+  "tiers": [
+   "ben5",
+   "ben30",
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R34",
@@ -560,7 +818,14 @@
   "customer_owns": "Qualified-person policy and PPE programme for DC work.",
   "profiles": [],
   "severity": "high",
-  "study": true
+  "study": true,
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R35",
@@ -571,7 +836,14 @@
   "customer_owns": "Accepting a field-evaluated assembly where offered.",
   "profiles": [],
   "severity": "high",
-  "study": true
+  "study": true,
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R36",
@@ -582,7 +854,14 @@
   "customer_owns": "Clearing a located fault within the agreed time.",
   "profiles": [],
   "severity": "medium",
-  "study": true
+  "study": true,
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R37",
@@ -596,7 +875,14 @@
    "ai_inference"
   ],
   "severity": "medium",
-  "study": true
+  "study": true,
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R38",
@@ -607,7 +893,14 @@
   "customer_owns": "Keeping drains and clearances; not bypassing an isolation valve.",
   "profiles": [],
   "severity": "medium",
-  "study": true
+  "study": true,
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R39",
@@ -618,7 +911,14 @@
   "customer_owns": "Water analysis contract if not under BEN Care.",
   "profiles": [],
   "severity": "medium",
-  "study": true
+  "study": true,
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
  },
  {
   "id": "R40",
@@ -629,6 +929,238 @@
   "customer_owns": "Choosing the IT equipment and its DC convention early in a project.",
   "profiles": [],
   "severity": "medium",
-  "study": true
+  "study": true,
+  "tiers": [
+   "ben150",
+   "ben300",
+   "ben500",
+   "ben1000",
+   "ben2000"
+  ]
+ },
+ {
+  "id": "R41",
+  "category": "thermal",
+  "title": "Heat goes into your closet (BEN 1)",
+  "plain_text": "Every watt the AI box uses becomes heat in the room: a full cab12 is about 5,600 BTU/h, like a small space heater running all day. A closed closet with no air path heats up within hours and the AI box slows down or shuts off.",
+  "covered_by": "Heat-to-room figure on the quote and the data plate, site check before shipping (room cooling or a vent path sized for the unit), BEN Pod intake-temperature alarm before the IT throttles, heat to room measured at handover (E22).",
+  "customer_owns": "Keep the vent path or door grille open, do not block the intake, tell us if the room changes.",
+  "profiles": [
+   "ai_inference",
+   "private_cloud"
+  ],
+  "severity": "high",
+  "tiers": [
+   "ben1"
+  ]
+ },
+ {
+  "id": "R42",
+  "category": "electrical",
+  "title": "Circuit overload trips the breaker (BEN 1)",
+  "plain_text": "A cab12 at full load uses most of a 20 A circuit. A heater, printer or coffee machine on the same circuit trips the breaker; the UPS carries the IT for a few minutes and then shuts it down.",
+  "covered_by": "Dedicated circuit required (15 A rack10, 20 A cab12), load limited to 80 % of the circuit in the configuration, clean shutdown on UPS input loss, input current measured at handover (E22).",
+  "customer_owns": "Have the dedicated circuit installed and keep other loads and power strips off it.",
+  "profiles": [
+   "ai_inference",
+   "private_cloud",
+   "disaster_recovery",
+   "healthcare",
+   "industrial_ot"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben1"
+  ]
+ },
+ {
+  "id": "R43",
+  "category": "environmental_noise",
+  "title": "Noisier than expected (BEN 1)",
+  "plain_text": "Fans speed up when the AI box works hard, which can annoy a small office and lead to the unit being moved somewhere worse.",
+  "covered_by": "Sound-damped cabinet (cab12), low-speed fans, target 45 dBA or less at 1 m at full load, measured at handover (E21).",
+  "customer_owns": "Place it away from desks where possible and keep the cabinet door closed.",
+  "profiles": [
+   "ai_inference",
+   "private_cloud",
+   "disaster_recovery",
+   "healthcare",
+   "industrial_ot"
+  ],
+  "severity": "low",
+  "tiers": [
+   "ben1"
+  ]
+ },
+ {
+  "id": "R44",
+  "category": "security",
+  "title": "Someone walks off with it (BEN 1)",
+  "plain_text": "A mini rack is small enough to carry and it holds your data.",
+  "covered_by": "Lockable cabinet (cab12) or cable-lock point (rack10), disk encryption on by default with the key held off the box, door-contact alarm through the BEN Pod, remote wipe of controller credentials.",
+  "customer_owns": "Keep it in a lockable room, keep the recovery key safe, insure the equipment.",
+  "profiles": [
+   "ai_inference",
+   "private_cloud",
+   "disaster_recovery",
+   "healthcare",
+   "industrial_ot"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben1"
+  ]
+ },
+ {
+  "id": "R45",
+  "category": "availability",
+  "title": "Consumer-grade gear creeps in (BEN 1)",
+  "plain_text": "Someone adds a gaming PC, a cheap switch or an unlisted power strip because it fits. The unit runs hotter, louder and less reliably and may hold a part nobody can support.",
+  "covered_by": "Shipped full and labelled, additions by change order with a fit, heat and power check, only UL 62368-1 listed parts on the BEN 1 catalog, BEN Care flags unknown devices.",
+  "customer_owns": "Ask before adding equipment; no extra power strips.",
+  "profiles": [
+   "ai_inference",
+   "private_cloud",
+   "disaster_recovery",
+   "healthcare",
+   "industrial_ot"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben1"
+  ]
+ },
+ {
+  "id": "R46",
+  "category": "availability",
+  "title": "Backups not tested, restore fails (BEN 1)",
+  "plain_text": "Small sites often have a backup job that has silently stopped. When a disk fails or ransomware hits, the restore does not work.",
+  "covered_by": "Backup to a second target set up at handover, BEN Care reports every failed backup, quarterly restore test on the maintenance list and checked remotely.",
+  "customer_owns": "Keep the second backup target and do the quarterly restore test (or let BEN Care do it).",
+  "profiles": [
+   "ai_inference",
+   "private_cloud",
+   "disaster_recovery",
+   "healthcare",
+   "industrial_ot"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben1"
+  ]
+ },
+ {
+  "id": "R47",
+  "category": "electrical",
+  "title": "UPS battery wears out (BEN 1)",
+  "plain_text": "Lithium UPS batteries last about 3 to 5 years. An old battery holds the IT for seconds, so a short power blip becomes a hard shutdown.",
+  "covered_by": "Quarterly UPS self-test reported by BEN Care, battery-health alarm, replacement pack shipped before end of life with a prepaid recycling return, runtime measured at handover (E23).",
+  "customer_owns": "Swap the battery when it arrives (about 10 minutes) or book the visit.",
+  "profiles": [
+   "ai_inference",
+   "private_cloud",
+   "disaster_recovery",
+   "healthcare",
+   "industrial_ot"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben1"
+  ]
+ },
+ {
+  "id": "R48",
+  "category": "availability",
+  "title": "One rack is a large share of the unit (dense tiers)",
+  "plain_text": "On BEN 300 a single 132 to 155 kW liquid rack can be half or all of the IT. A fault in that rack, its manifold branch or its tap-off takes most of the unit's capacity with it.",
+  "covered_by": "Per-rack isolation valves and tap-off breakers, N+1 CDUs and pumps, failure domain (kW lost per single fault) printed in the proposal, BEN 1000 spreads load over more racks.",
+  "customer_owns": "Decide whether the workload tolerates one failure domain or needs two units.",
+  "profiles": [
+   "ai_training",
+   "ai_inference",
+   "private_cloud",
+   "public_sector"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben300",
+   "ben1000"
+  ]
+ },
+ {
+  "id": "R49",
+  "category": "thermal",
+  "title": "CDU or pump failure at full liquid load (dense tiers)",
+  "plain_text": "Liquid is the default on BEN 300 and BEN 1000, so a CDU or pump failure applies to every unit. Cold plates at 130 to 250 kW per rack have seconds of margin.",
+  "covered_by": "N+1 CDUs as the default, automatic failover, monthly proof of redundancy (BEN Care), test E18 at FAT and SAT, CDUs and pumps on UPS.",
+  "customer_owns": "Keep the BEN Care proof running or do the monthly failover test.",
+  "profiles": [
+   "ai_training",
+   "ai_inference",
+   "private_cloud",
+   "public_sector"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben300",
+   "ben1000"
+  ]
+ },
+ {
+  "id": "R50",
+  "category": "thermal",
+  "title": "Coolant quality drifts (dense tiers)",
+  "plain_text": "Warm-water loops grow biofilm and scale faster; filters clog and cold plates lose margin over months.",
+  "covered_by": "Coolant to the OCP water-based spec or PG25, side-stream filtration, quarterly coolant sampling and filter changes on pressure drop, loop flow and temperature trended by the twin (E20).",
+  "customer_owns": "Water analysis contract if not under BEN Care; never top up with tap water.",
+  "profiles": [
+   "ai_training",
+   "ai_inference",
+   "private_cloud",
+   "public_sector"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben300",
+   "ben1000"
+  ]
+ },
+ {
+  "id": "R51",
+  "category": "structural_transport",
+  "title": "Weight on the 20 ft floor (dense tiers)",
+  "plain_text": "A current liquid AI rack weighs about 1.4 to 1.6 t. Two of them plus CDUs, UPS and batteries load a 20 ft frame close to its rating, and rack feet exceed what a container floor is built for.",
+  "covered_by": "Steel sub-floor spreading the load, PE structural check for the selected racks, racks set in at site when gross mass would exceed the frame rating, weighed at transport prep.",
+  "customer_owns": "Crane and site access for setting racks in at site where needed.",
+  "profiles": [
+   "ai_training",
+   "ai_inference",
+   "private_cloud",
+   "public_sector"
+  ],
+  "severity": "medium",
+  "tiers": [
+   "ben300",
+   "ben1000"
+  ]
+ },
+ {
+  "id": "R52",
+  "category": "supply_chain",
+  "title": "Long lead times for large electrical gear (dense tiers)",
+  "plain_text": "1,600 to 2,000 A switchboards, large UPS frames, row CDUs and megawatt-class dry coolers have the longest lead times in the catalog, stretched by AI demand.",
+  "covered_by": "Long-lead orders at engineering release, frame agreements and reserved slots, approved alternates, long-lead items and dates named in the quote.",
+  "customer_owns": "Early deposit and early configuration freeze.",
+  "profiles": [
+   "ai_training",
+   "ai_inference",
+   "private_cloud",
+   "public_sector"
+  ],
+  "severity": "high",
+  "tiers": [
+   "ben300",
+   "ben1000"
+  ]
  }
 ]

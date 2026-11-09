@@ -55,7 +55,7 @@ function buildProfiles() {
   for (const [k, p] of Object.entries(CAT.profiles)) {
     const b = document.createElement('button'); b.className = 'profile'; b.type = 'button'; b.setAttribute('role', 'listitem');
     b.setAttribute('aria-pressed', String(k === state.profile));
-    b.innerHTML = `<span class="tag">${p.redundancy}</span><span class="tag" style="background:#66E3FF">ASHRAE ${p.ashrae}</span><h3>${p.label}</h3><p>${PROFILE_BLURB[k] || ''}</p>`;
+    b.innerHTML = `<span class="tag">${p.redundancy}</span><span class="tag tag-class">ASHRAE ${p.ashrae}</span><h3>${p.label}</h3><p>${PROFILE_BLURB[k] || ''}</p>`;
     b.onclick = () => { state.profile = k; buildProfiles(); buildRisks(); setPreset(state.cfg?.tier || 'ben150'); };
     g.appendChild(b);
   }

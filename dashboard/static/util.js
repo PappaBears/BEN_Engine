@@ -1,8 +1,13 @@
 // Shared helpers: API client, formatting, DOM, sparklines (canvas, no library).
 
+// Schreiber AI brand v2 (brand/v2/tokens.json). Rev 1 keys kept, mapped to the same job:
+// cyan = Signal Blue accent, amber = Hold (caution) yellow — never the button amber — red = Stop, green = Run.
 export const BRAND = {
-  graphite: '#0B1018', slate: '#152234', panel: '#1B2B42', text: '#EDF4FF', muted: '#9FB3CC',
-  cyan: '#66E3FF', amber: '#FFC66D', red: '#FF707D', green: '#6EE7A8',
+  graphite: '#06101F', slate: '#0B1A31', panel: '#0F2342', text: '#EEF4FC', muted: '#B2C1D8',
+  cyan: '#4C9DFF', amber: '#F2C94C', red: '#FF6369', green: '#2BB673',
+  info: '#5CD6FF', steel: '#8EA7C8', border: '#24406B',
+  thermalCool: '#5CD6FF', thermalWarm: '#FF8A3D',
+  thermal: ['#5CD6FF', '#7FE3D2', '#C9E89A', '#FFB86B', '#FF8A3D'],
 };
 
 export const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

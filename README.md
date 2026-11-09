@@ -2,6 +2,27 @@
 
 # BEN Engine — modular data centers you can run before they exist
 
+> **BEN Engine, by Schreiber AI — Rev 2 (2026-11-09).** The current product revision. What changed: [docs/rev2/RELEASE_NOTES.md](docs/rev2/RELEASE_NOTES.md) · decision: [docs/REV2_DECISION.md](docs/REV2_DECISION.md) · budget: [USD 5 M revamp program](docs/programs/REV2_REVAMP_PROGRAM.md).
+
+## Rev 2 at a glance
+
+| Tier | Enclosure | IT load | Cooling | In Rev 2 |
+| --- | --- | --- | --- | --- |
+| **BEN 1** | Indoor mini rack: 10-inch 8U desk/shelf rack (≤ 0.6 kW) or 19-inch 12U sound-damped office cabinet (≤ 1.5 kW), 120 V plug-in | 0.2–1.5 kW | Office air, filtered and sound-damped | **new** — tiny businesses; built in-house |
+| BEN 5 | Outdoor NEMA 4X / IP66 24U cabinet | 2–5 kW | Cabinet DX | carried |
+| BEN 30 | 10 ft module | 10–30 kW | In-row DX | carried |
+| BEN 150 | 20 ft module | 50–150 kW | Rear-door + dry cooler | carried |
+| **BEN 300** | 20 ft module, liquid-first | 150–300 kW | W45 direct liquid, row CDUs N+1 | **new** — dense |
+| BEN 500 | 40 ft module | 150–500 kW | DLC + CDU | carried (existing quotes) |
+| **BEN 1000** | 40 ft module, liquid-first, all-in-one | 500–1,000 kW | W45 direct liquid, CDUs N+1, heat-reuse port | **new** — flagship dense |
+| BEN 2000 | Prefabricated 2 MW hall | 800–2,000 kW | DLC | carried — capability example |
+
+- **Brand:** Schreiber AI brand package v2 applied (masters in `brand/v2/`): Night Navy ground, Signal Blue mark, Safety Amber on the primary button only, Archivo + IBM Plex, and the data plate band on every unit, drawing, proposal and slide.
+- **Density:** per-tier kW per rack and per m² in `docs/DENSITY.md`; design values until the BEN 300 lighthouse measures them. 800 VDC stays a study option behind a gated test cell.
+- **Where Rev 1 lives:** frozen on branch `release/rev1` with its record and hashes in [releases/REV1.md](releases/REV1.md); every Rev 1 customer-facing document that Rev 2 rewrote is copied unchanged under [archive/rev1/](archive/rev1/README.md) (this README's Rev 1 edition: [archive/rev1/README.md](archive/rev1/README.md)). Rev 1 configurations load as `lineup: "rev1"` and reproduce their quoted numbers. Nothing is deleted ([docs/REVISION_POLICY.md](docs/REVISION_POLICY.md)).
+
+The rest of this page describes the engineering system that both revisions share.
+
 **For** small and mid-size businesses, integrators and public-sector sites that want AI and IT on their own pad.
 **The problem:** cloud bills that scale with success, colocation priced for hyperscalers, server closets nobody commissioned.
 **The outcome:** all-in-one modular data centers, power, cooling, compute and controls in one sealed enclosure: the BEN 5 outdoor cabinet (2–5 kW) and the BEN 30, BEN 150 and BEN 500 ISO-frame modules (10 ft to 40 ft, 10 to 500 kW), every unit NEMA 4X / IP66 with H1/H2/H3 hardening, built from off-the-shelf enclosures, with Schreiber AI's controls layer, digital twin, commissioning script and a complete, generated deal package. Every drawing, part, price, alarm threshold and proposal comes from one configuration model. And when a customer needs a single 2 MW center, the same system scales to BEN 2000, a prefabricated hall sized, drawn and priced from the same model.

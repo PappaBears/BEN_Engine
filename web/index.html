@@ -3,30 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BEN Engine — Schreiber AI</title>
-<meta name="description" content="BEN Engine: modular data centers named by IT power, from the 5 kW BEN 5 cabinet to the 2 MW BEN 2000 prefabricated center. Element-proof NEMA 4X / IP66 enclosures, hardened on request, with Schreiber AI controls, digital twin and commissioning. Risks disclosed before pricing.">
-<link rel="icon" href="kit/logo-sai.svg" type="image/svg+xml">
+<title>BEN Engine, by Schreiber AI</title>
+<meta name="description" content="BEN Engine, by Schreiber AI: data centers named by IT power, from the BEN 1 mini rack for a tiny business to liquid-first BEN 300 and BEN 1000 modules and the 2 MW BEN 2000. Element-proof NEMA 4X / IP66 outdoor enclosures, Schreiber AI controls, digital twin and commissioning. Risks shown before prices.">
+<meta name="theme-color" content="#06101F">
+<link rel="icon" href="kit/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="kit/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="kit/app-icon-180.png">
+<link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
-  <a class="brand" href="#"><img src="kit/logo-sai.svg" alt="Schreiber AI" width="36" height="36"><span>Schreiber AI</span><span class="sep">/</span><strong>BEN Engine</strong></a>
+  <a class="brand" href="#" aria-label="BEN Engine, by Schreiber AI">
+    <img class="brand-lockup" src="kit/lockup-signal.svg" alt="Schreiber AI" width="176" height="27">
+    <span class="brand-rule" aria-hidden="true"></span>
+    <span class="brand-product">BEN Engine</span>
+  </a>
   <nav aria-label="Page">
-    <a href="#profiles">Mission profiles</a><a href="#risks">Risks</a><a href="#hardening">Hardening</a><a href="#configure">Configure</a><a href="#demo">Live demo</a><a href="#how">How we build</a><a href="#compliance">Compliance</a><a href="#contact" class="cta">Talk to Ben</a>
+    <a href="#lineup">Lineup</a><a href="#mini">Mini racks</a><a href="#dense">Dense liquid</a><a href="#profiles">Mission profiles</a><a href="#risks">Risks</a><a href="#hardening">Hardening</a><a href="#configure">Configure</a><a href="#demo">Live demo</a><a href="#how">How we build</a><a href="#compliance">Compliance</a><a href="#contact" class="nav-call">Book a call</a>
   </nav>
 </header>
 
 <main id="main">
 <section class="hero">
-  <div>
-    <p class="eyebrow">Business Edge Node · modular data center</p>
-    <h1>AI infrastructure that arrives finished.</h1>
-    <p class="lead">An all-in-one data center sized by the power you need: power, cooling, compute and controls in one sealed enclosure, from one rack in an outdoor cabinet (BEN 5) through 10, 20 and 40 ft high-cube modules (BEN 30, 150, 500). Every enclosure is element-proof, NEMA 4X / IP66, and can be hardened for coasts, deserts or government sites. And when you need a 2 MW center, the same system scales to BEN 2000. Designed, built, commissioned and watched by Schreiber AI. Buy the whole box, just the power or cooling module, or put your own brand on it.</p>
+  <div class="hero-copy">
+    <p class="eyebrow"><span class="no">Rev 2</span>BEN Engine, by Schreiber AI</p>
+    <h1>AI infrastructure that <em>arrives finished.</em></h1>
+    <p class="lead">A data center sized by the power you need. Power, cooling, compute and controls in one sealed enclosure, from a mini rack on an office shelf (BEN 1) through an outdoor cabinet (BEN 5) and 10, 20 and 40 ft modules (BEN 30 to BEN 1000), up to a 2 MW prefabricated hall (BEN 2000). Schreiber AI designs it, builds it, commissions it and watches it. Buy the whole box, only the power or cooling module, or put your own brand on it.</p>
     <div class="hero-actions"><a class="btn primary" href="#profiles">Pick a mission profile</a><a class="btn" href="#demo">See it run</a></div>
     <ul class="proof">
-      <li>Five tiers, one engineering model: every drawing, part and alarm threshold comes from the same configuration.</li>
-      <li>Element-proof by default. Hardened on request: H1, H2 or H3.</li>
+      <li>One engineering model for every tier: each drawing, part and alarm threshold comes from the same configuration.</li>
+      <li>Outdoor tiers are element-proof by default (NEMA 4X / IP66). Hardened on request: H1, H2 or H3.</li>
       <li>Risks are shown before prices. Always.</li>
       <li>Open, local-first controls. Your data stays in your box.</li>
     </ul>
@@ -37,16 +45,76 @@
   </figure>
 </section>
 
-<section class="tiers" aria-labelledby="tiersH">
-  <h2 id="tiersH">One family, five sizes</h2>
-  <p>The number is the IT power in kilowatts. The core product is the all-in-one box: BEN 5 is an outdoor cabinet, BEN 30, 150 and 500 are 10, 20 and 40 ft high-cube modules sealed to IP66, each with power, cooling, compute and controls inside one enclosure. BEN 2000 shows how far the same system scales: a single 2 MW center built as a prefabricated modular hall with its own power module and plant yard, sized and priced from the same configuration model.</p>
+<section id="lineup" class="tiers" aria-labelledby="tiersH">
+  <p class="label">The lineup</p>
+  <h2 id="tiersH">One family, sized by IT power</h2>
+  <p class="body-copy">The number is the nominal maximum IT power in kilowatts. The core product is the all-in-one box: power, cooling distribution, compute and controls inside one enclosure, heat rejection outside on the roof or a skid. BEN 2000 shows how far the same system scales: a 2 MW prefabricated hall with its own power module and plant yard, sized and priced from the same configuration model.</p>
   <div class="tier-grid" id="tierGrid"></div>
   <p class="note">Modules can be bought separately: <strong>Power</strong> (service entrance, ATS, UPS, distribution), <strong>Cooling</strong> (DX, rear-door, or direct liquid), <strong>Compute</strong> (racks and reference GPU/CPU nodes), <strong>Controls</strong> (BEN Controller, BEN Pods on the BEN Mesh, dashboard, twin, BEN Care): <strong>BEN Controls Lite</strong> (Revolution Pi, BEN 5 and BEN 30) or <strong>BEN Controls Pro</strong> (PLCnext PLC in a UL 508A panel + industrial edge computer, BEN 150, 500 and 2000; BEN 30 on request). The container, envelope and fire/safety come with any module.</p>
 </section>
 
+<section id="mini" class="feature" aria-labelledby="miniH">
+  <div class="feature-head">
+    <p class="label">New in Rev 2 · BEN 1</p>
+    <h2 id="miniH">Mini racks for tiny businesses</h2>
+    <p class="body-copy">For an office with one or two AI boxes, a NAS and a firewall in a closet or on a shelf. BEN 1 is an indoor mini rack that plugs into a 120 V outlet and runs on office air, drawn through a filtered, sound-damped path. Any liquid cooling stays sealed inside the IT device itself. Same controls, same dashboard, same data plate as the big modules.</p>
+  </div>
+  <div class="spec-grid">
+    <article class="spec-card">
+      <h3>BEN 1 · 10-inch</h3>
+      <p class="muted">8U desk or shelf rack</p>
+      <dl><dt>IT load</dt><dd>up to 0.6 kW</dd><dt>Power</dt><dd>120 V plug-in</dd><dt>Cooling</dt><dd>Office air, filtered, sound-damped path</dd><dt>Fits</dt><dd>One DGX Spark-class desktop AI, a NAS and a firewall</dd></dl>
+    </article>
+    <article class="spec-card">
+      <h3>BEN 1 · 12U cabinet</h3>
+      <p class="muted">19-inch sound-damped office cabinet</p>
+      <dl><dt>IT load</dt><dd>up to 1.5 kW</dd><dt>Power</dt><dd>120 V plug-in</dd><dt>Cooling</dt><dd>Office air, filtered, sound-damped path</dd><dt>Fits</dt><dd>A small GPU server or two desktop AI boxes, NAS, firewall</dd></dl>
+    </article>
+    <article class="spec-card pending-card">
+      <h3>Still to prove</h3>
+      <ul class="pending-list">
+        <li><span class="chip c-pending">fact pending</span> Price</li>
+        <li><span class="chip c-pending">fact pending</span> Noise at 1 m, measured</li>
+        <li><span class="chip c-pending">fact pending</span> Lighthouse unit result</li>
+      </ul>
+      <p class="muted small">Yellow chips are empty proof slots. They fill with measured numbers from the first BEN 1 units, never with estimates.</p>
+    </article>
+  </div>
+</section>
+
+<section id="dense" class="feature" aria-labelledby="denseH">
+  <div class="feature-head">
+    <p class="label">New in Rev 2 · BEN 300 and BEN 1000</p>
+    <h2 id="denseH">Dense liquid, in one sealed box</h2>
+    <p class="body-copy">For current liquid-cooled racks. Both tiers are liquid-first: direct liquid cooling with warm W45 water, coolant distribution units at N+1, and only a small share of the heat left on the air side. Power, UPS and battery, CDUs and controls ride inside the module; heat rejection sits outside on an adjacent skid. A dense tier is only sold once its real footprint passes our interference checks (single row, 900 mm egress, NEC 110.26 working space at 480 V). Until then it is reported as a study.</p>
+  </div>
+  <div class="spec-grid">
+    <article class="spec-card">
+      <h3>BEN 300</h3>
+      <p class="muted">20 ft module, liquid-first</p>
+      <dl><dt>IT load</dt><dd>150–300 kW</dd><dt>Cooling</dt><dd>Direct liquid W45, row CDU N+1, ≤ 10 % air residual</dd><dt>Fits</dt><dd>One or two current liquid racks (GB300 NVL72-class, 132–155 kW each)</dd></dl>
+    </article>
+    <article class="spec-card">
+      <h3>BEN 1000</h3>
+      <p class="muted">40 ft module, liquid-first, all-in-one</p>
+      <dl><dt>IT load</dt><dd>500–1,000 kW</dd><dt>Cooling</dt><dd>Direct liquid W45, CDU N+1, heat-reuse port</dd><dt>Fits</dt><dd>Up to six or seven current liquid racks with power, UPS/battery, CDUs and controls in one sealed box</dd></dl>
+    </article>
+    <article class="spec-card pending-card">
+      <h3>Still to prove</h3>
+      <ul class="pending-list">
+        <li><span class="chip c-pending">fact pending</span> Interference check on the real footprint</li>
+        <li><span class="chip c-pending">fact pending</span> Price</li>
+        <li><span class="chip c-pending">fact pending</span> BEN 300 lighthouse unit result</li>
+      </ul>
+      <p class="muted small">The 800 VDC power architecture stays a study option on both tiers until the test cell signs it off.</p>
+    </article>
+  </div>
+</section>
+
 <section id="profiles" class="profiles" aria-labelledby="profH">
+  <p class="label">Step 1</p>
   <h2 id="profH">Mission profile picker</h2>
-  <p>Start with what the box is for. The profile sets the environmental class, redundancy, climate package, compliance pack and the risk list you will see next.</p>
+  <p class="body-copy">Start with what the box is for. The profile sets the environmental class, redundancy, climate package, compliance pack and the risk list you will see next.</p>
   <div class="profile-grid" id="profileGrid" role="list"></div>
   <div class="climate-row">
     <label>Where will it live? <select id="climateSel"></select></label>
@@ -55,15 +123,18 @@
 </section>
 
 <section id="risks" class="risks" aria-labelledby="riskH">
+  <p class="label">Step 2</p>
   <h2 id="riskH">The risks, before the price</h2>
-  <p>Every modular data center carries these risks. We list them first so you can see exactly which ones BEN Engine covers by design, which we monitor, and which stay with you. Filtered for the profile you picked.</p>
+  <p class="body-copy">Every modular data center carries these risks. We list them first so you can see which ones BEN Engine covers by design, which we monitor, and which stay with you. Filtered for the profile you picked.</p>
+  <div class="risk-key" aria-hidden="true"><span class="chip c-stop">high</span><span class="chip c-hold">medium</span><span class="chip c-run">low</span></div>
   <div id="riskList" class="risk-list"></div>
   <p class="muted small">Full register with likelihood, consequence and mitigation: <a href="../docs/RISK_REGISTER.md">docs/RISK_REGISTER.md</a>.</p>
 </section>
 
 <section id="hardening" class="hardening" aria-labelledby="hardH">
+  <p class="label">Envelope</p>
   <h2 id="hardH">Element-proof by default. Hardened on request.</h2>
-  <p>Weather is the first risk on the list above, so every BEN starts watertight. The envelope of every tier is rated <strong>NEMA 4X / IP66</strong>: gasketed doors with three-point latches, every penetration gasketed and hose-tested (UL 50E type 4X, test E14) before the unit ships and again after it moves, corrosion-resistant coating, a slightly pressurised interior so dust stays out. That is level H1 and it costs nothing extra. Two more levels are available from the Hardening select in the configurator.</p>
+  <p class="body-copy">Weather is the first risk on the list above, so every outdoor BEN starts watertight. The envelope of every outdoor tier is rated <strong>NEMA 4X / IP66</strong>: gasketed doors with three-point latches, every penetration gasketed and hose-tested (UL 50E type 4X, test E14) before the unit ships and again after it moves, corrosion-resistant coating, a slightly pressurised interior so dust stays out. That is level H1 and it costs nothing extra. Two more levels are in the Hardening select in the configurator. BEN 1 is indoor equipment and is not hardened.</p>
   <div class="comp-grid">
     <div><h3>H1 · Standard</h3><p>NEMA 4X / IP66 envelope, hose-tested. ISO 12944 C3 coating. Wind, snow and seismic to the climate package. Keyed access, door contacts, camera-ready. <strong>For most commercial sites.</strong></p></div>
     <div><h3>H2 · Severe environment</h3><p>Everything in H1 plus a 600 mm flood plinth, marine-grade C5-M coating with stainless fasteners and sacrificial anodes, sand and dust filtration with weather hoods, hurricane-rated door hardware and roof snow guards, 67 m/s (150 mph) wind, intrusion detection and lighting. <strong>For coastal, desert, arctic and hurricane sites;</strong> the configurator recommends it automatically for those climates.</p></div>
@@ -73,6 +144,7 @@
 </section>
 
 <section id="configure" class="configure" aria-labelledby="cfgH">
+  <p class="label">Step 3</p>
   <h2 id="cfgH">Configure your BEN</h2>
   <form id="cfgForm" class="cfg-form" onsubmit="return false">
     <fieldset><legend>Size</legend>
@@ -110,8 +182,9 @@
 </section>
 
 <section id="demo" class="demo" aria-labelledby="demoH">
+  <p class="label">Digital twin</p>
   <h2 id="demoH">See it run before it exists</h2>
-  <p>Every BEN ships with its digital twin. The dashboard below is the same software that runs in the box, in simulation mode: live data, 3-D walkthrough, automated test sweeps, fault injection, calibration, CFD and CSV export, with no hardware attached.</p>
+  <p class="body-copy">Every BEN ships with its digital twin. The dashboard below is the same software that runs in the box, in simulation mode: live data, 3-D walkthrough, automated test sweeps, fault injection, calibration, CFD and CSV export, with no hardware attached.</p>
   <div class="demo-grid">
     <figure><img src="../docs/media/screens/desktop-exterior-iso.png" alt="Dashboard: exterior isometric 3D view of the configured unit" loading="lazy"><figcaption>3-D twin built from the selector</figcaption></figure>
     <figure><img src="../docs/media/screens/interior-walkthrough.png" alt="Dashboard: first-person walkthrough in the cold aisle" loading="lazy"><figcaption>Walkthrough with live sensor values</figcaption></figure>
@@ -122,11 +195,12 @@
 </section>
 
 <section id="how" class="how" aria-labelledby="howH">
+  <p class="label">Process</p>
   <h2 id="howH">How we build it</h2>
   <ol class="steps">
     <li><strong>Profile and site.</strong> You pick the mission; we survey the site and you sign the site requirements.</li>
     <li><strong>Engineering release.</strong> The configuration is frozen. Drawings, bill of materials, compliance pack and twin are generated from it.</li>
-    <li><strong>Factory build.</strong> Off-the-shelf cabinet, ISO-frame module or, for BEN 2000, factory-built hall modules, fitted out from Simplified Technical English instructions with hold points for the licensed trades; the envelope is hose-tested before the liner closes.</li>
+    <li><strong>Factory build.</strong> Off-the-shelf mini rack or cabinet, ISO-frame module or, for BEN 2000, factory-built hall modules, fitted out from Simplified Technical English instructions with hold points for the licensed trades; the envelope is hose-tested before the liner closes.</li>
     <li><strong>Factory acceptance test.</strong> The commissioning script runs the unit through load steps, failover and ride-through before it ships.</li>
     <li><strong>Site acceptance.</strong> Same script, on your pad, with you watching. You get the signed report and the data.</li>
     <li><strong>Operate.</strong> Schreiber AI watches it, or you do, or your partner does under their brand.</li>
@@ -135,6 +209,7 @@
 </section>
 
 <section id="compliance" class="compliance" aria-labelledby="compH">
+  <p class="label">Compliance</p>
   <h2 id="compH">Compliance is the product</h2>
   <div class="comp-grid">
     <div><h3>Electrical</h3><p>NEC 110.26 working space, UL 891/67 distribution, UL 1778 UPS, UL 9540 battery cabinets, NFPA 70E arc-flash labels, UL 508A BEN Controller panel (BEN Controls Pro: Phoenix Contact PLCnext PLC, industrial edge computer with TPM); BEN Controls Lite uses listed DIN-rail components (Revolution Pi). BEN 2000: medium-voltage service to NESC and utility rules, UL 1558 switchgear, NFPA 855 battery rooms with 2-hour separation, NFPA 110 Level 1 generators, SPCC plan for 48 h of fuel.</p></div>
@@ -148,15 +223,22 @@
 </section>
 
 <section id="contact" class="contact" aria-labelledby="contactH">
-  <h2 id="contactH">Talk to Ben</h2>
-  <p>Schreiber AI builds BEN Engine for small and medium businesses that want AI on their own terms. Send the configuration you built above and we will come back with a site checklist and a real quote.</p>
-  <a class="btn primary" id="mailto" href="mailto:Ben@SchreiberAI.com?subject=BEN%20Engine%20inquiry">Ben@SchreiberAI.com</a>
+  <p class="label">Next step</p>
+  <h2 id="contactH">Book a 20-minute call</h2>
+  <p class="body-copy">Schreiber AI builds it. Ben Schreiber leads your project. Send the configuration you built above and we come back with a site checklist, a fixed scope and a real quote.</p>
+  <div class="hero-actions"><a class="btn primary" id="mailto" href="mailto:Ben@SchreiberAI.com?subject=BEN%20Engine%20inquiry">Book a 20-minute call</a><span class="muted small">or write to Ben@SchreiberAI.com</span></div>
 </section>
 </main>
 
-<footer>
-  <img src="kit/wordmark-ben-engine.svg" alt="BEN Engine, Business Edge Node, Schreiber AI" width="260" height="60">
-  <p class="muted small">© Schreiber AI. Numbers on this page are produced by the configuration model and the bill of materials in the open repository; nothing is invented for marketing. Prices are indicative until quoted.</p>
+<footer class="site-foot">
+  <div class="foot-row">
+    <img src="kit/lockup-signal.svg" alt="Schreiber AI" width="208" height="32">
+    <p class="muted small">BEN Engine, by Schreiber AI. Numbers on this page come from the configuration model and the bill of materials in the open repository; nothing is invented for marketing. Prices are indicative until quoted.</p>
+  </div>
+  <div class="dataplate" role="contentinfo" aria-label="Data plate">
+    <div class="dp"><span><b>Schreiber AI</b></span><i></i><span>BEN Engine</span><i></i><span>BEN 1 – BEN 2000</span><i></i><span>Rev 2</span><span class="grow"></span><span>schreiberai.com</span></div>
+  </div>
+  <p class="legal">© 2026 Schreiber AI. Schreiber AI is a Schreiber Holding LLC company.</p>
 </footer>
 <script type="module" src="assets/site.js"></script>
 </body>

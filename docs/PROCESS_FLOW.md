@@ -205,3 +205,51 @@ Reading the chart: order to engineering release ≈ 14 weeks; permit ≈ 12 week
 | H22 | Decommission | ENG + customer | "Data destroyed, hazards removed, safe to move." |
 
 CM progress payments are tied to H7, H10b, H13 and shipment release (Q-10); Schreiber AI's own milestones with the customer are H4, H13, H19 and H3-turnover (see `MANUFACTURING_STRATEGY.md` §7).
+
+## 6. BEN 1 path — built in-house, shipped, set up in 2–3 weeks (added 2026-11-09, Rev 2)
+
+BEN 1 is the one tier Schreiber AI builds itself (`docs/MANUFACTURING_STRATEGY.md` §12). There is **no contract manufacturer, no pad, no crane, no permit and no FAT/SAT pair**: the unit is assembled and burned in on Schreiber AI's bench, shipped by freight, and set up and handed over at the customer's site. Stages 4a, 6–11, 14–18 of the main flow do not apply. Typical order to handover: **2–3 weeks**, set by parts on hand (AI boxes are the longest lead) and the customer's dedicated circuit.
+
+```mermaid
+flowchart LR
+    A[1 Inquiry] --> B[2 Selector: rack10 or cab12, risks before price]
+    B --> C[3 Remote site check: circuit, room heat, vent path, network - H3-mini]
+    C --> D[4 Order and kit pick from stock]
+    D --> E[5 Assembly on the bench - ESD]
+    E --> F[6 Burn-in shelf 24 h + E21-E24 - H-mini]
+    F --> G[7 Data plate, pack, ship]
+    G --> H[8 Setup at site and E21-E23 again]
+    H --> I[9 Handover and BEN Care enrolment]
+    I --> J[10 Operations: monthly owner checks, quarterly remote tests]
+
+    classDef hold fill:#FFC66D,stroke:#0B1018,color:#0B1018;
+    class C,F hold;
+```
+
+| # | Stage | Owner | Inputs | Outputs | Hold (H) / witness (W) | Records | Typical duration |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1–2 | Inquiry and selector | Sales + CUST | Workload (one or two AI boxes, NAS, firewall), room, budget | rack10 or cab12 configuration; heat-to-room and circuit figures; **risk list shown before price** (R41–R47) | — | Config, risk acknowledgement | 1–3 days |
+| 3 | Remote site check | ENG (video call + photos) + CUST | `SITE_REQUIREMENTS.md` §15: receptacle and breaker photos, room size and cooling, vent path, network drop, shelf or floor | Signed one-page site check | **H3-mini**: customer signs the site check; a closed closet without heat removal is refused until fixed (R41) | Site check, photos | 1–2 days (customer's electrician may need a week for a new circuit) |
+| 4 | Order and kit pick | Schreiber AI purchasing | Config | Parts picked from stock with serials; AI box ordered if not stocked | — | Pick list, serials | 1–5 days (AI box lead time governs) |
+| 5 | Assembly | Schreiber AI assembly technician | Pick list, BEN 1 assembly sheet (STE) | Assembled unit: rack or cabinet, UPS, PDU, firewall, NAS, AI box(es), BEN Pod, cable management, BEN Controls Mini software imaged | — | Build record with listing-mark photos (`COMPLIANCE.md` §18) | 0.5 day |
+| 6 | Burn-in and acceptance | Schreiber AI test | Assembled unit | 24 h at full load on the burn-in shelf; **E21 noise, E22 heat and input current, E23 UPS runtime, E24 filter-clog alarm**; backups configured to a test target; firmware at the supported versions | **H-mini**: test record signed by the technician and a second person | Signed test record with data hash (same format as the commissioning report) | 1–2 days |
+| 7 | Data plate, pack, ship | Schreiber AI | Passed unit | Rev 2 data plate band (`Schreiber AI · BEN Engine · BEN 1 · S/N … · Rated … W IT · 120 V 1φ · Rev 2`, QR to the unit page); packed on a pallet (cab12) or in a carton (rack10); UPS battery shipped per 49 CFR 173.185 | — | Packing list, carrier record | 1–3 days in transit |
+| 8 | Setup at site | Schreiber AI field tech (or a trained partner) | Delivered unit, signed site check | Unit placed, anti-tip bracket or shelf strap fitted, plugged to the dedicated circuit, network up, customer data migration started; E21–E23 repeated in the final place | W: customer present | Setup checklist, E21–E23 results | 0.5 day |
+| 9 | Handover | Field tech + CUST | Set-up unit | One-page owner card, maintenance schedule (`MAINTENANCE.md` §10), backup target agreed, recovery key handed over, BEN Care enrolled; 30 minutes of owner training | Customer signs the acceptance certificate | Acceptance certificate | 1 hour |
+| 10 | Operations | R (BEN Care) + owner | — | Weekly report; monthly owner checks; quarterly UPS self-test, restore test and updates | — | BEN Care records | Life of unit |
+
+## 7. BEN 300 and BEN 1000 path — dense liquid-first modules (added 2026-11-09, Rev 2)
+
+BEN 300 follows the main flow (§1–§4) **as BEN 150** and BEN 1000 **as BEN 500**, at a qualified contract manufacturer, with these differences:
+
+| # | Stage | What is different | Hold / witness | Typical duration |
+| --- | --- | --- | --- | --- |
+| 3 | Site survey | Heat-rejection skid yard and its noise; utility capacity for a 600–800 A (BEN 300) or about 1,600–2,000 A (BEN 1000) service, often a customer transformer; heat-reuse offtaker if any | **H3** | 2–4 weeks |
+| 4 | Engineering release | Rev 2.A drawings with the liquid loop (manifolds, UQD v2 connectors, row isolation valves), N+1 CDUs, arc-flash study at the higher frames, NFPA 855 package and, on BEN 1000, the external battery enclosure where spacing requires it; PE floor check for the selected racks (R51) | **H4** | 3–4 weeks |
+| 5 | Procurement | Longest items: 1,600–2,000 A switchboard 20–40 weeks, row CDUs 12–24 weeks, large UPS frames 16–30 weeks, dry coolers / skid 16–24 weeks (R52); ordered at engineering release | — | Sets the schedule |
+| 9–11 | Fit-out | Liquid loop installed and **pressure-tested at 1.5 × design** before any IT power is connected; flushed and filled with coolant to OCP v1.3 / PG25; coolant sample at fill | **H11** pressure test and coolant sample | +1–2 weeks vs BEN 150 / 500 |
+| 13 | FAT | Liquid load banks on every rack position; **E18 (per CDU and one CDU off), E19 on every rack, E20 at 40 / 70 / 100 %, E25 single-rack isolation**; E17 only with `dc800` | **H13** | 1–2 weeks |
+| 14 | Transport prep | Racks shipped separately and set in at site where the gross mass would exceed the frame rating (R51); loop drained to transport level or kept filled per the CDU vendor | — | — |
+| 19 | SAT | E18–E20 repeated with the site heat rejection; the BEN 300 lighthouse adds a 30-day burn-in at ≥ 80 % load (`docs/programs/REV2_REVAMP_PROGRAM.md`) | **H19** | 1–2 weeks (+30 days burn-in on the lighthouse) |
+
+Typical order to in service at a qualified CM: **BEN 300 ≈ 28–32 weeks**, **BEN 1000 ≈ 36–44 weeks**, both set by the switchboard and CDU lead times, not by the shop.

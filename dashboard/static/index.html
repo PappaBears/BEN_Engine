@@ -4,18 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0B1018">
-<title>BEN Engine</title>
-<link rel="icon" href="logo-sai.svg" type="image/svg+xml">
+<meta name="theme-color" content="#06101F">
+<title>BEN Engine, by Schreiber AI</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app" class="app">
   <header class="topbar">
-    <a class="brand" href="./" title="Schreiber AI">
-      <img src="logo-sai.svg" alt="Schreiber AI" width="34" height="34">
-      <span class="wordmark"><b>BEN</b> Engine</span>
-      <span class="brand-sub" id="brand-sub">Business Edge Node · Schreiber AI</span>
+    <a class="brand" href="./" title="BEN Engine, by Schreiber AI">
+      <img class="lockup" src="lockup-signal.svg" alt="Schreiber AI" width="144" height="22">
+      <img class="mark-sm" src="favicon.svg" alt="Schreiber AI" width="28" height="28">
+      <span class="brand-rule" aria-hidden="true"></span>
+      <span class="wordmark">BEN Engine</span>
+      <span class="brand-sub" id="brand-sub">by Schreiber AI · Rev 2</span>
     </a>
     <div class="topbar-right">
       <span class="pill" id="pill-tier">—</span>
@@ -50,10 +54,9 @@
     <div class="caption" id="tour-caption" hidden></div>
     <div class="walk-hint" id="walk-hint" hidden>Click the scene to look around · W A S D move · Shift run · Esc exit</div>
     <div class="scene-legend" id="scene-legend">
-      <span><i style="background:#66E3FF"></i>cold aisle</span>
-      <span><i style="background:#FFC66D"></i>hot aisle</span>
-      <span><i style="background:#6EE7A8"></i>power flow</span>
-      <span><i style="background:#FF707D"></i>alarm</span>
+      <span>cold aisle<i class="thermal"></i>hot aisle</span>
+      <span><i style="background:#2BB673"></i>power flow</span>
+      <span><i style="background:#FF6369"></i>alarm</span>
     </div>
   </main>
 
@@ -71,6 +74,8 @@
     <span class="status-item mono" id="st-simt" title="Simulated time">t 00:00:00</span>
     <span class="status-item mono" id="st-step" title="Age of the latest twin step">step —</span>
     <span class="status-item mono right" id="st-clock">—</span>
+    <span class="status-sep" aria-hidden="true"></span>
+    <span class="dp-plate" id="dp-plate" aria-label="Data plate"><b>Schreiber AI</b><i></i><span>BEN Engine</span><i></i><span id="dp-tier">—</span><i class="dp-opt"></i><span class="dp-opt" id="dp-rated">—</span><i></i><span>Rev 2</span></span>
   </footer>
 
   <dialog id="help" class="help">

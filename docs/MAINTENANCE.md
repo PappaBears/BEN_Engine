@@ -194,3 +194,37 @@ All forms exist as PDF in the turnover package and as dashboard checklists (comp
 4. Hearing protection inside the hot aisle above 85 dBA (signed). Arc-rated PPE per label when any panel cover is removed.
 5. Nobody works alone on energised equipment. Lone entry for inspection is allowed with a check-in call before and after.
 6. Leave with no tools, no storage in the vestibule, door latched, entry logged.
+
+## 10. BEN 1 mini rack — a schedule a tiny business can do (added 2026-11-09, Rev 2)
+
+BEN 1 is indoors and has no envelope, refrigerant, generator or fire system, so sections 1–9 do not apply except the security checks in section 1. The owner or an office manager does the **L** tasks below in minutes, with no tools beyond a screwdriver; BEN Care (**R**) does the rest remotely and tells the owner by email when something needs a hand. Under a BEN Care plan Schreiber AI can do every task instead.
+
+| Interval | Task | Who | Pass | If not |
+| --- | --- | --- | --- | --- |
+| Weekly (automatic) | BEN Care report: intake temperature trend, fan speed, UPS status and battery health, backup job result, firmware and patch status, unknown devices on the network | R | Green report email | Follow the one action named in the email |
+| **Monthly** | **Filter look**: open the cabinet door (cab12) or look at the intake (rack10); if the filter is grey, rinse or replace it (spare in the kit). Check that nothing is stacked against the vents and the room vent or grille is open | L (5 min) | Filter light in colour; vents clear | Replace the filter; BEN Pod intake alarm (filter-clog, E24) is the backstop |
+| Monthly | Look at the cords: UPS plugged straight into its dedicated wall receptacle, no extra power strips, nothing new added (R42, R45) | L (2 min) | As shipped | Remove the addition; call us for a change order |
+| **Quarterly** | **UPS self-test**: press the test button (or BEN Care triggers it); the UPS switches to battery for about 10 s and back | L or R | Self-test passed; runtime estimate ≥ 80 % of the handover value (E23) | Battery replacement shipped (R47) |
+| **Quarterly** | **Backup restore test**: restore one folder and one model file from the backup to a scratch location and open them | L or R (15 min) | Files open | Fix the backup job before anything else (R46) |
+| Quarterly | **Firmware and software updates**: approve the update window BEN Care proposes for the firewall, NAS, AI box OS and BEN Controls Mini; updates are signed and staged, never forced during work hours | L approves, R runs | All parts on the supported version | Update at the next window; critical security updates within 7 days |
+| Annual | Dust out the cabinet with the unit shut down (compressed air outdoors or a vacuum with a brush), check fan noise against the handover figure (E21), re-seat the cable strain relief, check the anti-tip bracket | L or Schreiber AI visit | Noise within 3 dB of handover | Fan replacement (spare in the kit) |
+| 3–5 years | **UPS battery replacement** when the battery-health alarm or the quarterly runtime says so; old pack returned for recycling with the prepaid label | L (10 min) or visit | New pack passes the self-test | — |
+| 3–5 years | IT refresh review: AI box and NAS against the workload; drives wiped (NIST SP 800-88) on return | Schreiber AI + owner | Plan agreed | — |
+
+Spare kit shipped with every BEN 1: two intake filters, one fan (cab12), a printed one-page "what the lights mean" card and the battery return label.
+
+## 11. Dense liquid-first tiers BEN 300 and BEN 1000 (added 2026-11-09, Rev 2)
+
+BEN 300 and BEN 1000 follow sections 1–9 (as BEN 150 and BEN 500) and the liquid-loop rows of section 4b, which **apply to every unit** because liquid is the default on these tiers (no longer "study"). The rows below are added or tightened for the higher loop flows (about 177 LPM per GB300-class rack at a 45 °C supply, `docs/research/STATE_OF_THE_ART_2026.md` §2.3) and the larger number of CDUs and pumps.
+
+| Interval | Subsystem | Task | Who | Record |
+| --- | --- | --- | --- | --- |
+| Weekly (R) | Liquid loop | Per-rack flow at the rack valves vs commissioning (±10 %), loop ΔT vs IT load (E20 reconciliation within 5 %), CDU pump run hours balanced, side-stream filter ΔP trend, make-up volume (any make-up on a closed loop is a leak until proven otherwise) | R | Weekly report |
+| Monthly (L) | CDU pumps | **Pump rotation**: change the duty pump on each CDU so run hours stay within 10 %; **CDU failover proof** on one CDU by rotation (E18 reduced); listen and check for seal weep | L | M1 dense supplement |
+| Monthly (L) | Filters | Strainer and side-stream filter ΔP; change the side-stream filter element at 1.5 × clean ΔP or every 3 months, whichever is first | L | M1 dense supplement |
+| **Quarterly** | Coolant | **Coolant sampling**: pH, conductivity, inhibitor level, glycol % (PG25), biocide residual, bacteria count, iron and copper (corrosion indicators) per OCP water-based coolant v1.3 / PG25 limits; result trended against commissioning (R50) | L + water treatment S | Water log |
+| Quarterly | Leak isolation | E19 leak-to-isolation on one rack by rotation (every rack within a year on BEN 300; within 18 months on BEN 1000) | L | E19 record |
+| Semi-annual | CDU | CDU strainer clean; pump coupling and bearing check; VFD fan and filter; dead-head protection test with one row closed | S | Report |
+| Annual | Loop and heat rejection | Plate HX ΔP and approach on every CDU and the heat-reuse HX; flush or chemical clean at ΔP > 1.3 × commissioning; dry-cooler or skid coil clean; BTU-meter calibration; UQD connector inspection and seal replacement per vendor cycles | S | Report |
+| Annual | Power (≥ 1,200 A frames) | Ground-fault protection performance test on the main (NEC 230.95(C)); arc-energy reduction switch function test; IR scan of the main and busway at ≥ 40 % load; labels checked against the arc-flash study | S (NETA) | Report |
+| 3-year | CDU | Pump seal and bearing replacement per vendor hours; isolation-valve actuator test; coolant change if the quarterly trend calls for it | S | Report |

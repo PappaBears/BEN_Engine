@@ -1,19 +1,43 @@
 {
   "title": "BEN Engine — Product and engineering briefing",
-  "subtitle": "Schreiber AI · what was built, how it is verified, how to run it",
+  "subtitle": "Schreiber AI · BEN Engine Rev 2 · what was built, how it is verified, how to run it",
   "slides": [
     {
       "title": "BEN Engine, Business Edge Node",
-      "message": "All-in-one modular data centers named by IT power: power, cooling, compute and controls in one sealed enclosure, from an outdoor cabinet to a 40 ft liquid-cooled module, with Schreiber AI's controls, twin and commissioning layer. The same system scales to a 2 MW center.",
+      "message": "All-in-one modular data centers named by IT power, from a mini rack on a shelf to a 1 MW liquid-first 40 ft module, with Schreiber AI's controls, twin and commissioning layer. The same system scales to a 2 MW center.",
       "bullets": [
-        "Core, the all-in-one box: BEN 5 2–5 kW cabinet · BEN 30 10–30 kW (10 ft) · BEN 150 50–150 kW (20 ft) · BEN 500 150–500 kW (40 ft); capability example: BEN 2000 800–2,000 kW hall",
-        "Every enclosure NEMA 4X / IP66, hose-tested; hardening H1 / H2 / H3 selectable",
+        "Rev 2 lineup: BEN 1 mini rack 0.6–1.5 kW · BEN 5 2–5 kW · BEN 30 (10 ft) · BEN 150 (20 ft) · BEN 300 liquid 20 ft · BEN 500 · BEN 1000 liquid 40 ft; BEN 2000 2 MW hall",
+        "Outdoor units NEMA 4X / IP66, hose-tested, hardening H1 / H2 / H3; BEN 1 is indoor, 120 V plug-in, office air",
         "Modules: Power, Cooling, Compute, Controls; buy one or all",
         "Mission profiles set class, redundancy, climate, compliance and the risk list"
       ],
       "image": "../media/screens/desktop-exterior-iso.png",
       "image_alt": "BEN 500 isometric",
-      "notes": "Audience: engineers, integrators, facilities leads. Names changed on 2026-11-08: the number is now the IT kW, not the container length (docs/TIER_AND_ENCLOSURE_DECISION.md); old keys still load. Set expectations: every number on these slides comes from code in the repository and the evidence file is docs/VALIDATION.md."
+      "notes": "Audience: engineers, integrators, facilities leads. Names changed on 2026-11-08: the number is now the IT kW, not the container length (docs/TIER_AND_ENCLOSURE_DECISION.md); old keys still load. Set expectations: every number on these slides comes from code in the repository and the evidence file is docs/VALIDATION.md. Rev 2 (2026-11-09) adds BEN 1, BEN 300 and BEN 1000; Rev 1 configurations load as rev1 and reproduce (docs/rev2/RELEASE_NOTES.md)."
+    },
+    {
+      "title": "Density",
+      "message": "As dense as a sealed, relocatable box allows, with every figure generated from the configuration and checked against real footprints, not taken from a brochure.",
+      "bullets": [
+        "BEN 300: {{BEN300_KW_PER_RACK}} kW per rack, {{BEN300_KW_PER_M2}} kW per m² of module footprint, {{BEN300_RACKS}} racks in one 20 ft frame",
+        "BEN 1000: {{BEN1000_KW_PER_RACK}} kW per rack, {{BEN1000_KW_PER_M2}} kW per m²; power, UPS, CDUs and controls in one 40 ft box",
+        "Sourced peers: Delta 20 ft AI container up to 60 kW per rack (AC), ZTE prefab 40 kW per rack, HPE AI Mod POD up to 1.5 MW (AC)",
+        "Liquid-first at W45: dry coolers only, no chiller; loops sized for about 177 LPM per GB300-class rack at 45 °C (vendor table)",
+        "Design values until the BEN 300 lighthouse measures them; 800 VDC stays a gated study, not a claim"
+      ],
+      "notes": "Fill the placeholders from docs/DENSITY.md before presenting; never present a slide with braces on it. Peer figures come from docs/research/STATE_OF_THE_ART_2026.md section 3 and are vendor statements, so say 'as published'. The honest positioning: every DC-ready offer is MW-class and every sub-MW container is AC; none publishes leak-to-isolation or redundancy-proof numbers. For engineers: kW per m² is IT kW over the module's outside footprint; the interference checks (single row, 900 mm egress, NEC 110.26 at 480 V) must pass first. Our density is a design value until the lighthouse."
+    },
+    {
+      "title": "Mini racks: AI for tiny businesses",
+      "message": "A tiny business can run private AI on a shelf: one or two AI boxes, a NAS and a firewall, plugged into the wall, set up and watched by Schreiber AI.",
+      "bullets": [
+        "rack10: 10-inch 8U desk or shelf rack up to 0.6 kW; cab12: 19-inch 12U sound-damped office cabinet up to 1.5 kW",
+        "120 V plug-in on a dedicated 15 A or 20 A circuit; no pad, no permit, no crane; about 2–3 weeks from order to handover",
+        "Built and burned in by Schreiber AI, the one in-house build; noise, heat to room and UPS runtime measured before it ships",
+        "Risks in plain words before the price: heat in the closet, circuit overload, noise, theft, untested backups, UPS battery age",
+        "Market size: our sources hold no statistic for on-premises tiny-business AI; the 10-unit lighthouse is the first evidence"
+      ],
+      "notes": "The buyer is the owner of a studio, a trades business or a small office who wants AI on their own data without hiring IT. What they get is the same discipline as the big units: a site check, a burn-in, measured noise and heat, a handover, BEN Care watching it and a four-line owner maintenance list. Do not quote a market number for this segment; MARKET_SOURCES.md says none was found. Prices come from docs/rev2/UNIT_ECONOMICS.md. Engineering detail: COMPLIANCE.md section 18 (UL 62368-1 parts, NEC 210.23 80 % rule), SITE_REQUIREMENTS.md section 15, TEST_GUIDE.md E21–E24."
     },
     {
       "title": "A concrete scenario",
@@ -114,10 +138,11 @@
     },
     {
       "title": "Commissioning: the same script in the factory and on site",
-      "message": "Ten steps, pass/fail per step, CSV with SHA-256, signature block; the customer can run it.",
+      "message": "Twelve steps, pass/fail per step, CSV with SHA-256, signature block; the customer can run it.",
       "bullets": [
         "Sensor sanity, I/O point-to-point, meter vs PDU reconciliation, sequential cooling start and failover, load step, ride-through, alarm verification, export",
-        "BEN 150 simulation: all 10 pass; ride-through 2.1 min to ASHRAE A2 max, UPS empty at 11.8 min"
+        "BEN 150 simulation: 12/12 (steps 10–11 are forward-architecture steps, skipped with the reason on AC units); ride-through 2.1 min to ASHRAE A2 max",
+        "Dense tiers add mandatory E18–E20 and E25 single-rack isolation; BEN 1 runs E21–E24 on the burn-in shelf and again at handover"
       ],
       "notes": "Run it live: PYTHONPATH=software python -m ben_engine.commissioning --sim --tier ben150 --yes --out /tmp/r.md. Show the report."
     },
@@ -139,7 +164,8 @@
       "bullets": [
         "Python suite and firmware host tests pass; Playwright e2e exercises the dashboard",
         "Unverified: EFR32 Pod build, edge computer image, PLC project, any physical behaviour",
-        "Least accurate: ride-through minutes, envelope UA, CFD absolutes, estimate-status prices"
+        "Least accurate: ride-through minutes, envelope UA, CFD absolutes, estimate-status prices",
+        "Rev 2 tiers (BEN 1, BEN 300, BEN 1000) are design values; their numbers are measured by the lighthouse units in the revamp program"
       ],
       "notes": "Read docs/VALIDATION.md before presenting; update numbers to the latest run."
     },
@@ -152,7 +178,7 @@
         "bash scripts/run_dashboard.sh → http://localhost:8080",
         "PYTHONPATH=software python -m ben_engine.proposal --tier ben150 --profile healthcare --out /tmp/p.md"
       ],
-      "notes": "Next decision for an integrator: which tier to pilot and which site. Next decision for Schreiber AI: lighthouse funding."
+      "notes": "Next decision for an integrator: which tier to pilot and which site. Next decision for Schreiber AI: release gate G0 of the USD 5 M revamp (docs/programs/REV2_REVAMP_PROGRAM.md) and pick the BEN 1 pilot customers."
     }
   ]
 }

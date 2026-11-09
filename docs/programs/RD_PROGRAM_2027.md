@@ -1,5 +1,7 @@
 # Schreiber AI R&D Program 2027–2028 — refresh the BEN Engine lineup
 
+> **Superseded for budgeting by [REV2_REVAMP_PROGRAM.md](REV2_REVAMP_PROGRAM.md) (2026-11-09); kept for history and as workstream detail.** Nothing below is deleted (`docs/REVISION_POLICY.md` rule 4). The Rev 1 copy is in `archive/rev1/docs/programs/`.
+
 **Sponsor:** Ben Schreiber · **Budget envelope:** USD 5,000,000 core case, USD 10,000,000 full case · **Duration:** 24 months · **Governance:** quarterly gates release money; every claim measured or sourced (`docs/VALIDATION.md` standard).
 
 This is the umbrella plan. The 800 VDC and liquid-cooling workstream has its own detailed plan (`FORWARD_800V_LIQUID_PROGRAM.md`) and is funded from this envelope; its earlier stand-alone USD 5 M figure is superseded by the allocations below.

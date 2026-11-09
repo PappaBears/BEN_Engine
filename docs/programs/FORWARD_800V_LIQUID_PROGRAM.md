@@ -1,5 +1,7 @@
 # Forward Architecture Program — 800 VDC power and high-density liquid cooling
 
+> **Superseded for budgeting by [REV2_REVAMP_PROGRAM.md](REV2_REVAMP_PROGRAM.md) (2026-11-09); kept for history and as workstream detail.** Nothing below is deleted (`docs/REVISION_POLICY.md` rule 4). The Rev 1 copy is in `archive/rev1/docs/programs/`.
+
 **Sponsor:** Ben Schreiber, Schreiber AI · **Budget:** funded from the umbrella R&D program (`RD_PROGRAM_2027.md`: USD 2.2 M core case, USD 3.6 M full case; the detailed table below is the full-scope costing that the umbrella trims at gates) · **Duration:** 18 months from funding · **Decision basis:** `docs/FORWARD_ARCHITECTURE_DECISION.md` · **Evidence basis:** `docs/research/STATE_OF_THE_ART_2026.md`
 
 ## 1. Objective

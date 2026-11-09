@@ -1,0 +1,441 @@
+{
+ "generated_by": "brand/v2/livery/gen_livery.py",
+ "revision": "Rev 2",
+ "tiers_from_config": [
+  "ben150",
+  "ben2000",
+  "ben30",
+  "ben5",
+  "ben500"
+ ],
+ "files": [
+  {
+   "file": "brand/v2/livery/ben1-bezel-10in.svg",
+   "tier": "ben1",
+   "label": "BEN 1",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1-2646-0001?src=plate",
+   "view": "bezel-10in"
+  },
+  {
+   "file": "brand/v2/livery/ben1-door-12u.svg",
+   "tier": "ben1",
+   "label": "BEN 1",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1-2646-0001?src=plate",
+   "view": "door-12u"
+  },
+  {
+   "file": "brand/v2/livery/ben1-band.svg",
+   "tier": "ben1",
+   "label": "BEN 1",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1-2646-0001?src=plate",
+   "view": "band"
+  },
+  {
+   "file": "brand/v2/livery/ben1-qr.svg",
+   "tier": "ben1",
+   "label": "BEN 1",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1-2646-0001?src=plate",
+   "view": "qr",
+   "code_mm": 20.32,
+   "total_mm": 25.25
+  },
+  {
+   "file": "brand/v2/livery/ben1-nameplate.svg",
+   "tier": "ben1",
+   "label": "BEN 1",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1-2646-0001?src=plate",
+   "view": "nameplate"
+  },
+  {
+   "file": "brand/v2/livery/ben5-side.svg",
+   "tier": "ben5",
+   "label": "BEN 5",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN5-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN5-2646-0001?src=plate",
+   "view": "side"
+  },
+  {
+   "file": "brand/v2/livery/ben5-door.svg",
+   "tier": "ben5",
+   "label": "BEN 5",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN5-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN5-2646-0001?src=plate",
+   "view": "door"
+  },
+  {
+   "file": "brand/v2/livery/ben5-band.svg",
+   "tier": "ben5",
+   "label": "BEN 5",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN5-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN5-2646-0001?src=plate",
+   "view": "band"
+  },
+  {
+   "file": "brand/v2/livery/ben5-qr.svg",
+   "tier": "ben5",
+   "label": "BEN 5",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN5-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN5-2646-0001?src=plate",
+   "view": "qr",
+   "code_mm": 64.0,
+   "total_mm": 79.52
+  },
+  {
+   "file": "brand/v2/livery/ben5-nameplate.svg",
+   "tier": "ben5",
+   "label": "BEN 5",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN5-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN5-2646-0001?src=plate",
+   "view": "nameplate"
+  },
+  {
+   "file": "brand/v2/livery/ben30-side.svg",
+   "tier": "ben30",
+   "label": "BEN 30",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN30-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN30-2646-0001?src=plate",
+   "view": "side"
+  },
+  {
+   "file": "brand/v2/livery/ben30-door.svg",
+   "tier": "ben30",
+   "label": "BEN 30",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN30-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN30-2646-0001?src=plate",
+   "view": "door"
+  },
+  {
+   "file": "brand/v2/livery/ben30-band.svg",
+   "tier": "ben30",
+   "label": "BEN 30",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN30-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN30-2646-0001?src=plate",
+   "view": "band"
+  },
+  {
+   "file": "brand/v2/livery/ben30-qr.svg",
+   "tier": "ben30",
+   "label": "BEN 30",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN30-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN30-2646-0001?src=plate",
+   "view": "qr",
+   "code_mm": 100.0,
+   "total_mm": 124.24
+  },
+  {
+   "file": "brand/v2/livery/ben30-nameplate.svg",
+   "tier": "ben30",
+   "label": "BEN 30",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN30-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN30-2646-0001?src=plate",
+   "view": "nameplate"
+  },
+  {
+   "file": "brand/v2/livery/ben150-side.svg",
+   "tier": "ben150",
+   "label": "BEN 150",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN150-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN150-2646-0001?src=plate",
+   "view": "side"
+  },
+  {
+   "file": "brand/v2/livery/ben150-door.svg",
+   "tier": "ben150",
+   "label": "BEN 150",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN150-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN150-2646-0001?src=plate",
+   "view": "door"
+  },
+  {
+   "file": "brand/v2/livery/ben150-band.svg",
+   "tier": "ben150",
+   "label": "BEN 150",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN150-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN150-2646-0001?src=plate",
+   "view": "band"
+  },
+  {
+   "file": "brand/v2/livery/ben150-qr.svg",
+   "tier": "ben150",
+   "label": "BEN 150",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN150-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN150-2646-0001?src=plate",
+   "view": "qr",
+   "code_mm": 100.0,
+   "total_mm": 124.24
+  },
+  {
+   "file": "brand/v2/livery/ben150-nameplate.svg",
+   "tier": "ben150",
+   "label": "BEN 150",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN150-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN150-2646-0001?src=plate",
+   "view": "nameplate"
+  },
+  {
+   "file": "brand/v2/livery/ben300-side.svg",
+   "tier": "ben300",
+   "label": "BEN 300",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN300-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN300-2646-0001?src=plate",
+   "view": "side"
+  },
+  {
+   "file": "brand/v2/livery/ben300-door.svg",
+   "tier": "ben300",
+   "label": "BEN 300",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN300-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN300-2646-0001?src=plate",
+   "view": "door"
+  },
+  {
+   "file": "brand/v2/livery/ben300-band.svg",
+   "tier": "ben300",
+   "label": "BEN 300",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN300-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN300-2646-0001?src=plate",
+   "view": "band"
+  },
+  {
+   "file": "brand/v2/livery/ben300-qr.svg",
+   "tier": "ben300",
+   "label": "BEN 300",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN300-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN300-2646-0001?src=plate",
+   "view": "qr",
+   "code_mm": 100.0,
+   "total_mm": 124.24
+  },
+  {
+   "file": "brand/v2/livery/ben300-nameplate.svg",
+   "tier": "ben300",
+   "label": "BEN 300",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN300-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN300-2646-0001?src=plate",
+   "view": "nameplate"
+  },
+  {
+   "file": "brand/v2/livery/ben500-side.svg",
+   "tier": "ben500",
+   "label": "BEN 500",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN500-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN500-2646-0001?src=plate",
+   "view": "side"
+  },
+  {
+   "file": "brand/v2/livery/ben500-door.svg",
+   "tier": "ben500",
+   "label": "BEN 500",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN500-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN500-2646-0001?src=plate",
+   "view": "door"
+  },
+  {
+   "file": "brand/v2/livery/ben500-band.svg",
+   "tier": "ben500",
+   "label": "BEN 500",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN500-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN500-2646-0001?src=plate",
+   "view": "band"
+  },
+  {
+   "file": "brand/v2/livery/ben500-qr.svg",
+   "tier": "ben500",
+   "label": "BEN 500",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN500-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN500-2646-0001?src=plate",
+   "view": "qr",
+   "code_mm": 100.0,
+   "total_mm": 124.24
+  },
+  {
+   "file": "brand/v2/livery/ben500-nameplate.svg",
+   "tier": "ben500",
+   "label": "BEN 500",
+   "data_source": "config.py",
+   "fallback_fields": [],
+   "serial_sample": "BEN500-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN500-2646-0001?src=plate",
+   "view": "nameplate"
+  },
+  {
+   "file": "brand/v2/livery/ben1000-side.svg",
+   "tier": "ben1000",
+   "label": "BEN 1000",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1000-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1000-2646-0001?src=plate",
+   "view": "side"
+  },
+  {
+   "file": "brand/v2/livery/ben1000-door.svg",
+   "tier": "ben1000",
+   "label": "BEN 1000",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1000-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1000-2646-0001?src=plate",
+   "view": "door"
+  },
+  {
+   "file": "brand/v2/livery/ben1000-band.svg",
+   "tier": "ben1000",
+   "label": "BEN 1000",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1000-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1000-2646-0001?src=plate",
+   "view": "band"
+  },
+  {
+   "file": "brand/v2/livery/ben1000-qr.svg",
+   "tier": "ben1000",
+   "label": "BEN 1000",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1000-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1000-2646-0001?src=plate",
+   "view": "qr",
+   "code_mm": 100.0,
+   "total_mm": 124.24
+  },
+  {
+   "file": "brand/v2/livery/ben1000-nameplate.svg",
+   "tier": "ben1000",
+   "label": "BEN 1000",
+   "data_source": "REV2_DECISION.md \u00a72 (fallback)",
+   "fallback_fields": [
+    "it_kw_max",
+    "label",
+    "voltage"
+   ],
+   "serial_sample": "BEN1000-2646-0001",
+   "qr_url": "https://schreiberai.com/ben/BEN1000-2646-0001?src=plate",
+   "view": "nameplate"
+  },
+  {
+   "file": "brand/v2/livery/nameplate-template.svg",
+   "view": "nameplate-template"
+  }
+ ]
+}

@@ -276,7 +276,18 @@ setInterval(tickStatus, 500);
 store.on('config', (payload) => {
   document.getElementById('pill-tier').textContent = payload.derived.tier_label;
   document.getElementById('pill-site').textContent = payload.config.site_name;
-  document.getElementById('brand-sub').textContent = payload.config.white_label ? `Business Edge Node · ${payload.config.brand}` : 'Business Edge Node · Schreiber AI';
+  document.getElementById('brand-sub').textContent = payload.config.white_label ? `Business Edge Node · ${payload.config.brand}` : 'by Schreiber AI · Rev 2';
+  // data plate band in the status strip (brand v2 signature device)
+  const dpTier = document.getElementById('dp-tier'), dpRated = document.getElementById('dp-rated');
+  if (dpTier) dpTier.textContent = payload.derived.tier_label;
+  const g = payload.derived.geometry || {};
+  if (dpRated) {
+    // units keep their case inside the all-caps band (kW, φ)
+    const u = (t) => h('span', { class: 'u' }, t);
+    const v = String(payload.derived.voltage || g.voltage || '').match(/^(.*?)(\d)ph$/);
+    dpRated.replaceChildren(`Rated ${(g.it_kw_max ?? payload.config.it_kw).toLocaleString('en-US')} `, u('kW'), ' IT · ',
+      ...(v ? [v[1] + v[2], u('φ')] : [String(payload.derived.voltage || g.voltage || '')]));
+  }
   scene.rebuild(payload);
   for (const p of PANELS) if (mounted.has(p.id) && p.onConfig) p.onConfig(payload);
   renderInspector();

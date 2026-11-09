@@ -87,6 +87,15 @@ list that must be disclosed on the product page before purchase.
 | 22 | Deal package assembler | `software/ben_engine/package.py` | One command assembles the customer deal package and the partner onboarding package for a configuration |
 | 23 | BEN 2000 single 2 MW center | `config.py` (`ben2000`), `docs/COMPLIANCE.md` §14, `PROCESS_FLOW.md`, `SITE_REQUIREMENTS.md`, `MAINTENANCE.md`, `BUILD_AND_WIRING.md` | Sizing (MV service, transformers, UPS strings, generators, CDUs per module) generated from the config; building-permit, MV-service, NFPA 855 battery-room, NFPA 110 Level 1, SPCC and ASHRAE 188 rows in the compliance pack; ~52-week order-to-service plan with the utility lead time on the critical path |
 | 24 | Enclosure hardening H1/H2/H3 | `config.py` (`hardening`), `COMPLIANCE.md` §15, `TEST_GUIDE.md` E14, contracts | Every unit IP66 and hose-tested; H2/H3 packages priced from catalog lines, their tests (UL 752, ASTM F3038, IEEE 299 shielding) in the compliance pack, maintenance add-ons and warranty terms tied to the hose test |
+| 27 | Rev 2 decision, revision policy, Rev 1 frozen | `docs/REV2_DECISION.md`, `docs/REVISION_POLICY.md`, `releases/REV1.md`, `archive/rev1/` | Rev 1 is retrievable byte for byte (branch `release/rev1`, record with hashes); nothing deleted; every Rev 1 customer-facing document that Rev 2 rewrites is copied to `archive/rev1/` first; superseded plans carry a "Superseded" header |
+| 28 | Brand package v2 applied (data plate band, Night Navy / Signal Blue / one amber button, Archivo + IBM Plex) | `brand/v2/`, `web/`, `dashboard/`, `docs/contracts/` | Every customer-facing surface shows "BEN Engine, by Schreiber AI" with the v2 masters; amber only on the primary button; data plate band on drawings, proposals, slides, dashboard footer and the hardware |
+| 29 | BEN 1 mini rack for tiny businesses (rack10 10-inch 8U ≤ 0.6 kW; cab12 19-inch 12U sound-damped ≤ 1.5 kW; 120 V plug-in, office air) | `software/ben_engine/config.py`, `docs/COMPLIANCE.md`, `docs/SITE_REQUIREMENTS.md`, `docs/MAINTENANCE.md`, `docs/TEST_GUIDE.md`, `docs/PROCESS_FLOW.md`, `docs/MANUFACTURING_STRATEGY.md` | Selectable in the configuration with BEN Controls Mini; compliance §18, site requirements §15, owner maintenance §10, acceptance experiments E21–E24, in-house build path (process §6, manufacturing §12); risks R41–R47 disclosed before price |
+| 30 | Dense liquid-first tiers BEN 300 (20 ft, 150–300 kW) and BEN 1000 (40 ft, 500–1,000 kW), `dlc_hd` default | `software/ben_engine/config.py`, `docs/DENSITY.md`, `docs/rev2/` | Pass the interference checks (single row, 900 mm egress, NEC 110.26 at 480 V) with real footprints or are renamed to the power that fits; compliance §19, risks R48–R52, E25 and mandatory E18–E20 |
+| 31 | Density metrics per tier (kW per rack, kW per m², kW per m³, kW per tonne) against the sourced competitor table | `docs/DENSITY.md` | Generated from the configuration; competitors only from `docs/research/STATE_OF_THE_ART_2026.md` §3 with sources |
+| 32 | Rev 2 unit economics | `docs/rev2/UNIT_ECONOMICS.md` | Regenerated from the Rev 2 BOMs; Rev 1 table unchanged in `archive/rev1/docs/investors/VC_PROPOSITION.md` |
+| 33 | USD 5 M revamp program (operator's budget), 18 months, quarterly gates | `docs/programs/REV2_REVAMP_PROGRAM.md` | Table of line, USD, basis, releasing gate and measured deliverable totalling USD 5,000,000; supersedes `RD_PROGRAM_2027.md` for budgeting (kept) |
+| 34 | Rev 2 release notes | `docs/rev2/RELEASE_NOTES.md` | What changed, what did not, compatibility (Rev 1 configurations load as `rev1` and reproduce), where each Rev 2 artifact lives, known limits |
+| 35 | Investor proposition and decks, Rev 2 | `docs/investors/`, `docs/presentation/`, `archive/rev1/docs/investors/` | Lineup BEN 1 to BEN 1000 (BEN 2000 capability), density and mini-rack slides, use of funds = the USD 5 M revamp table; Rev 1 copies archived |
 
 ## 6. Constraints the operator set
 
@@ -117,3 +126,11 @@ list that must be disclosed on the product page before purchase.
 ## 8. Original request (verbatim, preserved)
 
 > Design a complete modular data center that can be built in an ISO container or other type of modified "Off the shelf" container … [full text in `docs/ORIGINAL_REQUEST.md`]
+
+### 8.1 Rev 2 addendum — operator's words, 2026-11-09 (verbatim, preserved)
+
+> "Make sure we have the correct branding on the modules … the base is good, we just need a once-over … the budget to do the once-over is a 5 million revamp … especially the liquid cooling, and I want to make sure we are as dense as we can be. Rev 2 of the Schreiber AI BEN Engine has the cutting edge and density people are looking for, along with the very low side for tiny business, where we do mini racks."
+
+> "We don't delete, we only save the updated revs, so we always have the history."
+
+How the brief reads these words: **branding** = brand package v2 on every module and every customer-facing surface (row 28); **once-over, base is good** = Rev 2 is a revision of the same configuration model, not a rewrite, and Rev 1 stays reproducible (row 27); **5 million revamp** = `docs/programs/REV2_REVAMP_PROGRAM.md` (row 33), spent on what a repository cannot do; **liquid cooling, as dense as we can be, cutting edge** = BEN 300 and BEN 1000 liquid-first with measured density (rows 30–31) and the W45 test cell, with 800 VDC kept as a gated study; **very low side for tiny business, mini racks** = BEN 1 (row 29). Decisions and the questions the operator still owns are in `docs/REV2_DECISION.md`.

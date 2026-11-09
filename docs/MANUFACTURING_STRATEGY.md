@@ -225,3 +225,34 @@ If the criteria are not met, the right answer is a third CM or a dedicated bay i
 | Certifications to obtain | UL 508A panel shop file, ISO 9001, state contractor licences, AWS D1.1 program with CWI, EPA 608 technicians, possibly NRTL field-evaluation partnership | 12–18 months to establish |
 | Location logic | Within a day's truck of the largest customer cluster; access to 480 V 2 MVA service; skilled electrical labour market; road route for 2.9 m high-cube loads | |
 | Study deliverables | Demand forecast from the pipeline, make-vs-buy model with real CM costs from §7, site shortlist, capex quotes, staffing plan, risk register, go/no-go against §10 | 3-month study when §10 triggers |
+
+## 12. BEN 1: the one in-house build (added 2026-11-09, Rev 2)
+
+**Decision (Rev 2):** BEN 1 mini racks are **assembled, burned in and shipped by Schreiber AI**. It is the only tier built in-house; every other tier stays third-party first (§1–§11 unchanged). This does **not** trigger the greenfield criteria of §10: BEN 1 needs a light assembly bench, not a factory.
+
+| Why in-house for BEN 1 | What it means |
+| --- | --- |
+| Nothing to fabricate | A BEN 1 is listed parts (cabinet or 10-inch rack, UPS, PDU, firewall, NAS, AI box, BEN Pod) put together, cabled, imaged and tested; no welding, no envelope, no field wiring, no licensed trades (`COMPLIANCE.md` §18) |
+| The value is the setup and the software | Imaging BEN Controls Mini, the firewall rules, backups and the BEN Pod is the product, and it is the same work as the controls kit Schreiber AI already keeps in-house (§1, "what we do not outsource") |
+| A CM adds margin and freight for no capability | A CM's crane, paint booth and 480 V test power are not used; shipping a cabinet to a CM and back costs more than the labour |
+| Fast feedback | Ten lighthouse units (`docs/programs/REV2_REVAMP_PROGRAM.md` line 1) teach us the build time, failure modes and support load before volume |
+
+### 12.1 The bench
+
+| Item | Specification |
+| --- | --- |
+| Space | About 25–40 m² of light-industrial or office space with a loading door: one assembly bench, one burn-in shelf, parts racking, packing table |
+| **ESD control** | ESD bench mat and wrist straps on a common ground point, ESD flooring mat at the bench, heel straps for anyone handling boards or drives; ESD-safe bins; programme to ANSI/ESD S20.20 principles (we do not seek certification at this scale); daily wrist-strap test log |
+| **Burn-in shelf** | Shelf for up to 4 units at once, each on its own 20 A, 120 V circuit (so the E22 input-current test is real), network switch with an isolated test VLAN, a backup test target, room cooling sized for 4 × 1.65 kW (≈ 22,500 BTU/h) |
+| Test equipment | IEC 61672 Class 2 sound level meter (E21), plug-in power meters (E22), stopwatch and logging laptop (E23), filter blank cards (E24), label printer, torque screwdriver |
+| Imaging | Imaging station for BEN Controls Mini, the firewall and NAS configuration from versioned templates; firmware hashes recorded in the build record |
+| Staff | One assembly and support technician (program line 8) with a second person for the burn-in sign-off |
+| Throughput | One technician: about 2 units per day assembled, 4 in burn-in at once, so about 8–10 units per week before the bench is a constraint |
+
+### 12.2 Quality at the bench
+
+Same rules as the CM model, applied to ourselves: an STE assembly sheet with one action per step; a build record with listing-mark photos of every powered part; hold point **H-mini** (24 h burn-in and E21–E24 signed by two people) before the data plate goes on; defects classified critical / major / minor (§6.3) and trended per unit; the first ten units are the first-article set. A part substitution (a different AI box or UPS) is an engineering change with a fit, heat and power check, never a bench decision (risk R45).
+
+### 12.3 When BEN 1 moves out of the house
+
+If BEN 1 volume passes about 400 units a year (two technicians at full bench throughput) or field setup becomes the constraint, the option is a value-added reseller or IT distributor that already does rack integration (a "configure to order" partner), under the same build record and H-mini hold point, not a container CM. The trigger is reviewed at each program gate.
