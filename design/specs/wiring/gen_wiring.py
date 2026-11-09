@@ -37,7 +37,7 @@ class Canvas:
         # title bar
         self.parts.append(f'<rect x="0" y="0" width="{w}" height="78" fill="{SLATE}"/>')
         self.parts.append(f'<rect x="0" y="78" width="{w}" height="3" fill="{SIGNAL}"/>')
-        self.text(32, 42, title, 30, TEXT, weight=700)
+        self.text(32, 42, title, (min(30, int((w - 150) / (len(title) * 0.56))) if LINEUP == "rev2" else 30), TEXT, weight=700)
         if subtitle:
             self.text(32, 66, subtitle, 15, MUTED)
         # SAI monogram (brand rule: cyan on graphite)
@@ -685,7 +685,7 @@ def power_one_line_ben1(form: str):
                                                                    ("tower beside the 10-inch rack" if form == "rack10" else "2U in the cabinet, U1-U2")], POWER, name_size=15, sub_size=11)
     for a, b in ((s1, s2), (s2, s3)):
         c.wire([(BUS, a[1] + a[3]), (BUS, b[1])], POWER, 4)
-    devs = [it for it in lay.items if it.mount == "rack" and it.tag not in ("UPS1", "BAT1", "P1", "P2")]
+    devs = [it for it in lay.items if it.mount == "rack" and it.tag not in ("UPS1", "BAT1", "P1", "P2", "PDU1")]
     y = 560
     if lay.find("PDU1"):
         c.box(X + 80, 520, 300, 60, "PDU1 10-inch 1U", ["4 × NEMA 5-15R, surge protected"], POWER, name_size=13, sub_size=11)
@@ -703,8 +703,8 @@ def power_one_line_ben1(form: str):
         c.box(bx, y + 40, pitch - 20, 80, name, [sub], SIGNAL if it is None or it.kind == "controls" else POWER, fill=SLATE, name_size=12, sub_size=10, rx=6)
     c.note(X + 640, 110, 660, [f"Outlet current {d['outlet_amps']} A at 120 V vs {0.8 * d['outlet_circuit_a']:.0f} A (80 % of {d['outlet_circuit_a']} A, NEC 210.19/210.20) — check I-B4",
                                f"UPS {d['ups_w']} W vs IT × 1.25 = {cfg.it_kw * 1250:.0f} W — check I-B5", "Every item listed and cord-connected: no field wiring inside BEN 1",
-                               "Equipment ground through the UPS cord to the building receptacle; frame bonded to the UPS chassis (≤ 0.1 Ω)",
-                               f"Export option: {d['voltage_option'][:70]}"], MUTED, "Sizes come from ben_engine.config (BEN 1)")
+                               "Ground through the UPS cord; frame bonded to the UPS chassis (≤ 0.1 Ω)",
+                               f"Export option: {d['voltage_option'].split(' option')[0]}"], MUTED, "Sizes come from ben_engine.config (BEN 1)")
     c.note(X + 640, 300, 660, [f"Heat to room {d['heat_to_room_w']} W ({d['heat_to_room_btu_h']} BTU/h); closet vent ≥ {d['closet_vent_cfm']} cfm", f"Noise {d['noise_dba_est']} dBA at 1 m (target {d['noise_dba_target']:.0f})", "Site sheet: design/drawings/rev2/ben1/" + form + "/I-001"], GREEN, "Site (drawing I-001)")
     c.legend(X + 640, 470, [(POWER, False, "120 V power, UPS-backed"), (SIGNAL, False, "Controls (BEN Pods, edge)")])
     c.save(f"03_power_one_line_ben1_{form}.svg")

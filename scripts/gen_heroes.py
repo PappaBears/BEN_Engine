@@ -236,7 +236,229 @@ def render(tier: str) -> str:
             f'<text x="590" y="60" text-anchor="end" font-family="Inter,system-ui,sans-serif" font-size="10" fill="{MUTED}">{g["enclosure"][:70]}</text>\n</svg>\n')
 
 
+# ====================================================================== Rev 2 heroes (web/assets/rev2/hero-<tier>.svg), brand v2 livery
+# Rev 1 palette -> brand v2 livery (Shop White body, Night Navy ground and band, Signal Blue accents; thermal ramp for heat only).
+V2_MAP = {
+    BG0: "#0B1A31", BG1: "#06101F", PAD: "#0F2342", "#16213a": "#0F2342", STROKE: "#8EA7C8",
+    SIDE: "#F4F7FB", END: "#DCE4EF", TOP: "#E8EEF6", RIB: "#C8D3E2",
+    SIDE_L: "#B9C6D8", END_L: "#9FB0C8", TOP_L: "#CBD6E4",
+    "#243a5a": "#E6ECF4", "#1b2f4c": "#D3DCE8", "#2f4a6e": "#EEF2F8",
+    "#7f8ea3": "#F4F7FB", "#6b7a90": "#DCE4EF", "#98a7bc": "#E8EEF6", "#5f6f86": "#C8D3E2",
+    "#3a4a60": "#6B7F99", "#2a3850": "#58708E", "#4a5c74": "#8EA7C8",
+    "#3b4656": "#5D6B7E", "#2d3745": "#4A5668", "#4a5667": "#738196", "#5b6878": "#7C8BA0", "#222b37": "#3E495A",
+    CYAN: "#4C9DFF", AMBER: "#4C9DFF", MUTED: "#B2C1D8", TEXT: "#EEF4FC", "#6EE7A8": "#2BB673",
+    "#3fc0e0": "#5CD6FF", "#e0a44a": "#FF8A3D",
+}
+THERMAL = ("#5CD6FF", "#7FE3D2", "#C9E89A", "#FFB86B", "#FF8A3D")
+
+
+def _recolor(svg: str) -> str:
+    import re as _re
+    keys = sorted(V2_MAP, key=len, reverse=True)
+    pat = _re.compile("|".join(_re.escape(k) for k in keys), _re.I)
+    low = {k.lower(): v for k, v in V2_MAP.items()}
+    return pat.sub(lambda m: low[m.group(0).lower()], svg)
+
+
+def _brandlib():
+    sys.path.insert(0, os.path.join(ROOT, "brand", "v2"))
+    import brandlib
+    return brandlib
+
+
+def _face_group(c: "Canvas", x, y, z, inner: str) -> str:
+    """Group skewed onto the +y face (front-left) at world point (x, y, z): local u along +x, v downward (screen px)."""
+    sx, sy = c.P(x, y, z)
+    return f'<g transform="translate({sx:.1f},{sy:.1f}) skewY(30) scale(1,0.866)">{inner}</g>'
+
+
+def livery_side(c: "Canvas", x0, y0, L, Wd, Hh, label, rated, mark="mark-deep", band_frac=0.066, outdoor=True):
+    """Data plate band along the bottom of the +y face, v2 mark, product line and tier number (brand/v2/livery side art)."""
+    bl = _brandlib()
+    k = c.scale / COS30           # screen px per metre along x on the skewed face
+    u_len = L * k
+    bh = max(Hh * band_frac * c.scale, 7.0)
+    band_ground = "#06101F" if outdoor else "#0F2342"
+    z_band = 0.18 if outdoor else 0.02
+    fields = ["SCHREIBER AI", "BEN ENGINE", label.upper(), rated, "REV 2"]
+    fs = max(4.2, min(7.0, bh * 0.52))
+    parts = [f'<rect x="{0.04 * u_len:.1f}" y="{-bh:.1f}" width="{0.92 * u_len:.1f}" height="{bh:.1f}" fill="{band_ground}" stroke="#24406B" stroke-width="0.6"/>']
+    ux = 0.04 * u_len + fs * 1.2
+    for i, f in enumerate(fields):
+        parts.append(f'<text x="{ux:.1f}" y="{-bh / 2 + fs * 0.36:.1f}" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="{fs:.1f}" letter-spacing="{fs * 0.16:.2f}" fill="{"#4C9DFF" if i == 0 else "#B2C1D8"}">{f}</text>')
+        ux += (len(f) + 2.4) * fs * 0.62
+    out = [_face_group(c, x0, y0 + Wd, z_band, "".join(parts))]
+    mh = min(Hh * 0.30 * c.scale, 34)
+    ink = "#0B1A31" if outdoor else "#EEF4FC"
+    sub = "#4A5D7A" if outdoor else "#B2C1D8"
+    inner = (bl.embed(mark, 0, -mh, mh, prefix=f"hm{abs(hash(label)) % 997}_") +
+             f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.52:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="800" font-size="{mh * 0.36:.1f}" letter-spacing="0.6" fill="{ink}">SCHREIBER AI</text>'
+             f'<text x="{mh * 1.28:.1f}" y="{-mh * 0.08:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="700" font-size="{mh * 0.24:.1f}" letter-spacing="1.2" fill="{sub}">BEN ENGINE</text>')
+    out.append(_face_group(c, x0 + 0.06 * L, y0 + Wd, Hh * 0.86, inner))
+    tz = Hh * 0.42
+    tsize = min(Hh * 0.22 * c.scale, 30)
+    out.append(_face_group(c, x0 + 0.60 * L, y0 + Wd, tz, f'<text x="0" y="0" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="900" font-size="{tsize:.1f}" fill="{ink}">{label.upper()}</text>'))
+    return "\n".join(out)
+
+
+def heat_plume(c: "Canvas", x, y, z, h=1.6, w=0.5):
+    """Warm-air cue above a fan: thermal ramp, never amber."""
+    gid = f"th{int(x * 100)}{int(y * 100)}"
+    a, b = c.P(x, y, z), c.P(x, y, z + h)
+    return (f'<defs><linearGradient id="{gid}" x1="0" y1="1" x2="0" y2="0">' + "".join(f'<stop offset="{i / 4:.2f}" stop-color="{col}" stop-opacity="{0.55 - i * 0.1:.2f}"/>' for i, col in enumerate(THERMAL)) +
+            f'</linearGradient></defs><path d="M{a[0] - w * c.scale:.1f},{a[1]:.1f} Q{a[0]:.1f},{(a[1] + b[1]) / 2:.1f} {a[0] - w * c.scale * 0.3:.1f},{b[1]:.1f} L{a[0] + w * c.scale * 0.3:.1f},{b[1]:.1f} Q{a[0]:.1f},{(a[1] + b[1]) / 2:.1f} {a[0] + w * c.scale:.1f},{a[1]:.1f} Z" fill="url(#{gid})"/>')
+
+
+def hero_v2_module(g, d, cfg):
+    L, Wd, Hh = g["ext_l_m"], g["ext_w_m"], g["ext_h_m"]
+    dense = bool(g.get("liquid_first"))
+    skid_l = (2.6 if cfg.it_kw <= 300 else 5.0) if dense else 0.0
+    span = L + (skid_l + 1.2 if dense else 0)
+    scale = min(28.0, 520 / ((span + Wd + 2) * COS30))
+    c = Canvas(scale=scale, ox=W / 2 - (span - Wd) * COS30 * scale / 2 + 20, oy=H / 2 + 40 - ((span + Wd) * SIN30 * scale) / 2)
+    n_dc = 0 if (dense or g["default_cooling"].startswith("inrow") or g["default_cooling"] == "cabinet_dx") else (2 if L < 8 else 3)
+    Canvas.brand = lambda self, *a, **k: ""
+    draw_module(c, 0, 0, L, Wd, Hh, g["label"], 0, dry_coolers=n_dc)
+    if g["default_cooling"].startswith("inrow"):
+        for i in range(2 if L > 4 else 1):
+            bx = 0.5 + i * 1.4
+            c.box(bx, 0.6, Hh, 1.0, Wd - 1.2, 0.5, side=SIDE_L, end=END_L, top=TOP_L)
+            c.ring(bx + 0.5, Wd / 2, Hh + 0.52, 0.32)
+    extra = []
+    if dense:
+        # adjacent heat-rejection skid at the blind end: W45 dry coolers + 18 C trim chiller, pipes to the end wall
+        sx0 = L + 1.2
+        c.slab(sx0 - 0.3, -0.5, skid_l + 0.6, Wd + 1.0)
+        c.box(sx0, 0, 0, skid_l, Wd, 0.25, side="#6B7F99", end="#58708E", top="#8EA7C8", sw=0.6)
+        n_fan = max(2, round(skid_l / 1.2))
+        c.box(sx0, 0.1, 0.25, skid_l, Wd - 0.2, 1.7, side=SIDE_L, end=END_L, top=TOP_L, sw=0.8)
+        for f in range(n_fan):
+            fx = sx0 + (f + 0.5) * skid_l / n_fan
+            c.ring(fx, Wd * 0.33, 1.97, min(0.42, skid_l / n_fan / 2 - 0.08))
+            c.ring(fx, Wd * 0.72, 1.97, min(0.42, skid_l / n_fan / 2 - 0.08))
+        c.box(sx0 + skid_l - 1.1, Wd - 0.05, 0.25, 1.0, 0.7, 1.1, side="#CBD6E4", end="#B9C6D8", top="#DCE4EF", sw=0.8)
+        for k2, col in enumerate(("#5CD6FF", "#FF8A3D")):
+            a, b = c.P(L, Wd * (0.35 + 0.15 * k2), 0.5), c.P(sx0, Wd * (0.35 + 0.15 * k2), 0.5)
+            c.out.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" stroke="{col}" stroke-width="2.4"/>')
+        for f in range(n_fan):
+            extra.append(heat_plume(c, sx0 + (f + 0.5) * skid_l / n_fan, Wd * 0.5, 2.05, h=1.4, w=0.35))
+    else:
+        for i in range(n_dc):
+            bw = min(2.2, (L - 0.6) / max(1, n_dc) - 0.2)
+            bx = 0.4 + i * (bw + 0.2)
+            extra.append(heat_plume(c, bx + bw / 2, Wd / 2, Hh + 0.8, h=1.3, w=0.4))
+    c.box(-1.4, Wd - 0.6, 0, 0.5, 0.5, 1.1, side="#3b4656", end="#2d3745", top="#4a5667", sw=0.8)
+    svg_body = _recolor("\n".join(c.out)) + "\n" + "\n".join(extra)
+    svg_body += "\n" + livery_side(c, 0, 0, L, Wd, Hh, g["label"], f"RATED {cfg.it_kw:g} kW IT")
+    return svg_body
+
+
+def hero_v2_cabinet(g, d, cfg):
+    Canvas.brand = lambda self, *a, **k: ""
+    c = hero_cabinet(g)
+    L, Wd, Hh = g["ext_l_m"], g["ext_w_m"], g["ext_h_m"]
+    body = _recolor("\n".join(c.out))
+    return body + "\n" + livery_side(c, 0, 0, L, Wd, Hh, g["label"], f"RATED {cfg.it_kw:g} kW IT", band_frac=0.08)
+
+
+def hero_v2_hall(g, d, cfg):
+    Canvas.brand = lambda self, *a, **k: ""
+    c = hero_hall(g, d)
+    L, Wd, Hh = g["ext_l_m"], g["ext_w_m"], g["ext_h_m"]
+    body = _recolor("\n".join(c.out))
+    plumes = [heat_plume(c, 1.0 + i * (L - 2.0) / max(1, d["cooling_units_total"]) + 2.0, Wd + 5.2, 2.6, h=3.0, w=1.2) for i in range(d["cooling_units_total"])]
+    return body + "\n" + "\n".join(plumes) + "\n" + livery_side(c, 0, 0, L, Wd, Hh, g["label"], f"RATED {cfg.it_kw:g} kW IT")
+
+
+def hero_v2_ben1(g, d, cfg):
+    """BEN 1: the 12U sound-damped office cabinet (Night Navy, S2 band) on a desk, with a small screen for scale."""
+    fm = g["forms"]["cab12"]
+    L, Wd, Hh = fm["ext_l_m"], fm["ext_w_m"], fm["ext_h_m"]
+    desk_l, desk_w, desk_h = 1.6, 1.0, 0.74
+    c = Canvas(scale=150, ox=W / 2 - 40, oy=96)
+    bl = _brandlib()
+    # floor
+    c.slab(-0.4, -0.3, desk_l + 0.9, desk_w + 0.7, fill="#0F2342")
+    # desk legs + top
+    for (lx, ly) in ((0.05, 0.05), (desk_l - 0.1, 0.05), (0.05, desk_w - 0.1), (desk_l - 0.1, desk_w - 0.1)):
+        c.box(lx, ly, 0, 0.05, 0.05, desk_h - 0.04, side="#8EA7C8", end="#6B7F99", top="#B2C1D8", sw=0.5)
+    c.box(0, 0, desk_h - 0.04, desk_l, desk_w, 0.04, side="#B2C1D8", end="#8EA7C8", top="#DCE4EF", sw=0.6)
+    z0 = desk_h
+    # monitor and keyboard for scale (left part of the desk)
+    c.box(0.15, 0.15, z0, 0.55, 0.02, 0.34, side="#16305A", end="#0F2342", top="#24406B", sw=0.5)
+    c.box(0.2, 0.55, z0, 0.42, 0.14, 0.015, side="#24406B", end="#16305A", top="#4A5D7A", sw=0.4)
+    # the cabinet (Night Navy), door on the +y face (front-left)
+    cx0, cy0 = desk_l - L - 0.05, desk_w - Wd * 0.62 - 0.02
+    sc = 0.62   # the 952 mm deep cabinet is drawn on a deep credenza; depth shown reduced so it reads on a desk
+    c.box(cx0, cy0, z0, L, Wd * sc, Hh, side="#0F2342", end="#0B1A31", top="#16305A", sw=1.0)
+    P = c.P
+    yf = cy0 + Wd * sc
+    c.out.append(poly([P(cx0 + 0.03, yf, z0 + 0.05), P(cx0 + L - 0.03, yf, z0 + 0.05), P(cx0 + L - 0.03, yf, z0 + Hh - 0.04), P(cx0 + 0.03, yf, z0 + Hh - 0.04)], "#06101F", stroke="#24406B", sw=1))
+    for i in range(7):   # door perforation / sound-damped intake slots
+        zz = z0 + 0.18 + i * 0.05
+        a, b = P(cx0 + 0.12, yf, zz), P(cx0 + L - 0.12, yf, zz)
+        c.out.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" stroke="#16305A" stroke-width="2"/>')
+    # band (S2) and the signal mark on the door
+    k = c.scale / COS30
+    bh = 0.07 * c.scale
+    fields = ["SCHREIBER AI", "BEN ENGINE", "BEN 1", "120 V", "REV 2"]
+    band = [f'<rect x="{0.02 * L * k:.1f}" y="{-bh:.1f}" width="{0.96 * L * k:.1f}" height="{bh:.1f}" fill="#0F2342" stroke="#24406B" stroke-width="0.6"/>']
+    ux = 0.05 * L * k
+    for i, f in enumerate(fields):
+        band.append(f'<text x="{ux:.1f}" y="{-bh / 2 + 2:.1f}" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="5.4" letter-spacing="0.8" fill="{"#4C9DFF" if i == 0 else "#B2C1D8"}">{f}</text>')
+        ux += (len(f) + 2) * 3.7
+    c.out.append(_face_group(c, cx0, yf, z0 + 0.06, "".join(band)))
+    mh = 0.16 * c.scale
+    c.out.append(_face_group(c, cx0 + 0.12, yf, z0 + Hh - 0.08, bl.embed("mark-signal", 0, 0, mh, prefix="b1m_") +
+                             f'<text x="{mh * 1.25:.1f}" y="{mh * 0.45:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="800" font-size="{mh * 0.3:.1f}" fill="#EEF4FC">SCHREIBER AI</text>'
+                             f'<text x="{mh * 1.25:.1f}" y="{mh * 0.82:.1f}" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="700" font-size="{mh * 0.2:.1f}" fill="#B2C1D8" letter-spacing="1">BEN ENGINE</text>'))
+    c.out.append(_face_group(c, cx0 + 0.12, yf, z0 + Hh * 0.42, f'<text x="0" y="0" font-family="Archivo,Inter,system-ui,sans-serif" font-weight="900" font-size="{0.1 * c.scale:.1f}" fill="#EEF4FC">BEN 1</text>'))
+    # status lamp (Run) and a warm exhaust cue at the rear top
+    sx, sy = P(cx0 + L - 0.06, yf, z0 + Hh - 0.07)
+    c.out.append(f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="3" fill="#2BB673"/>')
+    c.out.append(heat_plume(c, cx0 + L * 0.5, cy0, z0 + Hh, h=0.35, w=0.12))
+    # wall outlet + cord
+    a = P(desk_l + 0.25, 0.02, 0.35)
+    c.out.append(f'<rect x="{a[0] - 5:.1f}" y="{a[1] - 7:.1f}" width="10" height="14" rx="2" fill="#B2C1D8" stroke="#8EA7C8"/>')
+    return "\n".join(c.out)
+
+
+def render_v2(tier: str) -> str:
+    g = TIER_GEOMETRY[tier]
+    cfg = Config.preset(tier, lineup="rev2")
+    d = cfg.derived()
+    if g["kind"] == "minirack":
+        body = hero_v2_ben1(g, d, cfg)
+    elif g["kind"] == "cabinet":
+        body = hero_v2_cabinet(g, d, cfg)
+    elif g["kind"] == "hall":
+        body = hero_v2_hall(g, d, cfg)
+    else:
+        body = hero_v2_module(g, d, cfg)
+    bl = _brandlib()
+    rng = f"{g['it_kw_min']:,}–{g['it_kw_max']:,} kW IT".replace(".0", "")
+    sub = g["enclosure"][:74]
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="{g["label"]} — BEN Engine, by Schreiber AI, Rev 2 illustration">\n'
+            f'<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B1A31"/><stop offset="1" stop-color="#06101F"/></linearGradient></defs>\n'
+            f'<rect width="{W}" height="{H}" fill="url(#bg)"/>\n{body}\n'
+            + bl.embed("mark-signal", 24, 22, 26, prefix="hdr_") +
+            f'\n<text x="58" y="34" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="10" letter-spacing="1.6" fill="#4C9DFF">SCHREIBER AI</text>'
+            f'<text x="58" y="47" font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="1.4" fill="#B2C1D8">BEN ENGINE · REV 2</text>\n'
+            f'<text x="616" y="34" text-anchor="end" font-family="IBM Plex Sans,Inter,system-ui,sans-serif" font-weight="600" font-size="13" fill="#EEF4FC">{g["label"]} · {rng}</text>\n'
+            f'<text x="616" y="50" text-anchor="end" font-family="IBM Plex Sans,Inter,system-ui,sans-serif" font-size="10" fill="#B2C1D8">{sub}</text>\n</svg>\n')
+
+
 def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if "--lineup" in argv and argv[argv.index("--lineup") + 1] == "rev2":
+        out_dir = os.path.join(ROOT, "web", "assets", "rev2")
+        os.makedirs(out_dir, exist_ok=True)
+        for tier in TIERS_BY_LINEUP["rev2"]:
+            path = os.path.join(out_dir, f"hero-{tier}.svg")
+            with open(path, "w") as f:
+                f.write(render_v2(tier))
+            print(f"wrote {os.path.relpath(path, ROOT)} ({os.path.getsize(path)} bytes)")
+        return 0
     out_dir = os.path.join(ROOT, "web", "assets")
     for tier in TIERS_BY_LINEUP["rev1"]:
         path = os.path.join(out_dir, f"hero-{tier}.svg")
