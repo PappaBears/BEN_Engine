@@ -15,6 +15,10 @@
 | Cloud dashboards that stop when the subscription does. | **Local-first and open.** The dashboard, twin and data live in the box; the customer owns them; white-label partners put their brand on it; the safety identity stays. |
 | A commissioning report that is filed and forgotten. | **One script for the whole life.** FAT, SAT, monthly check and warranty baseline are the same signed script with the same pass criteria. |
 
+## Forward architecture additions (program `docs/programs/FORWARD_800V_LIQUID_PROGRAM.md`)
+- **DC-bus care:** insulation resistance trended per pole, ground-fault location, arc-event log, bus voltage window alarms with minutes-to-limit on battery-on-bus units.
+- **Loop care:** flow and ΔT per rack with calibrated budgets, CDU pump proof of redundancy monthly, leak-to-isolation time re-measured at every annual check, heat-reuse energy accounted and reported.
+
 ## Care plans
 
 | Plan | Who watches | What is included | Price basis |

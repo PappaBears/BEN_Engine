@@ -60,19 +60,25 @@ Lighthouse units first, then integrators as the channel, with profile-led market
 
 The product page is in web/ and renders without a backend; the proposal generator is the back end behind the slider. Transition: what the money is for.
 
-## 11. Use of funds
+## 11. Forward architecture: 800 VDC and liquid-first
+
+A USD 5 M gated program makes BEN 150–500 DC-ready and liquid-first, proven on a test cell and a prototype before any number is quoted.
+
+This is the slide that says Schreiber AI is not building yesterday's container. Be exact: standards and listed 800 VDC gear are immature in 2026, which is why the program buys a test cell and a field-evaluation path rather than claiming numbers. Budget split: team 1.65 M, test cell 1.2 M, prototype 1.05 M, listings 0.35 M, partners 0.25 M, contingency 0.5 M. Source for the industry direction: docs/research/STATE_OF_THE_ART_2026.md.
+
+## 12. Use of funds
 
 Convert 'verified in simulation' into 'verified on hardware', and get the listings that remove permitting friction.
 
 Do not quote an ask number from this deck; the shape of the plan is fixed, the amount is set with the lead investor against the BOM. The allocation is auditable because every line maps to a repo artifact.
 
-## 12. What is verified, what is not
+## 13. What is verified, what is not
 
 We tell investors the same thing we tell customers.
 
 This slide is the credibility slide. Read docs/VALIDATION.md before presenting and update the bullets to match the latest run. Never soften 'unverified'.
 
-## 13. Next decision
+## 14. Next decision
 
 Fund the two lighthouse units and the certification path; everything else in this deck is already runnable.
 
