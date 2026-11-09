@@ -93,9 +93,9 @@ Units are built by qualified third-party contract manufacturers (container modif
 2. **Integrators and MEP firms** as white-label channel: they bring sites and licensed trades, we bring the system.
 3. **Profile-led marketing**: the product page leads with mission profiles and risks, which qualifies buyers before a sales call.
 
-## 7b. Forward Architecture Program (USD 5 M, firm)
+## 7b. R&D Program 2027–2028 (USD 5–10 M)
 
-The industry is moving to **800 VDC power distribution** for AI racks (GPU-vendor roadmaps for 2027 rack generations and the Open Compute sidecar-power work) and to **direct liquid cooling at 100 kW per rack and above**. A modular product that cannot take DC input and warm-water liquid will be designed out of AI workloads within two product cycles. Schreiber AI commits USD 5 M to an 18-month program (`docs/programs/FORWARD_800V_LIQUID_PROGRAM.md`): an 800 VDC and liquid test cell, the controls and twin extensions, the standards and listing path, two component partnerships, and one forward BEN 150 prototype (800 VDC in, two 75 kW liquid-cooled racks) built with a contract manufacturer and proven by the same commissioning script. Gates release money; every efficiency, density and cost figure is measured on the cell or the prototype before it is quoted. The selector already carries the two options (`power_architecture = dc800`, `cooling = dlc_hd`) with their sizing rules and a forward BOM, so the program starts from engineering, not from a concept.
+The industry is moving to **800 VDC power distribution** for AI racks (GPU-vendor roadmaps for 2027 rack generations and the Open Compute sidecar-power work) and to **direct liquid cooling at 100 kW per rack and above**. A modular product that cannot take DC input and warm-water liquid will be designed out of AI workloads within two product cycles. Schreiber AI frames a 24-month R&D program (`docs/programs/RD_PROGRAM_2027.md`) at **USD 5 M core or USD 10 M full** that refreshes the whole lineup to generation 3: two lighthouse units, BEN Pod and BEN Controller productised and listed, BEN Care Managed live, an 800 VDC and W45 liquid test cell with the BEN 150 AI prototype, and in the full case the BEN 500 AI, two stand-alone products (BEN Power 800 DC sidecar, BEN Cool 600 CDU skid), the BEN 2000 engineering release and SOC 2. Gates release money; every efficiency, density and cost figure is measured on the cell or the prototype before it is quoted. The selector already carries the two options (`power_architecture = dc800`, `cooling = dlc_hd`) with their sizing rules and a forward BOM, so the program starts from engineering, not from a concept.
 
 ## 8. What the money is for
 
@@ -106,7 +106,7 @@ The industry is moving to **800 VDC power distribution** for AI racks (GPU-vendo
 | Controls hardware | BEN Pod PCBA production run (MGM240P), secure provisioning cell (PKI, Secure Vault certificate injection), first PLCnext panels and edge computers, RevPi Lite kits |
 | Team | Controls engineer, field commissioning lead, sourcing/quality lead |
 | Working capital | Long-lead equipment deposits (UPS, cooling, GPUs) |
-| Forward Architecture Program (USD 5 M, separately gated) | 800 VDC test cell, high-density liquid loop, DC/liquid controls and twin, listings path, partnerships, forward BEN 150 prototype |
+| R&D Program 2027–2028 (USD 5 M core / 10 M full, gated quarterly) | Lineup refresh to generation 3: lighthouse units, controls productisation and listings, BEN Care, 800 VDC and liquid test cell and prototypes, standards, manufacturing qualification (`docs/programs/RD_PROGRAM_2027.md`) |
 | **First BEN 2000 engineering release** | Stamped permit set for a reference site, utility pre-application and MV single-line, modular manufacturer qualification and first-article plan, per-module drawings and site plan, hardening vendor qualification (UL 752, ASTM F3038, shielding); makes the 2 MW center quotable and permittable before the first hall is sold |
 
 The exact ask and allocation are set with the lead investor; this document fixes the *shape* of the plan so the numbers can be audited against the build.

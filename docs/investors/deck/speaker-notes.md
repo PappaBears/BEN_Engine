@@ -60,11 +60,11 @@ Lighthouse units first, then integrators as the channel, with profile-led market
 
 The product page is in web/ and renders without a backend; the proposal generator is the back end behind the slider. Transition: what the money is for.
 
-## 11. Forward architecture: 800 VDC and liquid-first
+## 11. R&D 2027–2028: refresh the lineup to generation 3
 
-A USD 5 M gated program makes BEN 150–500 DC-ready and liquid-first, proven on a test cell and a prototype before any number is quoted.
+USD 5 M core or 10 M full, gated quarterly: lighthouse units, productised controls, BEN Care live, and the 800 VDC and liquid-first BEN 150 AI proven on a test cell before any number is quoted.
 
-This is the slide that says Schreiber AI is not building yesterday's container. Be exact: standards and listed 800 VDC gear are immature in 2026, which is why the program buys a test cell and a field-evaluation path rather than claiming numbers. Budget split: team 1.65 M, test cell 1.2 M, prototype 1.05 M, listings 0.35 M, partners 0.25 M, contingency 0.5 M. Source for the industry direction: docs/research/STATE_OF_THE_ART_2026.md.
+Lead with the lineup table in docs/programs/RD_PROGRAM_2027.md: what each tier becomes and which case buys it. The 800 VDC and liquid workstream is 2.2 M core / 3.6 M full inside this envelope, not a separate 5 M. Say plainly that in November 2026 no 800 VDC gear is listed and NEC coverage is aimed at 2029; the program buys a test cell and a field-evaluation path, which is why the measured numbers come at G3, not now.
 
 ## 12. Use of funds
 

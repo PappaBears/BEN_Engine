@@ -121,15 +121,15 @@
    "notes": "The product page is in web/ and renders without a backend; the proposal generator is the back end behind the slider. Transition: what the money is for."
   },
   {
-   "title": "Forward architecture: 800 VDC and liquid-first",
-   "message": "A USD 5 M gated program makes BEN 150–500 DC-ready and liquid-first, proven on a test cell and a prototype before any number is quoted.",
+   "title": "R&D 2027–2028: refresh the lineup to generation 3",
+   "message": "USD 5 M core or 10 M full, gated quarterly: lighthouse units, productised controls, BEN Care live, and the 800 VDC and liquid-first BEN 150 AI proven on a test cell before any number is quoted.",
    "bullets": [
-    "800 VDC (±400 V) distribution, battery on the bus, no double conversion; the direction of the 2027 GPU rack generations",
-    "Direct-to-chip W45 liquid at 75–250 kW per rack with leak-to-isolation measured, not assumed",
-    "Controls and twin extended: DC-bus insulation monitoring, loop twin, proof of redundancy on CDUs",
-    "Gates G1–G5 over 18 months; forward BEN 150 prototype at month 15; selector already carries both options"
+    "Core: BEN 5 and BEN 150 lighthouse units, BEN Pod in production, UL 508A controller, BEN Care Managed, BEN 150 AI prototype (800 VDC both conventions, W45 liquid)",
+    "Full adds: BEN 500 AI prototype, BEN Power 800 and BEN Cool 600 stand-alone products, BEN 2000 engineering release, SOC 2, second contract manufacturer, 14 % contingency",
+    "Eight quarterly gates; every efficiency, density and cost figure measured on our cell or units",
+    "Team of 6 (core) to 9 (full); no factory; contract manufacturing stays"
    ],
-   "notes": "This is the slide that says Schreiber AI is not building yesterday's container. Be exact: standards and listed 800 VDC gear are immature in 2026, which is why the program buys a test cell and a field-evaluation path rather than claiming numbers. Budget split: team 1.65 M, test cell 1.2 M, prototype 1.05 M, listings 0.35 M, partners 0.25 M, contingency 0.5 M. Source for the industry direction: docs/research/STATE_OF_THE_ART_2026.md."
+   "notes": "Lead with the lineup table in docs/programs/RD_PROGRAM_2027.md: what each tier becomes and which case buys it. The 800 VDC and liquid workstream is 2.2 M core / 3.6 M full inside this envelope, not a separate 5 M. Say plainly that in November 2026 no 800 VDC gear is listed and NEC coverage is aimed at 2029; the program buys a test cell and a field-evaluation path, which is why the measured numbers come at G3, not now."
   },
   {
    "title": "Use of funds",

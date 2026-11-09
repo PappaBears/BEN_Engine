@@ -22,7 +22,7 @@ The configuration model gains two selectable options: `power_architecture: "ac48
 
 Racks at 100 kW and above cannot be cooled by air or rear doors; the DLC market has matured (cold plates, CDUs, UQD connectors, ASHRAE W-classes) and a sealed, relocatable module with a warm-water loop is a natural fit: no chiller, dry coolers only, heat reuse possible. Our differentiation is the controls layer: loop twin, leak-to-isolation proof, monthly proof of redundancy on pumps and CDUs, and calibration of flow and ΔT so the energy accounting is trustworthy.
 
-## 4. The $5 M program (summary; full plan in `docs/programs/FORWARD_800V_LIQUID_PROGRAM.md`)
+## 4. The program (workstream 1 of the R&D Program 2027–2028, `docs/programs/RD_PROGRAM_2027.md`; detail in `FORWARD_800V_LIQUID_PROGRAM.md`)
 
 Workstreams: (A) 800 VDC power architecture and test cell; (B) high-density liquid cooling and loop controls; (C) controls, twin and BEN Care extensions for DC and liquid; (D) standards, listings and partnerships; (E) one forward-architecture BEN 150 prototype built with a contract manufacturer and tested end to end. Twelve months to a demonstrated prototype, eighteen to a sellable option. Budget, staffing, gates and metrics are in the program plan.
 
