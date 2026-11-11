@@ -35,6 +35,20 @@ let PRICING_BY_LINEUP = {};
 // the Rev 1 art in assets/hero-<tier>.svg (HERO_FALLBACK maps the new tiers onto the nearest Rev 1 drawing).
 // The page opens on the flagship dense all-in-one box (docs/REV2_DECISION.md §2b); BEN 150 stays one click away.
 const OPENING_TIER = 'ben700';
+// The live twin needs the BEN Engine server (software/ben_engine/api.py serves /web/ and /dashboard/ together).
+// Where the page is hosted on its own, the demo buttons become a demo request instead of a dead link.
+let TWIN_DOWN = false;
+async function probeTwin() {
+  try { const r = await fetch('../dashboard/', { method: 'HEAD', cache: 'no-store' }); if (r.ok) return; } catch { /* unreachable */ }
+  TWIN_DOWN = true;
+  const ask = 'mailto:Ben@SchreiberAI.com?subject=' + encodeURIComponent('BEN Engine live twin demo') + '&body=' + encodeURIComponent('Please show me the live twin for this configuration:\n');
+  for (const id of ['openDemo', 'launchDemo']) {
+    const a = document.getElementById(id); if (!a) continue;
+    a.href = ask; a.removeAttribute('target');
+    a.textContent = id === 'openDemo' ? 'Request a live twin demo of this configuration' : 'Request a live twin demo';
+    a.title = 'The live 3-D twin runs on the BEN Engine server and is shown in a call.';
+  }
+}
 const HERO_FALLBACK = { ben300: 'ben150', ben700: 'ben500' };
 function heroSources(tier, lineup) {
   const rev1 = `assets/hero-${HERO_FALLBACK[tier] || tier}.svg`;
@@ -232,7 +246,7 @@ function recompute() {
   $('#sizing').innerHTML = `<h3>Sizing</h3><table>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`;
   renderPrice(d);
   const q = encodeURIComponent(JSON.stringify(state.cfg));
-  $('#openDemo').href = `../dashboard/?config=${q}`;
+  if (!TWIN_DOWN) $('#openDemo').href = `../dashboard/?config=${q}`;
   $('#mailto').href = `mailto:Ben@SchreiberAI.com?subject=${encodeURIComponent('BEN Engine inquiry: ' + d.tier_label + ' ' + state.cfg.it_kw + ' kW ' + CAT.profiles[state.profile].label)}&body=${encodeURIComponent('Configuration:\n' + JSON.stringify(state.cfg, null, 2))}`;
 }
 function renderPrice(d) {
@@ -272,6 +286,7 @@ async function main() {
   const urlCfg = new URLSearchParams(location.search).get('config');
   if (urlCfg) { try { state.cfg = JSON.parse(urlCfg); state.cfg.tier = canonicalTier(state.cfg.tier, CAT); state.lineup = lineupOf(state.cfg, CAT); state.cfg.lineup = state.lineup; buildTierSelect(); buildTiers(); state.profile = state.cfg.profile; state.climate = state.cfg.climate; buildProfiles(); buildRisks(); writeForm(); recompute(); } catch { setPreset(OPENING_TIER); } }
   else setPreset(OPENING_TIER);
+  probeTwin();
   ts.onchange = () => setPreset(ts.value);
   $('#lineupSel').onchange = () => { state.lineup = $('#lineupSel').value; buildTierSelect(); buildTiers(); setPreset(state.cfg?.tier || 'ben150'); };
   $('#formSel').onchange = () => setPreset('ben1', $('#formSel').value);

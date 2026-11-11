@@ -317,6 +317,13 @@ document.getElementById('btn-help').addEventListener('click', () => document.get
 async function boot() {
   buildTabs();
   initScene();
+  // "Open this configuration in the live twin" on the product page links here with ?config=<JSON>: apply it first
+  const linked = new URLSearchParams(location.search).get('config');
+  if (linked) {
+    try { await api('/api/config', { body: JSON.parse(linked) }); }
+    catch (e) { console.error('linked configuration rejected', e); }
+    history.replaceState(null, '', location.pathname + location.hash);   // a reload keeps the twin as it is now
+  }
   try {
     const cfg = await api('/api/config');
     store.setConfig(cfg);

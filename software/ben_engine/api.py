@@ -17,6 +17,8 @@ Run:  ``PYTHONPATH=software uvicorn ben_engine.api:app --host 0.0.0.0 --port 808
 """
 from __future__ import annotations
 
+import mimetypes
+mimetypes.add_type("text/plain", ".md")   # repository docs open in the browser instead of downloading
 import asyncio
 import csv
 import dataclasses
@@ -579,6 +581,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="BEN Engine API", version="0.1.0", lifespan=lifespan,
+              # /docs serves the repository documents the product page links to; the API reference lives under /api
+              docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi.json",
               description="Schreiber AI BEN Engine digital-twin dashboard API (simulation mode).")
 
 
@@ -1266,7 +1270,15 @@ async def package_file(pid: str, name: str):
 
 
 # ----------------------------------------------------------------------------- static dashboard
+# One server for the whole demo: the product page (/web/), its "../dashboard/" and "../docs/..." links, and the dashboard at /.
+WEB_DIR = REPO_ROOT / "web"
+DOCS_DIR = REPO_ROOT / "docs"
+if WEB_DIR.exists():
+    app.mount("/web", StaticFiles(directory=str(WEB_DIR), html=True), name="web")
+if DOCS_DIR.exists():
+    app.mount("/docs", StaticFiles(directory=str(DOCS_DIR), html=True), name="docs")
 if STATIC_DIR.exists():
+    app.mount("/dashboard", StaticFiles(directory=str(STATIC_DIR), html=True), name="dashboard-path")
     app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="dashboard")
 else:  # pragma: no cover
     @app.get("/")
