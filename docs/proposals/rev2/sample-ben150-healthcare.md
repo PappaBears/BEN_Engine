@@ -1,6 +1,6 @@
-# Schreiber AI — BEN Engine proposal SAI-BEN150-20261109-6C6B44EE
+# Schreiber AI — BEN Engine proposal SAI-BEN150-20261111-DE701B0E
 
-*BEN 150 · Healthcare (HIPAA) · Acme Clinic · Austin, TX · 2026-11-09 · valid until 2027-01-08*
+*BEN 150 · Healthcare (HIPAA) · Acme Clinic · Austin, TX · 2026-11-11 · valid until 2027-01-10*
 
 ## 1. Cover
 
@@ -14,9 +14,9 @@
 | Mission profile | Healthcare (HIPAA) (healthcare) |
 | Climate package | Hot / humid |
 | Purchase option | Managed service |
-| Date | 2026-11-09 |
-| Valid until | 2027-01-08 (60 days) |
-| Proposal ID | SAI-BEN150-20261109-6C6B44EE |
+| Date | 2026-11-11 |
+| Valid until | 2027-01-10 (60 days) |
+| Proposal ID | SAI-BEN150-20261111-DE701B0E |
 | Configuration | 50 kW IT in 5 rack(s), Rear-door heat exchanger + dry cooler, 2N, 10 min UPS, generator |
 
 AI infrastructure that arrives finished. This proposal is generated from configuration version 3bb065d8; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
@@ -27,7 +27,7 @@ Acme Clinic needs 50 kW of IT capacity for a Healthcare (HIPAA) workload at Aust
 
 The unit arrives finished and factory-tested. It needs a pad, a 100 A 480 V 3ph feeder, fiber and a grounding electrode at the site; everything inside the enclosure is built, wired, tested and documented before it ships.
 
-Price for the managed service option: $1,849,943 capital ($36,999 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 62 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 38 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the managed service option: $2,049,168 capital ($40,983 per kW IT) plus $27,000 per year (Managed service at $45/kW-month x 50 kW IT). 62 % of the underlying cost is at confirmed vendor prices, 0 % at manufacturer list price and 38 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 34 weeks, set by the longest-lead item (20 weeks) and the permit cycle. Risks are disclosed in section 10 before the price is accepted; the site requirements in section 11 are signed before anything is built for this site.
 
@@ -71,35 +71,35 @@ What this means for you: the environmental class sets the alarm limits your IT w
 
 | Module | Status | BOM lines | Sell price |
 |---|---|---|---|
-| Power module | included | 16 lines | $273,828 |
-| Cooling module | included | 5 lines | $272,472 |
-| Compute module | included | 5 lines | $1,072,379 |
-| Controls module | included | 30 lines | $26,575 |
-| Structure (container / cabinet) | included | 17 lines | $55,729 |
-| Envelope (insulation, liner, coatings) | included | 20 lines | $24,898 |
-| Fire detection and suppression | included | 7 lines | $38,339 |
-| Site kit (anchors, embeds, signage) | included | 9 lines | $34,028 |
-| Build labour, FAT, logistics | included | 9 lines | $51,694 |
+| Power module | included | 16 lines | $303,317 |
+| Cooling module | included | 5 lines | $301,815 |
+| Compute module | included | 5 lines | $1,187,866 |
+| Controls module | included | 30 lines | $29,437 |
+| Structure (container / cabinet) | included | 17 lines | $61,731 |
+| Envelope (insulation, liner, coatings) | included | 20 lines | $27,580 |
+| Fire detection and suppression | included | 7 lines | $42,468 |
+| Site kit (anchors, embeds, signage) | included | 9 lines | $37,692 |
+| Build labour, FAT, logistics | included | 9 lines | $57,262 |
 
-Top 15 lines of the 118-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
+Top 15 lines of the 118-line bill of materials for this option (sell price at 35% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
-| CMP-GPU-L40S | GPU SuperServer 4U, 2x Xeon, 8x NVIDIA L40S (~4 kW), configured | Supermicro SYS-421GE-TNRT | 8 ea | $914,767 | confirmed | 6 |
-| CLG-RDHX | Active rear-door heat exchanger, 42/48U, up to 40 kW | nVent Schroff / ColdLogik / Motivair RackChiller RDC active | 5 ea | $125,000 | estimate | 12 |
-| CLG-CDU-RDHX | Row CDU 70-100 kW liquid-to-liquid for RDHx loop | Vertiv / CoolIT XDU070 / CHx80 | 2 ea | $125,000 | estimate | 14 |
-| CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 5 ea | $124,993 | confirmed | 3 |
-| PWR-GEN-150 | SD150 150 kW diesel standby generator, L2 enclosure, sub-base tank | Generac Industrial SD0150 | 1 ea | $104,167 | estimate | 20 |
-| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | Schneider Electric GVSUPS150KHS (configure-to-order) | 1 ea | $94,444 | estimate | 14 |
-| CMP-SW100G | Spectrum SN2700 32x100GbE QSFP28 switch, Cumulus Linux | NVIDIA Mellanox MSN2700-CS2RC | 2 ea | $29,425 | confirmed | 2 |
-| PWR-XFMR | Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben150) / 300 kVA (ben500), for rack PDUs | Square D / Eaton EX150T3H / EX300T3H | 2 ea | $26,389 | estimate | 8 |
-| FS-CLEAN-AGENT | Pre-engineered FK-5-1-12 (Novec 1230) clean agent system, installed: cylinder, nozzles, releasing panel, detection, design & AHJ submittal | Fike / Kidde (via licensed fire contractor) ECS-500 / Fike CA | 34 m3 protected | $25,972 | estimate | 8 |
-| PWR-ATS-400 | Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 4X | ASCO (Schneider) J03ATSB30400N5X | 1 ea | $17,361 | estimate | 8 |
-| STR-RACK42 | NetShelter SX 42U 600x1070 mm enclosure with sides | APC by Schneider Electric AR3100 | 5 ea | $16,111 | confirmed | 1 |
-| PWR-PDU | NetShelter metered rack PDU 0U 5.0 kW 208 V 30 A, L6-30P, (36) C13 (6) C19 | APC by Schneider Electric AP8841 | 10 ea | $15,555 | confirmed | 1 |
-| SVC-ELECTRICIAN | Licensed electrician (commercial journeyman, billed) | local electrical contractor ELEC-HR | 90 h | $13,750 | estimate | 1 |
-| CLG-PIPING | Glycol loop piping, valves, pumps skid, expansion tank, strainers (per m container length) | Victaulic / Grundfos FCW-LOOP | 7 per m | $11,667 | estimate | 6 |
-| STR-FLOOD-PLINTH | Flood plinth 600 mm: hot-dip galvanised steel frame with cross-bracing, grating step and sealed service risers, per m of enclosure perimeter (H2 severe environment) | local steel fabricator PLINTH-600 | 18 m | $10,500 | estimate | 8 |
+| CMP-GPU-L40S | GPU SuperServer 4U, 2x Xeon, 8x NVIDIA L40S (~4 kW), configured | Supermicro SYS-421GE-TNRT | 8 ea | $1,013,280 | confirmed | 6 |
+| CLG-RDHX | Active rear-door heat exchanger, 42/48U, up to 40 kW | nVent Schroff / ColdLogik / Motivair RackChiller RDC active | 5 ea | $138,462 | estimate | 12 |
+| CLG-CDU-RDHX | Row CDU 70-100 kW liquid-to-liquid for RDHx loop | Vertiv / CoolIT XDU070 / CHx80 | 2 ea | $138,462 | estimate | 14 |
+| CMP-CPU | PowerEdge R760 2U rack server (management / storage node) | Dell Technologies R760 | 5 ea | $138,454 | confirmed | 3 |
+| PWR-GEN-150 | SD150 150 kW diesel standby generator, L2 enclosure, sub-base tank | Generac Industrial SD0150 | 1 ea | $115,385 | estimate | 20 |
+| PWR-UPS-GVS150 | Galaxy VS UPS 150 kW 480 V single frame, N+1 internal power modules, internal lithium battery modules up to 20 kWh (BEN 150) or external cabinets (BEN 500) | Schneider Electric GVSUPS150KHS (configure-to-order) | 1 ea | $104,615 | estimate | 14 |
+| CMP-SW100G | Spectrum SN2700 32x100GbE QSFP28 switch, Cumulus Linux | NVIDIA Mellanox MSN2700-CS2RC | 2 ea | $32,594 | confirmed | 2 |
+| PWR-XFMR | Dry-type step-down transformer 480 D - 208Y/120 V, 150 kVA (ben150) / 300 kVA (ben500), for rack PDUs | Square D / Eaton EX150T3H / EX300T3H | 2 ea | $29,231 | estimate | 8 |
+| FS-CLEAN-AGENT | Pre-engineered FK-5-1-12 (Novec 1230) clean agent system, installed: cylinder, nozzles, releasing panel, detection, design & AHJ submittal | Fike / Kidde (via licensed fire contractor) ECS-500 / Fike CA | 34 m3 protected | $28,769 | estimate | 8 |
+| PWR-ATS-400 | Series 300 ATS 400 A 3P 480 V, service-entrance rated, NEMA 4X | ASCO (Schneider) J03ATSB30400N5X | 1 ea | $19,231 | estimate | 8 |
+| STR-RACK42 | NetShelter SX 42U 600x1070 mm enclosure with sides | APC by Schneider Electric AR3100 | 5 ea | $17,846 | confirmed | 1 |
+| PWR-PDU | NetShelter metered rack PDU 0U 5.0 kW 208 V 30 A, L6-30P, (36) C13 (6) C19 | APC by Schneider Electric AP8841 | 10 ea | $17,231 | confirmed | 1 |
+| SVC-ELECTRICIAN | Licensed electrician (commercial journeyman, billed) | local electrical contractor ELEC-HR | 90 h | $15,231 | estimate | 1 |
+| CLG-PIPING | Glycol loop piping, valves, pumps skid, expansion tank, strainers (per m container length) | Victaulic / Grundfos FCW-LOOP | 7 per m | $12,923 | estimate | 6 |
+| STR-FLOOD-PLINTH | Flood plinth 600 mm: hot-dip galvanised steel frame with cross-bracing, grating step and sealed service risers, per m of enclosure perimeter (H2 severe environment) | local steel fabricator PLINTH-600 | 18 m | $11,631 | estimate | 8 |
 
 Explicitly excluded:
 
@@ -113,27 +113,27 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $1,823,368 | $36,467 | - | 1 yr | $1,823,368 | 62 / 0 / 38 % | 88 | alternative |
-| Hardware + BEN Controls | $1,849,943 | $36,999 | $12,000 | 1 yr | $1,861,943 | 62 / 0 / 38 % | 118 | alternative |
-| White-label | $1,849,943 | $36,999 | $15,000 | 1 yr | $1,864,943 | 62 / 0 / 38 % | 118 | alternative |
-| Managed service | $1,849,943 | $36,999 | $27,000 | 3 yr | $1,930,943 | 62 / 0 / 38 % | 118 | PROPOSED |
+| Hardware only | $2,019,731 | $40,395 | - | 1 yr | $2,019,731 | 62 / 0 / 38 % | 88 | alternative |
+| Hardware + BEN Controls | $2,049,168 | $40,983 | $12,000 | 1 yr | $2,061,168 | 62 / 0 / 38 % | 118 | alternative |
+| White-label | $2,049,168 | $40,983 | $15,000 | 1 yr | $2,064,168 | 62 / 0 / 38 % | 118 | alternative |
+| Managed service | $2,049,168 | $40,983 | $27,000 | 3 yr | $2,130,168 | 62 / 0 / 38 % | 118 | PROPOSED |
 
-Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
+Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 35% gross margin on the whole project: every capital line (power, cooling, compute, controls, enclosure, fire, site and services) is sold at cost / (1 - 0.35). Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 50 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $1,849,943 | $27,000 | $1,876,943 |
-| 3 years | $1,849,943 | $81,000 | $1,930,943 |
-| 5 years | $1,849,943 | $135,000 | $1,984,943 |
+| 1 year | $2,049,168 | $27,000 | $2,076,168 |
+| 3 years | $2,049,168 | $81,000 | $2,130,168 |
+| 5 years | $2,049,168 | $135,000 | $2,184,168 |
 
-Payment milestones for the proposed option (Managed service, capital $1,849,943):
+Payment milestones for the proposed option (Managed service, capital $2,049,168):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Engineering release (H4) | 30 % | $554,983 | 6 |
-| Factory acceptance test (H13) | 40 % | $739,977 | 30 |
-| Site acceptance test (H19) | 25 % | $462,486 | 33 |
-| Turnover (W20) | 5 % | $92,497 | 34 |
+| Engineering release (H4) | 30 % | $614,750 | 6 |
+| Factory acceptance test (H13) | 40 % | $819,667 | 30 |
+| Site acceptance test (H19) | 25 % | $512,292 | 33 |
+| Turnover (W20) | 5 % | $102,458 | 34 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -348,7 +348,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 - Configuration as on the cover: 50 kW IT, 5 rack(s), Rear-door heat exchanger + dry cooler, 2N, climate Hot / humid; any change is priced as a change order
 - Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 62 % confirmed, 0 % list, 38 % estimate for this option; the estimate share is re-priced at engineering release
-- Gross margin 28% on hardware and build labour; controls licence $12,000/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
+- Gross margin 35% on the whole capital price; controls licence $12,000/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
 - Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost
@@ -358,7 +358,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-BEN150-20261109-6C6B44EE) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-BEN150-20261111-DE701B0E) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
@@ -368,4 +368,4 @@ By signing, the customer accepts this proposal (SAI-BEN150-20261109-6C6B44EE) an
 | Schreiber AI — compliance |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-BEN150-20261109-6C6B44EE. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-BEN150-20261111-DE701B0E. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

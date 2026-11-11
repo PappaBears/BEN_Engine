@@ -77,6 +77,16 @@ Every Rev 2 document, deck and the website use BEN 700 from this date. Open deci
 | Rev 1 BEN 2000 | The Rev 1 hall stays as built for `lineup: rev1` (never delete). | Unchanged. |
 | Budget | Fits the $5 M revamp under the BEN 700 lighthouse line (same module three times; the new work is the yard and the cluster controls). | Program line to be re-cut when the cluster checks run. |
 
+## 2c. Amendment (2026-11-11) — 35 % gross margin on the whole project; price follows every spec
+
+**Operator direction (2026-11-11):** "Changing the specs needs to change the price especially for hardened etc. I need a 35 percent margin on the whole project."
+
+| Item | Decision | Status |
+| --- | --- | --- |
+| Margin | 35 % gross margin on the whole capital price (price = cost / 0.65), all lines including compute and the BEN 2000 yard; recurring licences and managed service priced separately. Was 28 % on hardware and build labour. | Done: `software/ben_engine/commercial.py`; proposals, dashboard, unit economics, product page, investor table. |
+| Price follows spec | The product page prices from the same BOM rules as the proposals, so hardening (H1/H2/H3), redundancy, UPS minutes, generator, climate, power architecture, cooling, racks, IT load and module selection all move the price. | Done: `web/assets/bom.js`, `tests/test_price_parity.py` (975 configurations). |
+| Gross margin vs markup | 35 % gross margin is cost × 1.538; a 35 % markup (cost × 1.35) would be a 25.9 % gross margin. | Stated in `commercial.py`. |
+
 ## 3. Budget: USD 5 M revamp
 
 The revamp budget is USD 5 M. The engineering, branding and documentation revision is done in this repository now (Rev 2). The USD 5 M funds what a repository cannot: the BEN 1 and BEN 300 lighthouse units, the liquid and 800 VDC test cell, listings (UL 508A, FCC for the Pod, field evaluation), BEN Pod production, brand production (data plates, livery, print), and the team to run it. Allocation in `docs/programs/REV2_REVAMP_PROGRAM.md`, which supersedes `RD_PROGRAM_2027.md` (kept for history).

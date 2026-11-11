@@ -150,6 +150,7 @@ output{color:var(--paper);font:600 1em var(--f-mono)}
 .price .big{font:600 2rem/1.2 var(--f-mono);color:var(--paper)}
 .price .bar{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:12px 0;background:var(--s1)}.price .bar span{display:block;height:100%}
 .price .bar .c{background:var(--run)}.price .bar .l{background:var(--signal)}.price .bar .e{background:var(--hold)}
+.price .price-lines{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:.92rem}.price .price-lines td{padding:4px 0;border-bottom:1px solid var(--s3);color:var(--muted);vertical-align:top}.price .price-lines td:last-child{text-align:right;color:var(--paper);font-family:var(--f-mono);white-space:nowrap;padding-left:12px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font:500 12px/1.4 var(--f-mono);color:var(--fog)}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 
 /* demo, steps, compliance */

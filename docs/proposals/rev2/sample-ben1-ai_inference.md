@@ -1,6 +1,6 @@
-# Schreiber AI — BEN Engine proposal SAI-BEN1-20261109-ADA95012
+# Schreiber AI — BEN Engine proposal SAI-BEN1-20261111-07CFA4D0
 
-*BEN 1 · AI inference edge · Harbor Street Accounting · Portland, ME · 2026-11-09 · valid until 2027-01-08*
+*BEN 1 · AI inference edge · Harbor Street Accounting · Portland, ME · 2026-11-11 · valid until 2027-01-10*
 
 ## 1. Cover
 
@@ -14,9 +14,9 @@
 | Mission profile | AI inference edge (ai_inference) |
 | Climate package | Temperate |
 | Purchase option | Hardware + BEN Controls |
-| Date | 2026-11-09 |
-| Valid until | 2027-01-08 (60 days) |
-| Proposal ID | SAI-BEN1-20261109-ADA95012 |
+| Date | 2026-11-11 |
+| Valid until | 2027-01-10 (60 days) |
+| Proposal ID | SAI-BEN1-20261111-07CFA4D0 |
 | Configuration | 1 kW IT in 1 rack(s), Office air: filtered, sound-damped extraction path (no refrigerant), N, 10 min UPS |
 
 AI infrastructure that arrives finished. This proposal is generated from configuration version a70260a2; every number in it comes from the same model that produces the drawings, bill of materials, digital twin and commissioning script.
@@ -27,7 +27,7 @@ Harbor Street Accounting needs 1 kW of IT capacity for a AI inference edge workl
 
 BEN 1 arrives assembled and burnt in by Schreiber AI. It needs a NEMA 5-15R on a dedicated 15 A, 120 V circuit (12 A continuous at 80 %), a network port and a room that can take 649 W (2,213 BTU/h) of heat; estimated noise 45.2 dBA at 1 m (target 50).
 
-Price for the hardware + ben controls option: $19,746 capital ($32,910 per kW IT) plus $480 per year (BEN Controls licence). 9 % of the underlying cost is at confirmed vendor prices, 66 % at manufacturer list price and 25 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
+Price for the hardware + ben controls option: $21,873 capital ($36,454 per kW IT) plus $480 per year (BEN Controls licence). 9 % of the underlying cost is at confirmed vendor prices, 66 % at manufacturer list price and 25 % is engineering estimate; the price is firm at engineering release, when the configuration is frozen.
 
 Order to in-service: about 3 weeks: Schreiber AI assembles BEN 1 from stock kits, burns it in, ships it and sets it up (compute bought by us can add its own lead time, see section 7). No permits are needed for a plug-in unit; risks are disclosed in section 10.
 
@@ -71,34 +71,34 @@ What this means for you: the environmental class sets the alarm limits your IT w
 
 | Module | Status | BOM lines | Sell price |
 |---|---|---|---|
-| Power module | included | 2 lines | $2,311 |
+| Power module | included | 2 lines | $2,560 |
 | Cooling module | not in this option | - | - |
-| Compute module | included | 3 lines | $13,700 |
-| Controls module | included | 6 lines | $1,929 |
-| Structure (container / cabinet) | included | 2 lines | $271 |
-| Envelope (insulation, liner, coatings) | included | 1 lines | $49 |
-| Site kit (anchors, embeds, signage) | included | 1 lines | $167 |
-| Build labour, FAT, logistics | included | 2 lines | $1,319 |
+| Compute module | included | 3 lines | $15,175 |
+| Controls module | included | 6 lines | $2,137 |
+| Structure (container / cabinet) | included | 2 lines | $300 |
+| Envelope (insulation, liner, coatings) | included | 1 lines | $54 |
+| Site kit (anchors, embeds, signage) | included | 1 lines | $185 |
+| Build labour, FAT, logistics | included | 2 lines | $1,462 |
 
-Top 15 lines of the 17-line bill of materials for this option (sell price at 28% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
+Top 15 lines of the 17-line bill of materials for this option (sell price at 35% gross margin; the full priced BOM with vendors, part numbers and price confirmation dates is delivered at engineering release):
 
 | Code | Item | Manufacturer / MPN | Qty | Sell price | Price basis | Lead (wk) |
 |---|---|---|---|---|---|---|
-| CMP-AI-DGXSPARK | Desktop AI computer NVIDIA DGX Spark (GB10 Grace Blackwell, 128 GB unified memory, 240 W supply) — customer-selectable | NVIDIA DGX Spark | 2 ea | $13,053 | list | 4 |
-| PWR-UPS-MINI-1000 | Smart-UPS Li-ion short depth 1000 VA / 800 W 120 V, 2U rack/tower, line-interactive, SmartConnect (NEMA 5-15P) | APC by Schneider Electric SMTL1000RM2UC | 1 ea | $2,153 | estimate | 2 |
-| CTL-EDGE-MINI | Fanless edge computer for the BEN Care agent (OnLogic BlastShield CL210, dual LAN) — omit when BEN Care runs on the customer's own box | OnLogic CL210 (BlastShield) | 1 ea | $1,285 | confirmed | 3 |
-| SVC-MINI-ASSEMBLY | Schreiber AI assembly, imaging, 24 h burn-in and test of BEN 1 (hours) | Schreiber AI SVC-MINI | 6 h | $792 | estimate | 1 |
-| SVC-MINI-SETUP | Setup and handover at the customer (or remote): placement, outlet check, network, BEN Care enrolment, room-heat check (hours) | Schreiber AI SVC-MINI-SETUP | 4 h | $528 | estimate | 1 |
-| CMP-NAS-DS224 | Synology DiskStation DS224+ 2-bay desktop NAS beside the 10-inch rack (diskless) — customer-selectable | Synology DS224+ | 1 ea | $458 | estimate | 2 |
-| CTL-POD | BEN Pod v1 assembled and provisioned (MGM240P Thread module w/ Secure Vault High, 4x Pt1000 3-wire 24-bit front end, SHT45, 2x dry contact, leak-rope input, 2x isolated 4-20 mA; Pod E adds Ethernet/PoE PD, RS-485, 2x relay) - make item, per unit | Schreiber AI (contract electronics manufacturer) BEN-POD-v1 | 2 ea | $244 | estimate | 8 |
-| CMP-SW-MINI | UniFi Switch Lite 8 PoE, 8 x GbE, 4 x PoE+ (52 W), managed | Ubiquiti USW-Lite-8-PoE | 1 ea | $189 | confirmed | 1 |
-| CTL-LABELS | Label printer cartridges, cable labels, engraved phenolic tags (lot) | Brady / Brother M211 + B-427 | 1 lot | $167 | estimate | 1 |
-| SITE-MINI-PARCEL | Parcel freight, insured, BEN 1 10-inch rack | Carrier PARCEL | 1 ea | $167 | estimate | 1 |
-| STR-MINIRACK-10 | 10-inch 8U desk / shelf mini rack, aluminium + acrylic (DeskPi RackMate T1), 281 W x 200 D x 451 H mm | DeskPi (GeeekPi) RackMate T1 | 1 ea | $167 | confirmed | 2 |
-| PWR-PDU-10IN | 10-inch 1U PDU, 4 x NEMA 5-15R, 15 A, surge protected | Generic 10-inch 10IN-1U-4OUT | 1 ea | $158 | estimate | 2 |
-| CTL-CAT6A | Cat6A UTP patch cable 10 ft | Fiber Cables Direct C6A-UTP-10 | 10 ea | $135 | confirmed | 1 |
-| STR-MINI-SHELF10 | 10-inch 2U vented shelf (one desktop AI box or mini PC per shelf) | DeskPi (GeeekPi) 10in-2U-shelf | 3 ea | $104 | estimate | 2 |
-| CTL-RCP | xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 150/500 | Silicon Labs XG24-EK2703A | 1 ea | $54 | list | 1 |
+| CMP-AI-DGXSPARK | Desktop AI computer NVIDIA DGX Spark (GB10 Grace Blackwell, 128 GB unified memory, 240 W supply) — customer-selectable | NVIDIA DGX Spark | 2 ea | $14,458 | list | 4 |
+| PWR-UPS-MINI-1000 | Smart-UPS Li-ion short depth 1000 VA / 800 W 120 V, 2U rack/tower, line-interactive, SmartConnect (NEMA 5-15P) | APC by Schneider Electric SMTL1000RM2UC | 1 ea | $2,385 | estimate | 2 |
+| CTL-EDGE-MINI | Fanless edge computer for the BEN Care agent (OnLogic BlastShield CL210, dual LAN) — omit when BEN Care runs on the customer's own box | OnLogic CL210 (BlastShield) | 1 ea | $1,423 | confirmed | 3 |
+| SVC-MINI-ASSEMBLY | Schreiber AI assembly, imaging, 24 h burn-in and test of BEN 1 (hours) | Schreiber AI SVC-MINI | 6 h | $877 | estimate | 1 |
+| SVC-MINI-SETUP | Setup and handover at the customer (or remote): placement, outlet check, network, BEN Care enrolment, room-heat check (hours) | Schreiber AI SVC-MINI-SETUP | 4 h | $585 | estimate | 1 |
+| CMP-NAS-DS224 | Synology DiskStation DS224+ 2-bay desktop NAS beside the 10-inch rack (diskless) — customer-selectable | Synology DS224+ | 1 ea | $508 | estimate | 2 |
+| CTL-POD | BEN Pod v1 assembled and provisioned (MGM240P Thread module w/ Secure Vault High, 4x Pt1000 3-wire 24-bit front end, SHT45, 2x dry contact, leak-rope input, 2x isolated 4-20 mA; Pod E adds Ethernet/PoE PD, RS-485, 2x relay) - make item, per unit | Schreiber AI (contract electronics manufacturer) BEN-POD-v1 | 2 ea | $271 | estimate | 8 |
+| CMP-SW-MINI | UniFi Switch Lite 8 PoE, 8 x GbE, 4 x PoE+ (52 W), managed | Ubiquiti USW-Lite-8-PoE | 1 ea | $209 | confirmed | 1 |
+| CTL-LABELS | Label printer cartridges, cable labels, engraved phenolic tags (lot) | Brady / Brother M211 + B-427 | 1 lot | $185 | estimate | 1 |
+| SITE-MINI-PARCEL | Parcel freight, insured, BEN 1 10-inch rack | Carrier PARCEL | 1 ea | $185 | estimate | 1 |
+| STR-MINIRACK-10 | 10-inch 8U desk / shelf mini rack, aluminium + acrylic (DeskPi RackMate T1), 281 W x 200 D x 451 H mm | DeskPi (GeeekPi) RackMate T1 | 1 ea | $185 | confirmed | 2 |
+| PWR-PDU-10IN | 10-inch 1U PDU, 4 x NEMA 5-15R, 15 A, surge protected | Generic 10-inch 10IN-1U-4OUT | 1 ea | $175 | estimate | 2 |
+| CTL-CAT6A | Cat6A UTP patch cable 10 ft | Fiber Cables Direct C6A-UTP-10 | 10 ea | $150 | confirmed | 1 |
+| STR-MINI-SHELF10 | 10-inch 2U vented shelf (one desktop AI box or mini PC per shelf) | DeskPi (GeeekPi) 10in-2U-shelf | 3 ea | $115 | estimate | 2 |
+| CTL-RCP | xG24-EK2703A Explorer Kit (EFR32MG24/MGM240P) as OpenThread Border Router radio co-processor on USB; 2 for redundancy on BEN 150/500 | Silicon Labs XG24-EK2703A | 1 ea | $60 | list | 1 |
 
 Explicitly excluded:
 
@@ -113,26 +113,26 @@ Explicitly excluded:
 
 | Option | Capital price | Per kW IT | Recurring / year | Term | Total over term | Confirmed / list / estimate | BOM lines | Status |
 |---|---|---|---|---|---|---|---|---|
-| Hardware only | $17,817 | $29,694 | - | 1 yr | $17,817 | 2 / 73 / 25 % | 11 | alternative |
-| Hardware + BEN Controls | $19,746 | $32,910 | $480 | 1 yr | $20,226 | 9 / 66 / 25 % | 17 | PROPOSED |
-| White-label | $19,746 | $32,910 | $600 | 1 yr | $20,346 | 9 / 66 / 25 % | 17 | alternative |
-| Managed service | $19,746 | $32,910 | $324 | 3 yr | $20,718 | 9 / 66 / 25 % | 17 | alternative |
+| Hardware only | $19,735 | $32,892 | - | 1 yr | $19,735 | 2 / 73 / 25 % | 11 | alternative |
+| Hardware + BEN Controls | $21,873 | $36,454 | $480 | 1 yr | $22,353 | 9 / 66 / 25 % | 17 | PROPOSED |
+| White-label | $21,873 | $36,454 | $600 | 1 yr | $22,473 | 9 / 66 / 25 % | 17 | alternative |
+| Managed service | $21,873 | $36,454 | $324 | 3 yr | $22,845 | 9 / 66 / 25 % | 17 | alternative |
 
-Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 28% gross margin on purchased hardware and build labour. Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 1 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
+Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. Capital prices carry a 35% gross margin on the whole project: every capital line (power, cooling, compute, controls, enclosure, fire, site and services) is sold at cost / (1 - 0.35). Recurring items: Hardware + BEN Controls: BEN Controls licence (dashboard, twin, firmware updates, remote support hooks); White-label: White-label licence under the Schreiber AI brand (controls licence x 1.25, partner branding, source escrow); Managed service: Managed service at $45/kW-month x 1 kW IT (includes the BEN Controls licence, remote operations and the maintenance schedule).
 
 | Managed service term | Capital | Service fees | Total |
 |---|---|---|---|
-| 1 year | $19,746 | $324 | $20,070 |
-| 3 years | $19,746 | $972 | $20,718 |
-| 5 years | $19,746 | $1,620 | $21,366 |
+| 1 year | $21,873 | $324 | $22,197 |
+| 3 years | $21,873 | $972 | $22,845 |
+| 5 years | $21,873 | $1,620 | $23,493 |
 
-Payment milestones for the proposed option (Hardware + BEN Controls, capital $19,746):
+Payment milestones for the proposed option (Hardware + BEN Controls, capital $21,873):
 
 | Milestone | Share | Amount | Week from order |
 |---|---|---|---|
-| Order confirmation (H4) | 50 % | $9,873 | 0 |
-| Bench test passed and shipped (H13) | 40 % | $7,898 | 2 |
-| Setup and handover (H19) | 10 % | $1,975 | 3 |
+| Order confirmation (H4) | 50 % | $10,936 | 0 |
+| Bench test passed and shipped (H13) | 40 % | $8,749 | 2 |
+| Setup and handover (H19) | 10 % | $2,187 | 3 |
 
 Recurring fees are invoiced annually in advance from turnover. Prices are in USD, exclude taxes, and are valid to the date on the cover; the capital price becomes firm at engineering release.
 
@@ -307,7 +307,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 - Configuration as on the cover: 1 kW IT, 1 rack(s), Office air: filtered, sound-damped extraction path (no refrigerant), N, climate Temperate; any change is priced as a change order
 - Prices from purchasing/parts_catalog.json priced on the dates in the BOM; 9 % confirmed, 66 % list, 25 % estimate for this option; the estimate share is re-priced at engineering release
-- Gross margin 28% on hardware and build labour; controls licence $480/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
+- Gross margin 35% on the whole capital price; controls licence $480/yr for this tier; white-label uplift x1.25; managed service $45/kW-month
 - Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra
 - Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order
 - Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost
@@ -317,7 +317,7 @@ The governing documents are the Master Services Agreement (docs/contracts/MSA.md
 
 ## 16. Signature block
 
-By signing, the customer accepts this proposal (SAI-BEN1-20261109-ADA95012) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
+By signing, the customer accepts this proposal (SAI-BEN1-20261111-07CFA4D0) and the risk disclosure in section 10, and authorises Schreiber AI to start the site survey and engineering release; the site requirements form is signed separately at hold point H3.
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
@@ -327,4 +327,4 @@ By signing, the customer accepts this proposal (SAI-BEN1-20261109-ADA95012) and 
 | Schreiber AI — compliance |  |  |  |
 
 ---
-*Schreiber AI — proposal SAI-BEN1-20261109-ADA95012. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*
+*Schreiber AI — proposal SAI-BEN1-20261111-07CFA4D0. Generated by ben_engine.proposal from the configuration model; numbers are not hand-edited.*

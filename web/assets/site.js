@@ -1,4 +1,5 @@
 import { validate, derived, preset, canonicalTier, hardeningRecommended, powerArchitectures, dcConventions, tiersByLineup, lineupOf } from './selector.js';
+import { quote } from './bom.js';
 
 const $ = (s) => document.querySelector(s);
 const fmt = (n) => n.toLocaleString('en-US');
@@ -30,6 +31,7 @@ const FALLBACK_RISKS = [
 let CAT, RISKS, PRICING;
 let state = { profile: 'ai_inference', climate: 'temperate', cfg: null, lineup: 'rev2' };
 let PRICING_BY_LINEUP = {};
+let RULES = null;   // web/assets/price-rules.json (scripts/export_price_rules.py)
 // Rev 2 (docs/REV2_DECISION.md §2): tiers shown follow the lineup; BEN 1 has a form; hero art for tiers without their own image
 // Rev 2 heroes live in assets/rev2/hero-<tier>.svg (design agent); Rev 1 configurations and missing Rev 2 files fall back to
 // the Rev 1 art in assets/hero-<tier>.svg (HERO_FALLBACK maps the new tiers onto the nearest Rev 1 drawing).
@@ -250,26 +252,27 @@ function recompute() {
   $('#mailto').href = `mailto:Ben@SchreiberAI.com?subject=${encodeURIComponent('BEN Engine inquiry: ' + d.tier_label + ' ' + state.cfg.it_kw + ' kW ' + CAT.profiles[state.profile].label)}&body=${encodeURIComponent('Configuration:\n' + JSON.stringify(state.cfg, null, 2))}`;
 }
 function renderPrice(d) {
+  // Live price: the same catalog lines, quantity rules and 35 % project margin as the proposals (bom.js, price-rules.json,
+  // tests/test_price_parity.py). Every spec on the form moves it: hardening, redundancy, UPS minutes, generator, climate,
+  // power architecture, cooling, racks, IT load and the modules selected.
   const p = $('#price');
-  PRICING = PRICING_BY_LINEUP[state.lineup] || PRICING_BY_LINEUP.rev1;
-  if (!PRICING || !PRICING[state.cfg.tier]) { p.innerHTML = '<h3>Indicative price</h3><p class="muted">Pricing table not published yet. The bill of materials in the repository (docs/BOM.md) is the source.</p>'; return; }
-  const t = PRICING[state.cfg.tier];
-  // scale by selected subsystems and by IT kW relative to preset (compute scales, rest step-wise)
-  let total = 0, conf = 0, list = 0, est = 0;
-  for (const s of ['power', 'cooling', 'compute', 'controls', 'base']) {
-    if (s !== 'base' && !state.cfg.subsystems.includes(s)) continue;
-    const b = t.by_subsystem[s]; if (!b) continue;
-    let scale = 1;
-    if (s === 'compute') scale = state.cfg.it_kw / t.preset_it_kw;
-    if (s === 'cooling') scale = d.cooling_units_total / t.preset_cooling_units;
-    total += b.total * scale; conf += b.confirmed * scale; list += b.list * scale; est += b.estimate * scale;
-  }
-  const pc = (x) => Math.round(100 * x / Math.max(total, 1));
-  p.innerHTML = `<h3>Indicative hardware + build price</h3><div class="big">${usd(total)}</div>
-    <p class="muted small">Excludes site civil, utility service, permits and GPUs beyond the reference compute node unless Compute is selected. Managed service is priced separately.</p>
-    <div class="bar"><span class="c" style="width:${pc(conf)}%"></span><span class="l" style="width:${pc(list)}%"></span><span class="e" style="width:${pc(est)}%"></span></div>
-    <div class="legend"><span><i style="background:var(--green)"></i>Vendor-confirmed ${pc(conf)} %</span><span><i style="background:var(--cyan)"></i>List price ${pc(list)} %</span><span><i style="background:var(--hold)"></i>Estimate ${pc(est)} %</span></div>
-    <p class="small muted">Per kW IT: ${usd(total / state.cfg.it_kw)}. Priced ${t.priced_on}.</p>${t.kind === 'cluster' ? `<p class="small muted">${d.tier_label}: ${t.modules} × ${t.module_tier.replace('ben', 'BEN ')} modules plus the shared yard (transformers, 15 kV switchgear, MV feeders and interconnect, yard and lanes: ${usd(t.yard_cost_usd / (1 - t.margin))} of the price at the preset). Status: ${t.status}.</p>` : ''}${(state.cfg.power_architecture === 'dc800' || (state.cfg.cooling === 'dlc_hd' && !d.liquid_first)) ? '<p class="small muted"><strong>Forward options are not in this table.</strong> The 800 VDC chain and the high-density liquid loop are costed only as estimates in <a href="../docs/BOM-ben150-forward.md">docs/BOM-ben150-forward.md</a> (forward prototype); the figure above still uses the standard AC / cooling pricing.</p>' : ''}`;
+  if (!RULES) { p.innerHTML = '<h3>Indicative price</h3><p class="muted">Price rules not loaded. The bill of materials in the repository (docs/rev2/BOM.md) is the source.</p>'; return; }
+  let q;
+  try { q = quote(state.cfg, CAT, RULES); } catch (e) { console.error(e); p.innerHTML = '<h3>Indicative price</h3><p class="muted">This configuration cannot be priced yet.</p>'; return; }
+  const total = q.price_usd, pc = (x) => Math.round(100 * x / Math.max(total, 1));
+  const yard = q.rows.filter((r) => r.scope === 'yard').reduce((s, r) => s + r.ext_price_usd, 0) / (1 - q.margin);
+  const lines = [
+    ['Infrastructure (power, cooling, controls, enclosure, fire, site, services)', q.infra_price_usd],
+    ...(q.compute_price_usd > 0 ? [['Reference compute', q.compute_price_usd]] : []),
+    ...(q.hardening_add_usd > 0 ? [[`of which hardening ${state.cfg.hardening} over H1 Standard`, q.hardening_add_usd]] : []),
+    ...(yard > 0 ? [['of which the shared yard (transformers, switchgear, feeders, yard, lanes)', yard]] : []),
+  ];
+  p.innerHTML = `<h3>Indicative project price</h3><div class="big">${usd(total)}</div>
+    <table class="price-lines">${lines.map(([k, v]) => `<tr><td>${k}</td><td>${usd(v)}</td></tr>`).join('')}</table>
+    <p class="muted small">${Math.round(q.margin * 100)} % gross margin on the whole project, priced from ${q.lines} bill-of-materials lines. Excludes utility service upgrades, permits and taxes. Managed service and licences are priced separately.</p>
+    <div class="bar"><span class="c" style="width:${pc(q.by_status.confirmed)}%"></span><span class="l" style="width:${pc(q.by_status.list)}%"></span><span class="e" style="width:${pc(q.by_status.estimate)}%"></span></div>
+    <div class="legend"><span><i style="background:var(--green)"></i>Vendor-confirmed ${pc(q.by_status.confirmed)} %</span><span><i style="background:var(--cyan)"></i>List price ${pc(q.by_status.list)} %</span><span><i style="background:var(--hold)"></i>Estimate ${pc(q.by_status.estimate)} %</span></div>
+    <p class="small muted">Per kW IT: ${usd(total / state.cfg.it_kw)}${q.infra_price_usd && q.compute_price_usd ? ` · infrastructure only ${usd(q.infra_price_usd / state.cfg.it_kw)}/kW` : ''}.${d.kind === 'cluster' ? ` ${d.tier_label}: ${d.modules} × ${d.module_label} modules plus the shared yard. Two yard items wait on the local fire authority and the utility.` : ''}</p>${state.cfg.power_architecture === 'dc800' ? '<p class="small muted"><strong>800 VDC is a forward study option:</strong> its lines are engineering estimates and it is not quotable until the program test-cell gate.</p>' : ''}`;
 }
 
 async function main() {
@@ -278,6 +281,7 @@ async function main() {
   RISKS = await load('assets/risks.json', FALLBACK_RISKS);
   PRICING_BY_LINEUP = { rev1: await load('assets/pricing.json', null), rev2: await load('assets/pricing-rev2.json', null) };
   PRICING = PRICING_BY_LINEUP.rev2 || PRICING_BY_LINEUP.rev1;
+  RULES = await load('assets/price-rules.json', null);
   addRev2Controls();
   buildTiers(); buildProfiles(); buildRisks();
   buildTierSelect();

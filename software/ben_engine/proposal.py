@@ -65,7 +65,8 @@ BRAND_PATH = REPO_ROOT / "web" / "kit" / "brand.json"
 RISKS_PATH = REPO_ROOT / "web" / "assets" / "risks.json"
 
 # ----------------------------------------------------------------------------- commercial inputs
-MARGIN_HW = 0.28                       # gross margin on purchased hardware + build labour (unit_economics.py)
+from .commercial import PROJECT_MARGIN  # noqa: E402
+MARGIN_HW = PROJECT_MARGIN              # 35 % gross margin on the whole capital price (commercial.py; was 28 % on hardware + labour)
 CONTROLS_LICENCE_PER_UNIT_YR = {"ben5": 1200, "ben30": 4800, "ben150": 12000, "ben500": 30000, "ben2000": 90000,
                                 # Rev 2 tiers: BEN Controls Mini (BEN Care agent + 2 Pods); dense tiers priced per the BEN 150 -> BEN 500 slope
                                 "ben1": 480, "ben300": 24000, "ben700": 54000}
@@ -724,7 +725,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
               f"{p.term_years} yr", _usd(p.total_term_usd), f"{p.confirmed_pct:.0f} / {p.list_pct:.0f} / {p.estimate_pct:.0f} %", p.bom_lines,
               "PROPOSED" if p.headline else "alternative"] for p in prices])
     s.p("Confirmed listing (shown as 'confirmed') = a price seen on the vendor's or distributor's own product page on the date in the BOM, read from a search-result snippet, not a quote, re-verified before purchase order; list = manufacturer published price; estimate = engineering estimate with its basis stated in the BOM note. "
-        f"Capital prices carry a {margin:.0%} gross margin on purchased hardware and build labour. Recurring items: " + "; ".join(f"{p.label}: {p.recurring_label}" for p in prices if p.recurring_usd_per_year) + ".")
+        f"Capital prices carry a {margin:.0%} gross margin on the whole project: every capital line (power, cooling, compute, controls, enclosure, fire, site and services) is sold at cost / (1 - {margin:.2f}). Recurring items: " + "; ".join(f"{p.label}: {p.recurring_label}" for p in prices if p.recurring_usd_per_year) + ".")
     if any(p.key == "managed" for p in prices):
         mp = next(p for p in prices if p.key == "managed")
         s.table(["Managed service term", "Capital", "Service fees", "Total"],
@@ -914,7 +915,7 @@ def build_proposal(cfg: Config, option: str = "full", customer: Optional[str] = 
     s.ul([
         f"Configuration as on the cover: {cfg.it_kw:.0f} kW IT, {cfg.racks} rack(s), {d['cooling_label']}, {cfg.redundancy}, climate {clim['label']}; any change is priced as a change order",
         f"Prices from purchasing/parts_catalog.json priced on the dates in the BOM; {headline.confirmed_pct:.0f} % confirmed, {headline.list_pct:.0f} % list, {headline.estimate_pct:.0f} % estimate for this option; the estimate share is re-priced at engineering release",
-        f"Gross margin {margin:.0%} on hardware and build labour; controls licence {_usd(CONTROLS_LICENCE_PER_UNIT_YR[cfg.tier])}/yr for this tier; white-label uplift x{WHITE_LABEL_UPLIFT}; managed service ${MANAGED_PER_KW_MONTH:.0f}/kW-month",
+        f"Gross margin {margin:.0%} on the whole capital price; controls licence {_usd(CONTROLS_LICENCE_PER_UNIT_YR[cfg.tier])}/yr for this tier; white-label uplift x{WHITE_LABEL_UPLIFT}; managed service ${MANAGED_PER_KW_MONTH:.0f}/kW-month",
         "Domestic delivery within one day's haul of the integration shop; export, over-dimension permits beyond the carrier's standard, and crane standby beyond one day are extra",
         "Utility fault current <= 65 kA and voltage within +/-10 % at the disconnect; otherwise current-limiting fuses are added by change order",
         "Soil bearing >= 100 kPa; otherwise a geotechnical report and revised foundation are the customer's cost",

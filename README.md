@@ -129,7 +129,7 @@ Full architecture, trust boundaries and failure behaviour: `docs/ARCHITECTURE.md
 ## Tests and evidence
 
 ```bash
-PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e   # python suite: 289 tests (incl. the Rev 1 frozen fixture, the Rev 2 lineup and the BEN 2000 cluster)
+PYTHONPATH=software python -m pytest tests -q --ignore=tests/e2e   # python suite: 294 tests (incl. the Rev 1 frozen fixture, the Rev 2 lineup, the BEN 2000 cluster and the page price parity)
 bash tests/e2e/run_e2e.sh                                          # Playwright, ~13 min under software WebGL
 cd firmware/ben-pod && make test                                   # 37 host unit tests
 ```

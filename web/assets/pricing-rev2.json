@@ -4,10 +4,10 @@
   "preset_cooling_units": 1,
   "by_subsystem": {
    "power": {
-    "total": 2311.1111111111113,
+    "total": 2560.0,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 2311.1111111111113
+    "estimate": 2560.0
    },
    "cooling": {
     "total": 0.0,
@@ -16,26 +16,26 @@
     "estimate": 0.0
    },
    "compute": {
-    "total": 13700.0,
-    "confirmed": 188.88888888888889,
-    "list": 13052.777777777777,
-    "estimate": 458.33333333333337
+    "total": 15175.384615384615,
+    "confirmed": 209.23076923076923,
+    "list": 14458.461538461537,
+    "estimate": 507.6923076923077
    },
    "controls": {
-    "total": 1929.4305555555557,
-    "confirmed": 1419.7083333333335,
-    "list": 54.16666666666667,
-    "estimate": 455.5555555555556
+    "total": 2137.2153846153847,
+    "confirmed": 1572.6000000000001,
+    "list": 60.0,
+    "estimate": 504.6153846153846
    },
    "base": {
-    "total": 1805.5416666666667,
-    "confirmed": 166.65277777777777,
+    "total": 1999.9846153846154,
+    "confirmed": 184.6,
     "list": 0.0,
-    "estimate": 1638.888888888889
+    "estimate": 1815.3846153846152
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": "rack10",
   "racks": 1
@@ -45,38 +45,38 @@
   "preset_cooling_units": 2,
   "by_subsystem": {
    "power": {
-    "total": 39845.875,
-    "confirmed": 30602.819444444445,
+    "total": 44136.969230769224,
+    "confirmed": 33898.50769230769,
     "list": 0.0,
-    "estimate": 9243.055555555557
+    "estimate": 10238.461538461539
    },
    "cooling": {
-    "total": 25617.555555555555,
+    "total": 28376.36923076923,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 25617.555555555555
+    "estimate": 28376.36923076923
    },
    "compute": {
-    "total": 51802.77777777778,
-    "confirmed": 49997.222222222226,
+    "total": 57381.53846153846,
+    "confirmed": 55381.53846153846,
     "list": 0.0,
-    "estimate": 1805.5555555555557
+    "estimate": 2000.0
    },
    "controls": {
-    "total": 5878.583333333333,
-    "confirmed": 3404.972222222222,
-    "list": 872.2222222222223,
-    "estimate": 1601.388888888889
+    "total": 6511.661538461538,
+    "confirmed": 3771.6615384615384,
+    "list": 966.1538461538461,
+    "estimate": 1773.8461538461538
    },
    "base": {
-    "total": 60302.65277777779,
-    "confirmed": 583.2083333333333,
+    "total": 66796.78461538462,
+    "confirmed": 646.0153846153845,
     "list": 0.0,
-    "estimate": 59719.444444444445
+    "estimate": 66150.76923076923
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": null,
   "racks": 1
@@ -86,38 +86,38 @@
   "preset_cooling_units": 3,
   "by_subsystem": {
    "power": {
-    "total": 61806.958333333336,
-    "confirmed": 6813.902777777778,
+    "total": 68463.0923076923,
+    "confirmed": 7547.707692307692,
     "list": 0.0,
-    "estimate": 54993.055555555555
+    "estimate": 60915.38461538461
    },
    "cooling": {
-    "total": 100086.0,
-    "confirmed": 68752.66666666667,
+    "total": 110864.4923076923,
+    "confirmed": 76156.79999999999,
     "list": 0.0,
-    "estimate": 31333.333333333336
+    "estimate": 34707.692307692305
    },
    "compute": {
-    "total": 637716.6527777778,
-    "confirmed": 636438.875,
+    "total": 706393.8307692307,
+    "confirmed": 704978.4461538461,
     "list": 0.0,
-    "estimate": 1277.7777777777778
+    "estimate": 1415.3846153846152
    },
    "controls": {
-    "total": 6581.180555555556,
-    "confirmed": 3474.236111111111,
-    "list": 872.2222222222223,
-    "estimate": 2234.722222222222
+    "total": 7289.923076923076,
+    "confirmed": 3848.384615384615,
+    "list": 966.1538461538461,
+    "estimate": 2475.3846153846152
    },
    "base": {
-    "total": 118891.13888888889,
-    "confirmed": 16569.61111111111,
+    "total": 131694.8,
+    "confirmed": 18354.03076923077,
     "list": 0.0,
-    "estimate": 102321.52777777778
+    "estimate": 113340.76923076923
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": null,
   "racks": 2
@@ -127,38 +127,38 @@
   "preset_cooling_units": 4,
   "by_subsystem": {
    "power": {
-    "total": 154800.34722222222,
-    "confirmed": 18098.958333333336,
+    "total": 171471.15384615384,
+    "confirmed": 20048.076923076922,
     "list": 0.0,
-    "estimate": 136701.3888888889
+    "estimate": 151423.0769230769
    },
    "cooling": {
-    "total": 282368.05555555556,
+    "total": 312776.92307692306,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 282368.05555555556
+    "estimate": 312776.92307692306
    },
    "compute": {
-    "total": 1987145.8055555555,
-    "confirmed": 1983951.3611111112,
+    "total": 2201146.123076923,
+    "confirmed": 2197607.661538461,
     "list": 0.0,
-    "estimate": 3194.4444444444443
+    "estimate": 3538.4615384615386
    },
    "controls": {
-    "total": 22686.055555555555,
-    "confirmed": 12362.444444444443,
-    "list": 108.33333333333334,
-    "estimate": 10215.277777777777
+    "total": 25129.16923076923,
+    "confirmed": 13693.784615384613,
+    "list": 120.0,
+    "estimate": 11315.384615384615
    },
    "base": {
-    "total": 179512.58333333334,
-    "confirmed": 44538.972222222226,
+    "total": 198844.70769230768,
+    "confirmed": 49335.47692307692,
     "list": 0.0,
-    "estimate": 134973.61111111112
+    "estimate": 149509.23076923075
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": null,
   "racks": 5
@@ -168,38 +168,38 @@
   "preset_cooling_units": 2,
   "by_subsystem": {
    "power": {
-    "total": 329077.80555555556,
-    "confirmed": 276300.02777777775,
+    "total": 364516.9538461538,
+    "confirmed": 306055.41538461536,
     "list": 0.0,
-    "estimate": 52777.77777777778
+    "estimate": 58461.53846153846
    },
    "cooling": {
-    "total": 726881.9444444445,
+    "total": 805161.5384615384,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 726881.9444444445
+    "estimate": 805161.5384615384
    },
    "compute": {
-    "total": 12010431.930555556,
-    "confirmed": 64709.708333333336,
+    "total": 13303863.061538462,
+    "confirmed": 71678.44615384615,
     "list": 0.0,
-    "estimate": 11945722.222222222
+    "estimate": 13232184.615384614
    },
    "controls": {
-    "total": 20445.63888888889,
-    "confirmed": 11642.861111111113,
-    "list": 54.16666666666667,
-    "estimate": 8748.611111111111
+    "total": 22647.476923076923,
+    "confirmed": 12896.707692307693,
+    "list": 60.0,
+    "estimate": 9690.76923076923
    },
    "base": {
-    "total": 211183.5277777778,
-    "confirmed": 27952.972222222223,
+    "total": 233926.36923076925,
+    "confirmed": 30963.292307692307,
     "list": 0.0,
-    "estimate": 183230.55555555556
+    "estimate": 202963.0769230769
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": null,
   "racks": 2
@@ -209,38 +209,38 @@
   "preset_cooling_units": 2,
   "by_subsystem": {
    "power": {
-    "total": 444780.7361111111,
-    "confirmed": 187037.68055555556,
+    "total": 492680.2,
+    "confirmed": 207180.2,
     "list": 0.0,
-    "estimate": 257743.05555555556
+    "estimate": 285500.0
    },
    "cooling": {
-    "total": 542083.3333333334,
+    "total": 600461.5384615385,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 542083.3333333334
+    "estimate": 600461.5384615385
    },
    "compute": {
-    "total": 5552298.388888889,
-    "confirmed": 5545909.5,
+    "total": 6150238.215384615,
+    "confirmed": 6143161.292307692,
     "list": 0.0,
-    "estimate": 6388.888888888889
+    "estimate": 7076.923076923077
    },
    "controls": {
-    "total": 27627.722222222223,
-    "confirmed": 14859.666666666666,
-    "list": 108.33333333333334,
-    "estimate": 12659.722222222223
+    "total": 30603.01538461538,
+    "confirmed": 16459.93846153846,
+    "list": 120.0,
+    "estimate": 14023.076923076922
    },
    "base": {
-    "total": 291440.69444444444,
-    "confirmed": 33496.944444444445,
+    "total": 322826.6153846154,
+    "confirmed": 37104.30769230769,
     "list": 0.0,
-    "estimate": 257943.75
+    "estimate": 285722.3076923077
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": null,
   "racks": 10
@@ -250,38 +250,38 @@
   "preset_cooling_units": 3,
   "by_subsystem": {
    "power": {
-    "total": 703084.7083333334,
-    "confirmed": 552008.3194444445,
+    "total": 778801.523076923,
+    "confirmed": 611455.3692307692,
     "list": 0.0,
-    "estimate": 151076.3888888889
+    "estimate": 167346.15384615384
    },
    "cooling": {
-    "total": 1173354.1666666667,
+    "total": 1299715.3846153845,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 1173354.1666666667
+    "estimate": 1299715.3846153845
    },
    "compute": {
-    "total": 30018723.583333336,
-    "confirmed": 154418.02777777778,
+    "total": 33251509.2,
+    "confirmed": 171047.6615384615,
     "list": 0.0,
-    "estimate": 29864305.555555556
+    "estimate": 33080461.538461536
    },
    "controls": {
-    "total": 23423.444444444445,
-    "confirmed": 13099.833333333332,
-    "list": 108.33333333333334,
-    "estimate": 10215.277777777777
+    "total": 25945.96923076923,
+    "confirmed": 14510.584615384614,
+    "list": 120.0,
+    "estimate": 11315.384615384615
    },
    "base": {
-    "total": 371037.98611111107,
-    "confirmed": 32705.347222222223,
+    "total": 410995.923076923,
+    "confirmed": 36227.46153846153,
     "list": 0.0,
-    "estimate": 338332.6388888889
+    "estimate": 374768.4615384615
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": null,
   "racks": 5
@@ -291,38 +291,38 @@
   "preset_cooling_units": 9,
   "by_subsystem": {
    "power": {
-    "total": 2688004.125,
-    "confirmed": 1656024.9583333333,
+    "total": 2977481.4923076923,
+    "confirmed": 1834366.1076923076,
     "list": 0.0,
-    "estimate": 1031979.1666666667
+    "estimate": 1143115.3846153845
    },
    "cooling": {
-    "total": 3492508.3333333335,
+    "total": 3868624.615384615,
     "confirmed": 0.0,
     "list": 0.0,
-    "estimate": 3492508.3333333335
+    "estimate": 3868624.615384615
    },
    "compute": {
-    "total": 90056170.75,
-    "confirmed": 463254.0833333334,
+    "total": 99754527.6,
+    "confirmed": 513142.9846153846,
     "list": 0.0,
-    "estimate": 89592916.66666667
+    "estimate": 99241384.61538461
    },
    "controls": {
-    "total": 79282.29166666667,
-    "confirmed": 42686.458333333336,
-    "list": 325.0,
-    "estimate": 36270.833333333336
+    "total": 87820.38461538461,
+    "confirmed": 47283.46153846154,
+    "list": 360.0,
+    "estimate": 40176.92307692308
    },
    "base": {
-    "total": 1868926.4583333335,
-    "confirmed": 98116.04166666667,
+    "total": 2070195.4615384615,
+    "confirmed": 108682.38461538461,
     "list": 0.0,
-    "estimate": 1770810.4166666667
+    "estimate": 1961513.0769230768
    }
   },
   "priced_on": "2026-11-09",
-  "margin": 0.28,
+  "margin": 0.35,
   "lineup": "rev2",
   "form": null,
   "racks": 15,
