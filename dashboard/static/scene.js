@@ -5,6 +5,8 @@ import { OrbitControls } from './vendor/three/OrbitControls.js';
 import { PointerLockControls } from './vendor/three/PointerLockControls.js';
 import { tempColor, lerpColor, reducedMotion } from './util.js';
 import { liveryInfo, sideTexture, miniPanelTexture, bezelTexture, bandPlateTexture, resetLivery, BODY, LV } from './livery.js';
+import * as EQ from './equipment.js';
+const { EM, Parts, faceBox } = EQ;
 
 // Schreiber AI brand v2 (brand/v2/tokens.json). One job per colour: cyan = Signal Blue (selection, hover, edges); hold / red / green /
 // info = status (alarms, LEDs) only; heat (aisles, airflow, pipes, temperature sensors) uses the thermal ramp, never amber.
@@ -17,9 +19,11 @@ const U_M = 0.04445;
 
 // ----------------------------------------------------------------------------- materials
 const MAT = {
-  shell: (color) => new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.35 }),
+  shell: (color) => { const m = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0.35 }); m.userData.env = true; m.userData.envI = 0.45; return m; },
   liner: new THREE.MeshStandardMaterial({ color: 0x97a2b3, roughness: 0.95, metalness: 0.0, side: THREE.BackSide }),
-  floor: new THREE.MeshStandardMaterial({ color: 0x2a3341, roughness: 0.85, metalness: 0.1 }),
+  linerPanel: new THREE.MeshStandardMaterial({ color: 0xd3d8de, roughness: 0.8, metalness: 0.05 }),
+  section: new THREE.MeshStandardMaterial({ color: 0xe9d9a6, roughness: 0.95 }),
+  floor: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.78, metalness: 0.05 }),
   rack: new THREE.MeshStandardMaterial({ color: 0x1a2230, roughness: 0.6, metalness: 0.5 }),
   rackRear: new THREE.MeshStandardMaterial({ color: 0x0f1620, roughness: 0.8, metalness: 0.3 }),
   cooling: new THREE.MeshStandardMaterial({ color: 0xc9d2de, roughness: 0.5, metalness: 0.5 }),
@@ -31,8 +35,8 @@ const MAT = {
   tray: new THREE.MeshStandardMaterial({ color: 0xb9c3d1, roughness: 0.4, metalness: 0.7 }),
   glass: new THREE.MeshPhysicalMaterial({ color: 0xbfe9ff, transmission: 0.0, opacity: 0.22, transparent: true, roughness: 0.1, metalness: 0.0, side: THREE.DoubleSide, depthWrite: false }),
   casting: new THREE.MeshStandardMaterial({ color: 0x2a3340, roughness: 0.7, metalness: 0.6 }),
-  ground: new THREE.MeshStandardMaterial({ color: 0x0e1520, roughness: 1 }),
-  pad: new THREE.MeshStandardMaterial({ color: 0x3a4250, roughness: 0.95 }),
+  ground: new THREE.MeshStandardMaterial({ color: 0x1a222c, roughness: 1 }),
+  pad: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.92 }),
   pipeCold: new THREE.MeshStandardMaterial({ color: 0x5cd6ff, roughness: 0.4, metalness: 0.6 }),
   pipeHot: new THREE.MeshStandardMaterial({ color: 0xff8a3d, roughness: 0.4, metalness: 0.6 }),
   fan: new THREE.MeshStandardMaterial({ color: 0x222a36, roughness: 0.5, metalness: 0.6 }),
@@ -50,18 +54,21 @@ function edges(obj, color = 0x000000, opacity = 0.25) {
   obj.add(l); return l;
 }
 
-/** Corrugated wall: plane facing +z with a trapezoid profile along x. */
-function corrugatedWall(len, height, color, period = 0.25, depth = 0.028) {
-  const segs = Math.max(8, Math.round(len / period) * 4);
-  const g = new THREE.PlaneGeometry(len, height, segs, 1);
-  const pos = g.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i) + len / 2;
-    const ph = (x % period) / period;
-    const prof = ph < 0.25 ? ph / 0.25 : ph < 0.5 ? 1 : ph < 0.75 ? 1 - (ph - 0.5) / 0.25 : 0;
-    pos.setZ(i, prof * depth);
+/** Corrugated wall: plane facing +z with an ISO trapezoid profile along x (crisp facets: non-indexed normals). */
+function corrugatedWall(len, height, color, period = 0.278, depth = 0.036) {
+  const flat = depth <= 0;
+  const segs = flat ? 1 : Math.max(8, Math.round(len / period) * 4);
+  let g = new THREE.PlaneGeometry(len, height, segs, 1);
+  if (!flat) {
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i) + len / 2;
+      const ph = (x % period) / period;
+      const prof = ph < 0.18 ? ph / 0.18 : ph < 0.5 ? 1 : ph < 0.68 ? 1 - (ph - 0.5) / 0.18 : 0;
+      pos.setZ(i, prof * depth - depth / 2);
+    }
+    g = g.toNonIndexed(); g.computeVertexNormals();
   }
-  g.computeVertexNormals();
   const m = new THREE.Mesh(g, MAT.shell(color));
   m.castShadow = true; m.receiveShadow = true;
   return m;
@@ -117,6 +124,31 @@ function serverFrontTexture(units) {
   return t;
 }
 
+// ----------------------------------------------------------------------------- point sprites (airflow, power pulses)
+// Screen-size-clamped round points: world size with perspective, but never larger than maxPx on screen, and faded out
+// close to the camera, so particles stay small, crisp dots in aisle and walkthrough views instead of out-of-focus balls.
+const PT = { scale: { value: 600 }, pr: { value: 1 } };
+function pointsMaterial({ color = 0xffffff, size = 0.02, maxPx = 5, opacity = 0.8, fadeNear = 0.5, vertexColors = false } = {}) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color(color) }, uSize: { value: size }, uMaxPx: { value: maxPx }, uOpacity: { value: opacity }, uFadeNear: { value: fadeNear }, uScale: PT.scale, uPr: PT.pr },
+    vertexColors, transparent: true, depthWrite: false,
+    vertexShader: `uniform float uSize; uniform float uScale; uniform float uMaxPx; uniform float uPr; uniform float uFadeNear; varying float vFade; varying vec3 vCol;
+      void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); float d = max(0.01, -mv.z);
+        gl_PointSize = clamp(uSize * uScale / d, 1.0 * uPr, uMaxPx * uPr); vFade = smoothstep(uFadeNear, uFadeNear * 3.0, d);
+        #ifdef USE_COLOR
+        vCol = color;
+        #else
+        vCol = vec3(1.0);
+        #endif
+        gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `uniform vec3 uColor; uniform float uOpacity; varying float vFade; varying vec3 vCol;
+      void main() { float r = length(gl_PointCoord - 0.5); if (r > 0.5) discard; float a = smoothstep(0.5, 0.3, r) * uOpacity * vFade; if (a < 0.01) discard;
+        gl_FragColor = vec4(uColor * vCol, a);
+        #include <colorspace_fragment>
+      }`,
+  });
+}
+
 // ----------------------------------------------------------------------------- flow lines (power)
 class Flow {
   constructor(points, { n = 14, color = C.green, size = 0.09 } = {}) {
@@ -125,12 +157,12 @@ class Flow {
     this.total = this.len[this.len.length - 1];
     this.s = new Float32Array(n).map((_, i) => i / n * this.total);
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-    this.points = new THREE.Points(geo, new THREE.PointsMaterial({ color, size, sizeAttenuation: true, transparent: true, opacity: 0.95, depthWrite: false }));
+    this.points = new THREE.Points(geo, pointsMaterial({ color, size: size * 0.45, maxPx: 7, opacity: 0.95, fadeNear: 0.6 }));
     this.line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.25 }));
     this.group = new THREE.Group(); this.group.add(this.line, this.points);
     this.speed = 0.6; this.active = true; this.place();
   }
-  setColor(c) { this.points.material.color.setHex(c); this.line.material.color.setHex(c); }
+  setColor(c) { this.points.material.uniforms.uColor.value.setHex(c); this.line.material.color.setHex(c); }
   at(s, out) {
     s = ((s % this.total) + this.total) % this.total;
     let i = 1; while (i < this.len.length - 1 && this.len[i] < s) i++;
@@ -149,35 +181,67 @@ class Flow {
   }
 }
 
+/** Procedural studio room for image-based lighting (after three's RoomEnvironment): a dim box with a few emissive panels. */
+function studioRoom() {
+  const env = new THREE.Scene();
+  const geo = new THREE.BoxGeometry();
+  const room = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: 0x6b7480, roughness: 1 }));
+  room.position.set(-0.757, 13.219, 0.717); room.scale.set(31.713, 28.305, 28.591); env.add(room);
+  const boxMat = new THREE.MeshStandardMaterial({ color: 0x3a4048, roughness: 1 });
+  for (const [p, s, r] of [[[-10.906, 2.009, 1.846], [2.328, 7.905, 4.651], -0.244], [[-5.607, -0.754, -0.758], [1.97, 1.534, 3.955], 0.994], [[6.167, 0.857, 7.803], [3.927, 6.285, 3.687], 0.561], [[-2.017, 0.018, 6.124], [2.002, 4.566, 2.064], 0.4]]) {
+    const b = new THREE.Mesh(geo, boxMat); b.position.set(...p); b.scale.set(...s); b.rotation.y = r; env.add(b);
+  }
+  const light = (i) => new THREE.MeshBasicMaterial({ color: new THREE.Color(1, 1, 1).multiplyScalar(i) });
+  for (const [p, s, i] of [[[-16.116, 14.37, 8.208], [0.1, 2.428, 2.739], 50], [[-16.109, 18.021, -8.207], [0.1, 2.425, 2.751], 50], [[14.904, 12.198, -1.832], [0.15, 4.265, 6.331], 17], [[-0.462, 8.89, 14.52], [4.38, 5.441, 0.088], 43], [[3.235, 11.486, -12.541], [2.5, 2.0, 0.1], 20], [[0.0, 20.0, 0.0], [1.0, 0.1, 1.0], 100]]) {
+    const l = new THREE.Mesh(geo, light(i)); l.position.set(...p); l.scale.set(...s); env.add(l);
+  }
+  return env;
+}
+
 // ----------------------------------------------------------------------------- scene factory
 export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false;   // the sun is static: re-render the shadow map only when geometry, doors or the cutaway change
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2;
+  // Contrast first: a moderate exposure with ACES keeps whites below clipping and darks dark (high exposure + fog read as blur).
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.92;
+  EQ.setAnisotropy(renderer.capabilities.getMaxAnisotropy());
+  MAT.floor.map = EQ.floorTex([6, 1.2]); MAT.pad.map = EQ.concreteTex([5, 2]); MAT.linerPanel.map = EQ.linerTex([10, 1]); MAT.section.map = EQ.insulationTex();
+  MAT.ground.map = EQ.gravelTex([60, 60]); MAT.ground.color.setHex(0x59606a);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x06101f, 0.012);
-  const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 400);
+  // Linear fog only far away, for the ground falloff around the site; nothing inside the enclosure is ever fogged.
+  scene.fog = new THREE.Fog(0x06101f, 60, 220);
+  // Image-based lighting: a procedural studio room (RoomEnvironment-style) prefiltered with PMREM, so metal reads as metal.
+  // Applied per material to the metal parts only (pipes, chrome, galvanised steel, castings, the shell): prefiltered env lookups
+  // are expensive on software GL, and matte paint gains little from them.
+  const envTex = (() => { const pm = new THREE.PMREMGenerator(renderer); const t = pm.fromScene(studioRoom(), 0.04).texture; pm.dispose(); return t; })();
+  function applyEnv(root) {
+    root.traverse(o => { if (!o.material) return; for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+      if (m.isMeshStandardMaterial && !m.envMap && (m.metalness >= 0.55 || m.userData.env)) { m.envMap = envTex; m.envMapIntensity = m.userData.envI || 0.7; m.needsUpdate = true; }
+    } });
+  }
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.03, 400);
   camera.position.set(8, 5, 10);
   const orbit = new OrbitControls(camera, canvas);
   orbit.enableDamping = true; orbit.dampingFactor = 0.08; orbit.maxPolarAngle = Math.PI * 0.495; orbit.minDistance = 0.5; orbit.maxDistance = 80;
   const walk = new PointerLockControls(camera, canvas);
 
   // lights
-  scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x1a2230, 0.8));
-  const sun = new THREE.DirectionalLight(0xfff1dd, 2.2);
+  scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x2a2f36, 0.7));
+  const sun = new THREE.DirectionalLight(0xfff1dd, 2.4);
   sun.position.set(12, 16, 8); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
   sun.shadow.camera.left = -16; sun.shadow.camera.right = 16; sun.shadow.camera.top = 16; sun.shadow.camera.bottom = -16; sun.shadow.bias = -0.0005;
   scene.add(sun);
-  const fill = new THREE.DirectionalLight(0x9fd8ff, 0.35); fill.position.set(-10, 6, -8); scene.add(fill);
-  const back = new THREE.DirectionalLight(0xffffff, 0.25); back.position.set(6, 5, -12); scene.add(back);
+  const fill = new THREE.DirectionalLight(0x9fd8ff, 0.3); fill.position.set(-10, 6, -8); scene.add(fill);
+  const back = new THREE.DirectionalLight(0xffffff, 0.2); back.position.set(6, 5, -12); scene.add(back);
   const interiorLights = new THREE.Group(); scene.add(interiorLights);
 
   // ground
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), MAT.ground); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-  const grid = new THREE.GridHelper(120, 120, 0x1b2b42, 0x152234); grid.position.y = 0.002; scene.add(grid);
+  const grid = new THREE.GridHelper(120, 60, 0x2a3442, 0x222a35); grid.position.y = 0.003; grid.material.transparent = true; grid.material.opacity = 0.35; scene.add(grid);
 
   // model state
   const G = {}; // geometry numbers for the current config
@@ -186,6 +250,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   for (const g of Object.values(groups)) scene.add(g);
   const objects = {}; // key -> Object3D (rack1, cooling1, ups, battery, ats, panel, gateway, doors, drycooler1, cdu, tray, sensor:<id>)
   let pickables = [];
+  const solids = [];   // interior obstacles (equipment bodies, pipes): camera clearance + walkthrough collision
   const racks = [], coolingUnits = [], dryCoolers = [], sensorMeshes = new Map(), flows = [];
   let particles = null, doorLeaves = [], roof = null, wallPos = null, wallNeg = null, decals = [];
   let livery = null;   // Rev 2 livery facts of the current build (lineup, bandText, bodyColor), exposed for tests
@@ -281,6 +346,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const mini = kind === 'minirack';                       // Rev 2 BEN 1: indoor mini rack in an office corner
     const micro = kind === 'cabinet' || mini, hall = kind === 'hall';
     G.mini = mini; G.dense = !!d.liquid_first; G.form = cfg.form || '';
+    ground.visible = grid.visible = !mini;   // BEN 1 stands in an office: no site ground under its floor
     Object.assign(G, {
       extL: geo.ext_l_m, extW: geo.ext_w_m, extH: geo.ext_h_m, intL: geo.int_l_m, intW: geo.int_w_m, intH: geo.int_h_m,
       floorTop: micro ? 0.12 : 0.17, micro, hall, kind, racks: cfg.racks, rackU: geo.rack_u,
@@ -308,7 +374,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
 
     for (const g of Object.values(groups)) clearGroup(g);
     for (const k of Object.keys(objects)) delete objects[k];
-    racks.length = 0; coolingUnits.length = 0; dryCoolers.length = 0; sensorMeshes.clear(); flows.length = 0; doorLeaves = []; decals = []; particles = null; pickables = [];
+    racks.length = 0; coolingUnits.length = 0; dryCoolers.length = 0; sensorMeshes.clear(); flows.length = 0; doorLeaves = []; decals = []; particles = null; pickables = []; solids.length = 0; G.wallStubs = []; G.caps = []; G.wallMounted = []; G.extraModule = false; G.zoneLabels = null; solidCache = null;
     resetLivery();
     G.rev2 = (cfg.lineup || 'rev1') !== 'rev1';
     livery = G.rev2 ? { ...liveryInfo(cfg, d), bandTexture: false } : { lineup: cfg.lineup || 'rev1', bandText: '', bodyColor: null, bandTexture: false };
@@ -318,10 +384,11 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       buildMinirack(cfg, d, p.sensors || []);
       buildTour(cfg, d);
       sun.shadow.camera.left = -4; sun.shadow.camera.right = 4; sun.shadow.camera.top = 4; sun.shadow.camera.bottom = -4; sun.shadow.camera.updateProjectionMatrix();
-      scene.fog.density = 0.02;
       setCamera(mode.camera, true);
       if (state) update(state);
       applyCutaway();
+      renderer.shadowMap.needsUpdate = true;
+      applyEnv(scene);
       return;
     }
     buildShell(cfg, d);
@@ -334,20 +401,23 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     if (G.subs.has('controls')) buildControls(cfg, d, sensorsM);
     buildFx(cfg, d);
     if (clusterD) buildCluster(cfg, d, clusterD);
+    buildZoneLabels(cfg, d);
     buildTour(cfg, d);
     const sh = G.hall ? G.extL * 1.2 : (clusterD ? clusterD.yard.site_l_m * 0.6 : G.extL);
     sun.shadow.camera.left = -sh; sun.shadow.camera.right = sh; sun.shadow.camera.top = sh; sun.shadow.camera.bottom = -sh; sun.shadow.camera.updateProjectionMatrix();
-    scene.fog.density = micro ? 0.02 : (hall ? 0.004 : 0.08 / Math.max(4, G.extL));
     setCamera(mode.camera, true);
     if (state) update(state);
     applyCutaway();
+    renderer.shadowMap.needsUpdate = true;
+    applyEnv(scene);
   }
 
   /** Rev 2 BEN 2000: modules 2..n with the same builders as module 1 (shifted by the yard pitch, -z = site +y), then the shared yard from
    *  config.cluster_yard(): pad-mount transformers, 15 kV switchgear, generators when fitted, the yard slab and the two lanes. Module 1 keeps
    *  the cutaway roof / walls, the sensors and the airflow particles; racks and CDUs of every module are live (twin rack i -> module floor(i / 5)). */
   function buildCluster(cfg, d, cd) {
-    const keep = { roof, wallPos, wallNeg };
+    const keep = { roof, wallPos, wallNeg }, nStubs = G.wallStubs.length, nCaps = G.caps.length;
+    G.extraModule = true;
     const pitch = cd.yard.pitch_mm / 1000;
     const sx = (x) => x / 1000 - G.extL / 2, sz = (y) => -(y / 1000 - G.extW / 2);
     for (let k = 1; k < cd.modules; k++) {
@@ -358,21 +428,42 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       if (G.subs.has('power')) buildPower(cfg, d);
       for (const [n, g] of Object.entries(groups)) for (let i = before[n]; i < g.children.length; i++) g.children[i].position.z -= k * pitch;
     }
-    ({ roof, wallPos, wallNeg } = keep);
+    ({ roof, wallPos, wallNeg } = keep); G.wallStubs.length = nStubs; G.caps.length = nCaps; G.extraModule = false;
     const R = cd.yard.rects, g = groups.power;
     const fe = cd.yard.fence, slab = box((fe[2] - fe[0]) / 1000, 0.05, (fe[3] - fe[1]) / 1000, MAT.pad, (sx(fe[0]) + sx(fe[2])) / 2, -0.03, (sz(fe[1]) + sz(fe[3])) / 2);
     slab.castShadow = false; groups.shell.add(slab); objects.yard = slab;
-    for (const ln of ['LANE-W', 'LANE-E']) { const r = R[ln]; const m = box((r[2] - r[0]) / 1000, 0.04, (r[3] - r[1]) / 1000, MAT.ground, (sx(r[0]) + sx(r[2])) / 2, -0.02, (sz(r[1]) + sz(r[3])) / 2); m.castShadow = false; groups.shell.add(m); }
-    const add = (r, h, mat, type, id, extra = {}) => {
-      const w = (r[2] - r[0]) / 1000, dd = (r[3] - r[1]) / 1000;
-      const m = box(w, h, dd, mat, (sx(r[0]) + sx(r[2])) / 2, h / 2, (sz(r[1]) + sz(r[3])) / 2);
-      m.userData = { type, id, ...extra }; edges(m, 0, 0.3); g.add(m); pickables.push(m); return m;
+    const asphalt = new THREE.MeshStandardMaterial({ color: 0x2b3038, roughness: 0.95 });
+    for (const ln of ['LANE-W', 'LANE-E']) { const r = R[ln]; const m = box((r[2] - r[0]) / 1000, 0.04, (r[3] - r[1]) / 1000, asphalt, (sx(r[0]) + sx(r[2])) / 2, -0.02, (sz(r[1]) + sz(r[3])) / 2); m.castShadow = false; groups.shell.add(m); }
+    const xfFront = new THREE.MeshStandardMaterial({ map: EQ.transformerFront(), roughness: 0.55, metalness: 0.3 });
+    const mvFront = new THREE.MeshStandardMaterial({ map: EQ.mvSwitchgearFront(), roughness: 0.5, metalness: 0.3 });
+    const genSide = new THREE.MeshStandardMaterial({ map: EQ.louvreTex('#3b4656', '#1b2027'), roughness: 0.6, metalness: 0.4 });
+    const add = (r, h, kind, type, id, extra = {}) => {
+      const w = (r[2] - r[0]) / 1000, dd = (r[3] - r[1]) / 1000, cx = (sx(r[0]) + sx(r[2])) / 2, cz = (sz(r[1]) + sz(r[3])) / 2;
+      const P = new Parts(); let m;
+      if (kind === 'transformer') {   // pad-mount: tank + front compartment, radiator fins on the sides, lifting lugs, on its own pad
+        const tw = w * 0.62, td = dd * 0.7;
+        m = new THREE.Mesh(new THREE.BoxGeometry(tw, h, td), mats6(EM.green, { '+z': xfFront, '-z': xfFront }));
+        const nf = Math.max(6, Math.round(td / 0.09));
+        for (const sxn of [-1, 1]) for (let k = 0; k < nf; k++) P.box(0.32, h * 0.72, 0.025, EM.green, sxn * (tw / 2 + 0.16), -h * 0.06, -td / 2 + 0.06 + k * (td - 0.12) / (nf - 1));
+        for (const sxn of [-1, 1]) { P.box(0.05, 0.05, td * 0.9, EM.green, sxn * (tw / 2 + 0.16), h * 0.31, 0); P.box(0.05, 0.05, td * 0.9, EM.green, sxn * (tw / 2 + 0.16), -h * 0.42, 0); }
+        for (const sxn of [-1, 1]) for (const szn of [-1, 1]) P.box(0.06, 0.08, 0.02, EM.green, sxn * tw * 0.4, h / 2 + 0.04, szn * td * 0.4);
+        P.box(w, 0.15, dd, MAT.pad, 0, -h / 2 - 0.075 + 0.0, 0);
+      } else if (kind === 'switchgear') {
+        m = new THREE.Mesh(new THREE.BoxGeometry(w, h, dd * 0.8), mats6(EM.equipLight, { '+z': mvFront, '-z': mvFront }));
+        P.box(w + 0.1, 0.08, dd * 0.8 + 0.1, EM.equipMid, 0, h / 2 + 0.04, 0); P.box(w, 0.12, dd, MAT.pad, 0, -h / 2 - 0.06, 0);
+      } else {   // generator in a sound-attenuated enclosure: louvred sides, exhaust stack, base fuel tank
+        m = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.82, dd), mats6(MAT.powerDark, { '+z': genSide, '-z': genSide }));
+        P.box(w, h * 0.18, dd, EM.darkSteel, 0, -h * 0.41 - h * 0.09 + 0.0, 0).cyl(0.12, 0.9, EM.steel, -w * 0.3, h * 0.41 + 0.45, 0, 'y', 14);
+      }
+      m.position.set(cx, kind === 'generator' ? h * 0.18 + h * 0.41 : h / 2 + (kind === 'transformer' ? 0.15 : 0.12), cz); m.castShadow = m.receiveShadow = true;
+      P.build(m, { cast: true });
+      m.userData = { type, id, ...extra }; g.add(m); pickables.push(m); return m;
     };
     for (let k = 0; k < cd.modules; k++) {
-      objects[`transformer${k + 1}`] = add(R[`T${k + 1}`], 1.9, MAT.cooling, 'transformer', `transformer${k + 1}`, { index: k, label: `T${k + 1} ${cd.transformer_kva.toLocaleString()} kVA, 12.47 kV–480Y/277 V (module ${k + 1})` });
-      if (R[`G${k + 1}`]) objects[`generator${k + 1}`] = add(R[`G${k + 1}`], 2.6, MAT.powerDark, 'generator', `generator${k + 1}`, { index: k });
+      objects[`transformer${k + 1}`] = add(R[`T${k + 1}`], 1.9, 'transformer', 'transformer', `transformer${k + 1}`, { index: k, label: `T${k + 1} ${cd.transformer_kva.toLocaleString()} kVA, 12.47 kV–480Y/277 V (module ${k + 1})` });
+      if (R[`G${k + 1}`]) objects[`generator${k + 1}`] = add(R[`G${k + 1}`], 2.6, 'generator', 'generator', `generator${k + 1}`, { index: k });
     }
-    objects.mvswgr = add(R.SWGR, 2.0, MAT.power, 'switchgear', 'mvswgr', { label: '15 kV pad-mounted switchgear, 4-way' });
+    objects.mvswgr = add(R.SWGR, 2.0, 'switchgear', 'switchgear', 'mvswgr', { label: '15 kV pad-mounted switchgear, 4-way' });
   }
 
   function buildShell(cfg, d) {
@@ -381,35 +472,79 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     // Rev 2: Shop White body (decision default, REV2_DECISION §4.3) with the Night Navy band; Rev 1: the Rev 1 paint
     const color = G.rev2 ? BODY.shop : (micro ? REV1.cab : (cfg.white_label ? REV1.wl : (hall ? REV1.hall : REV1.body)));
     if (G.rev2) livery.bodyColor = LV.shop;
-    // pad (hall: slab-on-grade for the hall, the power module and the plant yard)
+    const corr = micro ? 0 : 0.036;          // ISO trapezoid corrugation on modules; outdoor cabinets have flat panels
+    // concrete pad (hall: slab-on-grade for the hall, the power module and the plant yard)
     const pad = hall ? box(extL + 18, 0.12, extW + 20, MAT.pad, -5, 0.06 - 0.12, 4) : box(extL + 1.2, 0.12, extW + 1.2, MAT.pad, 0, 0.06 - 0.12, 0);
-    pad.receiveShadow = true; g.add(pad);
+    pad.receiveShadow = true; pad.castShadow = false; g.add(pad);
     if (micro) { // skid
       g.add(box(extL + 0.2, 0.1, 0.12, MAT.casting, 0, 0.05, -extW / 2 + 0.1)); g.add(box(extL + 0.2, 0.1, 0.12, MAT.casting, 0, 0.05, extW / 2 - 0.1));
     }
-    // floor slab + roof
+    // floor slab + interior floor
     const floor = box(extL, G.floorTop, extW, MAT.shell(color), 0, G.floorTop / 2, 0); g.add(floor);
     const floorTop = new THREE.Mesh(new THREE.PlaneGeometry(G.intL, G.intW), MAT.floor); floorTop.rotation.x = -Math.PI / 2; floorTop.position.y = G.floorTop + 0.001; floorTop.receiveShadow = true; floorTop.userData = { type: 'container', id: 'container' }; g.add(floorTop);
-    roof = box(extL, extH - G.ceiling, extW, MAT.shell(color), 0, (extH + G.ceiling) / 2, 0); g.add(roof);
-    roof.userData = { type: 'container', id: 'container' }; pickables.push(roof);
-    // long walls (corrugated)
-    wallPos = corrugatedWall(extL, extH, color); wallPos.position.set(0, extH / 2, extW / 2); g.add(wallPos);
-    wallNeg = corrugatedWall(extL, extH, color); wallNeg.rotation.y = Math.PI; wallNeg.position.set(0, extH / 2, -extW / 2); g.add(wallNeg);
-    for (const w of [wallPos, wallNeg]) { w.userData = { type: 'container', id: 'container' }; pickables.push(w); }
+    const tW = Math.max(0.04, (extW - G.intW) / 2), tL = Math.max(0.04, (extL - G.intL) / 2), sill = G.floorTop + 0.45;
+    // roof: outer roof sheet (corrugated across the width) + ceiling liner; removed as one piece by the cutaway
+    roof = new THREE.Group(); roof.userData = { type: 'container', id: 'container' };
+    const roofSlab = box(extL, extH - G.ceiling, extW, MAT.shell(color), 0, (extH + G.ceiling) / 2, 0); roofSlab.userData = { type: 'container', id: 'container' }; roof.add(roofSlab); pickables.push(roofSlab);
+    if (!micro) { const rc = corrugatedWall(extW - 0.2, extL - 0.3, color, 0.3, 0.02); rc.rotation.set(-Math.PI / 2, 0, Math.PI / 2); rc.position.set(0, extH + 0.012, 0); roof.add(rc); }
+    const ceil = new THREE.Mesh(new THREE.PlaneGeometry(G.intL, G.intW), MAT.linerPanel); ceil.rotation.x = Math.PI / 2; ceil.position.y = G.ceiling - 0.002; roof.add(ceil);
+    g.add(roof);
+    // long walls: outer corrugated skin, PIR core, inner liner. The cutaway swaps the near wall for its sill stub with a cut face.
+    G.wallStubs = G.wallStubs || [];
+    const sectionCap = (len, thick, x, y, z, rotY = 0) => {
+      const grp = new THREE.Group();
+      const cap = box(len, 0.02, thick, MAT.section, 0, 0, 0); cap.castShadow = false; grp.add(cap);
+      grp.add(box(len, 0.024, 0.008, MAT.casting, 0, 0.002, thick / 2), box(len, 0.024, 0.006, MAT.casting, 0, 0.002, -thick / 2));
+      grp.position.set(x, y, z); grp.rotation.y = rotY; return grp;
+    };
+    const longWall = (side) => {
+      const full = new THREE.Group();
+      const outer = corrugatedWall(extL, extH, color, 0.278, corr); outer.position.set(0, extH / 2, side * (extW / 2 - corr / 2)); if (side < 0) outer.rotation.y = Math.PI;
+      outer.userData = { type: 'container', id: 'container' }; pickables.push(outer); full.add(outer);
+      const inner = new THREE.Mesh(new THREE.PlaneGeometry(G.intL, G.intH), MAT.linerPanel); inner.position.set(0, G.floorTop + G.intH / 2, side * G.intW / 2); inner.rotation.y = side > 0 ? Math.PI : 0; inner.receiveShadow = true; full.add(inner);
+      const topCap = sectionCap(extL, tW, 0, extH + 0.01, side * (extW + G.intW) / 4); topCap.visible = false; full.add(topCap); G.caps.push(topCap);   // cut face along the top (seen once the roof is off)
+      full.userData.capY = extH;
+      const stub = new THREE.Group(); stub.visible = false;
+      const so = corrugatedWall(extL, sill, color, 0.278, corr); so.position.set(0, sill / 2, side * (extW / 2 - corr / 2)); if (side < 0) so.rotation.y = Math.PI; stub.add(so);
+      const si = new THREE.Mesh(new THREE.PlaneGeometry(G.intL, sill - G.floorTop), MAT.linerPanel); si.position.set(0, (sill + G.floorTop) / 2, side * G.intW / 2); si.rotation.y = side > 0 ? Math.PI : 0; stub.add(si);
+      stub.add(sectionCap(extL, tW, 0, sill + 0.01, side * (extW + G.intW) / 4));
+      g.add(full, stub); G.wallStubs.push({ full, stub, side });
+      return full;
+    };
+    wallPos = longWall(1); wallNeg = longWall(-1);
     // far end wall
-    const endWall = corrugatedWall(extW, extH, color); endWall.rotation.y = Math.PI / 2; endWall.position.set(extL / 2, extH / 2, 0); g.add(endWall);
+    const endWall = corrugatedWall(extW, extH, color, 0.278, corr); endWall.rotation.y = Math.PI / 2; endWall.position.set(extL / 2 - corr / 2, extH / 2, 0); g.add(endWall);
     endWall.userData = { type: 'container', id: 'container' }; pickables.push(endWall);
-    // door end: frame + two leaves hinged at outer edges
+    const endIn = new THREE.Mesh(new THREE.PlaneGeometry(G.intW, G.intH), MAT.linerPanel); endIn.rotation.y = -Math.PI / 2; endIn.position.set(G.intL / 2, G.floorTop + G.intH / 2, 0); g.add(endIn);
+    const endCap = sectionCap(extW, tL, extL / 2 - tL / 2, extH + 0.01, 0, Math.PI / 2); g.add(endCap); endCap.visible = false; G.caps.push(endCap);
+    // door end: frame, corner posts, two leaves hinged at the outer edges, four lock rods with cam keepers, handles, hinges
     const doorGroup = new THREE.Group(); doorGroup.position.set(-extL / 2, 0, 0); doorGroup.userData = { type: 'doors', id: 'doors' };
     const frameMat = MAT.casting;
-    doorGroup.add(box(0.12, extH, 0.12, frameMat, 0, extH / 2, -extW / 2 + 0.06), box(0.12, extH, 0.12, frameMat, 0, extH / 2, extW / 2 - 0.06), box(0.12, 0.12, extW, frameMat, 0, extH - 0.06, 0), box(0.12, 0.15, extW, frameMat, 0, 0.075, 0));
-    const leafW = extW / 2 - 0.12, leafH = extH - 0.3;
+    doorGroup.add(box(0.12, extH, 0.12, frameMat, 0, extH / 2, -extW / 2 + 0.06), box(0.12, extH, 0.12, frameMat, 0, extH / 2, extW / 2 - 0.06), box(0.12, 0.16, extW, frameMat, 0, extH - 0.08, 0), box(0.12, 0.15, extW, frameMat, 0, 0.075, 0));
+    const leafW = extW / 2 - 0.12, leafH = extH - 0.31;
     for (const side of [-1, 1]) {
       const hinge = new THREE.Group(); hinge.position.set(0, 0, side * (extW / 2 - 0.12));
-      const leaf = box(0.06, leafH, leafW, MAT.shell(color), -0.03, 0.15 + leafH / 2, -side * leafW / 2);
+      const leaf = micro ? box(0.05, leafH, leafW, MAT.shell(color), -0.03, 0.15 + leafH / 2, -side * leafW / 2) : new THREE.Mesh(new THREE.BoxGeometry(0.05, leafH, leafW), MAT.shell(color));
+      if (!micro) { leaf.position.set(-0.03, 0.15 + leafH / 2, -side * leafW / 2); leaf.castShadow = leaf.receiveShadow = true; }
       leaf.userData = { type: 'doors', id: 'doors' };
-      // lock rods
-      for (const k of [0.35, 0.65]) leaf.add(box(0.03, leafH - 0.4, 0.03, MAT.casting, -0.05, 0, -side * leafW / 2 + side * k * leafW));
+      const P = new Parts();
+      if (!micro) {
+        for (const k of [0.22, 0.5, 0.78]) P.box(0.02, 0.07, leafW - 0.12, MAT.shell(color), -0.03, (k - 0.5) * leafH, 0);   // pressed stiffeners
+        for (const k of [0.3, 0.7]) {
+          const z = -side * leafW / 2 + side * k * leafW;
+          P.cyl(0.016, leafH - 0.02, EM.galv, -0.06, 0, z, 'y', 10);                                   // lock rod
+          for (const y of [-leafH / 2 + 0.06, leafH / 2 - 0.06]) P.box(0.05, 0.07, 0.07, EM.darkSteel, -0.05, y, z);   // cam keepers
+          for (const y of [-leafH / 2 + 0.3, leafH / 2 - 0.3]) P.box(0.03, 0.03, 0.06, EM.galv, -0.05, y, z);           // rod guides
+          P.box(0.03, 0.04, 0.3, EM.galv, -0.075, -leafH / 2 + 1.0, z + side * 0.13);                    // handle
+          P.box(0.035, 0.08, 0.06, EM.darkSteel, -0.07, -leafH / 2 + 1.0, z + side * 0.02);              // handle hub + retainer
+        }
+        for (const y of [-leafH / 2 + 0.25, -leafH / 2 + leafH * 0.38, leafH / 2 - leafH * 0.38, leafH / 2 - 0.25]) P.cyl(0.03, 0.12, EM.darkSteel, -0.045, y, side * leafW / 2 - side * 0.02, 'y', 10);   // hinges
+        P.box(0.003, 0.18, 0.28, EM.galv, -0.057, leafH / 2 - 0.4, 0);   // CSC plate
+      } else {
+        for (const k of [0.3, 0.7]) P.box(0.018, leafH - 0.3, 0.018, EM.galv, -0.04, 0, side * (k - 0.5) * leafW);
+        P.box(0.03, 0.12, 0.03, EM.galv, -0.04, 0, side * leafW * 0.35);
+      }
+      P.build(leaf);
       hinge.add(leaf); doorGroup.add(hinge); doorLeaves.push({ hinge, side });
       pickables.push(leaf);
     }
@@ -422,13 +557,22 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
         for (const z of [-1, 1]) g.add(box(0.14, extH, 0.1, seamMat, x, extH / 2, z * (extW / 2 + 0.04)));
         g.add(box(0.14, 0.08, extW + 0.1, seamMat, x, extH + 0.03, 0));
       }
-      // roof-edge parapet and the module ridge lines
       for (const z of [-1, 1]) g.add(box(extL + 0.1, 0.1, 0.12, MAT.casting, 0, extH + 0.03, z * (extW / 2 + 0.02)));
     }
-    // corner castings + bottom rails
+    // ISO corner castings (with their apertures), corner posts, top and bottom side rails
     if (!micro && !hall) {
-      for (const x of [-1, 1]) for (const y of [0, 1]) for (const z of [-1, 1]) g.add(box(0.18, 0.12, 0.16, MAT.casting, x * (extL / 2 - 0.09), y ? extH - 0.06 : 0.06, z * (extW / 2 - 0.08)));
-      for (const z of [-1, 1]) { g.add(box(extL, 0.16, 0.08, MAT.casting, 0, 0.08, z * (extW / 2 + 0.03))); g.add(box(extL, 0.08, 0.08, MAT.casting, 0, extH - 0.04, z * (extW / 2 + 0.03))); }
+      const P = new Parts();
+      for (const x of [-1, 1]) for (const y of [0, 1]) for (const z of [-1, 1]) {
+        const cx = x * (extL / 2 - 0.089), cy = y ? extH - 0.059 : 0.059, cz = z * (extW / 2 - 0.081);
+        P.box(0.178, 0.118, 0.162, MAT.casting, cx, cy, cz);
+        P.box(0.06, 0.05, 0.01, EM.black, cx, cy, z * (extW / 2 + 0.0005));        // side aperture
+        P.box(0.01, 0.05, 0.06, EM.black, x * (extL / 2 + 0.0005), cy, cz);         // end aperture
+        P.box(0.11, 0.01, 0.06, EM.black, cx, y ? extH + 0.0005 : -0.0005, cz);     // top / bottom aperture
+      }
+      for (const x of [-1, 1]) for (const z of [-1, 1]) P.box(0.12, extH - 0.236, 0.1, MAT.casting, x * (extL / 2 - 0.07), extH / 2, z * (extW / 2 - 0.06));
+      for (const z of [-1, 1]) { P.box(extL - 0.36, 0.16, 0.06, MAT.casting, 0, 0.08, z * (extW / 2 - 0.01)); P.box(extL - 0.36, 0.09, 0.06, MAT.casting, 0, extH - 0.045, z * (extW / 2 - 0.01)); }
+      P.box(0.06, 0.09, extW - 0.32, MAT.casting, extL / 2 - 0.02, extH - 0.045, 0);
+      P.build(g, { cast: true });
     }
     // brand on both long sides. Rev 2: livery canvas over the whole side (lockup, tier, product line, data plate band);
     // H3 armour panels sit 0.12 m proud of the wall, so the livery moves onto them. Rev 1: the Rev 1 monogram decal.
@@ -488,7 +632,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   /** BEN 2000 hall interior: `rows` rack rows with alternating cold/hot aisles, overhead busway, DLC manifolds per row. */
   function buildHallInterior(cfg, d) {
     const g = groups.shell;
-    const liner = new THREE.Mesh(new THREE.BoxGeometry(G.intL, G.intH, G.intW), MAT.liner); liner.position.set(0, G.floorTop + G.intH / 2, 0); liner.receiveShadow = true; g.add(liner);
+    const liner = new THREE.Mesh(new THREE.BoxGeometry(G.intL, G.intH, G.intW), MAT.liner); liner.position.set(0, G.floorTop + G.intH / 2, 0); liner.visible = false; g.add(liner);
     objects.liner = liner;
     const nL = Math.max(2, Math.round(G.intL / 4));
     for (let r = 0; r < G.rows; r++) for (let i = 0; i < nL; i++) {
@@ -659,45 +803,80 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
 
   function buildInterior(cfg, d) {
     const g = groups.shell;
-    // insulated liner (inside-out box)
-    const liner = new THREE.Mesh(new THREE.BoxGeometry(G.intL, G.intH, G.intW), MAT.liner); liner.position.set(0, G.floorTop + G.intH / 2, 0); liner.receiveShadow = true; g.add(liner);
+    // interior extent (kept for outlines / container highlights; the visible liner is the wall panels of the shell)
+    const liner = new THREE.Mesh(new THREE.BoxGeometry(G.intL, G.intH, G.intW), MAT.liner); liner.position.set(0, G.floorTop + G.intH / 2, 0); liner.visible = false; g.add(liner);
     objects.liner = liner;
-    // interior lights
-    const nL = Math.max(1, Math.round(G.intL / 2.5));
-    for (let i = 0; i < nL; i++) {
-      const pl = new THREE.PointLight(0xdfe9ff, G.micro ? 2 : 10, G.micro ? 2.5 : 7, 1.6); pl.position.set(-G.intL / 2 + (i + 0.5) * G.intL / nL, G.ceiling - 0.1, 0); interiorLights.add(pl);
-      const fixture = box(0.6, 0.03, 0.12, MAT.led(0xeef6ff), pl.position.x, G.ceiling - 0.02, G.zOff - G.rackD / 2 - G.coldW / 2); g.add(fixture);
+    const zc = G.zOff - (G.rackD / 2 + G.coldW / 2), zRow = G.zOff;
+    // ceiling LED strip luminaires (two runs: over the cold aisle and over the row), hung from the roof so the cutaway takes them off
+    const P = new Parts();
+    const runs = G.micro ? [0] : [zc, zRow];
+    const nF = Math.max(1, Math.floor((G.intL - 0.4) / 1.25));
+    const lum = EQ.led(0xf4f8ff);
+    for (const z of runs) for (let i = 0; i < nF; i++) {
+      const x = -G.intL / 2 + 0.2 + (i + 0.5) * (G.intL - 0.4) / nF;
+      P.box(1.12, 0.035, 0.07, EM.equipLight, x, G.ceiling - 0.02, z);
+      P.box(1.08, 0.004, 0.05, lum, x, G.ceiling - 0.039, z);
     }
-    // aisle volumes (thermal ramp: cold #5CD6FF / hot #FF8A3D) with containment doors at the hot aisle ends
-    const aisleH = G.intH - 0.05;
-    const cold = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, G.coldW - 0.02), new THREE.MeshBasicMaterial({ color: T.cool, transparent: true, opacity: 0.08, depthWrite: false }));
-    cold.position.set(0, G.floorTop + aisleH / 2, G.zOff - (G.rackD / 2 + G.coldW / 2)); cold.userData = { type: 'aisle_cold', id: 'aisle_cold' }; groups.cooling.add(cold); edges(cold, T.cool, 0.25);
-    const hot = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, G.hotW - 0.02), new THREE.MeshBasicMaterial({ color: T.warm, transparent: true, opacity: 0.08, depthWrite: false }));
-    hot.position.set(0, G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + G.hotW / 2); hot.userData = { type: 'aisle_hot', id: 'aisle_hot' }; edges(hot, T.warm, 0.25); groups.cooling.add(hot);
+    if (!G.micro) {
+      // VESDA sampling pipe + smoke / heat detectors along the cold aisle ceiling
+      P.cyl(0.0125, G.intL - 0.3, EM.red, 0, G.ceiling - 0.08, zc + 0.25, 'x', 8);
+      for (let i = 0; i < Math.max(2, Math.round(G.intL / 3)); i++) { const x = -G.intL / 2 + (i + 0.5) * G.intL / Math.max(2, Math.round(G.intL / 3)); P.cyl(0.05, 0.035, EM.equipLight, x, G.ceiling - 0.02, zc - 0.2, 'y', 16); P.cyl(0.012, 0.004, EQ.led(0xff6369), x + 0.02, G.ceiling - 0.04, zc - 0.2, 'y', 8); }
+    }
+    P.build(roof, { cast: false });
+    // area lights for the interior (module 1 only on the BEN 2000 yard: the other modules stay closed)
+    if (!G.extraModule) {
+      const nL = G.micro ? 1 : 2;
+      for (let i = 0; i < nL; i++) {
+        const pl = new THREE.PointLight(0xf2f6ff, G.micro ? 1.5 : 1.6 + G.intL * 0.08, G.micro ? 2.5 : G.intL * 0.75 + 2, 0.5); pl.position.set(-G.intL / 2 + (i + 0.5) * G.intL / nL, G.ceiling - 0.06, G.micro ? 0 : zc); interiorLights.add(pl);
+      }
+    }
+    // aisle volumes stay as invisible extents (hover / highlight targets); the floor carries thin thermal-ramp tape lines instead of a haze
+    const aisleH = G.intH - 0.05, hidden = new THREE.MeshBasicMaterial({ visible: false });
+    const cold = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, G.coldW - 0.02), hidden);
+    cold.position.set(0, G.floorTop + aisleH / 2, zc); cold.userData = { type: 'aisle_cold', id: 'aisle_cold' }; groups.cooling.add(cold);
+    const hot = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.04, aisleH, Math.max(0.05, G.hotW - 0.02)), hidden);
+    hot.position.set(0, G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + G.hotW / 2); hot.userData = { type: 'aisle_hot', id: 'aisle_hot' }; groups.cooling.add(hot);
     objects.aisle_cold = cold; objects.aisle_hot = hot;
     if (!G.micro) {
+      const tape = new Parts();
+      tape.box(G.intL - 0.3, 0.003, 0.05, EQ.led(T.cool), 0, G.floorTop + 0.003, G.zOff - G.rackD / 2 - 0.12);
+      if (G.hotW > 0.4) tape.box(G.intL - 0.3, 0.003, 0.05, EQ.led(T.warm), 0, G.floorTop + 0.003, G.zOff + G.rackD / 2 + 0.12);
+      tape.build(groups.shell, { cast: false });
       for (const x of [-1, 1]) {
+        if (G.hotW < 0.4) continue;   // dense tiers: a 200 mm rear plenum, no walk-in hot aisle to contain
         const door = new THREE.Mesh(new THREE.PlaneGeometry(G.hotW - 0.04, aisleH), MAT.glass); door.rotation.y = Math.PI / 2; door.position.set(x * (G.intL / 2 - 0.05), G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + G.hotW / 2); groups.cooling.add(door);
         door.userData = { type: 'containment', id: `containment${x > 0 ? 2 : 1}`, index: x > 0 ? 1 : 0 }; pickables.push(door); objects[door.userData.id] = door;
         const frame = box(0.04, aisleH, 0.04, MAT.tray, x * (G.intL / 2 - 0.05), G.floorTop + aisleH / 2, G.zOff + G.rackD / 2 + 0.02); groups.cooling.add(frame);
       }
+      // clean-agent fire suppression cylinder in the blind-end corner of the cold aisle (valve, gauge, discharge pipe to a ceiling nozzle)
+      // dense tiers: cold-aisle end (the rear is a 200 mm plenum); others: the hot-aisle end, out of the narrow cold aisle's sight line
+      const fx = G.intL / 2 - 0.2, fz = G.hotW > 0.45 ? G.intW / 2 - 0.19 : -G.intW / 2 + 0.19, fs = new THREE.Group(); fs.position.set(fx, G.floorTop, fz);
+      const cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.135, 1.15, 24), EM.red); cyl.position.y = 0.6; cyl.castShadow = true; fs.add(cyl);
+      const F = new Parts();
+      F.add(new THREE.SphereGeometry(0.135, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), EM.red, 0, 1.175, 0);
+      F.cyl(0.045, 0.12, EM.brass, 0, 1.36, 0, 'y', 12); F.cyl(0.035, 0.02, EM.equipLight, 0.06, 1.38, -0.0, 'x', 14);
+      F.cyl(0.02, G.intH - 1.48, EM.red, 0, 1.42 + (G.intH - 1.48) / 2, 0, 'y', 8);
+      F.cyl(0.03, 0.06, EM.chrome, 0, G.intH - 0.06, 0, 'y', 10);
+      F.box(0.06, 0.3, 0.02, EM.galv, 0, 0.6, 0.15); F.box(0.16, 0.12, 0.003, EQ.led(0xffffff), 0, 0.7, -0.136);
+      F.build(fs); groups.shell.add(fs); solids.push(cyl);
     }
   }
 
   function buildRacks(cfg, d) {
     const g = groups.compute;
-    const tex = serverFrontTexture(G.rackU);
+    const liquid = G.dense || G.hd || G.hall || (G.liquid && !G.micro);
+    const profile = G.dense || G.hd ? 'nvl72' : 'std';
     for (let i = 0; i < cfg.racks; i++) {
-      const rack = new THREE.Group(); rack.position.set(G.rackX[i], G.floorTop, G.rackZ ? G.rackZ[i] : G.zOff);
-      const body = box(G.rackW, G.rackH, G.rackD, MAT.rack, 0, G.rackH / 2, 0); body.userData = { type: 'rack', index: i, id: `rack${i + 1}` }; rack.add(body); pickables.push(body);
-      edges(body, 0x4c9dff, 0.12);
-      const frontMat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.4, roughness: 0.7, metalness: 0.2 });
-      const front = new THREE.Mesh(new THREE.PlaneGeometry(G.rackW - 0.06, G.rackH - 0.1), frontMat); front.position.set(0, G.rackH / 2, -G.rackD / 2 - 0.002); front.rotation.y = Math.PI; front.userData = body.userData; rack.add(front); pickables.push(front);
-      const rear = new THREE.Mesh(new THREE.PlaneGeometry(G.rackW - 0.06, G.rackH - 0.1), G.water ? MAT.pipeCold : MAT.rackRear); rear.position.set(0, G.rackH / 2, G.rackD / 2 + 0.002); rear.userData = body.userData; rack.add(rear);
-      if (G.water) { const coil = box(G.rackW, G.rackH - 0.1, 0.14, MAT.coolingDark, 0, G.rackH / 2, G.rackD / 2 + 0.08); coil.userData = { type: 'cooling', index: Math.min(i, d.cooling_units_total - 1), id: `cooling${Math.min(i, d.cooling_units_total - 1) + 1}` }; rack.add(coil); pickables.push(coil); }
-      // label plate
-      const led = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.01), MAT.led(C.green)); led.position.set(0, G.rackH + 0.015, -G.rackD / 2 + 0.01); rack.add(led);
-      rack.userData = { front, frontMat, led, body };
+      const M = EQ.rackModel({ W: G.rackW, H: G.rackH, D: G.rackD, U: G.rackU, profile, liquid, rearDoor: !G.water });
+      const rack = M.group; rack.position.set(G.rackX[i], G.floorTop, G.rackZ ? G.rackZ[i] : G.zOff);
+      const body = M.body; body.userData = { type: 'rack', index: i, id: `rack${i + 1}` }; pickables.push(body); solids.push(body);
+      M.front.userData = body.userData; pickables.push(M.front);
+      if (G.water) {   // rear-door heat exchanger: coil face + hinge frame, fed from the water loop
+        const coilMat = new THREE.MeshStandardMaterial({ map: EQ.coilTex(), roughness: 0.5, metalness: 0.7 });
+        const coil = faceBox(G.rackW, G.rackH - 0.12, 0.14, EM.darkSteel, coilMat, '+z'); coil.position.set(0, G.rackH / 2 + 0.04, G.rackD / 2 + 0.08);
+        coil.userData = { type: 'cooling', index: Math.min(i, d.cooling_units_total - 1), id: `cooling${Math.min(i, d.cooling_units_total - 1) + 1}` }; rack.add(coil); pickables.push(coil); solids.push(coil);
+      }
+      rack.userData = { front: M.front, frontMat: M.frontMat, led: M.led, body };
       g.add(rack); racks.push(rack); objects[`rack${i + 1}`] = body;
     }
   }
@@ -706,77 +885,109 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     return Array.from({ length: n }, (_, i) => G.unitX[i] === undefined ? null : G.unitX[i]);
   }
 
+  /** Front / rear textured material set for a box (BoxGeometry face order +x, -x, +y, -y, +z, -z). */
+  function mats6(body, faces) { const m = [body, body, body, body, body, body]; for (const [k, v] of Object.entries(faces)) m[{ '+x': 0, '-x': 1, '+y': 2, '-y': 3, '+z': 4, '-z': 5 }[k]] = v; return m; }
+  const texMat = (t, extra = {}) => new THREE.MeshStandardMaterial({ map: t.map || t, emissiveMap: t.emissive || null, emissive: t.emissive ? 0xffffff : 0x000000, emissiveIntensity: t.emissive ? 0.9 : 0, roughness: 0.5, metalness: 0.35, ...extra });
+  /** Roof / skid dry cooler: coil faces on the long sides, fan deck with guards on top, legs. Returns { unit, body, fans }. */
+  function dryCoolerModel(L, H, Wd, nf, bodyUserData) {
+    const unit = new THREE.Group();
+    const coil = new THREE.MeshStandardMaterial({ map: EQ.coilTex(), roughness: 0.5, metalness: 0.7 });
+    const body = new THREE.Mesh(new THREE.BoxGeometry(L, H, Wd), mats6(EM.equipLight, { '+z': coil, '-z': coil })); body.position.y = 0.12 + H / 2; body.castShadow = body.receiveShadow = true; body.userData = bodyUserData; unit.add(body);
+    const P = new Parts(); const fans = [];
+    for (const lx of [-1, 1]) for (const lz of [-1, 1]) P.box(0.06, 0.12, 0.06, EM.galv, lx * (L / 2 - 0.06), 0.06, lz * (Wd / 2 - 0.06));
+    P.box(L, 0.05, 0.06, EM.galv, 0, 0.12, Wd / 2 - 0.03); P.box(L, 0.05, 0.06, EM.galv, 0, 0.12, -Wd / 2 + 0.03);
+    const r = Math.min(0.42, Wd / 2 - 0.08, L / nf / 2 - 0.05);
+    for (let f = 0; f < nf; f++) { const x = -L / 2 + (f + 0.5) * L / nf; P.cyl(r + 0.03, 0.08, EM.equipMid, x, 0.12 + H + 0.04, 0, 'y', 28); fans.push(EQ.fanGuard(P, unit, x, 0.12 + H + 0.09, 0, r)); }
+    P.box(0.22, 0.3, 0.06, EM.equipMid, L / 2 - 0.2, 0.12 + H * 0.5, Wd / 2 + 0.03);   // EC fan control box
+    P.build(unit, { cast: true });
+    return { unit, body, fans };
+  }
+
   function buildCooling(cfg, d) {
     const g = groups.cooling;
     const n = d.cooling_units_total;
     const unitW = G.unitW || 0.3;
     if (G.air && !G.micro) {
       const xs = coolingGapPositions(n);
+      const front = new THREE.MeshStandardMaterial({ map: EQ.inrowFront(), roughness: 0.5, metalness: 0.35 });
       let wallIdx = 0;
       for (let i = 0; i < n; i++) {
         let x = xs[i], z = 0, w = unitW, dd = G.rackD;
         if (x === null) { x = G.intL / 2 - 0.5 - wallIdx++ * 0.7; z = G.zOff + G.rackD / 2 + G.hotW - 0.17; w = 0.6; dd = 0.3; } // wall-mounted extras
         const unit = new THREE.Group(); unit.position.set(x, G.floorTop, z + (z === 0 ? G.zOff : 0));
-        const body = box(w, G.rackH, dd, MAT.cooling, 0, G.rackH / 2, 0); body.userData = { type: 'cooling', index: i, id: `cooling${i + 1}` }; unit.add(body); pickables.push(body); edges(body, 0x000000, 0.3);
-        const grilleF = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.04, G.rackH - 0.2), MAT.coolingDark); grilleF.position.set(0, G.rackH / 2, -dd / 2 - 0.002); grilleF.rotation.y = Math.PI; unit.add(grilleF);
-        const grilleB = grilleF.clone(); grilleB.position.z = dd / 2 + 0.002; grilleB.rotation.y = 0; unit.add(grilleB);
-        const strip = new THREE.Mesh(new THREE.BoxGeometry(w - 0.06, 0.04, 0.02), MAT.led(C.green)); strip.position.set(0, G.rackH - 0.08, -dd / 2 - 0.012); unit.add(strip);
+        const body = new THREE.Mesh(new THREE.BoxGeometry(w, G.rackH, dd), mats6(EM.equipLight, { '-z': front, '+z': front })); body.position.y = G.rackH / 2; body.castShadow = body.receiveShadow = true;
+        body.userData = { type: 'cooling', index: i, id: `cooling${i + 1}` }; unit.add(body); pickables.push(body); solids.push(body);
+        const strip = new THREE.Mesh(new THREE.BoxGeometry(Math.min(0.12, w - 0.06), 0.02, 0.01), EQ.led(C.green)); strip.position.set(0, G.rackH - 0.06, -dd / 2 - 0.006); unit.add(strip);
         unit.userData = { strip, body }; g.add(unit); coolingUnits.push(unit); objects[`cooling${i + 1}`] = body;
+      }
+      // condensing units on the roof (one per in-row DX unit), on rails: the heat goes up and out
+      const nc = Math.min(n, Math.max(1, Math.floor((G.extL - 0.6) / 1.15)));
+      for (let i = 0; i < nc; i++) {
+        const cu = dryCoolerModel(1.0, 0.55, 0.8, 1, {}); cu.unit.position.set(-G.extL / 2 + 0.7 + i * 1.15, G.extH, 0); cu.unit.userData.decor = true; g.add(cu.unit);
+        cu.unit.userData.fans = cu.fans; cu.unit.userData.fanPct = 60; dryCoolers.push(cu.unit);
       }
     } else if (G.micro) {
       // cabinet DX mounted on the +z exterior side
       for (let i = 0; i < n; i++) {
         const unit = new THREE.Group(); unit.position.set(-G.extL / 2 + 0.35 + i * 0.5, 0, G.extW / 2 + 0.14);
-        const body = box(0.42, G.extH * 0.7, 0.26, MAT.cooling, 0, G.extH * 0.5, 0); body.userData = { type: 'cooling', index: i, id: `cooling${i + 1}` }; unit.add(body); pickables.push(body); edges(body, 0, 0.3);
-        const fan = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.02, 24), MAT.fan); fan.rotation.x = Math.PI / 2; fan.position.set(0, G.extH * 0.72, 0.14); unit.add(fan);
+        const body = box(0.42, G.extH * 0.7, 0.26, MAT.cooling, 0, G.extH * 0.5, 0); body.userData = { type: 'cooling', index: i, id: `cooling${i + 1}` }; unit.add(body); pickables.push(body);
+        const P = new Parts(); for (const k of [1, 0.7, 0.4]) P.ring(0.15 * k, 0.005, EM.darkSteel, 0, G.extH * 0.72, 0.135, 'z', 28); P.box(0.3, 0.004, 0.01, EM.darkSteel, 0, G.extH * 0.72, 0.135); P.box(0.004, 0.3, 0.01, EM.darkSteel, 0, G.extH * 0.72, 0.135); P.build(unit);
+        const fan = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.02, 24), MAT.fan); fan.rotation.x = Math.PI / 2; fan.position.set(0, G.extH * 0.72, 0.12); unit.add(fan);
         const strip = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.03, 0.02), MAT.led(C.green)); strip.position.set(0, G.extH * 0.2, 0.14); unit.add(strip);
         unit.userData = { strip, body, fan }; g.add(unit); coolingUnits.push(unit); objects[`cooling${i + 1}`] = body;
       }
     } else {
-      // liquid / water: CDU(s) inside at the far end + dry coolers on the roof; manifold pipes in the hot aisle
+      // liquid / water: CDU(s) in the row + heat rejection outside; supply / return headers along the rear with drops to each rack
       const nCdu = G.liquid ? (G.hd ? n : Math.min(2, n)) : 1;
+      const cduT = EQ.cduFront(), cduMat = texMat(cduT);
       for (let k = 0; k < nCdu; k++) {
         const w = G.unitW || 0.6;
         const x = G.unitX[k] !== undefined ? G.unitX[k] : (k === 0 ? G.intL / 2 - 0.4 : -G.intL / 2 + G.bayL + 0.4);
-        const cdu = box(w, G.rackH, G.rackD, MAT.cooling, x, G.floorTop + G.rackH / 2, G.zOff); cdu.userData = { type: 'cdu', id: G.hd ? `cdu${k + 1}` : 'cdu', index: k }; edges(cdu, 0, 0.3); g.add(cdu); pickables.push(cdu);
-        const disp = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.1, 0.25), MAT.led(0x4c9dff)); disp.position.set(0, G.rackH * 0.3, -G.rackD / 2 - 0.003); disp.rotation.y = Math.PI; cdu.add(disp);
-        if (G.hd) { // row CDU: pump pair indicator strip + W45 supply/return stubs on the top
-          const strip = new THREE.Mesh(new THREE.BoxGeometry(w - 0.1, 0.04, 0.02), MAT.led(C.green)); strip.position.set(0, G.rackH / 2 - 0.1, -G.rackD / 2 - 0.012); cdu.add(strip); cdu.userData.strip = strip;
-          cdu.add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 10), MAT.pipeCold).translateY(G.rackH / 2 + 0.15).translateX(-0.12));
-          cdu.add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 10), MAT.pipeHot).translateY(G.rackH / 2 + 0.15).translateX(0.12));
-          objects[`cdu${k + 1}`] = cdu;
+        const cdu = new THREE.Mesh(new THREE.BoxGeometry(w - 0.01, G.rackH, G.rackD), mats6(EM.equipLight, { '-z': cduMat })); cdu.position.set(x, G.floorTop + G.rackH / 2, G.zOff); cdu.castShadow = cdu.receiveShadow = true;
+        cdu.userData = { type: 'cdu', id: G.hd ? `cdu${k + 1}` : 'cdu', index: k }; g.add(cdu); pickables.push(cdu); solids.push(cdu);
+        const P = new Parts(), top = G.rackH / 2;
+        P.box(w - 0.02, 0.08, G.rackD - 0.04, EM.equipMid, 0, -top + 0.04, 0);   // plinth
+        for (const [dx, m] of [[-0.13, EM.pipeSupply], [0.13, EM.pipeReturn]]) {   // W45 supply / return stubs: flange, isolation valve, riser
+          P.cyl(0.045, 0.22, m, dx, top + 0.11, G.rackD * 0.25, 'y', 16); P.cyl(0.075, 0.02, EM.steel, dx, top + 0.02, G.rackD * 0.25, 'y', 20); P.cyl(0.075, 0.02, EM.steel, dx, top + 0.2, G.rackD * 0.25, 'y', 20);
+          P.box(0.11, 0.08, 0.11, EM.darkSteel, dx, top + 0.29, G.rackD * 0.25); P.box(0.2, 0.015, 0.03, EM.red, dx + 0.07, top + 0.34, G.rackD * 0.25);
         }
+        P.box(0.02, 0.18, 0.03, EM.chrome, w / 2 - 0.08, 0, -G.rackD / 2 - 0.016);   // door handle
+        P.build(cdu);
+        const strip = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.018, 0.006), MAT.led(C.green)); strip.position.set(0, top - 0.05, -G.rackD / 2 - 0.004); cdu.add(strip); cdu.userData.strip = strip;
+        if (G.hd) objects[`cdu${k + 1}`] = cdu;
         if (k === 0) objects.cdu = cdu;
       }
-      // manifolds along the hot aisle ceiling with drops to each rack (dlc_hd: a pickable manifold + UQD drop pair on every rack)
-      // dense tiers: both headers stay inside the 200 mm rear plenum (they used to poke through the rack-side wall)
-      const y = G.ceiling - 0.45, z0 = G.zOff + G.rackD / 2 + (G.dense ? 0.06 : 0.12), zs = G.dense ? 0.5 : 1;
-      for (const [mat, dz] of [[MAT.pipeCold, 0], [MAT.pipeHot, 0.16]]) {
-        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.055 : 0.04, G.hd ? 0.055 : 0.04, G.intL - 0.2, 12), mat); pipe.rotation.z = Math.PI / 2; pipe.position.set(0, y - dz, z0 + dz * zs); g.add(pipe);
-        for (const x of G.rackX) { const len = y - dz - (G.floorTop + G.rackH * 0.85); const drop = new THREE.Mesh(new THREE.CylinderGeometry(G.hd ? 0.025 : 0.018, G.hd ? 0.025 : 0.018, len, 8), mat); drop.position.set(x + (dz ? 0.08 : -0.08), y - dz - len / 2, z0 + dz * zs); g.add(drop); }
+      // overhead supply / return headers along the rear (dense tiers: inside the 200 mm rear plenum) with a drop to every rack
+      const y = G.ceiling - 0.3, z0 = G.zOff + G.rackD / 2 + (G.dense ? 0.07 : 0.12), zs = G.dense ? 0.55 : 1, rH = G.hd ? 0.055 : 0.04;
+      const H = new Parts();
+      for (const [mat, dz] of [[EM.pipeSupply, 0], [EM.pipeReturn, 0.13]]) {
+        const zz = z0 + dz * zs, yy = y - dz * 0.6;
+        H.cyl(rH, G.intL - 0.2, mat, 0, yy, zz, 'x', 14);
+        for (let k = 0; k < Math.floor((G.intL - 0.2) / 1.5); k++) H.cyl(rH + 0.01, 0.03, EM.steel, -G.intL / 2 + 0.85 + k * 1.5, yy, zz, 'x', 14);   // couplings
+        for (let k = 0; k < Math.floor((G.intL - 0.2) / 1.5); k++) H.box(0.03, G.ceiling - yy, 0.03, EM.galv, -G.intL / 2 + 0.85 + k * 1.5, (yy + G.ceiling) / 2, zz);   // hangers
+        for (const x of G.rackX) {
+          const xd = x + (dz ? 0.21 : -0.21) * (G.dense ? 1 : 0.5), top = G.floorTop + G.rackH;
+          H.cyl(rH * 0.55, yy - top + 0.02, mat, xd, (yy + top) / 2, zz, 'y', 10);
+          H.box(0.05, 0.05, 0.05, EM.darkSteel, xd, top + 0.18, zz);   // ball valve
+        }
       }
+      H.build(g);
+      const hdr = new THREE.Mesh(new THREE.BoxGeometry(G.intL - 0.2, 0.3, 0.25), new THREE.MeshBasicMaterial({ visible: false })); hdr.position.set(0, y - 0.05, z0 + 0.06); g.add(hdr); solids.push(hdr);
       if (G.hd) {
+        const ghost = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });   // pick target only: the visible manifolds are on the rack rears
         G.rackX.forEach((x, i) => {
-          const man = box(0.3, G.rackH - 0.3, 0.08, MAT.coolingDark, x, G.floorTop + G.rackH / 2, z0 + 0.1); man.userData = { type: 'manifold', id: `manifold${i + 1}`, index: i }; edges(man, 0, 0.3); g.add(man); pickables.push(man); objects[`manifold${i + 1}`] = man;
-          for (let u = 0; u < 4; u++) man.add(new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.12, 8), MAT.casting).rotateX(Math.PI / 2).translateY(-0.1).translateX(-0.09 + u * 0.06).translateZ(-(G.rackH - 0.3) / 2 + 0.3 + u * 0.4));
+          const man = new THREE.Mesh(new THREE.BoxGeometry(G.rackW - 0.04, G.rackH - 0.3, 0.1), ghost); man.position.set(x, G.floorTop + G.rackH / 2, G.zOff + G.rackD / 2 + 0.06);
+          man.userData = { type: 'manifold', id: `manifold${i + 1}`, index: i }; g.add(man); pickables.push(man); objects[`manifold${i + 1}`] = man;
         });
       }
       if (G.dense) { buildDenseCoolingExtras(cfg, d); return; }
       // dry coolers on the roof
       const dcW = Math.min(2.2, (G.extL - 0.6) / n - 0.2), dcL = Math.min(1.1, G.extW - 0.6);
       for (let i = 0; i < n; i++) {
-        const unit = new THREE.Group(); unit.position.set(-G.extL / 2 + 0.4 + dcW / 2 + i * (dcW + 0.2), G.extH, 0);
-        const body = box(dcW, 0.75, dcL, MAT.cooling, 0, 0.45, 0); body.userData = { type: 'drycooler', index: i, id: `cooling${i + 1}` }; unit.add(body); pickables.push(body); edges(body, 0, 0.3);
-        for (const leg of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) unit.add(box(0.06, 0.1, 0.06, MAT.casting, leg[0] * (dcW / 2 - 0.1), 0.05, leg[1] * (dcL / 2 - 0.1)));
-        const fans = []; const nf = Math.max(1, Math.round(dcW / 0.9));
-        for (let f = 0; f < nf; f++) {
-          const ring = new THREE.Mesh(new THREE.TorusGeometry(Math.min(0.38, dcL / 2 - 0.1), 0.03, 8, 32), MAT.coolingDark); ring.rotation.x = Math.PI / 2; ring.position.set(-dcW / 2 + (f + 0.5) * dcW / nf, 0.86, 0); unit.add(ring);
-          const blades = new THREE.Group(); blades.position.copy(ring.position);
-          for (let b = 0; b < 5; b++) { const bl = box(0.3, 0.015, 0.09, MAT.fan, 0.16, 0, 0); const piv = new THREE.Group(); piv.rotation.y = b / 5 * Math.PI * 2; piv.add(bl); blades.add(piv); }
-          unit.add(blades); fans.push(blades);
-        }
-        const strip = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.02), MAT.led(C.green)); strip.position.set(0, 0.2, dcL / 2 + 0.012); unit.add(strip);
-        unit.userData = { strip, body, fans }; g.add(unit); dryCoolers.push(unit); coolingUnits.push(unit); objects[`cooling${i + 1}`] = body;
+        const m = dryCoolerModel(dcW, 0.62, dcL, Math.max(1, Math.round(dcW / 0.9)), { type: 'drycooler', index: i, id: `cooling${i + 1}` });
+        const unit = m.unit; unit.position.set(-G.extL / 2 + 0.4 + dcW / 2 + i * (dcW + 0.2), G.extH, 0); pickables.push(m.body);
+        const strip = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.03, 0.01), MAT.led(C.green)); strip.position.set(-dcW / 2 + 0.2, 0.3, dcL / 2 + 0.01); unit.add(strip);
+        unit.userData = { strip, body: m.body, fans: m.fans }; g.add(unit); dryCoolers.push(unit); coolingUnits.push(unit); objects[`cooling${i + 1}`] = m.body;
       }
     }
   }
@@ -784,54 +995,78 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   /** Rev 2 dense tiers: in-row fan coils on the 18 C trim loop, and the heat-rejection skid (W45 dry coolers + trim chiller) beside the blind end. */
   function buildDenseCoolingExtras(cfg, d) {
     const g = groups.cooling;
+    const fcMat = new THREE.MeshStandardMaterial({ map: EQ.fancoilFront(), roughness: 0.5, metalness: 0.35 });
     G.fcX.forEach((x, k) => {
       const unit = new THREE.Group(); unit.position.set(x, G.floorTop, G.zOff);
-      const body = box(0.3, G.rackH - 0.2, 1.07, MAT.cooling, 0, (G.rackH - 0.2) / 2, 0); body.userData = { type: 'fancoil', id: `fancoil${k + 1}`, index: k }; unit.add(body); pickables.push(body); edges(body, 0, 0.3);
-      const grille = new THREE.Mesh(new THREE.PlaneGeometry(0.26, G.rackH - 0.4), MAT.coolingDark); grille.position.set(0, (G.rackH - 0.2) / 2, -0.537); grille.rotation.y = Math.PI; unit.add(grille);
-      const strip = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.04, 0.02), MAT.led(C.green)); strip.position.set(0, G.rackH - 0.35, -0.55); unit.add(strip);
+      const hh = G.rackH - 0.05;
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.29, hh, 1.07), mats6(EM.equipLight, { '-z': fcMat })); body.position.y = hh / 2; body.castShadow = body.receiveShadow = true;
+      body.userData = { type: 'fancoil', id: `fancoil${k + 1}`, index: k }; unit.add(body); pickables.push(body); solids.push(body);
+      const P = new Parts(); P.cyl(0.018, 0.2, EM.pipeSupply, -0.06, hh + 0.1, 0.3, 'y', 8); P.cyl(0.018, 0.2, EM.pipeReturn, 0.06, hh + 0.1, 0.3, 'y', 8); P.build(unit);
+      const strip = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.016, 0.006), MAT.led(C.green)); strip.position.set(0, hh - 0.05, -0.539); unit.add(strip);
       unit.userData = { strip, body }; g.add(unit); objects[`fancoil${k + 1}`] = body;
     });
-    // adjacent skid: pad, frame, dry cooler bank (one module per CDU), trim chiller, pipe bridge to the module
+    // adjacent skid: concrete pad, steel skid frame, dry cooler bank (one module per CDU), trim chiller, insulated pipe bridge into the end wall
     const n = Math.max(1, d.cooling_units_n || 1), skidL = cfg.it_kw <= 300 ? 2.4 : 4.8, skidW = 2.6, sx0 = G.extL / 2 + 1.5;
-    const skid = box(skidL, 0.25, skidW, MAT.casting, sx0 + skidL / 2, 0.125, 0); skid.userData = { type: 'skid', id: 'skid' }; edges(skid, 0, 0.3); g.add(skid); pickables.push(skid); objects.skid = skid;
+    const skid = box(skidL, 0.25, skidW, MAT.casting, sx0 + skidL / 2, 0.125, 0); skid.userData = { type: 'skid', id: 'skid' }; g.add(skid); pickables.push(skid); objects.skid = skid;
+    const pad = box(skidL + 0.6, 0.12, skidW + 0.6, MAT.pad, sx0 + skidL / 2, -0.06, 0); pad.castShadow = false; g.add(pad);
+    const SP = new Parts();
+    for (let k = 0; k <= Math.round(skidL / 0.8); k++) SP.box(0.1, 0.26, skidW, EM.galv, sx0 + k * skidL / Math.round(skidL / 0.8), 0.13, 0);
     const dcW = skidL / n - 0.1;
     for (let i = 0; i < n; i++) {
-      const unit = new THREE.Group(); unit.position.set(sx0 + 0.05 + dcW / 2 + i * (dcW + 0.1), 0.25, -0.35);
-      const body = box(dcW, 1.6, 1.6, MAT.cooling, 0, 0.8, 0); body.userData = { type: 'drycooler', index: i, id: `drycooler${i + 1}` }; unit.add(body); pickables.push(body); edges(body, 0, 0.3);
-      const fans = [];
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(Math.min(0.5, dcW / 2 - 0.1), 0.03, 8, 32), MAT.coolingDark); ring.rotation.x = Math.PI / 2; ring.position.set(0, 1.62, 0); unit.add(ring);
-      const blades = new THREE.Group(); blades.position.copy(ring.position);
-      for (let b = 0; b < 5; b++) { const piv = new THREE.Group(); piv.rotation.y = b / 5 * Math.PI * 2; piv.add(box(0.36, 0.015, 0.1, MAT.fan, 0.19, 0, 0)); blades.add(piv); }
-      unit.add(blades); fans.push(blades);
-      const strip = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.02), MAT.led(C.green)); strip.position.set(0, 0.3, 0.81); unit.add(strip);
-      unit.userData = { strip, body, fans, unit: i }; g.add(unit); dryCoolers.push(unit); if (i === 0) objects.drycooler1 = body;
+      const m = dryCoolerModel(dcW, 1.45, 1.6, Math.max(1, Math.round(dcW / 1.1)), { type: 'drycooler', index: i, id: `drycooler${i + 1}` });
+      const unit = m.unit; unit.position.set(sx0 + 0.05 + dcW / 2 + i * (dcW + 0.1), 0.25, -0.35); pickables.push(m.body);
+      const strip = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.03, 0.01), MAT.led(C.green)); strip.position.set(-dcW / 2 + 0.25, 0.5, 0.81); unit.add(strip);
+      unit.userData = { strip, body: m.body, fans: m.fans, unit: i }; g.add(unit); dryCoolers.push(unit); if (i === 0) objects.drycooler1 = m.body;
     }
-    const trim = box(1.0, 1.4, 0.8, MAT.coolingDark, sx0 + skidL - 0.6, 0.95, 0.85); trim.userData = { type: 'trim_chiller', id: 'trim_chiller' }; edges(trim, 0, 0.3); g.add(trim); pickables.push(trim); objects.trim_chiller = trim;
-    for (const [mat, dz] of [[MAT.pipeCold, -0.12], [MAT.pipeHot, 0.12]]) {
-      const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.6, 10), mat); pipe.rotation.z = Math.PI / 2; pipe.position.set(G.extL / 2 + 0.75, 1.0, dz); g.add(pipe);
+    const lv = new THREE.MeshStandardMaterial({ map: EQ.louvreTex(), roughness: 0.5, metalness: 0.3 });
+    const trim = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.3, 0.8), mats6(EM.equipLight, { '+x': lv, '-x': lv, '+z': lv })); trim.position.set(sx0 + skidL - 0.6, 0.9, 0.85); trim.castShadow = trim.receiveShadow = true;
+    trim.userData = { type: 'trim_chiller', id: 'trim_chiller' }; g.add(trim); pickables.push(trim); objects.trim_chiller = trim;
+    const TP = new Parts(); TP.cyl(0.32, 0.06, EM.equipMid, 0, 0.68, 0, 'y', 24); const tf = EQ.fanGuard(TP, trim, 0, 0.72, 0, 0.3); TP.box(0.3, 0.4, 0.02, EM.darkSteel, -0.2, 0.1, -0.41); TP.box(0.18, 0.1, 0.005, EQ.led(0x14325a), -0.2, 0.22, -0.421); TP.build(trim);
+    dryCoolers.push({ userData: { fans: [tf], fanPct: 70, decor: true } });
+    // insulated supply / return from the skid header up and across into the blind end wall
+    const xs = G.extL / 2, xe = sx0 + 0.3;
+    for (const [mat, dz] of [[EM.pipeSupply, -0.14], [EM.pipeReturn, 0.14]]) {
+      const yb = 1.05 + (dz > 0 ? 0.0 : 0.16);
+      SP.cyl(0.07, xe - xs, mat, (xs + xe) / 2, yb, dz, 'x', 14);
+      SP.cyl(0.07, yb - 0.25, mat, xe, (yb + 0.25) / 2, dz, 'y', 14);
+      SP.add(new THREE.SphereGeometry(0.07, 14, 10), mat, xe, yb, dz);
+      SP.cyl(0.11, 0.03, EM.steel, xs + 0.02, yb, dz, 'x', 18);   // wall flange
+      SP.box(0.05, yb, 0.05, EM.galv, (xs + xe) / 2, yb / 2, dz);   // pipe support
     }
+    SP.build(g, { cast: true });
   }
 
   /** Rev 2 dense tiers: the power gear stands in the row (switchboard sections, UPS frames, lithium cabinets, backed onto the rack wall). */
   function buildDensePower(cfg, d) {
     const g = groups.power, zw = G.intW / 2;   // the rack wall
     const depth = { swbd: 0.61, ups: 0.925, batt: 1.0, rect: 1.0, batt800: 1.0 };
+    const upsT = EQ.upsFront(), batT = EQ.batteryFront();
+    const upsMat = texMat(upsT), batMat = texMat(batT, { roughness: 0.55 });
     let nB = 0, nU = 0, nS = 0;
     for (const it of G.powerItems) {
       const dd = depth[it.kind] || 1.0, hgt = Math.min(G.intH - 0.2, it.kind === 'swbd' ? 2.29 : 2.0);
       const type = it.kind === 'swbd' ? 'switchgear' : (it.kind === 'ups' ? 'ups' : (it.kind === 'rect' ? 'rectifier' : 'battery'));
       const idx = type === 'battery' ? nB++ : type === 'ups' ? nU++ : nS++;
-      const cab = box(it.w - 0.02, hgt, dd, type === 'battery' ? MAT.battery : MAT.power, it.x, G.floorTop + hgt / 2, zw - dd / 2);
-      cab.userData = { type, id: type === 'switchgear' ? 'switchgear' : (type === 'rectifier' ? 'rectifier' : type), index: idx }; edges(cab, 0, 0.35); g.add(cab); pickables.push(cab);
-      cab.add(new THREE.Mesh(new THREE.PlaneGeometry(Math.min(0.5, it.w * 0.6), 0.14), MAT.led(type === 'battery' ? C.green : 0x4c9dff)).translateY(hgt / 2 - 0.25).translateZ(-dd / 2 - 0.003).rotateY(Math.PI));
-      if (type === 'switchgear') for (let k = 0; k < 4; k++) cab.add(box(it.w * 0.7, 0.3, 0.02, MAT.powerDark, 0, -0.7 + k * 0.42, -dd / 2 - 0.01));
+      const front = type === 'switchgear' ? new THREE.MeshStandardMaterial({ map: EQ.switchboardFront(idx), roughness: 0.5, metalness: 0.35 }) : type === 'battery' ? batMat : upsMat;
+      const bodyMat = type === 'battery' ? EM.equipDark : EM.equipLight;
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(it.w - 0.02, hgt, dd), mats6(bodyMat, { '-z': front })); cab.position.set(it.x, G.floorTop + hgt / 2, zw - dd / 2); cab.castShadow = cab.receiveShadow = true;
+      cab.userData = { type, id: type === 'switchgear' ? 'switchgear' : (type === 'rectifier' ? 'rectifier' : type), index: idx }; g.add(cab); pickables.push(cab); solids.push(cab);
+      const P = new Parts();
+      P.box(it.w - 0.03, 0.08, dd - 0.04, EM.black, 0, -hgt / 2 + 0.04, 0);   // plinth
+      if (type === 'switchgear') { P.box(it.w - 0.02, 0.18, dd, EM.equipMid, 0, hgt / 2 + 0.09, 0); P.box(0.02, 0.14, 0.03, EM.chrome, it.w / 2 - 0.08, 0.1, -dd / 2 - 0.015); }
+      else for (const sx of [-1, 1]) P.box(0.02, 0.16, 0.03, EM.chrome, sx * 0.05 + (type === 'battery' ? it.w * 0.3 : 0), 0.15, -dd / 2 - 0.015);
+      P.build(cab);
       if (!objects[type]) objects[type] = cab;
     }
     if (!objects.ups) objects.ups = objects.rectifier || objects.battery;
     // ATS / main on the end wall outside the row; the 600 A wall panel (BEN 300) or the first switchboard section is the distribution panel
-    const ats = box(0.22, 0.9, 0.4, MAT.powerDark, G.intL / 2 - 0.11, G.floorTop + 1.55, -G.intW / 2 + 0.35); ats.userData = { type: 'ats', id: 'ats' }; edges(ats, 0, 0.35); g.add(ats); pickables.push(ats); objects.ats = ats;
+    const ats = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.9, 0.4), mats6(EM.equipLight, { '-x': new THREE.MeshStandardMaterial({ map: EQ.panelboardFront('ats'), roughness: 0.5 }) }));
+    ats.position.set(G.intL / 2 - 0.11, G.floorTop + 1.55, -G.intW / 2 + 0.35); ats.castShadow = true; ats.userData = { type: 'ats', id: 'ats' }; g.add(ats); pickables.push(ats); objects.ats = ats;
     if (objects.switchgear) objects.panel = objects.switchgear;
-    else { const panel = box(0.25, 1.8, 0.9, MAT.power, G.intL / 2 - 0.13, G.floorTop + 1.2, -G.intW / 2 + 0.55 + 0.45); panel.userData = { type: 'panel', id: 'panel' }; edges(panel, 0, 0.35); g.add(panel); pickables.push(panel); objects.panel = panel; }
+    else {
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(0.25, 1.8, 0.9), mats6(EM.equipLight, { '-x': new THREE.MeshStandardMaterial({ map: EQ.panelboardFront('panel'), roughness: 0.5 }) }));
+      panel.position.set(G.intL / 2 - 0.13, G.floorTop + 1.2, -G.intW / 2 + 0.55 + 0.45); panel.castShadow = true; panel.userData = { type: 'panel', id: 'panel' }; g.add(panel); pickables.push(panel); objects.panel = panel; solids.push(panel);
+    }
     G.powerEndX = -G.intL / 2;
   }
 
@@ -839,8 +1074,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const g = groups.power;
     // cable tray above the rack row (containers only)
     const tray = new THREE.Group(); tray.position.set(0, G.ceiling - 0.3, G.zOff); tray.visible = !G.micro;
-    tray.add(box(G.intL - 0.1, 0.04, 0.04, MAT.tray, 0, 0, -0.15), box(G.intL - 0.1, 0.04, 0.04, MAT.tray, 0, 0, 0.15));
-    for (let x = -G.intL / 2 + 0.2; x < G.intL / 2 - 0.1; x += 0.3) tray.add(box(0.03, 0.03, 0.3, MAT.tray, x, 0, 0));
+    { // ladder cable tray: two side rails, rungs at 300 mm, threaded-rod hangers, a few cable bundles laid in it
+      const P = new Parts(), L = G.intL - 0.1;
+      P.box(L, 0.08, 0.012, EM.galv, 0, 0.02, -0.15).box(L, 0.08, 0.012, EM.galv, 0, 0.02, 0.15);
+      for (let x = -L / 2 + 0.15; x < L / 2; x += 0.3) P.box(0.03, 0.015, 0.3, EM.galv, x, -0.012, 0);
+      for (let x = -L / 2 + 0.6; x < L / 2; x += 1.5) for (const z of [-0.17, 0.17]) P.cyl(0.005, 0.32, EM.steel, x, 0.16, z, 'y', 6);
+      for (const [z, c] of [[-0.08, EM.black], [0.0, EM.hose], [0.08, EM.black]]) P.cyl(0.022, L - 0.2, c, 0, 0.012, z, 'x', 8);
+      P.build(tray, { cast: false });
+    }
     const trayPick = box(G.intL - 0.1, 0.06, 0.34, new THREE.MeshBasicMaterial({ visible: false }), 0, 0, 0); trayPick.userData = { type: 'tray', id: 'tray' }; tray.add(trayPick); pickables.push(trayPick);
     g.add(tray); objects.tray = tray;
 
@@ -864,33 +1105,33 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       const cabD = Math.min(0.6, G.bayL - 0.45), cabH = Math.min(1.9, G.intH - 0.35);
       const rowW = nCab * cabW + (nCab - 1) * 0.05;
       let z = -rowW / 2 + cabW / 2;
+      const upsMat = texMat(EQ.upsFront()), batMat = texMat(EQ.batteryFront(), { roughness: 0.55 });
+      const cab = (type, mat, bodyMat, z, ud) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(cabD, cabH, cabW), mats6(bodyMat, { '+x': mat })); m.position.set(x0 + 0.05 + cabD / 2, G.floorTop + cabH / 2, z); m.castShadow = m.receiveShadow = true;
+        m.userData = ud; g.add(m); pickables.push(m); solids.push(m);
+        const P = new Parts(); P.box(cabD - 0.04, 0.07, cabW - 0.02, EM.black, 0, -cabH / 2 + 0.035, 0); P.box(0.03, 0.15, 0.02, EM.chrome, cabD / 2 + 0.015, 0.1, cabW * 0.32); P.build(m);
+        return m;
+      };
       for (let m = 0; m < d.ups_modules; m++) {
-        const ups = box(cabD, cabH, cabW, MAT.power, x0 + 0.05 + cabD / 2, G.floorTop + cabH / 2, z); ups.userData = { type: 'ups', id: 'ups' }; edges(ups, 0, 0.35); g.add(ups); pickables.push(ups);
-        ups.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.65, 0.16), MAT.led(0x4c9dff)).translateY(0.55).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
-        for (let k = 0; k < 3; k++) ups.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.25, cabW * 0.8), MAT.powerDark).translateY(-0.55 + k * 0.3).translateX(cabD / 2 + 0.004));
+        const ups = cab('ups', upsMat, EM.equipLight, z, { type: 'ups', id: 'ups' });
         if (m === 0) objects.ups = ups;
         z += cabW + 0.05;
       }
       for (let r = 0; r < nRect; r++) {
         // 800 VDC: SiC rectifier / SST front-end cabinet (4 x 100 kW modules each) in place of the UPS frames
-        const rect = box(cabD, cabH, cabW, MAT.power, x0 + 0.05 + cabD / 2, G.floorTop + cabH / 2, z); rect.userData = { type: 'rectifier', id: 'rectifier', index: r }; edges(rect, 0, 0.35); g.add(rect); pickables.push(rect);
-        for (let k = 0; k < 4; k++) rect.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.3, cabW * 0.8), MAT.powerDark).translateY(-0.6 + k * 0.38).translateX(cabD / 2 + 0.004));
-        for (let k = 0; k < 4; k++) rect.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.03, 0.03), MAT.led(C.green)).translateY(-0.72 + k * 0.38).translateX(cabD / 2 + 0.008).translateZ(cabW * 0.3));
-        rect.add(new THREE.Mesh(new THREE.PlaneGeometry(cabW * 0.5, 0.12), MAT.led(0x4c9dff)).translateY(cabH / 2 - 0.2).translateX(cabD / 2 + 0.002).rotateY(Math.PI / 2));
+        const rect = cab('rectifier', upsMat, EM.equipLight, z, { type: 'rectifier', id: 'rectifier', index: r });
         if (r === 0) { objects.rectifier = rect; objects.ups = objects.ups || rect; }
         z += cabW + 0.05;
       }
       for (let b = 0; b < nBat; b++) {
-        const bat = box(cabD, cabH, cabW, MAT.battery, x0 + 0.05 + cabD / 2, G.floorTop + cabH / 2, z); bat.userData = { type: 'battery', id: 'battery' }; edges(bat, 0, 0.35); g.add(bat); pickables.push(bat);
-        for (let k = 0; k < 6; k++) bat.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.02, cabW * 0.8), MAT.coolingDark).translateY(-0.7 + k * 0.28).translateX(cabD / 2 + 0.004));
-        bat.add(new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.04, 0.04), MAT.led(C.green)).translateY(cabH / 2 - 0.12).translateX(cabD / 2 + 0.006));
+        const bat = cab('battery', batMat, EM.equipDark, z, { type: 'battery', id: 'battery' });
         if (b === 0) objects.battery = bat;
         z += cabW + 0.05;
       }
-      const ats = box(0.4, 0.9, 0.22, MAT.powerDark, x0 + 0.3, G.floorTop + 1.55, zWall - 0.11); ats.userData = { type: 'ats', id: 'ats' }; edges(ats, 0, 0.35); g.add(ats); pickables.push(ats); objects.ats = ats;
-      ats.add(new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.01), MAT.led(C.green)).translateY(0.3).translateZ(-0.115));
-      const panel = box(0.55, 1.0, 0.2, MAT.power, x0 + Math.min(G.bayL - 0.3, 0.85), G.floorTop + 1.5, zWall - 0.1); panel.userData = { type: 'panel', id: 'panel' }; edges(panel, 0, 0.35); g.add(panel); pickables.push(panel); objects.panel = panel;
-      for (let k = 0; k < Math.min(cfg.racks + 2, 12); k++) panel.add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.02), MAT.powerDark).translateX(-0.18 + (k % 4) * 0.12).translateY(0.3 - Math.floor(k / 4) * 0.2).translateZ(-0.11));
+      const ats = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.9, 0.22), mats6(EM.equipLight, { '-z': new THREE.MeshStandardMaterial({ map: EQ.panelboardFront('ats'), roughness: 0.5 }) }));
+      ats.position.set(x0 + 0.3, G.floorTop + 1.55, zWall - 0.11); ats.castShadow = true; ats.userData = { type: 'ats', id: 'ats' }; g.add(ats); pickables.push(ats); objects.ats = ats;
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(0.55, 1.0, 0.2), mats6(EM.equipLight, { '-z': new THREE.MeshStandardMaterial({ map: EQ.panelboardFront('panel'), roughness: 0.5 }) }));
+      panel.position.set(x0 + Math.min(G.bayL - 0.3, 0.85), G.floorTop + 1.5, zWall - 0.1); panel.castShadow = true; panel.userData = { type: 'panel', id: 'panel' }; g.add(panel); pickables.push(panel); objects.panel = panel;
       if (G.dc800) {
         // 800 VDC busway (±400 V) over the rack row with a DC tap-off box per rack, replacing the AC feeders in the power tray
         const bwY = G.ceiling - 0.42, bwZ = G.zOff - G.rackD / 2 - 0.1, bwLen = G.intL - G.bayL - 0.3;
@@ -959,12 +1200,27 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     // Rev 2 livery: Night Navy powder-coat body (indoor default), lockup and S2 data plate band (brand/v2/livery/previews/ben1-*.png)
     const bodyMat = new THREE.MeshStandardMaterial({ color: BODY.night, roughness: 0.55, metalness: 0.35 });
     livery.bodyColor = LV.night;
-    const body = box(W, H, D, bodyMat, 0, H / 2, 0); body.userData = { type: 'rack', index: 0, id: 'rack1' }; rack.add(body); pickables.push(body); edges(body, 0x4c9dff, rack10 ? 0.3 : 0.15);
+    const glassFront = new THREE.MeshPhysicalMaterial({ color: 0x9fb3cc, transparent: true, opacity: 0.16, roughness: 0.05, metalness: 0.1, depthWrite: false });
+    const body = rack10 ? box(W, H, D, bodyMat, 0, H / 2, 0) : new THREE.Mesh(new THREE.BoxGeometry(W, H, D), mats6(bodyMat, { '+z': glassFront }));
+    if (!rack10) { body.position.y = H / 2; body.castShadow = body.receiveShadow = true; }
+    body.userData = { type: 'rack', index: 0, id: 'rack1' }; rack.add(body); pickables.push(body);
+    { // cabinet / rack hardware: door frame, handle, vented top, feet (cab12) or open 10-inch frame posts (rack10)
+      const P = new Parts();
+      if (rack10) { for (const sx2 of [-1, 1]) for (const sz2 of [-1, 1]) P.box(0.02, H, 0.02, EM.rackFrame, sx2 * (W / 2 - 0.01), H / 2, sz2 * (D / 2 - 0.01)); P.box(W, 0.02, D, EM.rackFrame, 0, H - 0.01, 0); P.box(W, 0.02, D, EM.rackFrame, 0, 0.01, 0); }
+      else {
+        const fz = D / 2 + 0.006;
+        P.box(W, 0.05, 0.012, bodyMat, 0, H - 0.025, fz).box(W, 0.05, 0.012, bodyMat, 0, 0.025, fz).box(0.04, H, 0.012, bodyMat, -W / 2 + 0.02, H / 2, fz).box(0.04, H, 0.012, bodyMat, W / 2 - 0.02, H / 2, fz);
+        P.box(0.015, 0.14, 0.03, EM.chrome, W / 2 - 0.045, H * 0.55, fz + 0.012);
+        for (let k = 0; k < 8; k++) P.box(W * 0.6, 0.004, 0.012, EM.black, 0, H + 0.002, -D / 2 + 0.08 + k * 0.03);
+        for (const sx2 of [-1, 1]) for (const sz2 of [-1, 1]) P.cyl(0.02, 0.03, EM.rubber, sx2 * (W / 2 - 0.05), -0.012, sz2 * (D / 2 - 0.05), 'y', 10);
+      }
+      P.build(rack);
+    }
     if (rack10) { body.material = bodyMat.clone(); body.material.transparent = true; body.material.opacity = 0.22; }   // open front: see the shelves
     const tex = serverFrontTexture(G.rackU);
-    const frontMat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.4, roughness: 0.7, metalness: 0.2, transparent: rack10, opacity: rack10 ? 0.0 : 1 });
+    const frontMat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.4, roughness: 0.7, metalness: 0.2, transparent: true, opacity: 0.0, depthWrite: false });   // the real contents show through the open front / glass door
     const front = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.06, H - 0.1), frontMat); front.position.set(0, H / 2, D / 2 + 0.003); front.userData = body.userData; rack.add(front);
-    if (!rack10) { const door = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.04, H - 0.06), MAT.glass); door.position.set(0, H / 2, D / 2 + 0.008); rack.add(door); }
+
     const led = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.01), MAT.led(C.green)); led.position.set(W / 2 - 0.08, H - 0.04, D / 2 + 0.01); rack.add(led);
     // side panels carry the stacked lockup, BEN 1, the product line and the band; rack10 adds a lockup bezel across the top
     // of the open front, cab12 the band across the foot of the glass door
@@ -984,14 +1240,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     }
     livery.bandTexture = true;
     rack.userData = { front, frontMat, led, body };
-    gc.add(rack); racks.push(rack); objects.rack1 = body;
+    gc.add(rack); racks.push(rack); objects.rack1 = body; solids.push(body);
     G.rackX = [rx]; G.rackZ = [rz]; G.rowZ = [rz];
     // contents stack (bottom up), 19-inch or 10-inch wide
     const iw = rack10 ? 0.222 : 0.48, u = 0.04445; let uy = baseY + 0.03;
     const add = (type, id, nU, depth, mat, label) => {
-      const m = box(iw, nU * u - 0.004, depth, mat, rx, uy + nU * u / 2, rz + D / 2 - depth / 2 - 0.03); m.userData = { type, id, label }; edges(m, 0, 0.35);
+      const bz = new THREE.MeshStandardMaterial({ map: EQ.bezelTex(type === 'ai_box' && !rack10 ? 'gpu' : type, nU, !rack10), roughness: 0.5, metalness: 0.4 });
+      const m = faceBox(iw, nU * u - 0.004, depth, mat, bz, '+z'); m.position.set(rx, uy + nU * u / 2, rz + D / 2 - depth / 2 - 0.03); m.userData = { type, id, label };
       (type === 'ups' || type === 'pdu' || type === 'battery' ? gp : (type === 'edge' ? gt : gc)).add(m); pickables.push(m); objects[id] = objects[id] || m;
-      m.add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.01, 0.005), MAT.led(C.green)).translateX(iw / 2 - 0.03).translateZ(depth / 2 + 0.003));
       uy += nU * u; return m;
     };
     const ai = cfg.profile === 'ai_training' || cfg.profile === 'ai_inference';
@@ -1041,11 +1297,14 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     for (const f of flows) gp.add(f.group);
   }
 
+  const sensorClip = new THREE.BoxGeometry(0.016, 0.03, 0.012).translate(0, -0.026, 0);
   function buildControls(cfg, d, sensors) {
     const g = groups.controls;
     // gateway / network cabinet on the cold-aisle wall at the door end
     const gw = box(0.45, 0.55, 0.18, MAT.gateway, -G.intL / 2 + (G.micro ? 0.2 : 0.5), G.floorTop + (G.micro ? 1.2 : 1.7), -(G.intW / 2 - 0.09));
-    gw.userData = { type: 'controller', id: 'controller' }; edges(gw, 0x4c9dff, 0.35); g.add(gw); pickables.push(gw); objects.controller = gw; objects.gateway = gw;
+    gw.userData = { type: 'controller', id: 'controller' }; g.add(gw); pickables.push(gw); objects.controller = gw; objects.gateway = gw;
+    gw.material = mats6(MAT.gateway, { '+z': new THREE.MeshStandardMaterial({ map: EQ.bezelTex('edge', 4, false), roughness: 0.5, metalness: 0.4 }) });
+    G.wallMounted = [{ obj: gw, side: -1 }];   // hangs on the cold-side long wall: goes with it when the cutaway takes that wall off
     for (let k = 0; k < 4; k++) gw.add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.01), MAT.led(k % 2 ? C.cyan : C.green)).translateX(-0.15 + k * 0.08).translateY(0.2).translateZ(0.115));
     // leak-detection rope along the floor under the rack row (BEN Pod leak input)
     const ropeMat = new THREE.MeshStandardMaterial({ color: 0xf2c94c, roughness: 0.8 });
@@ -1054,7 +1313,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       rope.position.set(0, G.floorTop + 0.01, (G.rowZ ? G.rowZ[r] : G.zOff) + G.rackD / 2 + 0.06); rope.userData = { type: 'leak_rope', id: 'leak_rope', index: r }; g.add(rope); pickables.push(rope); if (r === 0) objects.leak_rope = rope;
     }
     // sensors as small spheres (clamped into the interior)
-    const r = G.micro ? 0.02 : 0.03;
+    const r = G.micro ? 0.015 : 0.018;
     const geo = new THREE.SphereGeometry(r, 12, 10);
     for (const s of sensors) {
       const rm = /_r(\d+)(_|$)/.exec(s.id);
@@ -1063,16 +1322,17 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       p.z = THREE.MathUtils.clamp(p.z, -G.intW / 2 + 0.08, G.intW / 2 - 0.08);
       p.y = THREE.MathUtils.clamp(p.y + G.floorTop, G.floorTop + 0.03, G.ceiling - 0.08);
       const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x9fb3cc, emissive: 0x9fb3cc, emissiveIntensity: 0.6, roughness: 0.4 }));
+      m.add(new THREE.Mesh(sensorClip, EM.equipDark));   // probe clip / housing
       m.position.copy(p); m.userData = { type: 'sensor', id: s.id, spec: s }; g.add(m); pickables.push(m); sensorMeshes.set(s.id, m); objects[`sensor:${s.id}`] = m;
     }
   }
 
   function buildFx(cfg, d) {
     if (!G.subs.has('cooling')) return;
-    const n = Math.min(1600, Math.max(200, (G.racks || 1) * 180));
+    const n = Math.min(720, Math.max(160, (G.racks || 1) * 90));
     const pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    const mat = new THREE.PointsMaterial({ size: G.micro ? 0.015 : 0.03, map: dotTexture(), alphaTest: 0.2, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false, sizeAttenuation: true });
+    const mat = pointsMaterial({ size: G.micro ? 0.008 : 0.014, maxPx: 4, opacity: 0.75, fadeNear: G.micro ? 0.3 : 0.8, vertexColors: true });
     particles = new THREE.Points(geo, mat); particles.frustumCulled = false;
     // sources: cold-side positions of cooling units (or the far end for liquid / micro)
     const srcX = [];
@@ -1301,50 +1561,119 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     const hfov = 2 * Math.atan(Math.tan(vfov / 2) * Math.max(0.5, camera.aspect || 1));
     return radius / Math.sin(Math.min(vfov, hfov) / 2) * 1.08;
   }
+  /** Distance at which a span of `w` metres (and `h` metres tall) fills the view with a margin. */
+  function fitSpan(w, h = 0) {
+    const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * Math.max(0.5, camera.aspect || 1));
+    return Math.max(w / 2 / Math.tan(hfov / 2), h / 2 / Math.tan(vfov / 2)) * 1.12;
+  }
+  // ---- clearance: bounding boxes of everything a camera or a walker must not sit in (racks, CDUs, power gear, pipes, walls)
+  let solidCache = null;
+  function solidBoxes() {
+    if (!solidCache) solidCache = solids.filter(o => o.parent).map(o => { o.updateWorldMatrix(true, false); return new THREE.Box3().setFromObject(o); }).filter(b => !b.isEmpty());
+    return solidCache;
+  }
+  const inContainer = (p, pad = 0) => !G.mini && Math.abs(p.x) < G.extL / 2 + pad && Math.abs(p.z) < G.extW / 2 + pad && p.y < G.extH + pad && p.y > 0;
+  const _ray = new THREE.Ray(), _hit = new THREE.Vector3(), _bb = new THREE.Box3();
+  function poseClear(p, look) {
+    if (inContainer(p)) {   // inside: off the walls, floor and ceiling
+      if (Math.abs(p.x) > G.intL / 2 - 0.15 || Math.abs(p.z) > G.intW / 2 - 0.15 || p.y > G.ceiling - 0.12 || p.y < G.floorTop + 0.3) return false;
+    }
+    const dir = new THREE.Vector3().subVectors(look, p).normalize();
+    _ray.set(p, dir);
+    for (const b of solidBoxes()) {
+      if (_bb.copy(b).expandByScalar(0.18).containsPoint(p)) return false;
+      if (_ray.intersectBox(b, _hit) && _hit.distanceTo(p) < 0.75) return false;   // nothing filling the frame right in front of the lens
+    }
+    return true;
+  }
+  /** Nudge a preset camera until it is clear of geometry: back along the view line first, then up / sideways. */
+  function clearPose(pos, look) {
+    const p = new THREE.Vector3(...pos), l = new THREE.Vector3(...look);
+    if (poseClear(p, l)) return p.toArray();
+    const back = new THREE.Vector3().subVectors(p, l).setY(0).normalize(), side = new THREE.Vector3(-back.z, 0, back.x), up = new THREE.Vector3(0, 1, 0);
+    const dirs = [back, up, side, side.clone().negate(), up.clone().negate(), back.clone().add(up).normalize(), back.clone().add(side).normalize(), back.clone().sub(side).normalize()];
+    const inside = inContainer(p);   // never push an interior camera through a wall (or an exterior one into the module)
+    for (const s of [0.12, 0.25, 0.4, 0.6, 0.85, 1.2]) for (const dv of dirs) { const c = p.clone().addScaledVector(dv, s); if (inContainer(c) === inside && poseClear(c, l)) return c.toArray(); }
+    return pos;
+  }
+  function rowSpan(xs, pad = 0.3) { return xs.length ? [Math.min(...xs) - pad, Math.max(...xs) + pad] : [-G.intL / 2, G.intL / 2]; }
   function presetPose(name) {
     const { extL, extW, extH, intL, intW, rackD, floorTop } = G;
-    const eye = floorTop + 1.65;
+    const eye = floorTop + 1.6;
     const zc = G.zOff - (rackD / 2 + G.coldW / 2), zh = G.zOff + rackD / 2 + G.hotW / 2;
-    const outdoor = G.hall ? 22 : (objects.generator ? 2.6 : 0) + 2.2; // utility pedestal / generator stand outside the ends (hall: power module + yards)
+    const outdoor = G.hall ? 22 : (objects.generator ? 2.6 : 0) + (objects.skid ? 5.5 : 2.2); // utility pedestal / generator / skid outside the ends (hall: power module + yards)
     const R = 0.5 * Math.hypot(extL + outdoor, extW + (G.hall ? 16 : 1.2), extH + 0.9);
-    const centre = [G.hall ? -4 : (objects.generator ? 0 : -0.6), extH * 0.45, G.hall ? 1.5 : 0];
+    const centre = [G.hall ? -4 : (objects.skid ? 1.6 : (objects.generator ? 0 : -0.6)), extH * 0.45, G.hall ? 1.5 : 0];
     if (G.cluster && (name === 'exterior_iso' || name === 'roof')) {   // the whole yard: modules, skids, transformers, lanes
       const y = G.cluster.yard, site = y.site;
       const cx = ((site[0] + site[2]) / 2) / 1000 - extL / 2, cz = -(((site[1] + site[3]) / 2) / 1000 - extW / 2);
       const Rc = 0.5 * Math.hypot(y.site_l_m, y.site_w_m, extH);
       const v = name === 'roof' ? new THREE.Vector3(-0.2, 1.0, 0.6) : new THREE.Vector3(-0.7, 0.5, 0.95);
-      const dd = fitDistance(Rc * (name === 'roof' ? 0.75 : 0.9)); v.normalize().multiplyScalar(dd);
+      const dd = fitDistance(Rc * (name === 'roof' ? 0.62 : 0.66)); v.normalize().multiplyScalar(dd);
       return { pos: [cx + v.x, extH * 0.4 + v.y, cz + v.z], look: [cx, extH * 0.3, cz], cutaway: false };
     }
     if (G.hall) {
       const z0 = G.rowZ[0], zc0 = z0 - (rackD / 2 + G.aisleW / 2), zh0 = z0 + rackD / 2 + G.aisleW / 2;
       switch (name) {
-        case 'cold_aisle': return { pos: [-intL / 2 + 0.9, eye, zc0], look: [intL / 2, eye - 0.35, zc0], cutaway: true };
-        case 'hot_aisle': return { pos: [intL / 2 - 0.9, eye, zh0], look: [-intL / 2, eye - 0.35, zh0], cutaway: true };
-        case 'power_room': { const pm = objects.pm ? objects.pm.position.x : -extL / 2 - 6; return { pos: [pm - 9, extH + 4, -11], look: [pm, 1.2, 0], cutaway: true }; }
-        case 'roof': { const d = fitDistance(R * 0.7), v = new THREE.Vector3(-0.2, 1.0, 0.6).normalize().multiplyScalar(d); return { pos: [centre[0] + v.x, extH + v.y, centre[2] + v.z], look: [centre[0], extH, centre[2]], cutaway: false }; }
+        case 'cold_aisle': return { pos: [-intL / 2 + 0.9, eye, zc0], look: [intL / 2, eye - 0.45, zc0 + 0.3], cutaway: false };
+        case 'hot_aisle': return { pos: [intL / 2 - 0.9, eye, zh0], look: [-intL / 2, eye - 0.45, zh0 - 0.3], cutaway: false };
+        case 'power_room': { const pm = objects.pm ? objects.pm.position.x : -extL / 2 - 6; return { pos: [pm - 7, extH + 4, -10], look: [pm, 1.2, 0], cutaway: true }; }
+        case 'roof': { const d = fitDistance(R * 0.6), v = new THREE.Vector3(-0.2, 1.0, 0.6).normalize().multiplyScalar(d); return { pos: [centre[0] + v.x, extH + v.y, centre[2] + v.z], look: [centre[0], extH, centre[2]], cutaway: false }; }
         default: { const d = fitDistance(R * 0.95), v = new THREE.Vector3(-0.7, 0.42, 0.95).normalize().multiplyScalar(d); return { pos: [centre[0] + v.x, centre[1] + v.y, centre[2] + v.z], look: centre, cutaway: false }; }
       }
     }
     if (G.mini) { // BEN 1 in an office corner: every preset looks at the rack from the room
-      const rx = G.rackX[0], rz = G.rackZ[0], ry = G.form === 'rack10' ? 0.74 : 0, cy = ry + extH / 2;
-      if (name === 'hot_aisle') return { pos: [rx + 0.8, cy + 0.6, rz - 0.2], look: [rx, cy, rz], cutaway: false };
-      if (name === 'power_room') return { pos: [rx + 1.0, ry + 0.9, rz + 0.9], look: [rx + extL / 2, ry + 0.3, rz], cutaway: false };
-      if (name === 'cold_aisle') return { pos: [rx + 0.2, cy + 0.3, rz + 1.3], look: [rx, cy, rz], cutaway: false };
-      if (name === 'roof') return { pos: [rx + 0.6, ry + extH + 1.6, rz + 1.2], look: [rx, ry + extH, rz], cutaway: false };
-      return { pos: [2.3, 1.8, 2.5], look: [0, 0.7, -0.4], cutaway: false };
+      const rx = G.rackX[0], rz = G.rackZ[0], ry = G.form === 'rack10' ? 0.74 : 0, cy = ry + extH / 2, W = extL, D = extW, H = extH;
+      if (name === 'hot_aisle') { const sx = G.form === 'rack10' ? -1 : 1; return { pos: [rx + sx * (W / 2 + 0.6), ry + H + 0.6, rz - D / 2 + 0.1], look: [rx, ry + H * 0.55, rz - D / 2], cutaway: false }; }   // over the shoulder at the exhaust side (rack10: away from the UPS tower)
+      if (name === 'power_room') return { pos: [rx + 0.5, ry + 0.55, rz + D / 2 + 0.85], look: [rx + (G.form === 'rack10' ? W / 2 + 0.12 : 0), ry + 0.15, rz + D / 4], cutaway: false };
+      if (name === 'cold_aisle') return { pos: [rx + 0.25, ry + H * 0.6 + 0.3, rz + D / 2 + 1.0], look: [rx, ry + H * 0.5, rz + D / 2], cutaway: false };
+      if (name === 'roof') return { pos: [rx + 0.5, ry + H + 1.0, rz + 0.75], look: [rx, ry + H, rz], cutaway: false };
+      return { pos: [2.1, 1.7, 2.3], look: [0, 0.7, -0.4], cutaway: false };
     }
-    if (G.micro && name !== 'exterior_iso' && name !== 'roof') { // a cabinet: look in from outside with the shell ghosted
+    if (G.micro && name !== 'exterior_iso' && name !== 'roof') { // a cabinet: look in from outside with the shell cut open
       const side = name === 'hot_aisle' ? 1 : -1;
-      if (name === 'power_room') return { pos: [-extL / 2 - 1.9, extH * 0.8, -extW * 0.6], look: [-intL / 2 + 0.3, floorTop + 0.45, 0], cutaway: true, doors: true };
-      return { pos: [extL * 0.4, extH * 0.85, side * (extW / 2 + 1.7)], look: [0, floorTop + G.rackH * 0.5, 0], cutaway: true };
+      if (name === 'power_room') return { pos: [-extL / 2 - 1.6, extH * 0.9, -extW * 0.9], look: [-intL / 2 + 0.3, floorTop + 0.45, 0], cutaway: true, doors: true };
+      return { pos: [extL * 0.35, extH * 1.05, side * (extW / 2 + 1.5)], look: [0, floorTop + G.rackH * 0.5, 0], cutaway: true };
     }
+    const [r0, r1] = rowSpan(G.rackX), rcx = (r0 + r1) / 2;
+    const zFront = G.zOff - rackD / 2;
+    // BEN 2000: the next module stands on the -z side, so section views from that side look down steeply from the gap between modules
+    const gapNeg = G.cluster ? Math.max(1.0, G.cluster.yard.pitch_mm / 1000 - extW) : 99;
+    const negSide = (dist, x, lookY, lookZ, y) => gapNeg < dist ? { pos: [x, extH + 2.6, -extW / 2 - gapNeg * 0.5], look: [x, lookY, lookZ] } : { pos: [x, y, -intW / 2 - dist], look: [x, lookY, lookZ] };
     switch (name) {
-      case 'cold_aisle': return { pos: [-intL / 2 + G.bayL + 0.15, eye, zc], look: [intL / 2, eye - 0.35, zc], cutaway: true };
-      case 'hot_aisle': return { pos: [intL / 2 - 0.25, eye, zh + G.hotW * 0.2], look: [-intL / 2, eye - 0.35, zh + G.hotW * 0.1], cutaway: true };
-      case 'power_room': return G.micro ? { pos: [-intL / 2 + 0.3, eye - 0.3, -0.2], look: [-intL / 2 + 0.1, floorTop + 0.6, intW / 2], cutaway: true }
-        : { pos: [-intL / 2 + G.bayL + 2.6, extH + 1.1, -(intW / 2 + 1.9)], look: [-intL / 2 + 0.45, floorTop + 0.9, 0.1], cutaway: true };
-      case 'roof': { const d = fitDistance(R * 0.62), v = new THREE.Vector3(-0.25, 1.0, 0.75).normalize().multiplyScalar(d); return { pos: [centre[0] + v.x, extH + v.y, v.z], look: [centre[0], extH, 0], cutaway: false }; }
+      case 'cold_aisle': {   // in the aisle, rack fronts running away on the side
+        // stand close to the cold-side wall a little before the first rack and look diagonally down the row of fronts
+        const x0 = G.dense ? Math.max(-intL / 2 + 0.5, r0 - 1.9) : -intL / 2 + Math.max(0.75, G.bayL - 0.2);
+        const z0 = Math.min(zc, -intW / 2 + 0.24);
+        return { pos: [x0, eye, z0], look: [Math.min(intL / 2 - 0.3, r1 + 0.4), eye - 0.6, zFront - Math.min(0.12, G.coldW * 0.2)], cutaway: false };
+      }
+      case 'hot_aisle': {
+        if (G.hotW < 0.95) {   // a 200 mm rear plenum (dense) or a sub-metre hot aisle: take the near wall off and look at the rack rears, manifolds and hoses
+          const dist = Math.max(3.2, fitSpan(r1 - r0 + 0.6, 2.2) * 0.95);
+          return { pos: [rcx - 0.3, floorTop + 2.1, intW / 2 + Math.max(2.4, dist)], look: [rcx, floorTop + 1.15, G.zOff + rackD / 2], cutaway: true };
+        }
+        return { pos: [intL / 2 - 0.3, eye, Math.max(zh, intW / 2 - 0.22)], look: [r0 - 0.2, eye - 0.65, G.zOff + rackD / 2 + 0.05], cutaway: false };
+      }
+      case 'power_room': {
+        if (G.dense) {   // switchboard sections, UPS frames and lithium cabinets face the cold aisle: section view from the aisle side
+          const [p0, p1] = rowSpan(G.powerItems.map(it => it.x), 0.55), pcx = (p0 + p1) / 2;
+          const dist = Math.max(3.0, fitSpan(p1 - p0, 2.4)) * 0.82, v = negSide(dist, pcx, floorTop + 1.0, intW / 2 - 0.6, floorTop + 2.3);
+          return { pos: [v.pos[0] + 0.35, v.pos[1], v.pos[2]], look: v.look, cutaway: true };
+        }
+        return { pos: [-intL / 2 + G.bayL + 2.3, extH + 1.2, -(intW / 2 + 1.5)], look: [-intL / 2 + G.bayL * 0.55, floorTop + 0.8, 0.05], cutaway: true };   // power bay with the first racks beside it
+      }
+      case 'compute': {   // tour: rack fronts in section from the cold-aisle side
+        const dist = Math.max(2.8, fitSpan(r1 - r0 + 0.4, 2.4)) * 0.85, v = negSide(dist, rcx, floorTop + 1.1, G.zOff, floorTop + 2.4);
+        return { pos: [v.pos[0] - 0.4, v.pos[1], v.pos[2]], look: v.look, cutaway: true };
+      }
+      case 'roof': {
+        if (objects.skid) {   // dense: the roof is clean, the heat goes to the skid beside the blind end
+          const sk = objects.skid.position, v = new THREE.Vector3(0.25, 0.9, 0.85).normalize().multiplyScalar(fitDistance(4.4));
+          return { pos: [sk.x - 1.4 + v.x, v.y, v.z], look: [sk.x - 1.4, 1.0, 0], cutaway: false };
+        }
+        const d = fitDistance(Math.max(2.6, extL * 0.58)), v = new THREE.Vector3(-0.3, 0.95, 0.8).normalize().multiplyScalar(d);
+        return { pos: [v.x, extH + v.y, v.z], look: [0, extH + 0.3, 0], cutaway: false };
+      }
       default: { const d = fitDistance(R), v = new THREE.Vector3(-0.78, 0.48, 0.95).normalize().multiplyScalar(d); return { pos: [centre[0] + v.x, centre[1] + v.y, v.z], look: centre, cutaway: false }; }
     }
   }
@@ -1356,123 +1685,197 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     mode.cutaway = pose.cutaway;
     if (pose.doors !== undefined) mode.doors = pose.doors; else if (G.micro) mode.doors = false;
     if (state) update(state);
+    const pos = clearPose(pose.pos, pose.look);
+    flyTo(new THREE.Vector3(...pos), new THREE.Vector3(...pose.look), instant || reduce ? 0 : 0.9);
     applyCutaway();
-    flyTo(new THREE.Vector3(...pose.pos), new THREE.Vector3(...pose.look), instant || reduce ? 0 : 0.9);
     notify();
   }
   function flyTo(pos, look, dur) {
     orbit.enabled = true;
-    if (dur <= 0) { camera.position.copy(pos); orbit.target.copy(look); camera.lookAt(look); orbit.update(); camTween = null; return; }
-    camTween = { p0: camera.position.clone(), l0: orbit.target.clone(), p1: pos, l1: look, t: 0, dur };
+    if (dur <= 0) { camera.position.copy(pos); orbit.target.copy(look); camera.lookAt(look); orbit.update(); camTween = null; applyCutaway(); return; }
+    camTween = { p0: camera.position.clone(), l0: orbit.target.clone(), p1: pos, l1: look, t0: performance.now(), dur };
   }
-  function ghost(mesh, on) { // transparent but still casting shadows, so the interior keeps its indoor lighting
+  function ghost(mesh, on) { // hall power module: transparent but still casting shadows
     if (!mesh) return;
     const m = mesh.material; m.transparent = true; m.opacity = on ? 0.06 : 1; m.depthWrite = !on; mesh.renderOrder = on ? 5 : 0;
   }
+  /** Architectural section: the roof (with its luminaires) comes off and the long wall nearest the camera is cut down to a sill
+   *  showing the wall build-up (steel skin, PIR core, liner); zone labels name what you are looking at. Inside, nothing is cut. */
   function applyCutaway() {
-    ghost(roof, mode.cutaway);
-    if (G.hall && G.pmRoof) { ghost(G.pmRoof, mode.cutaway); for (const w of G.pmWalls || []) ghost(w, mode.cutaway && camera.position.y > G.extH * 0.6); }
-    const inside = Math.abs(camera.position.z) < G.extW / 2 && Math.abs(camera.position.x) < G.extL / 2 && camera.position.y < G.extH;
-    if (G.mini) return;   // office corner: nothing to ghost
-    const near = camera.position.z >= 0 ? wallPos : wallNeg, far = near === wallPos ? wallNeg : wallPos;
-    ghost(near, mode.cutaway && !inside); ghost(far, false);
-    for (const dcl of decals) dcl.visible = !(mode.cutaway && !inside && ((dcl.position.z > 0) === (camera.position.z >= 0)));
+    if (G.mini) return;
+    const c = camera.position;
+    const inside = Math.abs(c.z) < G.extW / 2 && Math.abs(c.x) < G.extL / 2 && c.y < G.extH;
+    const cut = mode.cutaway && !inside;
+    if (roof) roof.visible = !cut;
+    for (const cap of G.caps || []) cap.visible = cut;
+    if (G.hall && G.pmRoof) { ghost(G.pmRoof, cut); for (const w of G.pmWalls || []) ghost(w, cut && c.y > G.extH * 0.6); }
+    const nearSide = c.z >= 0 ? 1 : -1;
+    for (const w of G.wallStubs || []) { const isNear = cut && w.side === nearSide; w.full.visible = !isNear; w.stub.visible = isNear; }
+    for (const w of G.wallMounted || []) w.obj.visible = !(cut && w.side === nearSide);
+    for (const dcl of decals) dcl.visible = !(cut && ((dcl.position.z > 0) === (c.z >= 0)));
+    if (G.zoneLabels) G.zoneLabels.visible = cut && !mode.walk;
+    const sig = `${cut}|${nearSide}`; if (sig !== cutSig) { cutSig = sig; renderer.shadowMap.needsUpdate = true; }
   }
+  let cutSig = '';
   function toggleCutaway() { mode.cutaway = !mode.cutaway; applyCutaway(); notify(); return mode.cutaway; }
   function toggleDoors() { mode.doors = !mode.doors; if (state) update(state); notify(); return mode.doors; }
   function notify() { api.onModeChange && api.onModeChange({ ...mode }); }
+  /** Floating zone tags for the section view. */
+  function buildZoneLabels(cfg, d) {
+    if (G.mini || G.micro || G.hall) return;
+    const grp = new THREE.Group(); grp.visible = false;
+    const yA = G.ceiling + 0.35, yB = G.ceiling + 0.95;
+    const add = (title, sub, color, x, y, z) => { const sp = EQ.zoneLabel(title, sub, color); sp.position.set(x, y, z); grp.add(sp); };
+    const avg = (xs) => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
+    const [r0, r1] = rowSpan(G.rackX, 0);
+    if (G.dense) {
+      add('POWER', d.swbd_sections ? 'switchboard · UPS · batteries' : 'UPS · lithium batteries', '#2BB673', avg(G.powerItems.map(i => i.x)), yA, 0.2);
+      add('COOLING', 'CDUs · fan coils', '#5CD6FF', avg(G.unitX), yB, 0.2);
+      add('IT', `${cfg.racks} × liquid racks`, '#4C9DFF', (r0 + r1) / 2, yA, 0.2);
+      if (objects.skid) add('HEAT REJECTION', 'dry coolers · trim chiller', '#FF8A3D', objects.skid.position.x, 2.4, 0);
+    } else {
+      add('POWER', 'UPS · batteries · ATS', '#2BB673', -G.intL / 2 + Math.max(0.4, G.bayL / 2), yA, 0);
+      add('IT', `${cfg.racks} racks`, '#4C9DFF', (r0 + r1) / 2, yA, 0);
+      const cool = G.air ? 'in-row coolers' : G.water ? 'rear-door coils' : 'CDU · manifolds';
+      add('COOLING', cool, '#5CD6FF', G.unitX.length ? avg(G.unitX) : (r0 + r1) / 2 + 0.8, yB, 0);
+      add('HEAT REJECTION', G.air ? 'roof condensers' : 'roof dry coolers', '#FF8A3D', 0.6, G.extH + 1.25, 0);
+    }
+    groups.fx.add(grp); G.zoneLabels = grp;
+  }
 
   // --------------------------------------------------------------------------- walkthrough
-  const keys = new Set(); const vel = new THREE.Vector3(); const walkPos = new THREE.Vector3();
+  const keys = new Set(); const walkPos = new THREE.Vector3();
   document.addEventListener('keydown', (e) => { if (mode.walk) keys.add(e.code); });
   document.addEventListener('keyup', (e) => keys.delete(e.code));
   walk.addEventListener('unlock', () => { if (mode.walk && !walkNoLock) exitWalk(); });
+  // own mouse look (the vendored control's handler is detached): ignores the spurious jump some browsers send right after the
+  // lock, clamps per-event deltas, and also works as click-drag look when the pointer is not locked
+  canvas.ownerDocument.removeEventListener('mousemove', walk._onMouseMove);
+  const look = { yaw: 0, pitch: 0, ignoreUntil: 0, drag: null };
+  const _eul = new THREE.Euler(0, 0, 0, 'YXZ');
+  function syncLook() { _eul.setFromQuaternion(camera.quaternion, 'YXZ'); look.yaw = _eul.y; look.pitch = _eul.x; }
+  walk.addEventListener('lock', () => { look.ignoreUntil = performance.now() + 180; syncLook(); });
+  document.addEventListener('mousemove', (e) => {
+    if (!mode.walk) return;
+    let dx, dy;
+    if (walk.isLocked) { if (performance.now() < look.ignoreUntil) return; dx = e.movementX; dy = e.movementY; }
+    else if (look.drag) { dx = e.clientX - look.drag[0]; dy = e.clientY - look.drag[1]; look.drag = [e.clientX, e.clientY]; }
+    else return;
+    dx = THREE.MathUtils.clamp(dx || 0, -60, 60); dy = THREE.MathUtils.clamp(dy || 0, -60, 60);
+    look.yaw -= dx * 0.0022; look.pitch = THREE.MathUtils.clamp(look.pitch - dy * 0.0022, -1.25, 1.25);
+    _eul.set(look.pitch, look.yaw, 0, 'YXZ'); camera.quaternion.setFromEuler(_eul);
+  });
+  canvas.addEventListener('pointerdown', (e) => { if (mode.walk && !walk.isLocked) { look.drag = [e.clientX, e.clientY]; if (!walkNoLock) { try { walk.lock(); } catch (_) { /* headless */ } } } });
+  document.addEventListener('pointerup', () => { look.drag = null; });
   let walkNoLock = false;
+  const EYE = 1.6;
   function enterWalk({ lock = true } = {}) {
-    if (!payload) return; tour.stop(false); setHover(null);
+    if (!payload) return; tour.stop(false); setHover(null); camTween = null;
     mode.walk = true; mode.cutaway = true; orbit.enabled = false; walkNoLock = !lock;
-    const eye = G.floorTop + 1.7;
-    const zc = G.hall ? G.rowZ[0] - (G.rackD / 2 + G.aisleW / 2) : G.zOff - (G.rackD / 2 + G.coldW / 2);
-    if (G.micro) { camera.position.set(-G.extL / 2 - 1.5, eye, 0); camera.lookAt(0, G.floorTop + 0.8, 0); }
-    else { camera.position.set(-G.intL / 2 + G.bayL + 0.3 + (G.hall ? 0.6 : 0), eye, zc); camera.lookAt(G.intL / 2, eye - 0.2, zc); }
+    const eye = (G.micro || G.mini ? 0 : G.floorTop) + EYE;
+    if (G.mini) { camera.position.set(1.6, eye, 1.7); camera.lookAt(G.rackX[0], 0.9, G.rackZ[0]); }
+    else if (G.micro) { camera.position.set(-G.extL / 2 - 2.3, eye, 0.4); camera.lookAt(0, G.floorTop + 0.8, 0); }
+    else {
+      // just inside the door, in the (first) cold aisle, looking down it toward the far end
+      const zc = G.hall ? G.rowZ[0] - (G.rackD / 2 + G.aisleW / 2) : G.zOff - (G.rackD / 2 + G.coldW / 2);
+      const p = new THREE.Vector3(-G.intL / 2 + 0.45, eye, zc);
+      for (let k = 0; k < 40 && !collide(p.clone()); k++) p.x += 0.15;
+      camera.position.copy(p); camera.lookAt(G.intL / 2, eye - 0.15, zc + (G.hall ? 0.15 : 0.1));
+    }
+    syncLook();
     if (lock) { try { walk.lock(); } catch (_) { /* headless */ } }
     if (walkHint) walkHint.hidden = false;
     applyCutaway(); notify();
   }
   function exitWalk() {
     if (!mode.walk) return;
-    mode.walk = false; keys.clear(); if (walk.isLocked) walk.unlock();
+    mode.walk = false; keys.clear(); look.drag = null; if (walk.isLocked) walk.unlock();
     orbit.enabled = true; orbit.target.copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(3)); orbit.update();
     if (walkHint) walkHint.hidden = true;
-    notify();
+    applyCutaway(); notify();
   }
   function toggleWalk() { mode.walk ? exitWalk() : enterWalk(); }
-  const obstacles = () => [...racks.map(r => r.userData.body), ...coolingUnits.map(u => u.userData.body).filter(b => b.userData.type === 'cooling' || b.userData.type === 'cdu'), ...(G.hall ? [] : [objects.ups, objects.battery]), objects.cdu].filter(Boolean);
-  const bb = new THREE.Box3();
+  /** Collision: interior walls, then the footprint of every solid that reaches below head height (overhead pipes and trays pass). */
   function collide(p) {
-    const m = 0.22;
-    if (G.mini) { p.x = THREE.MathUtils.clamp(p.x, -0.8, 2.1); p.z = THREE.MathUtils.clamp(p.z, -0.1, 2.1); return true; }
+    const m = 0.25;
+    if (G.mini) { p.x = THREE.MathUtils.clamp(p.x, -0.75, 2.1); p.z = THREE.MathUtils.clamp(p.z, -0.05, 2.1); const rx = G.rackX[0], rz = G.rackZ[0]; return !(Math.abs(p.x - rx) < G.extL / 2 + 0.35 && Math.abs(p.z - rz) < G.extW / 2 + 0.35) && !(p.x > 0.2 && p.z < 0.05); }
     if (G.micro) { // outdoor cabinet: walk the pad, the cabinet is the obstacle
       p.x = THREE.MathUtils.clamp(p.x, -4, 4); p.z = THREE.MathUtils.clamp(p.z, -4, 4);
-      return !(Math.abs(p.x) < G.extL / 2 + m && Math.abs(p.z) < G.extW / 2 + m);
+      return !(Math.abs(p.x) < G.extL / 2 + 0.7 && Math.abs(p.z) < G.extW / 2 + 0.7);
     }
-    p.x = THREE.MathUtils.clamp(p.x, -G.intL / 2 + m, G.intL / 2 - m);
-    p.z = THREE.MathUtils.clamp(p.z, -G.intW / 2 + m, G.intW / 2 - m);
-    for (const o of obstacles()) { bb.setFromObject(o).expandByScalar(m); if (bb.containsPoint(p)) return false; }
+    // body radius: 0.25 m, less in a narrow aisle (a 20 ft module's cold aisle is about 0.5 m) so the walker still fits
+    const aisle = G.hall ? G.aisleW : G.coldW, mw = Math.min(m, aisle / 2 - 0.04), me = Math.min(0.22, aisle / 2 - 0.08);
+    if (Math.abs(p.x) > G.intL / 2 - mw || Math.abs(p.z) > G.intW / 2 - mw) return false;
+    const lo = G.floorTop + 0.05, hi = G.floorTop + EYE + 0.15;
+    for (const b of solidBoxes()) {
+      if (b.max.y < lo || b.min.y > hi) continue;
+      if (p.x > b.min.x - me && p.x < b.max.x + me && p.z > b.min.z - me && p.z < b.max.z + me) return false;
+    }
     return true;
   }
   function stepWalk(dt) {
     const run = keys.has('ShiftLeft') || keys.has('ShiftRight');
-    const sp = (run ? 3.2 : 1.6);
+    const sp = (run ? 3.0 : 1.4);
     const f = (keys.has('KeyW') || keys.has('ArrowUp') ? 1 : 0) - (keys.has('KeyS') || keys.has('ArrowDown') ? 1 : 0);
     const r = (keys.has('KeyD') || keys.has('ArrowRight') ? 1 : 0) - (keys.has('KeyA') || keys.has('ArrowLeft') ? 1 : 0);
+    camera.position.y = (G.micro || G.mini ? 0 : G.floorTop) + EYE;
     if (!f && !r) return;
     const dir = camera.getWorldDirection(new THREE.Vector3()); dir.y = 0; dir.normalize();
     const right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0));
-    const prev = camera.position.clone();
-    walkPos.copy(camera.position).addScaledVector(dir, f * sp * dt);
-    if (collide(walkPos)) camera.position.x = walkPos.x, camera.position.z = walkPos.z;
-    walkPos.copy(camera.position).addScaledVector(right, r * sp * dt);
-    if (collide(walkPos)) camera.position.x = walkPos.x, camera.position.z = walkPos.z;
-    camera.position.y = (G.micro ? 0 : G.floorTop) + 1.7;
-    void prev;
+    const mv = new THREE.Vector3().addScaledVector(dir, f).addScaledVector(right, r); if (mv.lengthSq() > 1) mv.normalize(); mv.multiplyScalar(sp * dt);
+    // slide along obstacles: try the full move, then each axis on its own
+    for (const t of [mv, new THREE.Vector3(mv.x, 0, 0), new THREE.Vector3(0, 0, mv.z)]) {
+      walkPos.copy(camera.position).add(t);
+      if (collide(walkPos)) { camera.position.x = walkPos.x; camera.position.z = walkPos.z; break; }
+    }
   }
 
   // --------------------------------------------------------------------------- guided tour
+  // Each stop holds its framing for most of its slot. Between two outside stops the camera flies (lifted over the module);
+  // into or out of the enclosure it dips to the background colour and cuts, so no frame ever shows the inside of a wall.
   let tourWantsDoors = false;
-  const tour = { running: false, t: 0, total: 0, stops: [], curve: null, lookCurve: null,
-    start() { if (!payload) return; exitWalk(); orbit.enabled = false; this.running = true; this.t = 0; mode.tour = true; mode.cutaway = true; applyCutaway(); this.apply(0); notify(); },
-    stop(doNotify = true) { if (!this.running) { tourWantsDoors = false; return; } this.running = false; mode.tour = false; tourWantsDoors = false; if (caption) caption.hidden = true; orbit.enabled = true; orbit.target.copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(4)); orbit.update(); if (state) update(state); if (doNotify) notify(); },
+  const fadeEl = (() => { const el = document.createElement('div'); el.className = 'tour-fade'; el.style.cssText = 'position:absolute;inset:0;background:#06101f;opacity:0;pointer-events:none;'; canvas.insertAdjacentElement('afterend', el); return el; })();
+  const smooth = (x) => x * x * (3 - 2 * x);
+  const tour = { running: false, t: 0, total: 0, stops: [],
+    start() { if (!payload) return; exitWalk(); camTween = null; orbit.enabled = false; this.running = true; this.t = 0; mode.tour = true; mode.cutaway = true; this.apply(0); notify(); },
+    stop(doNotify = true) { fadeEl.style.opacity = 0; if (!this.running) { tourWantsDoors = false; return; } this.running = false; mode.tour = false; tourWantsDoors = false; if (caption) caption.hidden = true; orbit.enabled = true; orbit.target.copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(4)); orbit.update(); if (state) update(state); if (doNotify) notify(); },
     toggle() { this.running ? this.stop() : this.start(); },
     seek(frac) { if (!this.running) this.start(); this.t = THREE.MathUtils.clamp(frac, 0, 0.9999) * this.total; this.apply(this.t); },
     apply(t) {
-      const u = this.total ? t / this.total : 0;
-      if (reduce) { // discrete hops, no motion
-        const k = Math.min(this.stops.length - 1, Math.floor(u * this.stops.length)); const s = this.stops[k];
-        camera.position.copy(s.pos); camera.lookAt(s.look);
-      } else {
-        camera.position.copy(this.curve.getPointAt(u)); camera.lookAt(this.lookCurve.getPointAt(u));
+      const n = this.stops.length; if (!n) return;
+      const u = THREE.MathUtils.clamp(this.total ? t / this.total : 0, 0, 0.99999) * n, k = Math.floor(u), f = u - k;
+      const s = this.stops[k], nx = this.stops[Math.min(n - 1, k + 1)];
+      let pos = s.pos, lk = s.look, fade = 0;
+      const prev = this.stops[Math.max(0, k - 1)];
+      if (!reduce && k < n - 1 && nx !== s) {
+        if (s.inside || nx.inside) { if (f > 0.95) fade = (f - 0.95) / 0.05; }
+        else if (f > 0.6) {
+          const e = smooth((f - 0.6) / 0.4);
+          pos = new THREE.Vector3().lerpVectors(s.pos, nx.pos, e); lk = new THREE.Vector3().lerpVectors(s.look, nx.look, e);
+          // lift the path over the module when the straight line would cut through it
+          const mid = new THREE.Vector3().lerpVectors(s.pos, nx.pos, 0.5);
+          if (inContainer(mid, 1.2)) pos.y += Math.sin(Math.PI * e) * (G.extH + 2.5 - Math.min(s.pos.y, nx.pos.y) * 0.5);
+        }
       }
-      const k = Math.min(this.stops.length - 1, Math.floor(u * this.stops.length)); const s = this.stops[k];
+      if (!reduce && k > 0 && (s.inside || prev.inside) && f < 0.05) fade = 1 - f / 0.05;
+      camera.position.copy(pos); camera.lookAt(lk);
+      fadeEl.style.opacity = fade.toFixed(3);
       tourWantsDoors = !!s.doors;
-      if (caption) { caption.hidden = false; caption.innerHTML = `<b>${k + 1} / ${this.stops.length} · ${s.title}</b>${s.text}`; }
+      if (caption) { caption.hidden = false; caption.innerHTML = `<b>${k + 1} / ${n} · ${s.title}</b>${s.text}`; }
       applyCutaway();
     },
     step(dt) { if (!this.running) return; this.t += dt; if (this.t >= this.total) { this.stop(); return; } this.apply(this.t); },
   };
+  function finishTour(stops) {
+    for (const s of stops) { const p = clearPose(s.pos.toArray(), s.look.toArray()); s.pos.fromArray(p); s.inside = inContainer(s.pos); }
+    tour.stops = stops;
+    tour.total = reduce ? stops.length * 4 : 7.5 * stops.length;
+  }
   function buildTour(cfg, d) {
     const { extL, extW, extH, intL, intW, rackD, floorTop } = G; const eye = floorTop + 1.6;
     const zc = G.zOff - (rackD / 2 + G.coldW / 2), zh = G.zOff + rackD / 2 + G.hotW / 2;
     const st = state || {};
     const hz = `${d.hardening_label || cfg.hardening || 'H1'}: ${d.hardening_rating || 'NEMA 4X / IP66'}`;
-    if (G.cluster && (name === 'exterior_iso' || name === 'roof')) {   // the whole yard: modules, skids, transformers, lanes
-      const y = G.cluster.yard, site = y.site;
-      const cx = ((site[0] + site[2]) / 2) / 1000 - extL / 2, cz = -(((site[1] + site[3]) / 2) / 1000 - extW / 2);
-      const Rc = 0.5 * Math.hypot(y.site_l_m, y.site_w_m, extH);
-      const v = name === 'roof' ? new THREE.Vector3(-0.2, 1.0, 0.6) : new THREE.Vector3(-0.7, 0.5, 0.95);
-      const dd = fitDistance(Rc * (name === 'roof' ? 0.75 : 0.9)); v.normalize().multiplyScalar(dd);
-      return { pos: [cx + v.x, extH * 0.4 + v.y, cz + v.z], look: [cx, extH * 0.3, cz], cutaway: false };
-    }
     if (G.hall) {
       const z0 = G.rowZ[0], zc0 = z0 - (rackD / 2 + G.aisleW / 2), zh0 = z0 + rackD / 2 + G.aisleW / 2, pmX = objects.pm ? objects.pm.position.x : -extL / 2 - 6;
       const stops = [
@@ -1486,10 +1889,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
         { title: 'Controls module', text: `BEN Controls Pro: redundant edge computers, one PLC per module plus a plant PLC, ${d.pods} BEN Pods on a BEN Mesh with multiple border routers. Every sphere is a sensor coloured by its live value.`, pos: [-intL / 2 + 2.5, eye, zc0], look: [-intL / 2 + 0.6, floorTop + 1.6, -intW / 2] },
         { title: 'Ready for site', text: `Predicted PUE ${d.pue_estimate}. Order-to-service about 52 weeks: MV transformers and 2 MW UPS strings are the long-lead items; slab and MV service run in parallel.`, pos: [extL * 0.8, extH * 2.2 + 3, -(extW * 2 + 12)], look: [-4, extH * 0.4, 2] },
       ].map(s => ({ ...s, pos: new THREE.Vector3(...s.pos), look: new THREE.Vector3(...s.look) }));
-      tour.stops = stops;
-      tour.curve = new THREE.CatmullRomCurve3(stops.map(s => s.pos), false, 'centripetal', 0.3);
-      tour.lookCurve = new THREE.CatmullRomCurve3(stops.map(s => s.look), false, 'centripetal', 0.3);
-      tour.total = reduce ? stops.length * 4 : 7.5 * stops.length;
+      finishTour(stops);
       return;
     }
     if (G.mini) {
@@ -1497,13 +1897,10 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       const stops = [
         { title: `${d.tier_label} · ${d.form_label}`, text: `${cfg.it_kw} kW IT for a small business, on a 120 V plug: ${d.outlet_circuit}. ${d.room_cooling_note.split('.')[0]}.`, pos: [2.2, 1.9, 2.4], look: [rx, ry + extH / 2, rz] },
         { title: 'The IT', text: G.form === 'rack10' ? `Desktop AI boxes on 2U shelves in a 10-inch 8U rack, a managed switch and a 10-inch PDU; the 2U lithium UPS stands beside it.` : `A 2U short-depth GPU server, NAS, switch and 2U lithium UPS in a sound-damped 12U cabinet (${d.geometry.insertion_loss_db} dB).`, pos: [rx + 0.4, ry + extH * 0.8, rz + 1.2], look: [rx, ry + extH / 2, rz] },
-        { title: 'Air and noise', text: `Office air in at the front, out at the back${G.form === 'cab12' ? ' through the N+1 extraction fans' : ''}; estimated ${d.noise_dba_est} dBA at 1 m (target ${d.noise_dba_target}). All ${d.heat_to_room_w} W stays in the room.`, pos: [rx - 0.9, ry + extH + 0.3, rz + 0.6], look: [rx, ry + extH * 0.6, rz] },
-        { title: 'BEN Controls Mini', text: `Two BEN Pods (inlet and exhaust) on the BEN Mesh; the BEN Care agent runs on ${G.form === 'rack10' ? 'a fanless edge box on the top shelf' : 'the edge computer in the cabinet'} or the customer's own box.`, pos: [rx - 0.6, ry + 0.9, rz + 0.9], look: [rx - extL / 2, ry + extH * 0.6, rz] },
+        { title: 'Air and noise', text: `Office air in at the front, out at the back${G.form === 'cab12' ? ' through the N+1 extraction fans' : ''}; estimated ${d.noise_dba_est} dBA at 1 m (target ${d.noise_dba_target}). All ${d.heat_to_room_w} W stays in the room.`, pos: [rx + extL / 2 + 0.6, ry + extH + 0.6, rz - extW / 2 + 0.1], look: [rx, ry + extH * 0.55, rz - extW / 2] },
+        { title: 'BEN Controls Mini', text: `Two BEN Pods (inlet and exhaust) on the BEN Mesh; the BEN Care agent runs on ${G.form === 'rack10' ? 'a fanless edge box on the top shelf' : 'the edge computer in the cabinet'} or the customer's own box.`, pos: [rx + 0.15, ry + extH * 0.7 + 0.2, rz + extW / 2 + 0.7], look: [rx - extL / 4, ry + extH * 0.6, rz + extW / 2] },
       ].map(s => ({ ...s, pos: new THREE.Vector3(...s.pos), look: new THREE.Vector3(...s.look) }));
-      tour.stops = stops;
-      tour.curve = new THREE.CatmullRomCurve3(stops.map(s => s.pos), false, 'centripetal', 0.3);
-      tour.lookCurve = new THREE.CatmullRomCurve3(stops.map(s => s.look), false, 'centripetal', 0.3);
-      tour.total = reduce ? stops.length * 4 : 7.5 * stops.length;
+      finishTour(stops);
       return;
     }
     const stops = [
@@ -1517,10 +1914,19 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
       { title: G.air ? 'Roof and heat rejection' : 'Heat rejection', text: G.air ? 'In-row DX units reject heat through condensers on the roof pad. CSC plate stays valid: no structural cuts.' : `Dry coolers on the roof reject ${cfg.it_kw} kW at a design day of ${d.climate.t_design_c} °C through a glycol loop to the CDU.`, pos: [-extL * 0.25, extH + Math.max(3, extL * 0.3), extW * 1.4 + 2], look: [0, extH, 0] },
       { title: 'Ready for site', text: `Predicted PUE ${d.pue_estimate}. The same configuration drives the BOM, drawings, commissioning script and this twin.`, pos: [extL * 0.7, extH * 1.1 + 1, -(extW * 1.5 + extL * 0.4 + 2)], look: [0, extH * 0.45, 0] },
     ].map(s => ({ ...s, pos: new THREE.Vector3(...s.pos), look: new THREE.Vector3(...s.look) }));
-    tour.stops = stops;
-    tour.curve = new THREE.CatmullRomCurve3(stops.map(s => s.pos), false, 'centripetal', 0.3);
-    tour.lookCurve = new THREE.CatmullRomCurve3(stops.map(s => s.look), false, 'centripetal', 0.3);
-    tour.total = reduce ? stops.length * 4 : 7.5 * stops.length;
+    if (!G.micro) {   // frame real equipment at every stop (same presets as the camera buttons, plus a few tour-only views)
+      const P = (n) => presetPose(n), V = (a) => new THREE.Vector3(...a);
+      const zc = G.zOff - (rackD / 2 + G.coldW / 2);
+      const heat = objects.skid ? { pos: [objects.skid.position.x + 3.2, 3.6, 5.6], look: [objects.skid.position.x - 0.6, 1.0, 0] } : P('roof');
+      const views = [P('exterior_iso'),
+        { pos: [-extL / 2 - 3.4, eye + 0.4, -extW * 0.55], look: [-extL / 2 + 1.2, floorTop + 1.1, 0.1] },
+        P('cold_aisle'), P('compute'), P('hot_aisle'), P('power_room'),
+        { pos: [-intL / 2 + 2.0, eye, zc + 0.2], look: [-intL / 2 + 0.45, floorTop + 1.45, -intW / 2] },
+        heat,
+        { pos: [extL * 0.55, extH * 1.2 + 1.2, -(extW * 1.6 + extL * 0.35 + 2.5)], look: [0.8, extH * 0.4, 0] }];
+      stops.forEach((s, i) => { if (views[i]) { s.pos = V(views[i].pos); s.look = V(views[i].look); } });
+    }
+    finishTour(stops);
     void st;
   }
 
@@ -1529,16 +1935,17 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
   function resize() {
     const parent = canvas.parentElement; const w = parent.clientWidth || 800, hgt = parent.clientHeight || 500;
     if (canvas.width !== Math.round(w * renderer.getPixelRatio()) || canvas.height !== Math.round(hgt * renderer.getPixelRatio())) { renderer.setSize(w, hgt, false); camera.aspect = w / hgt; camera.updateProjectionMatrix(); }
+    PT.scale.value = canvas.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)); PT.pr.value = renderer.getPixelRatio();
   }
   new ResizeObserver(resize).observe(canvas.parentElement);
   let pulse = 0;
   function frame() {
     const dt = Math.min(0.1, clock.getDelta());
     resize();
-    if (camTween) { camTween.t += dt; const k = Math.min(1, camTween.t / camTween.dur), e = k * k * (3 - 2 * k); camera.position.lerpVectors(camTween.p0, camTween.p1, e); orbit.target.lerpVectors(camTween.l0, camTween.l1, e); if (k >= 1) camTween = null; }
+    if (camTween) { const k = Math.min(1, (performance.now() - camTween.t0) / 1000 / camTween.dur), e = k * k * (3 - 2 * k); camera.position.lerpVectors(camTween.p0, camTween.p1, e); orbit.target.lerpVectors(camTween.l0, camTween.l1, e); if (k >= 1) camTween = null; }
     if (mode.walk) stepWalk(dt); else if (tour.running) tour.step(dt); else orbit.update();
     // doors
-    for (const l of doorLeaves) { const target = (l.target || 0) * THREE.MathUtils.degToRad(125) * -l.side; const cur = l.hinge.rotation.y; l.hinge.rotation.y = reduce ? target : cur + (target - cur) * Math.min(1, dt * 3); }
+    for (const l of doorLeaves) { const target = (l.target || 0) * THREE.MathUtils.degToRad(125) * -l.side; const cur = l.hinge.rotation.y; if (Math.abs(target - cur) > 1e-3) renderer.shadowMap.needsUpdate = true; l.hinge.rotation.y = reduce ? target : cur + (target - cur) * Math.min(1, dt * 3); }
     // fans
     if (!reduce) for (const u of dryCoolers) for (const f of u.userData.fans || []) f.rotation.y += dt * 6 * ((u.userData.fanPct || 0) / 100);
     if (!reduce) for (const u of coolingUnits) if (u.userData.fan) u.userData.fan.rotation.z += dt * 8 * ((u.userData.fanPct || 0) / 100);
@@ -1565,7 +1972,7 @@ export function createScene(canvas, { onSelect, caption, walkHint } = {}) {
     // Rev 2: counts of the dense-row parts and the BEN 1 contents, for tests and the tour
     rev2Objects: () => { const n = (t) => pickables.filter(o => o.userData && o.userData.type === t).length; return { mini: !!G.mini, form: G.form, dense: !!G.dense, fancoils: n('fancoil'), cdus: n('cdu'), ups: n('ups'), batteries: n('battery'), switchgear: n('switchgear'), skid: !!objects.skid, aiBoxes: n('ai_box'), pods: n('pod'), desk: !!objects.desk, fans: n('cooling') }; }, clusterObjects: () => ({ cluster: !!G.cluster, modules: G.cluster ? G.cluster.modules : 0, transformers: pickables.filter(o => o.userData && o.userData.type === 'transformer').length, mvswgr: !!objects.mvswgr, yard: !!objects.yard, skids: pickables.filter(o => o.userData && o.userData.type === 'skid').length, cdus: pickables.filter(o => o.userData && o.userData.type === 'cdu').length }),
     hallObjects: () => ({ powermodule: !!objects.pm, transformers: pickables.filter(o => o.userData && o.userData.type === 'transformer').length, generators: pickables.filter(o => o.userData && o.userData.type === 'generator').length, fanwalls: pickables.filter(o => o.userData && o.userData.type === 'fanwall').length, plinth: !!objects.plinth, vestibule: !!objects.vestibule }),
-    mode, camera, objects, G,
+    mode, camera, objects, G, renderer, three: scene, solidBoxes: () => solidBoxes().map(b => [b.min.toArray(), b.max.toArray()]),
     focus(sel) { // orbit camera to an object
       const obj = targetObject(sel); if (!obj) return; const c = new THREE.Box3().setFromObject(obj).getCenter(new THREE.Vector3());
       mode.cutaway = true; applyCutaway(); const dir = new THREE.Vector3(0.6, 0.5, -1).normalize(); exitWalk(); tour.stop(false);
