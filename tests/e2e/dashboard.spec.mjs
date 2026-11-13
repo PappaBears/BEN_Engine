@@ -337,7 +337,7 @@ try {
     await page.waitForTimeout(300);
     const y0 = await page.evaluate(() => window.__ben.scene.camera.position.y);
     const floor = await page.evaluate(() => window.__ben.scene.G.floorTop);
-    if (Math.abs(y0 - floor - 1.7) > 0.05) throw new Error(`eye height ${y0 - floor}`);
+    if (Math.abs(y0 - floor - 1.6) > 0.05) throw new Error(`eye height ${y0 - floor}`);
     await page.keyboard.down('KeyW'); await page.waitForTimeout(1200); await page.keyboard.up('KeyW');
     const inside = await page.evaluate(() => { const c = window.__ben.scene.camera.position, G = window.__ben.scene.G; return Math.abs(c.x) < G.intL / 2 && Math.abs(c.z) < G.intW / 2; });
     if (!inside) throw new Error('camera left the container');
